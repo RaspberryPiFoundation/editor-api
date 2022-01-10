@@ -29,7 +29,7 @@ ActiveRecord::Schema.define(version: 2021_12_21_135519) do
   create_table "projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id"
     t.string "name"
-    t.string "identifier"
+    t.string "identifier", null: false
     t.string "project_type", default: "python", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
