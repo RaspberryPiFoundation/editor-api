@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe Project, type: :model do
@@ -5,8 +7,13 @@ RSpec.describe Project, type: :model do
     it { is_expected.to have_many(:components) }
   end
 
-  context 'not null' do
+  describe 'identifier not nil' do
     subject { Project.new }
-    it { should validate_uniqueness_of(:identifier) }
+    it { is_expected.not_to allow_value(nil).for(:identifier)}
+  end
+
+  describe 'identifier unique' do
+    before {FactoryBot.build(:project)}
+    it {should validate_uniqueness_of(:identifier)}
   end
 end
