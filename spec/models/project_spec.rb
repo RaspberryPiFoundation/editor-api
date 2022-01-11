@@ -12,7 +12,7 @@ RSpec.describe Project, type: :model do
     it { is_expected.not_to allow_value(nil).for(:identifier)}
   end
 
-  describe 'identifier unique' do
+  context 'identifier unique' do
     before {FactoryBot.build(:project)}
     it {should validate_uniqueness_of(:identifier)}
   end
