@@ -1,9 +1,9 @@
+require 'phrase_identifier'
+
 class Project < ApplicationRecord
   before_validation :check_unique_not_null, on: :create
   validates :identifier, presence: true, uniqueness: true
   has_many :components, dependent: :destroy
-
-  require 'phrase_identifier'
 
   private
     def check_unique_not_null

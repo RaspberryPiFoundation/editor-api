@@ -14,8 +14,7 @@ RSpec.describe Project, type: :model do
 
   describe 'identifier unique' do
     it do
-      project1=FactoryBot.build(:project)
-      project1.save
+      project1=FactoryBot.create(:project)
       project2=FactoryBot.build(:project, identifier: project1.identifier)
       expect {project2.valid?}.to change {project2.identifier}
     end
