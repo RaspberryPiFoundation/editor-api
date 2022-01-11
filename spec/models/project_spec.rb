@@ -9,14 +9,14 @@ RSpec.describe Project, type: :model do
 
   describe 'identifier not nil' do
     subject { FactoryBot.build(:project) }
-    it { is_expected.not_to allow_value(nil).for(:identifier)}
+    it { is_expected.not_to allow_value(nil).for(:identifier) }
   end
 
   describe 'identifier unique' do
     it do
-      project1=FactoryBot.create(:project)
-      project2=FactoryBot.build(:project, identifier: project1.identifier)
-      expect {project2.valid?}.to change {project2.identifier}
+      project1 = FactoryBot.create(:project)
+      project2 = FactoryBot.build(:project, identifier: project1.identifier)
+      expect { project2.valid? }.to change { project2.identifier }
     end
   end
 end
