@@ -17,15 +17,15 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  host: db
-  username: postgres
-  password: password
   # For details on connection pooling, see Rails configuration guide
   # https://guides.rubyonrails.org/configuring.html#database-pooling
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
 
 development:
   <<: *default
+  host: db
+  username: postgres
+  password: password
   database: choco_cake_development
 
   # The specified database role being used to connect to postgres.
@@ -84,6 +84,5 @@ test:
 #
 production:
   <<: *default
-  database: choco_cake_production
-  username: app
-  password: <%= ENV["APP_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
+
