@@ -3,7 +3,7 @@ namespace :projects do
   task create_starter: :environment do
 
     Project.find_by(identifier: "python-hello-starter")&.destroy
-    project = Project.new(identifier: "python-hello-starter", name: "Hello World!")
+    project = Project.new(identifier: "python-hello-starter", name: "Hello 🌍🌎🌏")
     project.components << Component.new(name: "main", extension: "py", content: main_content)
     project.components << Component.new(name: "emoji", extension: "py", content: emoji_content)
     project.components << Component.new(name: "noemoji", extension: "py", content: no_emoji_content)
@@ -32,7 +32,6 @@ from random import randint
 
 # Put code to run under here
 
-print('Hello ', world)
     END
 end
 
