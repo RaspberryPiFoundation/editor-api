@@ -1,0 +1,72 @@
+jobs:
+  # Project has lots of rubocop fixing to do. Enable this once fixed in separate pr.
+  # rubocop:
+  #   docker:
+  #     - image: 'cimg/ruby:3.0.3'
+  #   steps:
+  #     - checkout
+  #     - ruby/install-deps
+  #     - ruby/rubocop-check:
+  #         format: progress
+  #         label: Inspecting with Rubocop
+
+  test:
+    docker:
+      - image: 'cimg/ruby:3.0.3-browsers'
+      - image: 'circleci/postgres:12.0-alpine-ram'
+        environment:
+          POSTGRES_DB: choco_cake_test
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: choco
+      - image: 'circleci/redis:6.2-alpine'
+
+    environment:
+      BUNDLE_JOBS: '3'
+      BUNDLE_RETRY: '3'
+      PAGER: ''
+      POSTGRES_DB: choco_cake_test
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: choco
+      POSTGRES_HOST: "127.0.0.1"
+      RAILS_ENV: test
+    steps:
+      - checkout
+      # - browser-tools/install-firefox
+      - ruby/install-deps
+      - run:
+          command: 'dockerize -wait tcp://localhost:5432 -timeout 1m'
+          name: Wait for DB
+      - run:
+          command: 'sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client jq curl imagemagick'
+          name: Install postgres client, jq, curl, imagemagick
+      - run:
+          command: 'bin/rails db:setup --trace'
+          name: Database setup
+      - ruby/rspec-test
+      - store_artifacts:
+          path: coverage
+      - run:
+          name: Post test coverage to Github
+          command: bash -ue .circleci/record_coverage
+          when: always
+
+orbs:
+  browser-tools: circleci/browser-tools@1
+  node: circleci/node@4
+  ruby: circleci/ruby@1.3
+
+version: 2.1
+
+workflows:
+  # code_quality:
+  #   jobs:
+  #     - rubocop:
+  #         filters:
+  #           branches:
+  #             ignore:
+  #               - master
+  #               - main
+  test:
+    jobs:
+      - test:
+          context: raspberrypigithubbot
