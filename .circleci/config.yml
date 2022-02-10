@@ -31,7 +31,7 @@ jobs:
       RAILS_ENV: test
     steps:
       - checkout
-      - browser-tools/install-firefox
+      # - browser-tools/install-firefox
       - ruby/install-deps
       - run:
           command: 'dockerize -wait tcp://localhost:5432 -timeout 1m'
