@@ -32,23 +32,15 @@ jobs:
       - checkout
       - browser-tools/install-firefox
       - ruby/install-deps
-      - node/install-packages:
-          pkg-manager: yarn
       - run:
           command: 'dockerize -wait tcp://localhost:5432 -timeout 1m'
           name: Wait for DB
-      - run:
-          command: 'cp .env.example .env'
-          name: Copy example environment
       - run:
           command: 'sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client jq curl imagemagick'
           name: Install postgres client, jq, curl, imagemagick
       - run:
           command: 'bin/rails db:setup --trace'
           name: Database setup
-      - run:
-          name: Checking factory bot factories
-          command: bundle exec rake factory_bot:lint
       - ruby/rspec-test
       - store_artifacts:
           path: coverage
