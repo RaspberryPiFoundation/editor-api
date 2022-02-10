@@ -58,14 +58,14 @@ orbs:
 version: 2.1
 
 workflows:
-  code_quality:
-    jobs:
-      - rubocop:
-          filters:
-            branches:
-              ignore:
-                - master
-                - main
+  # code_quality:
+  #   jobs:
+  #     - rubocop:
+  #         filters:
+  #           branches:
+  #             ignore:
+  #               - master
+  #               - main
   test:
     jobs:
       - test:
