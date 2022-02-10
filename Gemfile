@@ -22,6 +22,7 @@ group :development, :test do
   gem 'rspec_junit_formatter'
   gem 'rspec-rails'
   gem 'rubocop'
+  gem 'simplecov', require: false
 end
 
 group :development do
