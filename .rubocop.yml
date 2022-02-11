@@ -1,0 +1,16 @@
+---
+inherit_from:
+  - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-base.yml
+  - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rails.yml
+  - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rspec.yml
+  - .rubocop_todo.yml
+
+# RPF Digital Products house styles
+
+  # Include your pre-existing rubocop_todo.yaml here, if you have one.
+  # - .rubocop_todo.yml
+
+# Allow the Exclude arrays to be merged.
+inherit_mode:
+  merge:
+    - Exclude

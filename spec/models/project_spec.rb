@@ -9,7 +9,7 @@ RSpec.describe Project, type: :model do
 
   describe 'identifier not nil' do
     it 'generates an identifier if not present' do
-      proj = FactoryBot.build(:project, identifier: nil)
+      proj = build(:project, identifier: nil)
       expect { proj.valid? }
         .to change { proj.identifier.nil? }
         .from(true)
@@ -19,8 +19,8 @@ RSpec.describe Project, type: :model do
 
   describe 'identifier unique' do
     it do
-      project1 = FactoryBot.create(:project)
-      project2 = FactoryBot.build(:project, identifier: project1.identifier)
+      project1 = create(:project)
+      project2 = build(:project, identifier: project1.identifier)
       expect { project2.valid? }.to change(project2, :identifier)
     end
   end
