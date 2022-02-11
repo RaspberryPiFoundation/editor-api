@@ -1,19 +1,19 @@
 # frozen_string_literal: true
 require 'yaml'
 
+
 namespace :projects do
   desc 'Import starter projects'
   task create_starter: :environment do
-
-    Dir.each_child("#{File.dirname(__FILE__)}/project_components") do |dir_name|
-      config = YAML.safe_load(File.open("#{File.dirname(__FILE__)}/project_components/#{dir_name}/project_config.yml").read)
+    Dir.each_child("#{File.dirname(__FILE__)}/project_components") do |dir|
+      config = YAML.safe_load(File.open("#{File.dirname(__FILE__)}/project_components/#{dir}/project_config.yml").read)
       Project.find_by(identifier: config['IDENTIFIER'])&.destroy
       new_project = Project.new(identifier: config['IDENTIFIER'], name: config['NAME'])
       num_extra_components = 0
 
-      Dir.each_child("#{File.dirname(__FILE__)}/project_components/#{dir_name}") do |component|
+      Dir.each_child("#{File.dirname(__FILE__)}/project_components/#{dir}") do |component|
         if component != 'project_config.yml'
-          file = File.open(File.dirname(__FILE__) + "/project_components/#{dir_name}/#{component}")
+          file = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{component}")
           code = file.read
           file.close
           name = component.split('.')[0]
