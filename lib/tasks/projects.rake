@@ -12,23 +12,19 @@ namespace :projects do
       num_extra_components = 0
 
       Dir.each_child("#{File.dirname(__FILE__)}/project_components/#{dir}") do |component|
-        if component == 'project_config.yml'
-          next
+        next if component == 'project_config.yml'
+
+        code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{component}")
+        name = component.split('.')[0]
+        extension = component.split('.').drop(1).join('.')
+        if component == 'main.py'
+          index = 0
+        else
+          num_extra_components += 1
+          index = num_extra_components
         end
-          file = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{component}")
-          code = file.read
-          file.close
-          name = component.split('.')[0]
-          extension = component.split('.').drop(1).join('.')
-          if component == 'main.py'
-            index = 0
-          else
-            num_extra_components += 1
-            index = num_extra_components
-          end
-          new_component = Component.new(name: name, extension: extension, content: code, index: index)
-          new_project.components << new_component
-        # end
+        new_component = Component.new(name: name, extension: extension, content: code, index: index)
+        new_project.components << new_component
       end
       new_project.save
     end
