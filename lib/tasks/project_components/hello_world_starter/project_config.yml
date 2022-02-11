@@ -1,2 +1,15 @@
 NAME: "Hello 🌍🌎🌏"
 IDENTIFIER: "python-hello-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+  - name: "emoji"
+    extension: "py"
+    location: "emoji.py"
+    index: 1
+  - name: "noemoji"
+    extension: "py"
+    location: "noemoji.py"
+    index: 2

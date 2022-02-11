@@ -1,2 +1,7 @@
 NAME: "Target Practice"
 IDENTIFIER: "python-archery-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
