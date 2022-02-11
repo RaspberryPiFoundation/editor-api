@@ -6,10 +6,10 @@ namespace :projects do
   desc 'Import starter projects'
   task create_starter: :environment do
     Dir.each_child("#{File.dirname(__FILE__)}/project_components") do |dir|
-      project_config = YAML.safe_load(File.open("#{File.dirname(__FILE__)}/project_components/#{dir}/project_config.yml").read)
-      Project.find_by(identifier: project_config['IDENTIFIER'])&.destroy
-      new_project = Project.new(identifier: project_config['IDENTIFIER'], name: project_config['NAME'])
-      components = project_config["COMPONENTS"]
+      proj_config = YAML.safe_load(File.read("#{File.dirname(__FILE__)}/project_components/#{dir}/project_config.yml"))
+      Project.find_by(identifier: proj_config['IDENTIFIER'])&.destroy
+      new_project = Project.new(identifier: proj_config['IDENTIFIER'], name: proj_config['NAME'])
+      components = proj_config['COMPONENTS']
       components.each do |component|
         name = component['name']
         extension = component['extension']
