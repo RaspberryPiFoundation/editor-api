@@ -27,7 +27,7 @@ module Api
       @project.components << Component.new(python_component)
       @project.save
 
-      render '/api/projects/show', status: 201
+      render '/api/projects/show', status: :created
     end
 
     private

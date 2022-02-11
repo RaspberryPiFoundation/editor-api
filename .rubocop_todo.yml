@@ -30,20 +30,6 @@ RSpec/EmptyExampleGroup:
   Exclude:
     - 'spec/models/component_spec.rb'
 
-# Offense count: 3
-# Cop supports --auto-correct.
-RSpec/FactoryBot/SyntaxMethods:
-  Exclude:
-    - 'spec/models/project_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: EnforcedStyle.
-# SupportedStyles: numeric, symbolic
-Rails/HttpStatus:
-  Exclude:
-    - 'app/controllers/api/default_projects_controller.rb'
-
 # Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
