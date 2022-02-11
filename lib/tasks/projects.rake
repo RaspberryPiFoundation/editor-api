@@ -1,6 +1,6 @@
 # frozen_string_literal: true
-require 'yaml'
 
+require 'yaml'
 
 namespace :projects do
   desc 'Import starter projects'
@@ -12,7 +12,9 @@ namespace :projects do
       num_extra_components = 0
 
       Dir.each_child("#{File.dirname(__FILE__)}/project_components/#{dir}") do |component|
-        if component != 'project_config.yml'
+        if component == 'project_config.yml'
+          next
+        end
           file = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{component}")
           code = file.read
           file.close
@@ -26,7 +28,7 @@ namespace :projects do
           end
           new_component = Component.new(name: name, extension: extension, content: code, index: index)
           new_project.components << new_component
-        end
+        # end
       end
       new_project.save
     end
