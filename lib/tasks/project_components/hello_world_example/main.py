@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from emoji import * 
+from noemoji import * 
 from datetime import *
 from random import randint
 
