@@ -1,7 +1,8 @@
+# frozen_string_literal: true
 require 'yaml'
 
 namespace :projects do
-  desc "Import starter projects"
+  desc 'Import starter projects'
   task create_starter: :environment do
     
     Dir.each_child("#{File.dirname(__FILE__)}/project_components") do |dir_name|

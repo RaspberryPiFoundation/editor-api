@@ -1,14 +1,13 @@
 jobs:
-  # Project has lots of rubocop fixing to do. Enable this once fixed in separate pr.
-  # rubocop:
-  #   docker:
-  #     - image: 'cimg/ruby:3.0.3'
-  #   steps:
-  #     - checkout
-  #     - ruby/install-deps
-  #     - ruby/rubocop-check:
-  #         format: progress
-  #         label: Inspecting with Rubocop
+  rubocop:
+    docker:
+      - image: 'cimg/ruby:3.0.3'
+    steps:
+      - checkout
+      - ruby/install-deps
+      - ruby/rubocop-check:
+          format: progress
+          label: Inspecting with Rubocop
 
   test:
     docker:
@@ -58,14 +57,14 @@ orbs:
 version: 2.1
 
 workflows:
-  # code_quality:
-  #   jobs:
-  #     - rubocop:
-  #         filters:
-  #           branches:
-  #             ignore:
-  #               - master
-  #               - main
+  code_quality:
+    jobs:
+      - rubocop:
+          filters:
+            branches:
+              ignore:
+                - master
+                - main
   test:
     jobs:
       - test:

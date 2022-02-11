@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2022_02_11_102958) do
     t.string "project_type", default: "python", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.index ["identifier"], name: "index_projects_on_identifier"
+    t.index ["identifier"], name: "index_projects_on_identifier", unique: true
   end
 
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
