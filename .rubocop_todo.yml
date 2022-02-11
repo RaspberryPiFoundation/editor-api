@@ -6,13 +6,6 @@
 # Note that changes in the inspected code, or installation of new
 # versions of RuboCop, may require this file to be generated again.
 
-# Offense count: 2
-# Configuration parameters: AllowComments, AllowEmptyLambdas.
-Lint/EmptyBlock:
-  Exclude:
-    - 'Gemfile'
-    - 'spec/models/component_spec.rb'
-
 # Offense count: 4
 Lint/UselessAssignment:
   Exclude:
@@ -24,15 +17,3 @@ Lint/UselessAssignment:
 Naming/HeredocDelimiterNaming:
   Exclude:
     - 'lib/tasks/projects.rake'
-
-# Offense count: 1
-RSpec/EmptyExampleGroup:
-  Exclude:
-    - 'spec/models/component_spec.rb'
-
-# Offense count: 1
-# Cop supports --auto-correct.
-# Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
-# URISchemes: http, https
-Layout/LineLength:
-  Max: 192

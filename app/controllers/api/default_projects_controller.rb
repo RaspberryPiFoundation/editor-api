@@ -47,11 +47,15 @@ module Api
     end
 
     def html_project
+      content = <<~CON
+        <html>\n  <head>\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n
+          </head> <body>\n    <h1>Heading</h1>\n    <p>Paragraph</p>\n  </body>\n</html>
+      CON
+
       {
         type: 'html',
         components: [
-          { lang: 'html', name: 'index',
-            content: "<html>\n  <head>\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n  </head> <body>\n    <h1>Heading</h1>\n    <p>Paragraph</p>\n  </body>\n</html>" },
+          { lang: 'html', name: 'index', content: content },
           { lang: 'css', name: 'style', content: "h1 {\n  color: blue;\n}" },
           { lang: 'css', name: 'test', content: "p {\n  background-color: red;\n}" }
         ]
