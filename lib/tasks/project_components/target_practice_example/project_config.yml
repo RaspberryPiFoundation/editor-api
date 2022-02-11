@@ -1,0 +1,7 @@
+NAME: "Target Practice Example"
+IDENTIFIER: "python-archery-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
