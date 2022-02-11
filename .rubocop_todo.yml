@@ -45,13 +45,6 @@ Rails/HttpStatus:
     - 'app/controllers/api/default_projects_controller.rb'
 
 # Offense count: 1
-# Configuration parameters: Include.
-# Include: app/models/**/*.rb
-Rails/UniqueValidationWithoutIndex:
-  Exclude:
-    - 'app/models/project.rb'
-
-# Offense count: 1
 # Cop supports --auto-correct.
 # Configuration parameters: AllowHeredoc, AllowURI, URISchemes, IgnoreCopDirectives, IgnoredPatterns.
 # URISchemes: http, https
