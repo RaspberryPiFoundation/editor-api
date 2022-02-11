@@ -6,8 +6,7 @@ module Api
       require 'phrase_identifier'
 
       def show
-        projects = Project.all.includes(:components).order('components.index')
-        @project = projects.find_by!(identifier: params[:id])
+        @project = Project.find_by!(identifier: params[:id])
         render '/api/projects/show', formats: [:json]
       end
 
