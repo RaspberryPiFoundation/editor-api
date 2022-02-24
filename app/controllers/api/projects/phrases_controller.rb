@@ -21,24 +21,6 @@ module Api
         head :ok
       end
 
-      # def remix
-      #   puts '*'*50
-      #   puts "DBG: #{params}"
-      #   puts '*'*50
-      #   old = Project.find_by!(identifier: params[:phrase_id])
-      #
-      #   @project = old.dup
-      #   @project.identifier = PhraseIdentifier.generate
-      #
-      #   old.components.each do |component|
-      #     @project.components << component.dup
-      #   end
-      #
-      #   @project.save
-      #
-      #   render '/api/projects/show', formats: [:json]
-      # end
-
       private
 
       def project_params
