@@ -4,7 +4,7 @@ module Api
   module Projects
     class RemixesController < ApiController
       def create
-        result = Project::Operation::CreateRemix.call(params)
+        result = Project::Operation::CreateRemix.call(remix_params)
 
         if result.success?
           @project = result[:project]
