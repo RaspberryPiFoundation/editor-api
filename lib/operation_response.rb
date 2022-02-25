@@ -13,4 +13,3 @@ class OperationResponse < Hash
     true
   end
 end
-
