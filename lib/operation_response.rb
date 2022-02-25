@@ -8,8 +8,6 @@ class OperationResponse < Hash
   end
 
   def failure?
-    return false if self[:error].nil?
-
-    true
+    !success?
   end
 end
