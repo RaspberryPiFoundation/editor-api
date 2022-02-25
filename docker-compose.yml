@@ -18,6 +18,8 @@ services:
       - "3009:3009"
     depends_on:
       - db
+    stdin_open: true
+    tty: true
 
 volumes:
   pg-data:

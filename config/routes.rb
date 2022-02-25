@@ -14,7 +14,7 @@ Rails.application.routes.draw do
 
     namespace :projects do
       resources :phrases, only: %i[show update] do
-        post 'remix', to: 'phrases#remix'
+        resource :remix, only: %i[create]
       end
     end
   end
