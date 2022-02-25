@@ -17,5 +17,14 @@ RSpec.describe 'Remix requests', type: :request do
 
       expect(response.status).to eq(200)
     end
+
+    context 'when request is invalid' do
+      it 'returns error response' do
+        post "/api/projects/phrases/#{original_project.identifier}/remix",
+             params: { remix: { user_id: '' } }
+
+        expect(response.status).to eq(400)
+      end
+    end
   end
 end

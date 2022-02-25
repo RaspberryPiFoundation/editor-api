@@ -10,7 +10,7 @@ module Api
           @project = result[:project]
           render '/api/projects/show', formats: [:json]
         else
-          render json: { error: result[:error] }
+          render json: { error: result[:error] }, status: :bad_request
         end
       end
 
