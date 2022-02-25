@@ -3,8 +3,6 @@
 module Api
   module Projects
     class RemixesController < ApiController
-      # require 'phrase_identifier'
-
       def create
         result = Project::Operation::CreateRemix.call(params)
 
