@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2022_02_11_102958) do
+ActiveRecord::Schema.define(version: 2022_02_28_094815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
@@ -34,7 +34,9 @@ ActiveRecord::Schema.define(version: 2022_02_11_102958) do
     t.string "project_type", default: "python", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.bigint "remixed_from_id"
     t.index ["identifier"], name: "index_projects_on_identifier", unique: true
+    t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
   end
 
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
