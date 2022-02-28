@@ -34,7 +34,7 @@ ActiveRecord::Schema.define(version: 2022_02_28_094815) do
     t.string "project_type", default: "python", null: false
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
-    t.bigint "remixed_from_id"
+    t.uuid "remixed_from_id"
     t.index ["identifier"], name: "index_projects_on_identifier", unique: true
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
   end
