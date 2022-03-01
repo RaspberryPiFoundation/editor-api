@@ -16,21 +16,18 @@ RSpec.describe 'Remix requests', type: :request do
         mock_oauth_user
       end
 
-      it 'returns expected response' do
+      it 'returns success response' do
         post "/api/projects/phrases/#{original_project.identifier}/remix"
 
         expect(response.status).to eq(200)
       end
 
-      context 'when project not found' do
-        it 'returns expected response' do
-          post "/api/projects/phrases/no-such-project/remix"
+      it 'returns 404 response if invalid project' do
+        post '/api/projects/phrases/no-such-project/remix'
 
-          expect(response.status).to eq(404)
-        end
+        expect(response.status).to eq(404)
       end
     end
-
 
     context 'when auth is invalid' do
       it 'returns unauthorized' do
