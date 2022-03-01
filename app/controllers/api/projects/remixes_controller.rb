@@ -19,7 +19,7 @@ module Api
       private
 
       def remix_params
-        params.permit(:phrase_id, remix: [:user_id])
+        params.permit(:phrase_id)
       end
     end
   end
