@@ -11,19 +11,32 @@ RSpec.describe 'Remix requests', type: :request do
       mock_phrase_generation
     end
 
-    it 'returns expected response' do
-      post "/api/projects/phrases/#{original_project.identifier}/remix",
-           params: { remix: { user_id: user_id } }
+    context 'when auth is correct' do
+      before do
+        mock_oauth_user
+      end
 
-      expect(response.status).to eq(200)
+      it 'returns expected response' do
+        post "/api/projects/phrases/#{original_project.identifier}/remix"
+
+        expect(response.status).to eq(200)
+      end
+
+      context 'when project not found' do
+        it 'returns expected response' do
+          post "/api/projects/phrases/no-such-project/remix"
+
+          expect(response.status).to eq(404)
+        end
+      end
     end
 
-    context 'when request is invalid' do
-      it 'returns error response' do
-        post "/api/projects/phrases/#{original_project.identifier}/remix",
-             params: { remix: { user_id: '' } }
 
-        expect(response.status).to eq(400)
+    context 'when auth is invalid' do
+      it 'returns unauthorized' do
+        post "/api/projects/phrases/#{original_project.identifier}/remix"
+
+        expect(response.status).to eq(401)
       end
     end
   end

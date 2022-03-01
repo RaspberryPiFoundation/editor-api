@@ -3,8 +3,10 @@
 module Api
   module Projects
     class RemixesController < ApiController
+      before_action :require_oauth_user
+
       def create
-        result = Project::Operation::CreateRemix.call(remix_params)
+        result = Project::Operation::CreateRemix.call(remix_params, oauth_user_id)
 
         if result.success?
           @project = result[:project]
