@@ -24,12 +24,11 @@ class Project
         end
 
         def create_remix(original_project, params)
-          remixed_project = original_project.dup.tap do |proj|
+          original_project.dup.tap do |proj|
             proj.user_id = params[:remix][:user_id]
             proj.components = original_project.components.map(&:dup)
             proj.remixed_from_id = original_project.id
           end
-          remixed_project
         end
 
         def remix_project(response, params)
