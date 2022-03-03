@@ -6,6 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '3.0.3'
 
 gem 'bootsnap', require: false
+gem 'faraday'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'pg', '~> 1.1'
@@ -32,4 +33,5 @@ end
 
 group :test do
   gem 'shoulda-matchers', '~> 5.0'
+  gem 'webmock'
 end
