@@ -17,15 +17,7 @@ module Api
           components = project_params[:components]
 
           components.each do |comp_params|
-            if !comp_params[:id].nil?
-              component = Component.find(comp_params[:id])
-              component.update(comp_params)
-            elsif !comp_params[:content].nil?
-              @project.components << Component.new(comp_params)
-              @project.save
-            else
-              next
-            end
+            update_component(comp_params)
           end
           head :ok
         else
@@ -37,6 +29,16 @@ module Api
 
       def project_params
         params.require(:project).permit(:identifier, :type, components: %i[id name extension content])
+      end
+
+      def update_component(comp_params)
+        if !comp_params[:id].nil?
+          component = Component.find(comp_params[:id])
+          component.update(comp_params)
+        elsif !comp_params[:content].nil?
+          @project.components << Component.new(comp_params)
+          @project.save
+        end
       end
     end
   end
