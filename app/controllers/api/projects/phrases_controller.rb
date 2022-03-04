@@ -20,9 +20,11 @@ module Api
             if !comp_params[:id].nil?
               component = Component.find(comp_params[:id])
               component.update(comp_params)
-            else
+            elsif !comp_params[:content].nil?
               @project.components << Component.new(comp_params)
               @project.save
+            else
+              next
             end
           end
           head :ok
