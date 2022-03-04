@@ -23,14 +23,6 @@ class Project
           response[:error] = 'Invalid parameters' unless valid
         end
 
-        def create_remix(original_project, user_id)
-          original_project.dup.tap do |proj|
-            proj.user_id = user_id
-            proj.components = original_project.components.map(&:dup)
-            proj.remixed_from_id = original_project.id
-          end
-        end
-
         def remix_project(response, params, user_id)
           original_project = Project.find_by!(identifier: params[:phrase_id])
 
@@ -38,6 +30,14 @@ class Project
 
           response[:error] = 'Unable to create project' unless response[:project].save
           response
+        end
+
+        def create_remix(original_project, user_id)
+          original_project.dup.tap do |proj|
+            proj.user_id = user_id
+            proj.components = original_project.components.map(&:dup)
+            proj.remixed_from_id = original_project.id
+          end
         end
       end
     end
