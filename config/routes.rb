@@ -13,9 +13,7 @@ Rails.application.routes.draw do
     end
 
     resources :projects, only: %i[show update] do
-      resources :phrases, only: %i[show update] do
-        resource :remix, only: %i[create]
-      end
+      resource :remix, only: %i[create], controller: 'projects/remixes'
     end
   end
 end

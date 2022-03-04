@@ -14,6 +14,7 @@ services:
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3009 -b '0.0.0.0'"
     volumes:
       - .:/app
+      - bundle:/usr/local/bundle
     ports:
       - "3009:3009"
     depends_on:
@@ -22,4 +23,5 @@ services:
     tty: true
 
 volumes:
-  pg-data:
+  pg-data: null
+  bundle: null

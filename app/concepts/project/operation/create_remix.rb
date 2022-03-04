@@ -19,12 +19,12 @@ class Project
         private
 
         def validate_params(response, params, user_id)
-          valid = params[:phrase_id].present? && user_id.present?
+          valid = params[:project_id].present? && user_id.present?
           response[:error] = 'Invalid parameters' unless valid
         end
 
         def remix_project(response, params, user_id)
-          original_project = Project.find_by!(identifier: params[:phrase_id])
+          original_project = Project.find_by!(identifier: params[:project_id])
 
           response[:project] = create_remix(original_project, user_id)
 
