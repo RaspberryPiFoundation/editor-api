@@ -14,7 +14,7 @@ module Api
       def update
         @project = Project.find_by!(identifier: params[:id])
 
-        if oauth_user_id && oauth_user_id==@project.user_id
+        if oauth_user_id && oauth_user_id == @project.user_id
           components = project_params[:components]
 
           components.each do |comp_params|
