@@ -8,7 +8,6 @@ class ApiController < ActionController::API
     rescue_from CanCan::AccessDenied, with: -> { return401 }
   end
 
-
   private
 
   def require_oauth_user

@@ -30,7 +30,6 @@ RSpec.describe 'Project update requests', type: :request do
 
   context 'when authed user is not creator' do
     let(:project) { create(:project) }
-    let!(:component) { create(:component, project: project) }
     let(:params) { { project: { components: [] } } }
 
     before do
