@@ -17,8 +17,13 @@ module Api
           components = project_params[:components]
 
           components.each do |comp_params|
-            component = Component.find(comp_params[:id])
-            component.update(comp_params)
+            if !comp_params[:id].nil?
+              component = Component.find(comp_params[:id])
+              component.update(comp_params)
+            else
+              @project.components << Component.new(comp_params)
+              @project.save
+            end
           end
           head :ok
         else
