@@ -28,6 +28,21 @@ RSpec.describe 'Project update requests', type: :request do
     end
   end
 
+  context 'when authed user is not creator' do
+    let(:project) { create(:project) }
+    let!(:component) { create(:component, project: project) }
+    let(:params) { { project: { components: [] } } }
+
+    before do
+      mock_oauth_user(user_id)
+    end
+
+    it 'returns unauthorized response' do
+      put "/api/projects/#{project.identifier}", params: params
+      expect(response.status).to eq(401)
+    end
+  end
+
   context 'when auth is invalid' do
     it 'returns unauthorized' do
       put "/api/projects/#{project.identifier}"

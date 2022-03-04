@@ -13,18 +13,14 @@ module Api
 
     def update
       @project = Project.find_by!(identifier: params[:id])
+      authorize! :update, @project
 
-      if oauth_user_id && oauth_user_id == @project.user_id
-        components = project_params[:components]
-
-        components.each do |comp_params|
-          component = Component.find(comp_params[:id])
-          component.update(comp_params)
-        end
-        head :ok
-      else
-        head :unauthorized
+      components = project_params[:components]
+      components.each do |comp_params|
+        component = Component.find(comp_params[:id])
+        component.update(comp_params)
       end
+      head :ok
     end
 
     private
