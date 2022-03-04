@@ -7,7 +7,6 @@ module Api
 
       def show
         @project = Project.find_by!(identifier: params[:id])
-        @user_id = oauth_user_id
         render '/api/projects/show', formats: [:json]
       end
 
