@@ -4,6 +4,6 @@ FactoryBot.define do
   factory :component do
     name { Faker::Lorem.word }
     extension { 'py' }
-    sequence (:index) { |n| n }
+    sequence(:index) { |n| n }
   end
 end
