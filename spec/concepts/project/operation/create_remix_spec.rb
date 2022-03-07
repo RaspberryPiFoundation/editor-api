@@ -14,7 +14,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
 
   describe '.call' do
     context 'when all params valid' do
-      let(:params) { { phrase_id: original_project.identifier } }
+      let(:params) { { project_id: original_project.identifier } }
 
       it 'returns success' do
         result = create_remix
@@ -54,7 +54,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
 
     context 'when user_id is not present' do
       let(:user_id) { nil }
-      let(:params) { { phrase_id: original_project.identifier } }
+      let(:params) { { project_id: original_project.identifier } }
 
       it 'returns failure' do
         result = create_remix

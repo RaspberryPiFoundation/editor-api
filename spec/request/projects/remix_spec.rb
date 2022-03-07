@@ -17,13 +17,13 @@ RSpec.describe 'Remix requests', type: :request do
       end
 
       it 'returns success response' do
-        post "/api/projects/phrases/#{original_project.identifier}/remix"
+        post "/api/projects/#{original_project.identifier}/remix"
 
         expect(response.status).to eq(200)
       end
 
       it 'returns 404 response if invalid project' do
-        post '/api/projects/phrases/no-such-project/remix'
+        post '/api/projects/no-such-project/remix'
 
         expect(response.status).to eq(404)
       end
@@ -31,7 +31,7 @@ RSpec.describe 'Remix requests', type: :request do
 
     context 'when auth is invalid' do
       it 'returns unauthorized' do
-        post "/api/projects/phrases/#{original_project.identifier}/remix"
+        post "/api/projects/#{original_project.identifier}/remix"
 
         expect(response.status).to eq(401)
       end
