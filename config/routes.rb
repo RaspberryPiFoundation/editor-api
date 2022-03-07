@@ -12,10 +12,8 @@ Rails.application.routes.draw do
       get '/python', to: 'default_projects#python'
     end
 
-    namespace :projects do
-      resources :phrases, only: %i[show update] do
-        resource :remix, only: %i[create]
-      end
+    resources :projects, only: %i[show update] do
+      resource :remix, only: %i[create], controller: 'projects/remixes'
     end
   end
 end
