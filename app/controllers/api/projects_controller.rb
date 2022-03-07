@@ -3,16 +3,15 @@
 module Api
   class ProjectsController < ApiController
     require 'phrase_identifier'
-
     before_action :require_oauth_user, only: %i[update]
+    before_action :load_project
+    load_and_authorize_resource
 
     def show
-      @project = Project.find_by!(identifier: params[:id])
       render :show, formats: [:json]
     end
 
     def update
-      @project = Project.find_by!(identifier: params[:id])
       authorize! :update, @project
 
       components = project_params[:components]
@@ -24,6 +23,10 @@ module Api
     end
 
     private
+
+    def load_project
+      @project = Project.find_by!(identifier: params[:id])
+    end
 
     def project_params
       params.require(:project)
