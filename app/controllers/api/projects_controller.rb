@@ -12,8 +12,6 @@ module Api
     end
 
     def update
-      authorize! :update, @project
-
       components = project_params[:components]
       components.each do |comp_params|
         component = Component.find(comp_params[:id])
