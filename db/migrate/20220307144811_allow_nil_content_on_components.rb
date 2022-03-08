@@ -4,6 +4,6 @@ class AllowNilContentOnComponents < ActiveRecord::Migration[7.0]
   end
 
   def down
-    change_column :components, :content, :string, null: false
+    raise ActiveRecord::IrreversibleMigration
   end
 end

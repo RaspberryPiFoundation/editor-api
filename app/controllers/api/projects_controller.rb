@@ -12,6 +12,7 @@ module Api
     end
 
     def update
+      result = Project::Operation::Update.(project_params, @project)
       components = project_params[:components]
       components.each do |comp_params|
         component = Component.find(comp_params[:id])
@@ -28,9 +29,8 @@ module Api
 
     def project_params
       params.require(:project)
-            .permit(:identifier,
-                    :type,
-                    components: %i[id name extension content])
+            .permit(:name,
+                    components: %i[id name extension content index])
     end
   end
 end

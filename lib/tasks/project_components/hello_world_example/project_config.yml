@@ -5,11 +5,14 @@ COMPONENTS:
     extension: "py"
     location: "main.py"
     index: 0
+    default: true
   - name: "emoji"
     extension: "py"
     location: "emoji.py"
     index: 1
+    default: false
   - name: "noemoji"
     extension: "py"
     location: "noemoji.py"
     index: 2
+    default: false
