@@ -9,12 +9,8 @@ class Project
         response = setup_response(project)
 
         setup_deletions(response, params)
-
         update_project_attributes(response, params)
         update_component_attributes(response, params)
-
-        return response if response.failure?
-
         persist_changes(response)
 
         response
