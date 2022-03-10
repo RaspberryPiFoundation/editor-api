@@ -20,9 +20,23 @@ RSpec.describe Component, type: :model do
         expect(component.valid?).to eq(false)
       end
 
+      it 'sets error message when name changed' do
+        component.name = 'updated'
+        component.valid?
+        expect(component.errors[:name])
+          .to include(I18n.t('errors.project.editing.change_default_name'))
+      end
+
       it 'returns valid? false when extension changed' do
         component.extension = 'txt'
         expect(component.valid?).to eq(false)
+      end
+
+      it 'sets error message when extension changed' do
+        component.extension = 'txt'
+        component.valid?
+        expect(component.errors[:extension])
+          .to include(I18n.t('errors.project.editing.change_default_extension'))
       end
     end
   end

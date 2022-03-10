@@ -13,6 +13,6 @@ class Component < ApplicationRecord
     return unless default?
 
     errors.add(:name, I18n.t('errors.project.editing.change_default_name')) if name_changed?
-    errors.add(:name, I18n.t('errors.project.editing.change_default_extension')) if extension_changed?
+    errors.add(:extension, I18n.t('errors.project.editing.change_default_extension')) if extension_changed?
   end
 end
