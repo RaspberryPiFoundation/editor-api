@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require '../../../app/lib/operation_response'
+require_relative '../../../app/lib/operation_response'
 
 RSpec.describe 'Project update requests', type: :request do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
