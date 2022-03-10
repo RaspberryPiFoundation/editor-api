@@ -14,8 +14,8 @@ FactoryBot.define do
 
       after(:create) do |object, evaluator|
         object.components << FactoryBot.create_list(:component,
-                                                   evaluator.component_count,
-                                                   project: object)
+                                                    evaluator.component_count,
+                                                    project: object)
       end
     end
 

@@ -12,13 +12,14 @@ module Api
     end
 
     def update
-      result = Project::Operation::Update.(project_params, @project)
-      components = project_params[:components]
-      components.each do |comp_params|
-        component = Component.find(comp_params[:id])
-        component.update(comp_params)
+      result = Project::Operation::Update.call(project_params, @project)
+
+      if result.success?
+        # TODO: render the updated project
+        head :ok
+      else
+        render json: { error: result[:error] }, status: :bad_request
       end
-      head :ok
     end
 
     private

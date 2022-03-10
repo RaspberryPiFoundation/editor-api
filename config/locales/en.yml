@@ -31,3 +31,9 @@
 
 en:
   hello: "Hello world"
+  errors:
+    project:
+      editing:
+        delete_default_component: 'Can not delete default file'
+        change_default_name: 'Can not amend default file name'
+        change_default_extension: 'Can not amend default file extension'
