@@ -15,7 +15,9 @@ namespace :projects do
         extension = component['extension']
         code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{component['location']}")
         index = component['index']
-        project_component = Component.new(name: name, extension: extension, content: code, index: index)
+        default = component['default']
+        project_component = Component.new(name: name, extension: extension, content: code, index: index,
+                                          default: default)
         new_project.components << project_component
       end
       new_project.save

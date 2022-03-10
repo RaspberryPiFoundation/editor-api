@@ -5,3 +5,4 @@ COMPONENTS:
     extension: "py"
     location: "main.py"
     index: 0
+    default: true

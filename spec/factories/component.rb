@@ -4,6 +4,14 @@ FactoryBot.define do
   factory :component do
     name { Faker::Lorem.word }
     extension { 'py' }
-    content { Faker::Lorem.paragraph(sentence_count: 2) }
+    sequence(:index) { |n| n }
+    default { false }
+    project
+
+    factory :default_python_component do
+      name { 'main' }
+      index { 0 }
+      default { true }
+    end
   end
 end
