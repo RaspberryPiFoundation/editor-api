@@ -15,8 +15,7 @@ module Api
       result = Project::Operation::Update.call(project_params, @project)
 
       if result.success?
-        # TODO: render the updated project
-        head :ok
+        render :show, formats: [:json]
       else
         render json: { error: result[:error] }, status: :bad_request
       end
