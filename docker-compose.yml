@@ -2,11 +2,11 @@ version: "3.9"
 services:
   db:
     image: postgres:14.1
-    volumes:
-      - pg-data:/var/lib/postgresql/data
     command: postgres -c listen_addresses='*'
     environment:
-      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER
+      - POSTGRES_PASSWORD
+      - POSTGRES_DB
     ports:
       - "5434:5432"
   web:
