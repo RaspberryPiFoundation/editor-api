@@ -12,18 +12,27 @@ RSpec.describe 'Remix requests', type: :request do
     end
 
     context 'when auth is correct' do
+      let(:project_params) do
+        {
+          name: original_project.name,
+          identifier: original_project.identifier,
+          components: []
+        }
+      end
+
       before do
-        mock_oauth_user
+        mock_oauth_user(user_id)
       end
 
       it 'returns success response' do
-        post "/api/projects/#{original_project.identifier}/remix"
+        post "/api/projects/#{original_project.identifier}/remix", params: { project: project_params }
 
         expect(response.status).to eq(200)
       end
 
       it 'returns 404 response if invalid project' do
-        post '/api/projects/no-such-project/remix'
+        project_params[:identifier] = 'no-such-project'
+        post '/api/projects/no-such-project/remix', params: { project: project_params }
 
         expect(response.status).to eq(404)
       end

@@ -26,4 +26,6 @@ class ApiController < ActionController::API
   def return401
     head :unauthorized
   end
+
+  alias_method :current_user, :oauth_user_id
 end
