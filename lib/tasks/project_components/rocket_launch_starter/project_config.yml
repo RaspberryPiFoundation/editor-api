@@ -1,0 +1,8 @@
+NAME: "Rocket Launch"
+IDENTIFIER: "rocket-launch-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true

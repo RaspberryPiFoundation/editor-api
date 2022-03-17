@@ -1,0 +1,8 @@
+NAME: "Rocket Launch Example"
+IDENTIFIER: "rocket-launch-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
