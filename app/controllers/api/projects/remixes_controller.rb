@@ -7,7 +7,8 @@ module Api
       before_action :load_project
 
       def create
-        result = Project::Operation::CreateRemix.call(params: remix_params, user_id: oauth_user_id, original_project: @project)
+        result = Project::Operation::CreateRemix.call(params: remix_params, user_id: oauth_user_id,
+                                                      original_project: @project)
 
         if result.success?
           @project = result[:project]
