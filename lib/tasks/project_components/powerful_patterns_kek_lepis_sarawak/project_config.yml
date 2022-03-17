@@ -1,0 +1,8 @@
+NAME: "Powerful Patterns: Kek Lepis Sarawak Example"
+IDENTIFIER: "repeated-patterns-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true

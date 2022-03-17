@@ -1,0 +1,8 @@
+NAME: "Powerful Patterns: Yakan Weaving"
+IDENTIFIER: "yakan-weaving-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
