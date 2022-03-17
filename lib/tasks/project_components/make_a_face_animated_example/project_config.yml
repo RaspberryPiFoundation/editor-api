@@ -1,0 +1,8 @@
+NAME: "Make A Face Animated Example"
+IDENTIFIER: "animated-face-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
