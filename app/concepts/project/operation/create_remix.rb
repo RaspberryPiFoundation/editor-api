@@ -5,20 +5,20 @@ class Project
     class CreateRemix
       require 'operation_response'
 
-      def self.call(params:, user_id:, original_project:)
-        response = OperationResponse.new
-
-        validate_params(response, params, user_id, original_project)
-        remix_project(response, params, user_id, original_project)
-        response
-      end
-
       class << self
+        def call(params:, user_id:, original_project:)
+          response = OperationResponse.new
+
+          validate_params(response, params, user_id, original_project)
+          remix_project(response, params, user_id, original_project)
+          response
+        end
+
         private
 
         def validate_params(response, params, user_id, original_project)
           valid = params[:identifier].present? && user_id.present? && original_project.present?
-          response[:error] = 'Invalid parameters' unless valid
+          response[:error] = I18n.t('errors.project.remixing.invalid_params') unless valid
         end
 
         def remix_project(response, params, user_id, original_project)
@@ -26,7 +26,7 @@ class Project
 
           response[:project] = create_remix(original_project, params, user_id)
 
-          response[:error] = 'Unable to create project' unless response[:project].save
+          response[:error] = I18n.t('errors.project.remixing.cannot_save') unless response[:project].save
           response
         end
 

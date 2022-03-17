@@ -94,6 +94,11 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
         expect(result.failure?).to eq(true)
       end
 
+      it 'returns error message' do
+        result = create_remix
+        expect(result[:error]).to eq(I18n.t('errors.project.remixing.invalid_params'))
+      end
+
       it 'does not create new project' do
         expect { create_remix }.not_to change(Project, :count)
       end
@@ -107,8 +112,29 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
         expect(result.failure?).to eq(true)
       end
 
+      it 'returns error message' do
+        result = create_remix
+        expect(result[:error]).to eq(I18n.t('errors.project.remixing.invalid_params'))
+      end
+
       it 'does not create new project' do
         expect { create_remix }.not_to change(Project, :count)
+      end
+    end
+
+    context 'when project components are invalid' do
+      let(:invalid_component_params) { { name: 'added_component', extension: 'py', content: '' } }
+
+      before do
+        remix_params[:components] << invalid_component_params
+      end
+
+      it 'returns failure' do
+        expect(create_remix.failure?).to eq(true)
+      end
+
+      it 'sets error message' do
+        expect(create_remix[:error]).to eq(I18n.t('errors.project.remixing.cannot_save'))
       end
     end
   end
