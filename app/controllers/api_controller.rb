@@ -3,6 +3,8 @@
 class ApiController < ActionController::API
   include OauthUser
 
+  alias current_user oauth_user_id
+
   unless Rails.application.config.consider_all_requests_local
     rescue_from ActiveRecord::RecordNotFound, with: -> { return404 }
     rescue_from CanCan::AccessDenied, with: -> { return401 }
@@ -21,6 +23,4 @@ class ApiController < ActionController::API
   def return401
     head :unauthorized
   end
-
-  alias current_user oauth_user_id
 end
