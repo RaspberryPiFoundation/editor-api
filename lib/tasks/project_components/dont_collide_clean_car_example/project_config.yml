@@ -1,0 +1,8 @@
+NAME: "Don't Collide: Clean Car"
+IDENTIFIER: "clean-car-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
