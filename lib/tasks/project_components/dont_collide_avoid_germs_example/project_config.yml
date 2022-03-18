@@ -1,5 +1,5 @@
-NAME: "Don't Collide: Skiing Cat"
-IDENTIFIER: "skiing-cat-example"
+NAME: "Don't Collide: Avoid the Germs"
+IDENTIFIER: "avoid-germs-example"
 COMPONENTS:
   - name: "main"
     extension: "py"
