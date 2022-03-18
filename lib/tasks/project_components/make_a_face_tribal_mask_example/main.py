@@ -1,10 +1,10 @@
 #!/bin/python3
 
-from processing import *
+from p5 import *
 
 def setup():
   size(400, 400)
-  noStroke()
+  no_stroke()
   
 
 def draw():

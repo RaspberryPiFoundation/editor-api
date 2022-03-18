@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from processing import *
+from p5 import *
 
 def setup():
   size(400, 600)
@@ -9,13 +9,13 @@ def setup():
   
 
 def draw():
-  blue = color(92, 204, 206)
-  green = color(149, 212, 122)
-  red = color(239, 62, 91)
-  purple = color(75, 37, 109)
-  brown = color(178, 162, 150)
-  grey = color(201, 201, 201)
-  lilac = color(160, 158, 214)
+  blue = Color(92, 204, 206)
+  green = Color(149, 212, 122)
+  red = Color(239, 62, 91)
+  purple = Color(75, 37, 109)
+  brown = Color(178, 162, 150)
+  grey = Color(201, 201, 201)
+  lilac = Color(160, 158, 214)
   
   # Top face background 
   fill(blue)

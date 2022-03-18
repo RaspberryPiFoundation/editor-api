@@ -1,17 +1,17 @@
 #!/bin/python3
 
-from processing import *
+from p5 import *
 
 def setup():
   size(400, 400)
-  noStroke()
+  no_stroke()
   
 
 def draw():
   background(255)
-  orange = color(255, 165, 0)
-  brown = color(200, 120, 0)
-  green = color(100, 155, 0)
+  orange = Color(255, 165, 0)
+  brown = Color(200, 120, 0)
+  green = Color(100, 155, 0)
   fill(orange)
   ellipse(200, 200, 200, 190)
   fill(0)
