@@ -5,7 +5,7 @@ from p5 import *
 def setup():
   size(400, 600)
   background(255, 255, 255)
-  noStroke()
+  no_stroke()
   
 
 def draw():
