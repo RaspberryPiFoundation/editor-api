@@ -1,13 +1,11 @@
 #!/bin/python3
 
-from processing import *
+from p5 import *
 import random
 
 def setup():
   size(400, 400)
-  noStroke()
-  frameRate(5)
-  
+  no_stroke()
 
 def draw():
   background(255)
@@ -43,4 +41,4 @@ def draw():
   fill(0)
   rect(185, 320, 30, 5)
   
-run()
+run(frame_rate=5)
