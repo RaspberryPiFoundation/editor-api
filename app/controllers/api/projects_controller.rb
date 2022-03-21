@@ -12,7 +12,7 @@ module Api
     end
 
     def update
-      result = Project::Operation::Update.call(project_params, @project)
+      result = Project::Operation::Update.call(params: project_params, project: @project)
 
       if result.success?
         render :show, formats: [:json]

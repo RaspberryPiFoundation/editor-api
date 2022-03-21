@@ -5,7 +5,7 @@ class Project
     class Update
       require 'operation_response'
 
-      def self.call(params, project)
+      def self.call(params:, project:)
         response = setup_response(project)
 
         setup_deletions(response, params)

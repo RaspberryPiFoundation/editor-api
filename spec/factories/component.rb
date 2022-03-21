@@ -6,6 +6,7 @@ FactoryBot.define do
     extension { 'py' }
     sequence(:index) { |n| n }
     default { false }
+    content { Faker::Lorem.paragraph }
     project
 
     factory :default_python_component do

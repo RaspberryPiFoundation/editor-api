@@ -6,7 +6,9 @@ module Api
       before_action :require_oauth_user
 
       def create
-        result = Project::Operation::CreateRemix.call(remix_params, oauth_user_id)
+        result = Project::Operation::CreateRemix.call(params: remix_params,
+                                                      user_id: oauth_user_id,
+                                                      original_project: project)
 
         if result.success?
           @project = result[:project]
@@ -18,8 +20,15 @@ module Api
 
       private
 
+      def project
+        @project ||= Project.find_by!(identifier: params[:project_id])
+      end
+
       def remix_params
-        params.permit(:project_id)
+        params.require(:project)
+              .permit(:name,
+                      :identifier,
+                      components: %i[id name extension content index])
       end
     end
   end
