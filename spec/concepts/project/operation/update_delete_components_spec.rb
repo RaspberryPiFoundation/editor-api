@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Project::Operation::Update, type: :unit do
-  subject(:update) { described_class.call(project_params, project) }
+  subject(:update) { described_class.call(params: project_params, project: project) }
 
   let!(:project) { create(:project, :with_default_component, :with_components) }
   let(:component_to_delete) { project.components.last }

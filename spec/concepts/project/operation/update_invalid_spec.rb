@@ -8,7 +8,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
       name: 'updated project name',
       components: [default_component_params, edited_component_params, new_component_params]
     }
-    described_class.call(params, project)
+    described_class.call(params: params, project: project)
   end
 
   let!(:project) { create(:project, :with_default_component, :with_components, component_count: 2) }
