@@ -3,44 +3,33 @@
 from p5 import *
 from random import randint
 
-def draw_motif():
-  orange = color(191, 64, 191)
-  brown = color(200, 120, 0)
-  green = color(100, 155, 0)
-  fill(orange)
-  ellipse(200, 200, 200, 190)
-  fill(0)
-  # Eyes
-  ellipse(160, 190, 30, 30)
-  ellipse(240, 190, 30, 30)
-  fill(255)
-  ellipse(165, 200, 10, 10)
-  ellipse(245, 200, 10, 10)
-  # Mouth
-  noFill()
-  stroke(255, 255, 255)
-  ellipse(150, 250, 30, 30)
-  ellipse(250, 250, 30, 30)
-  fill(255, 255, 255)
-  noStroke()
-  rect(150, 230, 100, 40)
-  fill(108, 200, 206)
-  rect(152, 235, 96, 30)
-  
-  
+def motif():
+  global circle_size
+  for i in range(5):
+    ellipse(0, 0, circle_size / 5 * (5 - i), circle_size / 5 * (5  - i)) 
+
 def setup():
   size(400, 400)
-  background(255)
-  no_stroke()
-  frame_rate(10)
-
-
+  print('🖌 This art uses lots of circles!')
+  
+  global circle_size
+  
+  circle_size = 50
+  
 def draw():
-  push_matrix()
-  translate(randint(-50, 350), randint(-50, 350)) # offset by the width of the quarter-size face
-  scale(0.25) # quarter size paths
-  draw_motif()
-  pop_matrix()
- 
-
-run()
+  
+  # Pattern colours
+  stroke(40, 35, 100) # blue
+  stroke_weight(2) # thick border
+  fill(200, 180, 128) # gold
+  
+  translate(0,0) # start from the top left of the screen
+  
+  if frame_count <= 16: # creates 16 rows then stops
+    for row in range (frame_count): # animates 1 row at a time
+      for shape in range (16): # create a row of motifs
+        motif()
+        translate(circle_size / 2, 0)
+      translate(-width, circle_size / 2) # move down to start next row
+  
+run(frame_rate=3)

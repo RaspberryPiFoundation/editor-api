@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from draw import *
+from p5 import *
 from time import *
 
 # Based on the amazing Malaysian geometric cake art: Kek lapis Sarawak
@@ -8,12 +8,12 @@ from time import *
 def quadrant():
 
   # Choose some gorgeous colours for the cake layers
-  turquoise = color(64, 224, 208)
-  gold = color(255, 215, 0)
-  tomato = color(255, 99, 71)
+  turquoise = Color(64, 224, 208)
+  gold = Color(255, 215, 0)
+  tomato = Color(255, 99, 71)
   
   # Jam sticks the layers together
-  jam = color(255, 165, 0) 
+  jam = Color(255, 165, 0) 
   stroke(jam)
   stroke_weight(2) # Change the number to change the amount of jam
 
@@ -42,7 +42,6 @@ def outer():
 def setup():
   size(400, 400) # make the cake square
   background(255, 255, 255, 0) # transparent background
-  frame_rate(5) # 5 frames per second
 
 
 def draw():
@@ -64,4 +63,4 @@ def draw():
     outer() # outer layer
     
 
-run()
+run(frame_rate = 5) # 5 frames per second

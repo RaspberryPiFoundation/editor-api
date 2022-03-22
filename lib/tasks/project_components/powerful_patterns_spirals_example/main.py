@@ -14,8 +14,7 @@ def motif():
     rect(i * 5, 0, 5, 5) 
 
 def setup():
-  size(400, 400) 
-  frame_rate(10) # fast animation
+  size(400, 400)
   stroke_weight(2) # thick border
   background(255)
   
@@ -27,4 +26,4 @@ def draw():
       rotate(5) # turns the motif
       translate(i,i) # moves the motif
   
-run()
+run(frame_rate=10) # fast animation

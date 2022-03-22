@@ -4,7 +4,6 @@ from p5 import *
 
 def setup():
   size(400, 400)
-  frame_rate(10)
   print('🏴󠁧󠁢󠁳󠁣󠁴󠁿󠁢󠁳󠁣󠁴󠁿 This is McEwen Tartan 🏴󠁧󠁢󠁳󠁣󠁴󠁿󠁧󠁢󠁳󠁣󠁴󠁿')
  
   global square_size
@@ -16,17 +15,17 @@ def draw():
   
   # McEwen tartan colours
   # Base square colours
-  BLUE = color(83, 143, 200)
-  GREEN = color(78, 163, 162)
+  BLUE = Color(83, 143, 200)
+  GREEN = Color(78, 163, 162)
   BASE_COLORS = [GREEN, BLUE]
   
   # Cross colours
-  YELLOW = color(155, 176, 135)
-  RED = color(155, 129, 113)
+  YELLOW = Color(155, 176, 135)
+  RED = Color(155, 129, 113)
   CROSS_COLORS = [YELLOW, RED]
   
   # Stitching and overlap colour
-  GREY = color(78, 99, 86)
+  GREY = Color(78, 99, 86)
   
   # Draw all the GREEN and BLUE alternating Base squares
   no_stroke()
@@ -73,7 +72,7 @@ def draw():
     rect(0, gap, lines, 8)
     gap = gap + square_size
   
-run()
+run(frame_rate=10)
 
 
 

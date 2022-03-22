@@ -7,10 +7,10 @@ def motif():
   motif_size = 100
   
   #Thread colours
-  ORANGE = color(254, 96, 1)
-  PURPLE = color(135, 18, 192)
-  YELLOW = color(243, 200, 19)
-  BLUE = color(83, 171, 176)
+  ORANGE = Color(254, 96, 1)
+  PURPLE = Color(135, 18, 192)
+  YELLOW = Color(243, 200, 19)
+  BLUE = Color(83, 171, 176)
     
   # Squares
   fill(ORANGE)
@@ -41,7 +41,6 @@ def rotate_motif():
 
 def setup():
   size(400, 400)
-  frame_rate(3)
   background(250, 5, 94) # pink
   no_stroke()
   print('This is 🇵🇭 Yakan weaving ') 
@@ -61,4 +60,4 @@ def draw():
       else:  
         translate(-motif_width * 5 - 75, 80) 
         
-run()
+run(frame_rate=3)
