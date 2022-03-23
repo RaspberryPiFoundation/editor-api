@@ -54,16 +54,16 @@ def setup():
   global skiing, crashed
   
   # Setup your animation here
+  size(400, 400)
   text_size(40)
   text_align(CENTER, TOP) # position around the centre
-  size(400, 400)
   skiing = load_image('skiing.png')
   crashed = load_image('fallenover.png')
   
 def draw():
   # Things to do in every frame
   global score, safe, speed, skiing, crashed
-  safe = color(255)
+  safe = Color(255)
 
   if speed > 0:
     background(safe) 

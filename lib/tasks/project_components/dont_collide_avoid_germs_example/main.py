@@ -101,7 +101,7 @@ def draw_obstacles():
 def setup():
 # Put code to run once here
   size(400, 400) # width and height
-  noStroke()
+  no_stroke()
   text_size(40)
   text_align(CENTER, TOP)
 
@@ -109,7 +109,7 @@ def draw():
 # Put code to run every frame here
   global safe, score, level
   
-  safe = color(149, 161, 195)
+  safe = Color(149, 161, 195)
   
   if level > 0:
     background(safe)

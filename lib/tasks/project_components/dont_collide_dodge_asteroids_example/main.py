@@ -115,7 +115,7 @@ def setup():
 def draw():
   # Things to do in every frame
   global score, safe, level
-  safe = color(0)
+  safe = Color(0)
   
   if level > 0:
     background(safe) 
