@@ -1,5 +1,5 @@
 def grid():
-  pushMatrix()
+  push_matrix()
   stroke(200)
   fill(0)
   line(0, height/2, width, height/2)
@@ -11,4 +11,4 @@ def grid():
     for y in y_coords:
       show_coord(x, y)
 
-  popMatrix()
+  pop_matrix()
