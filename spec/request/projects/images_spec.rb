@@ -19,10 +19,6 @@ RSpec.describe 'Images requests', type: :request do
   end
 
   describe 'create' do
-    before do
-      mock_phrase_generation
-    end
-
     context 'when auth is correct' do
       before do
         mock_oauth_user
