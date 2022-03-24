@@ -9,6 +9,7 @@ class Project < ApplicationRecord
   has_many :components, -> { order(:index) }, dependent: :destroy, inverse_of: :project
   has_many :children, class_name: 'Project', foreign_key: 'remixed_from_id', dependent: :nullify, inverse_of: :parent
   has_many_attached :images
+  accepts_nested_attributes_for :components
 
   private
 

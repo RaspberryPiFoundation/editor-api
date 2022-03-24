@@ -3,33 +3,34 @@
 module Api
   class ProjectsController < ApiController
     require 'phrase_identifier'
-
     before_action :require_oauth_user, only: %i[update]
+    before_action :load_project
+    load_and_authorize_resource
 
     def show
-      @project = Project.find_by!(identifier: params[:id])
       render :show, formats: [:json]
     end
 
     def update
-      @project = Project.find_by!(identifier: params[:id])
-      authorize! :update, @project
+      result = Project::Operation::Update.call(params: project_params, project: @project)
 
-      components = project_params[:components]
-      components.each do |comp_params|
-        component = Component.find(comp_params[:id])
-        component.update(comp_params)
+      if result.success?
+        render :show, formats: [:json]
+      else
+        render json: { error: result[:error] }, status: :bad_request
       end
-      head :ok
     end
 
     private
 
+    def load_project
+      @project = Project.find_by!(identifier: params[:id])
+    end
+
     def project_params
       params.require(:project)
-            .permit(:identifier,
-                    :type,
-                    components: %i[id name extension content])
+            .permit(:name,
+                    components: %i[id name extension content index])
     end
   end
 end
