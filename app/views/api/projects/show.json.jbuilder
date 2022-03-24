@@ -8,5 +8,5 @@ json.components @project.components, :id, :name, :extension, :content
 
 json.image_list @project.images do |image|
   json.filename image.filename
-  json.url url_for(attachment)
+  json.url rails_blob_url(image)
 end

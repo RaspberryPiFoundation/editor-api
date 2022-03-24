@@ -8,7 +8,7 @@ module Api
       def create
         @project = Project.find_by!(identifier: params[:project_id])
         @project.images.attach(params[:images])
-        head :ok
+        render '/api/projects/images', formats: [:json]
       end
     end
   end
