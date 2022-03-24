@@ -1,0 +1,8 @@
+NAME: "Powerful Patterns: Art Deco Wallpaper Example"
+IDENTIFIER: "art-deco-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true

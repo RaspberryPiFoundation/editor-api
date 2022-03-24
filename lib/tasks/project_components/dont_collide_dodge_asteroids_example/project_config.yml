@@ -1,0 +1,8 @@
+NAME: "Don't Collide: Dodge Asteroids"
+IDENTIFIER: "dodge-asteroids-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true

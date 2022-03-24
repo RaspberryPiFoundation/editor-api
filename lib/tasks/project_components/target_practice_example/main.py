@@ -27,18 +27,16 @@ def shoot_arrow():
 def setup():
 # Setup your game here
   size(400, 400) # width and height
-  frame_rate(2)
-
 
 def draw():
 # Things to do in every frame
   global outer, inner, bullseye
-  sky = color(92, 204, 206) # Red = 92, Green = 204, Blue = 206
-  grass = color(149, 212, 122)
-  wood = color(145, 96, 51)
-  outer = color(0, 120, 180) 
-  inner = color(210, 60, 60)
-  bullseye = color(220, 200, 0)
+  sky = Color(92, 204, 206) # Red = 92, Green = 204, Blue = 206
+  grass = Color(149, 212, 122)
+  wood = Color(145, 96, 51)
+  outer = Color(0, 120, 180) 
+  inner = Color(210, 60, 60)
+  bullseye = Color(220, 200, 0)
 
   no_stroke()
   fill(sky)
@@ -58,4 +56,4 @@ def draw():
   fill(wood)
   shoot_arrow()
 # Keep this to run your code
-run()
+run(frame_rate=2)
