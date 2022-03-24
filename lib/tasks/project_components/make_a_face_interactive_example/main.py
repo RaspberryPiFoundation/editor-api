@@ -7,12 +7,12 @@ def sad(x_middle, y_eye, y_mouth):
   ellipse(x_middle - 50, y_eye - 20, 60, 50) # x, y, width, height
   ellipse(x_middle + 50, y_eye - 20, 60, 50)
   ellipse(x_middle, y_mouth + 30, 100, 65)
-  
+
 def happy(x_middle, y_eye, y_mouth):
   ellipse(x_middle - 50, y_eye + 20, 60, 50) # x, y, width, height
   ellipse(x_middle + 50, y_eye + 20, 60, 50)
   ellipse(x_middle, y_mouth - 30, 100, 65)
-  
+
 def setup():
 # Put code to run once here
   size(400, 400) # width and height
@@ -23,7 +23,7 @@ def setup():
 def draw():
 # Put code to run every frame here
   mask_width = width / 2
-  x_middle = width / 2 
+  x_middle = width / 2
   y_eye = 180
   y_mouth = 255
   # draw mask
@@ -47,12 +47,11 @@ def draw():
   # shade half of the mask
   fill(0, 25)
   rect(300, 200, width/2, height)
-  #grid()
 
 def mouse_pressed():
 # Put code to run when the mouse is pressed here
-  print(mouse_x, mouse_y) 
-  
+  print(mouse_x, mouse_y)
+
 # Keep this to run your code
 run()
 

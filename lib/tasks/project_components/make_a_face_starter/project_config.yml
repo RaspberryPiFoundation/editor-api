@@ -6,3 +6,8 @@ COMPONENTS:
     location: "main.py"
     index: 0
     default: true
+  - name: "grid"
+    extension: "py"
+    location: "grid.py"
+    index: 1
+    default: false
