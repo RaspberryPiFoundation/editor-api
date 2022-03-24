@@ -7,6 +7,7 @@ RSpec.describe Project, type: :model do
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:children) }
     it { is_expected.to belong_to(:parent).optional(true) }
+    it { is_expected.to have_many_attached(:images) }
   end
 
   describe 'identifier not nil' do
