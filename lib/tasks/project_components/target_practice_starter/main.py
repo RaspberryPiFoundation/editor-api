@@ -12,16 +12,14 @@ from random import randint
 def setup():
 # Setup your game here
   size(400, 400) # width and height
-  frame_rate(2)
-
 
 def draw():
 # Things to do in every frame
-  sky = color(92, 204, 206) # Red = 92, Green = 204, Blue = 206
-  grass = color(149, 212, 122)
-  wood = color(145, 96, 51)
-  outer = color(0, 120, 180) 
+  sky = Color(92, 204, 206) # Red = 92, Green = 204, Blue = 206
+  grass = Color(149, 212, 122)
+  wood = Color(145, 96, 51)
+  outer = Color(0, 120, 180)
 
-  
+
 # Keep this to run your code
-run()
+run(frame_rate=2)
