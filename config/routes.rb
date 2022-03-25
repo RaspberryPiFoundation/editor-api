@@ -9,6 +9,7 @@ Rails.application.routes.draw do
 
     resources :projects, only: %i[show update] do
       resource :remix, only: %i[create], controller: 'projects/remixes'
+      resource :images, only: %i[create], controller: 'projects/images'
     end
   end
 end

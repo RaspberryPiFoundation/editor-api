@@ -10,7 +10,8 @@ RSpec.describe 'Project show requests', type: :request do
       project_type: 'python',
       name: project.name,
       user_id: project.user_id,
-      components: []
+      components: [],
+      image_list: []
     }.to_json
   end
 

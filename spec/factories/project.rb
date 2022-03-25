@@ -24,5 +24,11 @@ FactoryBot.define do
         object.components << FactoryBot.create(:default_python_component, project: object)
       end
     end
+
+    trait :with_attached_images do
+      after(:create) do |object|
+        object.images.attach(fixture_file_upload(Rails.root.join('spec/fixtures/test_image_1.png'), 'image/png'))
+      end
+    end
   end
 end
