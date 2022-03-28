@@ -20,6 +20,13 @@ namespace :projects do
                                           default: default)
         new_project.components << project_component
       end
+
+      project_images = proj_config['IMAGES'] || []
+      project_images.each do |image_name|
+        new_project.images.attach(io: File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}"),
+                                  filename: image_name)
+      end
+
       new_project.save
     end
   end
