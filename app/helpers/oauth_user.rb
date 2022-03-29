@@ -19,7 +19,7 @@ module OauthUser
     res = con.post do |req|
       req.url '/oauth2/introspect'
       req.headers['Content-Type'] = 'application/x-www-form-urlencoded'
-      req.headers['Authorization'] = "Basic #{ENV.fetch('HYDRA_SECRET')}"
+      req.headers['apiKey'] = ENV.fetch('HYDRA_SECRET')
       req.body = { token: request.headers['Authorization'] }
     end
     JSON.parse(res.body)
