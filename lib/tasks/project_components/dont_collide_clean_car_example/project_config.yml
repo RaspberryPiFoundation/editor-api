@@ -6,3 +6,5 @@ COMPONENTS:
     location: "main.py"
     index: 0
     default: true
+IMAGES:
+  - "car.png"

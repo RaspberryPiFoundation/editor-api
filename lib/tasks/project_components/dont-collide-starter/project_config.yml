@@ -6,3 +6,18 @@ COMPONENTS:
     location: "main.py"
     index: 0
     default: true
+IMAGES:
+  - "astronaut1.png"
+  - "astronaut2.png"
+  - "earth.png"
+  - "flowers.png"
+  - "iss.png"
+  - "moon.png"
+  - "planet1.png"
+  - "planet2.png"
+  - "rocket1.png"
+  - "rocket2.png"
+  - "shark.png"
+  - "tree.png"
+  - "treefeller.png"
+  - "turtle.png"

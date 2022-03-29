@@ -53,9 +53,9 @@ def draw_player():
 
 def setup():
   # Setup your animation here
+  size(400, 400)
   text_size(40)
   text_align(CENTER, TOP) # position around the centre, top
-  size(400, 400)
 
 
 def draw():

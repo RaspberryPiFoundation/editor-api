@@ -6,3 +6,6 @@ COMPONENTS:
     location: "main.py"
     index: 0
     default: true
+IMAGES:
+  - "fallenover.png"
+  - "skiing.png"

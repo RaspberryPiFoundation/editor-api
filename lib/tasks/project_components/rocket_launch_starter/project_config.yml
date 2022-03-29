@@ -6,3 +6,9 @@ COMPONENTS:
     location: "main.py"
     index: 0
     default: true
+IMAGES:
+  - "moon.png"
+  - "orange_planet.png"
+  - "planet.png"
+  - "purple_planet.png"
+  - "rocket.png"
