@@ -1,0 +1,19 @@
+NAME: "Encoded Art: Lost in Space"
+IDENTIFIER: "lost-in-space"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+IMAGES:
+  - "astronaut.png"
+  - "astropi.png"
+  - "blue_star.png"
+  - "green_planet.png"
+  - "moon.png"
+  - "orange_planet.png"
+  - "pink_star.png"
+  - "purple_planet.png"
+  - "satellite.png"
+  - "yellow_star.png"

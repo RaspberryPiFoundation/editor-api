@@ -1,0 +1,8 @@
+NAME: "Encoded Art: Geometric Patterns with Punctuation"
+IDENTIFIER: "geometric-patterns-punctuation"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
