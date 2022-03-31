@@ -1,0 +1,23 @@
+NAME: "Charting Champions"
+IDENTIFIER: "charting-champions-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "medals"
+    extension: "csv"
+    location: "medals.csv"
+    index: 1
+    default: false
+  - name: "carbon"
+    extension: "csv"
+    location: "carbon.csv"
+    index: 2
+    default: false
+  - name: "mcu"
+    extension: "csv"
+    location: "mcu.csv"
+    index: 3
+    default: false
