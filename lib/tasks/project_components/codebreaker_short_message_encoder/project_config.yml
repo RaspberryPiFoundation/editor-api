@@ -1,0 +1,27 @@
+NAME: "Codebreaker: Custom Short Message Encoder"
+IDENTIFIER: "short-message-encoder"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "frequency"
+    extension: "py"
+    location: "frequency.py"
+    index: 1
+    default: false
+  - name: "input"
+    extension: "txt"
+    location: "input.txt"
+    index: 2
+    default: false
+  - name: "longer"
+    extension: "txt"
+    location: "longer.txt"
+    index: 3
+    default: false
+
+
+
+
