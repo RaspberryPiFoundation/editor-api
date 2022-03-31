@@ -1,0 +1,50 @@
+NAME: "Mapping Data: World Happiness Measures"
+IDENTIFIER: "world-happiness-measures"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "regions"
+    extension: "py"
+    location: "regions.py"
+    index: 1
+    default: false
+  - name: "pop"
+    extension: "csv"
+    location: "pop.csv"
+    index: 2
+    default: false
+  - name: "olympics"
+    extension: "csv"
+    location: "olympics.csv"
+    index: 3
+    default: false
+  - name: "carbon"
+    extension: "csv"
+    location: "carbon.csv"
+    index: 4
+    default: false
+  - name: "species"
+    extension: "csv"
+    location: "species.csv"
+    index: 5
+    default: false
+  - name: "gdp"
+    extension: "csv"
+    location: "gdp.csv"
+    index: 6
+    default: false
+  - name: "happy"
+    extension: "csv"
+    location: "happy.csv"
+    index: 7
+    default: false
+
+IMAGES:
+  - "ink-map.jpg"
+  - "mercator.jpeg"
+  - "mercator_bw.png"
+  - "old-map.jpg"
+  - "tech-map.jpg"
