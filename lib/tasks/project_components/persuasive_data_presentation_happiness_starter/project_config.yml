@@ -1,0 +1,13 @@
+NAME: "Persuasive Data Presentation: World Happiness Index"
+IDENTIFIER: "data-happiness-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "WHI_2019"
+    extension: "csv"
+    location: "WHI_2019.csv"
+    index: 1
+    default: false

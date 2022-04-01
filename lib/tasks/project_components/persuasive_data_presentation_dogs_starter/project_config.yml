@@ -1,0 +1,17 @@
+NAME: "Persuasive Data Presentation: Dog Breed Characteristics"
+IDENTIFIER: "data-dogs-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "dog_breed_characteristics"
+    extension: "csv"
+    location: "dog_breed_characteristics.csv"
+    index: 1
+    default: false
+  
+IMAGES:
+  - "mercator.jpeg"
+  - "mercator_bw.png"

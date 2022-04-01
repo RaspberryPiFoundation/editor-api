@@ -1,0 +1,14 @@
+NAME: "Persuasive Data Presentation: Pokemon Cards"
+IDENTIFIER: "data-cards-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "pokemon"
+    extension: "csv"
+    location: "pokemon.csv"
+    index: 1
+    default: false
+  

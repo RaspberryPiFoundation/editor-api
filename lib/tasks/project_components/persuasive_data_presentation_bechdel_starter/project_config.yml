@@ -1,0 +1,13 @@
+NAME: "Persuasive Data Presentation: Bechdel Test Scores"
+IDENTIFIER: "data-bechdel-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "bechdel"
+    extension: "csv"
+    location: "bechdel.csv"
+    index: 1
+    default: false

@@ -1,0 +1,22 @@
+NAME: "Persuasive Data Presentation: Volcanic Eruptions"
+IDENTIFIER: "data-volcano-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "xy"
+    extension: "py"
+    location: "xy.py"
+    index: 1
+    default: false
+  - name: "volcano-data"
+    extension: "txt"
+    location: "volcano-data.txt"
+    index: 2
+    default: false
+  
+IMAGES:
+  - "mercator.jpeg"
+  - "mercator_bw.png"

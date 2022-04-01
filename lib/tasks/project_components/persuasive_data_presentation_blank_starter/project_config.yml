@@ -1,0 +1,17 @@
+NAME: "Persuasive Data Presentation"
+IDENTIFIER: "data-blank-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "xy"
+    extension: "py"
+    location: "xy.py"
+    index: 1
+    default: false
+  
+IMAGES:
+  - "mercator.jpeg"
+  - "mercator_bw.png"
