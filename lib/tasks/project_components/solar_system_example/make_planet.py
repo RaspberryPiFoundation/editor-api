@@ -1,5 +1,4 @@
 from p5 import *
-import __main__
 
 def make_planet(colour, orbit, size, speed):
   no_stroke()
@@ -9,7 +8,7 @@ def make_planet(colour, orbit, size, speed):
   # Centre the orbit on the centre of the model
   translate(width / 2, height / 2)
   # Rotate 'speed' degrees every frame
-  rotate(radians((__main__.frame_count * speed) % 360)) 
+  rotate(radians((frame_count * speed) % 360)) 
   # Draw the planet
   ellipse(orbit / 2, 0, size, size)
   # End the 2D transformation

@@ -8,17 +8,11 @@ pt_dict_period = {}
 
 # Put code to run once here
 def setup():
+  global map
   load_pt_data('pt.csv')
   setup_coords()
   size(1024, 576)
   map = load_image('pt.png')
-  image(
-      map, # The image to draw
-      0, # The x of the top-left corner
-      0, # The y of the top-left corner
-      width, # The width of the image
-      height # The height of the image
-      )
 
 def setup_coords():
 
@@ -34,7 +28,13 @@ def setup_coords():
       
 # Put code to run every frame here
 def draw():
-  pass
+  image(
+      map, # The image to draw
+      0, # The x of the top-left corner
+      0, # The y of the top-left corner
+      width, # The width of the image
+      height # The height of the image
+      )
 
 # Put code to run when the mouse is pressed here
 def mouse_pressed():

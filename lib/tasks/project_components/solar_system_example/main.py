@@ -109,7 +109,7 @@ def draw():
 
 def mouse_pressed():
 # Put code to run when the mouse is pressed here
-  pixel_colour = color(get(mouse_x, mouse_y))
+  pixel_colour = Color(get(mouse_x, mouse_y))
   
   if pixel_colour == mercury['colour']:
     print(mercury['name'])

@@ -7,19 +7,11 @@ colours = {}
 
 # Put code to run once here
 def setup():
+  global map
   load_data('carbon.csv')
   print(region_list)
   size(991, 768)
   map = load_image('mercator_bw.png')
-  image(
-    map, # The image to draw
-    0, # The x of the top-left corner
-    0, # The y of the top-left corner
-    width, # The width of the image
-    height # The height of the image
-    )
-  #draw_pin(200, 200, color(255,0,0))
-  draw_data()
 
 def draw_pin(x, y, colour):
   no_stroke()
@@ -46,7 +38,15 @@ def draw_data():
   
 # Put code to run every frame here
 def draw():
-  pass
+  image(
+    map, # The image to draw
+    0, # The x of the top-left corner
+    0, # The y of the top-left corner
+    width, # The width of the image
+    height # The height of the image
+    )
+  #draw_pin(200, 200, color(255,0,0))
+  draw_data()
 
 
 # Put code to run when the mouse is pressed here

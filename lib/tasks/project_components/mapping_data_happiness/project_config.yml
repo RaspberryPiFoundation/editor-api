@@ -43,8 +43,8 @@ COMPONENTS:
     default: false
 
 IMAGES:
-  - "ink-map.jpg"
+  - "ink_map.jpg"
   - "mercator.jpeg"
   - "mercator_bw.png"
-  - "old-map.jpg"
-  - "tech-map.jpg"
+  - "old_map.jpg"
+  - "tech_map.jpg"

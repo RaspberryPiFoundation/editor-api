@@ -8,9 +8,13 @@ colours = {}
 
 # Put code to run once here
 def setup():
+  global map
   load_data('pop.csv')
   size(991, 768)
   map = load_image('mercator_bw.png')
+
+# Put code to run every frame here
+def draw():
   image(
       map, # The image to draw
       0, # The x of the top-left corner
@@ -18,11 +22,8 @@ def setup():
       width, # The width of the image
       height # The height of the image
       )
-  draw_pin(300, 300, color(255, 0, 0))
+  draw_pin(300, 300, Color(255, 0, 0))
   draw_data()
-# Put code to run every frame here
-def draw():
-  pass
 
 def draw_pin(x_coord, y_coord, colour):
   no_stroke()

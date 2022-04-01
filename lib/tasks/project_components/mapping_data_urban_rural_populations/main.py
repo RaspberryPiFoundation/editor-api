@@ -38,7 +38,7 @@ def draw_data():
       region_coords = get_region_coords(region_name)
       region_x = region_coords['x']
       region_y = region_coords['y']
-      region_colour = color(red_value, 255, 0)
+      region_colour = Color(red_value, 255, 0)
       draw_pin(region_x, region_y, region_colour)
       colours[region_colour] = region
       red_value -= 1

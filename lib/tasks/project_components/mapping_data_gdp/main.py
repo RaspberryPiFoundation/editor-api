@@ -20,16 +20,21 @@ def draw_data():
     region_x = region_coords['x'] # Get the x coordinate
     region_y = region_coords['y'] # Get the y coordinate
     #print(region_name, region_x, region_y)
-    region_colour = color(red_value, 0, 0) # Set the pin colour
+    region_colour = Color(red_value, 0, 0) # Set the pin colour
     colours[region_colour] = region
     draw_pin(region_x, region_y, region_colour) # Draw the pin
     red_value -= 1 # Change the red value
 
 # Put code to run once here
 def setup():
+  global map
   load_data('gdp.csv')
   size(991, 768)
   map = load_image('old-map.jpg') # Replace with your image
+
+
+# Put code to run every frame here
+def draw():
   image(
     map, # The image to draw
     0, # The x of the top-left corner
@@ -39,11 +44,6 @@ def setup():
     )
   draw_pin(300, 300, Color(255,0,0))
   draw_data()
-
-
-# Put code to run every frame here
-def draw():
-  pass
 
 
 # Put code to run when the mouse is pressed here
