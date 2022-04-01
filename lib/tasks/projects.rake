@@ -21,6 +21,7 @@ namespace :projects do
       end
 
       project_images = proj_config['IMAGES'] || []
+      delete_removed_images(project, project_images)
       project_images.each do |image_name|
         attach_image_if_needed(project, image_name, dir)
       end
@@ -40,6 +41,17 @@ def find_project(proj_config)
   end
 
   project
+end
+
+def delete_removed_images(project, images_to_attach)
+  existing_images = project.images.map { |x| x.blob.filename.to_s }
+  diff = existing_images - images_to_attach
+  return if diff.empty?
+
+  diff.each do |filename|
+    img = project.images.find { |i| i.blob.filename == filename }
+    img.purge
+  end
 end
 
 def attach_image_if_needed(project, image_name, dir)
