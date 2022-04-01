@@ -22,8 +22,7 @@ namespace :projects do
 
       project_images = proj_config['IMAGES'] || []
       project_images.each do |image_name|
-        project.images.attach(io: File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}"),
-                              filename: image_name)
+        attach_image_if_needed(project, image_name, dir)
       end
 
       project.save
@@ -38,8 +37,30 @@ def find_project(proj_config)
     project = Project.find_by(identifier: proj_config['IDENTIFIER'])
     project.name = proj_config['NAME']
     project.components.each(&:destroy)
-    project.images.purge
   end
 
   project
+end
+
+def attach_image_if_needed(project, image_name, dir)
+  existing_image = project.images.find { |i| i.blob.filename == image_name }
+
+  if existing_image
+    return if existing_image.blob.checksum == image_checksum(image_name, dir)
+
+    existing_image.purge
+  end
+  project.images.attach(io: File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}"),
+                        filename: image_name)
+end
+
+def image_checksum(image_name, dir)
+  io = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}")
+  OpenSSL::Digest.new('MD5').tap do |checksum|
+    while (chunk = io.read(5.megabytes))
+      checksum << chunk
+    end
+
+    io.rewind
+  end.base64digest
 end
