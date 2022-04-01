@@ -36,6 +36,10 @@ class Project
             proj.remixed_from_id = original_project.id
           end
 
+          original_project.images.each do |image|
+            remix.images.attach(image.blob)
+          end
+
           params[:components].each do |x|
             remix.components.build(x.slice(:name, :extension, :content, :index))
           end

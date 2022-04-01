@@ -6,7 +6,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
   subject(:create_remix) { described_class.call(params: remix_params, user_id: user_id, original_project: original_project) }
 
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let!(:original_project) { create(:project, :with_components) }
+  let!(:original_project) { create(:project, :with_components, :with_attached_image) }
   let(:remix_params) do
     component = original_project.components.first
     {
@@ -57,6 +57,19 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
       remixed_attrs = remixed_project.attributes.symbolize_keys.slice(:name, :project_type)
       original_attrs = original_project.attributes.symbolize_keys.slice(:name, :project_type)
       expect(remixed_attrs).to eq(original_attrs)
+    end
+
+    it 'links remix to attached images' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.images.length).to eq(original_project.images.length)
+    end
+
+    it 'creates a new attachment' do
+      expect { create_remix }.to change(ActiveStorage::Attachment, :count).by(1)
+    end
+
+    it 'does not create a new image' do
+      expect { create_remix }.not_to change(ActiveStorage::Blob, :count)
     end
 
     it 'creates new components' do
