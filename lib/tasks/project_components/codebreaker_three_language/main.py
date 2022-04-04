@@ -94,7 +94,7 @@ def menu():
   elif choice == 'm':
     message = input('What text would you like to encode?')
     code = atbash(message)
-    print code
+    print(code)
     
 # Start up
 def main():
