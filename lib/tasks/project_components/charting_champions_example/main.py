@@ -2,8 +2,7 @@
 from pygal import Bar
 
 # Create a chart
-chart = Bar()
-chart.title = 'Olympic medals'
+chart = Bar(title='Olympic medals')
 
 # Add data to the chart
 with open('medals.csv') as f:

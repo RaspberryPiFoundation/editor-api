@@ -36,11 +36,9 @@ def frequency(text):
 
 # Make frequency chart
 def make_chart(text, language):
-  chart = Bar()
-  chart.title = 'Frequency analysis'
-  chart.x_labels = text.keys() # First explicit use of keys
-  chart.add('Target message', text.values()) # First explicit use of values
-  chart.add('Language', language.values())
+  chart = Bar(title='Frequency analysis', x_labels = list(text.keys()))
+  chart.add('Target message', list(text.values())) # First explicit use of values
+  chart.add('Language', list(language.values()))
   
   chart.render()
 

@@ -15,8 +15,7 @@ def main():
   choice = input('Analysing Toy dogs. What would you like to see? \n1. Average price, \n2. Popularity, \n3. Intelligence, \nChoice:')
   
   if choice == '1':
-    chart = Bar(width=600, height=400)
-    chart.title = ' 🐶 Average price of Toy dogs by breed 🐶 '
+    chart = Bar(width=600, height=400, title=' 🐶 Average price of Toy dogs by breed 🐶 ')
     for line in lines:
       info = line.split(',')
       BreedName = info[0]
@@ -28,8 +27,7 @@ def main():
     main()
       
   if choice == '2':
-    chart = Pie(width=600, height=400)
-    chart.title = '🐶 Popularity of Toy dogs by breed 🐶 '
+    chart = Pie(width=600, height=400, title='🐶 Popularity of Toy dogs by breed 🐶 ')
     for line in lines:
       info = line.split(',')
       BreedName = info[0]
@@ -43,8 +41,7 @@ def main():
     main()
     
   if choice == '3':
-    chart = Bar(width=600, height=400)
-    chart.title = '🐶 Intelligence of Toy dogs by breed 🐶'
+    chart = Bar(width=600, height=400, title='🐶 Intelligence of Toy dogs by breed 🐶')
     for line in lines:
       info = line.split(',')
       BreedName = info[0]
