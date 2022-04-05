@@ -48,11 +48,11 @@ RSpec.describe 'Images requests', type: :request do
     end
 
     context 'when authed user is not creator' do
-  
+
       before do
         mock_oauth_user
       end
-  
+
       it 'returns forbidden response' do
         post "/api/projects/#{project.identifier}/images", params: params
         expect(response.status).to eq(403)
