@@ -48,7 +48,6 @@ RSpec.describe 'Images requests', type: :request do
     end
 
     context 'when authed user is not creator' do
-
       before do
         mock_oauth_user
       end
