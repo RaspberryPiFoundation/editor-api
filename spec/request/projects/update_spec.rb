@@ -68,9 +68,9 @@ RSpec.describe 'Project update requests', type: :request do
       mock_oauth_user(user_id)
     end
 
-    it 'returns unauthorized response' do
+    it 'returns forbidden response' do
       put "/api/projects/#{project.identifier}", params: params
-      expect(response.status).to eq(401)
+      expect(response.status).to eq(403)
     end
   end
 

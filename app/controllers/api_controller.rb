@@ -4,8 +4,8 @@ class ApiController < ActionController::API
   include OauthUser
 
   unless Rails.application.config.consider_all_requests_local
-    rescue_from ActiveRecord::RecordNotFound, with: -> { return404 }
-    rescue_from CanCan::AccessDenied, with: -> { return401 }
+    rescue_from ActiveRecord::RecordNotFound, with: -> { notfound }
+    rescue_from CanCan::AccessDenied, with: -> { denied }
   end
 
   private
@@ -19,11 +19,11 @@ class ApiController < ActionController::API
     oauth_user_id
   end
 
-  def return404
+  def notfound
     head :not_found
   end
 
-  def return401
-    head :unauthorized
+  def denied
+    head :forbidden
   end
 end

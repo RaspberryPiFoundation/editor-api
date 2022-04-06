@@ -7,6 +7,7 @@ module Api
 
       def create
         @project = Project.find_by!(identifier: params[:project_id])
+        authorize! :update, @project
         @project.images.attach(params[:images])
         render '/api/projects/images', formats: [:json]
       end
