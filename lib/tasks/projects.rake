@@ -21,9 +21,9 @@ namespace :projects do
       end
 
       project_images = proj_config['IMAGES'] || []
+      delete_removed_images(project, project_images)
       project_images.each do |image_name|
-        project.images.attach(io: File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}"),
-                              filename: image_name)
+        attach_image_if_needed(project, image_name, dir)
       end
 
       project.save
@@ -38,8 +38,41 @@ def find_project(proj_config)
     project = Project.find_by(identifier: proj_config['IDENTIFIER'])
     project.name = proj_config['NAME']
     project.components.each(&:destroy)
-    project.images.purge
   end
 
   project
+end
+
+def delete_removed_images(project, images_to_attach)
+  existing_images = project.images.map { |x| x.blob.filename.to_s }
+  diff = existing_images - images_to_attach
+  return if diff.empty?
+
+  diff.each do |filename|
+    img = project.images.find { |i| i.blob.filename == filename }
+    img.purge
+  end
+end
+
+def attach_image_if_needed(project, image_name, dir)
+  existing_image = project.images.find { |i| i.blob.filename == image_name }
+
+  if existing_image
+    return if existing_image.blob.checksum == image_checksum(image_name, dir)
+
+    existing_image.purge
+  end
+  project.images.attach(io: File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}"),
+                        filename: image_name)
+end
+
+def image_checksum(image_name, dir)
+  io = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}")
+  OpenSSL::Digest.new('MD5').tap do |checksum|
+    while (chunk = io.read(5.megabytes))
+      checksum << chunk
+    end
+
+    io.rewind
+  end.base64digest
 end
