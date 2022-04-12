@@ -1,0 +1,18 @@
+NAME: "Solar System"
+IDENTIFIER: "solar-system-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "planets"
+    extension: "csv"
+    location: "planets.csv"
+    index: 1
+    default: false
+  - name: "make_planet"
+    extension: "py"
+    location: "make_planet.py"
+    index: 2
+    default: false

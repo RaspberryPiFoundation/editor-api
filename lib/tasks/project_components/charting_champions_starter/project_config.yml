@@ -1,0 +1,8 @@
+NAME: "Charting Champions"
+IDENTIFIER: "charting-champions-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true

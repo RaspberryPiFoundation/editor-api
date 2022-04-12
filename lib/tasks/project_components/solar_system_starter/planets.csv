@@ -1,0 +1,9 @@
+planet,colour_r,colour_g,colour_b,size,orbit,speed,info
+Mercury,165,42,42,15,150,1,The smallest and fastest planet.
+Venus,255,190,200,30,200,0.75,The hottest planet in the Solar System. Water would turn to steam and some metals would melt just by being there!
+Earth,104,149,197,35,300,0.5,You are here — the only planet we know of that can support life.
+Mars,223,30,38,15,400,0.25,Home of Olympus Mons — the highest mountain in the Solar System.
+Jupiter,148,26,28,60,500,0.2,The largest planet in the Solar System but with the shortest day — a little under ten hours.
+Saturn,241,169,78,50,600,0.1,Saturn's rings are wide enough to fit almost 10 Earths side-by-side. But they're only around 10 metres high!
+Uranus,214,236,239,40,700,0.05,The coldest planet in the Solar System and the first discovered after the telescope was invented.
+Neptune,0,105,148,40,800,0.025,The farthest planet from the Sun. Neptune's day is only 16 hours — but its year is 165 Earth years!

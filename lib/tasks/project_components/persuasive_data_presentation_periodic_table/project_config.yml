@@ -1,0 +1,16 @@
+NAME: "Persuasive Data Presentation: Periodic Table"
+IDENTIFIER: "periodic-table-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "pt"
+    extension: "csv"
+    location: "pt.csv"
+    index: 1
+    default: false
+  
+IMAGES:
+  - "pt.png"

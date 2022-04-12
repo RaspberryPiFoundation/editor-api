@@ -1,0 +1,22 @@
+NAME: "Persuasive Data Presentation: Caffeinated Drinks"
+IDENTIFIER: "data-caffeine-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "xy"
+    extension: "py"
+    location: "xy.py"
+    index: 1
+    default: false
+  - name: "caffeine"
+    extension: "csv"
+    location: "caffeine.csv"
+    index: 2
+    default: false
+  
+IMAGES:
+  - "mercator.jpeg"
+  - "mercator_bw.png"

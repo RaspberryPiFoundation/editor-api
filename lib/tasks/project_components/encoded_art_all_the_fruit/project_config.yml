@@ -1,0 +1,8 @@
+NAME: "Encoded Art: All the Fruit!"
+IDENTIFIER: "all-the-fruit"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true

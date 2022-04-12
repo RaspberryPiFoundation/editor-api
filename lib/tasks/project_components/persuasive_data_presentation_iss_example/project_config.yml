@@ -1,0 +1,26 @@
+NAME: "Persuasive Data Presentation: ISS Expeditions Example"
+IDENTIFIER: "data-iss-example"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "iss-expedition-data"
+    extension: "csv"
+    location: "iss-expedition-data.csv"
+    index: 1
+    default: false
+  
+IMAGES:
+  - "be.jpg"
+  - "ca.jpg"
+  - "fr.jpg"
+  - "gb.jpg"
+  - "gm.jpg"
+  - "iss.jpg"
+  - "it.jpg"
+  - "jp.jpg"
+  - "ne.jpg"
+  - "ru.jpg"
+  - "us.jpg"
