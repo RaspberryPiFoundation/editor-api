@@ -2,8 +2,8 @@
 
 module Api
   class ProjectsController < ApiController
-    before_action :require_oauth_user, only: %i[update index]
-    before_action :load_project, only: %i[show update]
+    before_action :require_oauth_user, only: %i[update index destroy]
+    before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
 
@@ -23,6 +23,11 @@ module Api
       else
         render json: { error: result[:error] }, status: :bad_request
       end
+    end
+
+    def destroy
+      @project.destroy
+      head :ok
     end
 
     private
