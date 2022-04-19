@@ -4,9 +4,10 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    can :read, Project
+    can :show, Project
 
     return if user.blank?
+    can :index, Project, user_id: user
 
     can :update, Project, user_id: user
   end
