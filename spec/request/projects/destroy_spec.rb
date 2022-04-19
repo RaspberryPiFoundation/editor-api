@@ -19,14 +19,15 @@ RSpec.describe 'Project delete requests', type: :request do
       end
 
       it "deletes user's project" do
-        expect {
+        expect do
           delete "/api/projects/#{project.identifier}"
-        }.to change(Project, :count).by(-1)
+        end.to change(Project, :count).by(-1)
       end
     end
 
     context 'when attempting to delete another users project' do
       let(:non_owned_project) { create(:project) }
+
       it 'returns forbidden' do
         delete "/api/projects/#{non_owned_project.identifier}"
         expect(response.status).to eq(403)
@@ -36,7 +37,7 @@ RSpec.describe 'Project delete requests', type: :request do
 
   context 'when no user' do
     it 'returns unauthorized' do
-      delete "/api/projects/project-identifier"
+      delete '/api/projects/project-identifier'
       expect(response.status).to eq(401)
     end
   end
