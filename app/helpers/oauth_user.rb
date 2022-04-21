@@ -10,6 +10,8 @@ module OauthUser
   def fetch_oauth_user_id
     return nil if request.headers['Authorization'].blank?
 
+    return AUTH_USER_ID if BYPASS_AUTH
+
     json = hydra_request
     json['sub']
   end
