@@ -4,7 +4,10 @@ require 'rails_helper'
 
 RSpec.describe 'Project index requests', type: :request do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let!(:projects) { create_list(:project, 2, user_id: user_id) }
+
+  before do
+    create_list(:project, 2, user_id: user_id)
+  end
 
   context 'when user is logged in' do
     before do
