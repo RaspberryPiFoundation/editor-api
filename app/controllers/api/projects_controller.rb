@@ -2,10 +2,11 @@
 
 module Api
   class ProjectsController < ApiController
-    before_action :require_oauth_user, only: %i[update index destroy]
+    before_action :require_oauth_user, only: %i[update index destroy create]
     before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
+    skip_load_resource only: :create
 
     def index
       render :index, formats: [:json]
@@ -13,6 +14,17 @@ module Api
 
     def show
       render :show, formats: [:json]
+    end
+
+    def create
+      result = Project::Operation::Create.call(user_id: current_user)
+
+      if result.success?
+        @project = result[:project]
+        render :show, formats: [:json]
+      else
+        render json: { error: result[:error] }, status: :internal_server_error
+      end
     end
 
     def update

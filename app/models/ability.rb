@@ -8,8 +8,6 @@ class Ability
 
     return if user.blank?
 
-    can :index, Project, user_id: user
-    can :destroy, Project, user_id: user
-    can :update, Project, user_id: user
+    can %i[create index destroy update], Project, user_id: user
   end
 end

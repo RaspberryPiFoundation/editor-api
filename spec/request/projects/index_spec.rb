@@ -18,9 +18,16 @@ RSpec.describe 'Project index requests', type: :request do
       expect(response.status).to eq(200)
     end
 
+    it 'returns correct number of projects' do
+      get '/api/projects'
+      returned = JSON.parse(response.body)
+      expect(returned.length).to eq(2)
+    end
+
     it 'returns users projects' do
       get '/api/projects'
-      expect(response.body).to eq(projects_json)
+      returned = JSON.parse(response.body)
+      expect(returned.all? { |proj| proj['user_id'] == user_id }).to eq(true)
     end
   end
 
@@ -29,16 +36,5 @@ RSpec.describe 'Project index requests', type: :request do
       get '/api/projects'
       expect(response.status).to eq(401)
     end
-  end
-
-  def projects_json
-    projects.map do |p|
-      {
-        identifier: p.identifier,
-        project_type: p.project_type,
-        name: p.name,
-        user_id: p.user_id
-      }
-    end.to_json
   end
 end
