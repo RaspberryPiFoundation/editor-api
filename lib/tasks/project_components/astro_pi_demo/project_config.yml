@@ -1,0 +1,33 @@
+NAME: "Astro Pi Test Project"
+IDENTIFIER: "flight-case-demo"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+  - name: "sense_hat"
+    extension: "py"
+    location: "sense_hat.py"
+    index: 1
+    default: false
+  - name: "_sense_hat_text_dict"
+    extension: "py"
+    location: "_sense_hat_text_dict.py"
+    index: 2
+    default: false
+  - name: "sense_stick"
+    extension: "py"
+    location: "sense_stick.py"
+    index: 3
+    default: false
+  - name: "exc"
+    extension: "py"
+    location: "exc.py"
+    index: 4
+    default: false
+  - name: "gpiozero"
+    extension: "py"
+    location: "gpiozero.py"
+    index: 5
+    default: false
