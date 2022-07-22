@@ -5,16 +5,34 @@ class Project
     class Create
       require 'operation_response'
 
-      def self.call(user_id:)
-        response = OperationResponse.new
-        response[:project] = Project.new(user_id: user_id, project_type: 'python')
-        response[:project].components.build(name: 'main', extension: 'py', default: true, index: 0)
-        response[:project].save!
-        response
-      rescue StandardError
-        # TODO: log error
-        response[:error] = 'Error creating project'
-        response
+      DEFAULT_COMPONENT = { 'name' => 'main', 'extension' => 'py', 'default' => true, 'index' => 0 }.freeze
+      DEFAULT_PROJECT = { 'type' => 'python', 'name' => 'Untitled project', 'components' => [DEFAULT_COMPONENT],
+                          'image_list' => [] }.freeze
+
+      class << self
+        def call(user_id:, params:)
+          response = OperationResponse.new
+
+          project = DEFAULT_PROJECT.merge(params)
+          new_project = Project.new(project_type: project['type'], user_id: user_id, name: project['name'])
+          new_project.components.build(project['components'])
+
+          response[:project] = new_project
+          response[:project].save!
+          response
+        rescue StandardError
+          # TODO: log error
+          response[:error] = 'Error creating project'
+          response
+        end
+
+        private
+
+        def create_with_content(project, user_id)
+          new_project = Project.new(project_type: project[:type], user_id: user_id, name: 'Untitled Project')
+          new_project.components.build(project[:components])
+          new_project
+        end
       end
     end
   end
