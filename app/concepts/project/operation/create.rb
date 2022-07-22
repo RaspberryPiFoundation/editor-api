@@ -13,7 +13,11 @@ class Project
         def call(user_id:, params:)
           response = OperationResponse.new
 
-          project = DEFAULT_PROJECT.merge(params.deep_symbolize_keys)
+          project = DEFAULT_PROJECT.merge(params.deep_transform_keys do |key|
+                                            key.to_sym
+          rescue StandardError
+            key
+                                          end)
           new_project = Project.new(project_type: project[:type], user_id: user_id, name: project[:name])
           new_project.components.build(project[:components])
 

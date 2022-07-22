@@ -6,7 +6,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
   subject(:create_project) { described_class.call(user_id: user_id, params: project_params) }
 
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let(:project_params) do 
+  let(:project_params) do
     {}
   end
 
@@ -42,7 +42,8 @@ RSpec.describe Project::Operation::Create, type: :unit do
 
     context 'when initial project present' do
       subject(:create_project_with_content) { described_class.call(user_id: user_id, params: project_params) }
-      let(:project_params) do 
+
+      let(:project_params) do
         {
           type: 'python',
           components: [
@@ -61,7 +62,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
         expect(create_project_with_content.success?).to eq(true)
       end
 
-      it 'returns project with correct component content', focus: true do
+      it 'returns project with correct component content' do
         new_project = create_project_with_content[:project]
         expect(new_project.components.first.content).to eq('print("hello world")')
       end
