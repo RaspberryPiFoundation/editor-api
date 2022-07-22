@@ -6,9 +6,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
   subject(:create_project) { described_class.call(user_id: user_id, params: project_params) }
 
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let(:project_params) do
-    {}
-  end
+  let(:project_params) { {} }
 
   before do
     mock_phrase_generation
