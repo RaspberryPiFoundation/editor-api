@@ -54,7 +54,7 @@ module Api
 
     def project_params
       params.permit(project: [:name, :type, :image_list,
-                              { components: %i[id name extension content index default] }]).fetch(:project)
+                              { components: %i[id name extension content index default] }]).fetch(:project, {})
     end
   end
 end
