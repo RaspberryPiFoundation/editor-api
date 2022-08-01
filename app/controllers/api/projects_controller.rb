@@ -17,7 +17,7 @@ module Api
     end
 
     def create
-      result = Project::Operation::Create.call(user_id: current_user)
+      result = Project::Operation::Create.call(params: project_params, user_id: current_user)
 
       if result.success?
         @project = result[:project]
@@ -53,9 +53,8 @@ module Api
     end
 
     def project_params
-      params.require(:project)
-            .permit(:name,
-                    components: %i[id name extension content index])
+      params.permit(project: [:name, :type, :image_list,
+                              { components: %i[id name extension content index default] }]).fetch(:project, {})
     end
   end
 end
