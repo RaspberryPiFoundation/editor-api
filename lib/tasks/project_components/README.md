@@ -24,7 +24,7 @@ Every directory representing a `project` must contain a `project_config.yml`. Th
   - `default` - a boolean which if `true`, the file is shown in the editor by default on page load. Only one file should be given `default: true` (generally `main.py`), with all other files in the `project` having `default: false`.
 - `IMAGES` - a list of the names of the image files associated with the project, including their extensions. This property can be omitted if the `project` has no images.
 
-An example `project_config.yml` with all of the above properties can be seen [here](https://github.com/RaspberryPiFoundation/editor-api/blob/main/lib/tasks/project_components/persuasive_data_presentation_iss_starter/project_config.yml)
+An example `project_config.yml` with all of the above properties can be seen [here](https://github.com/RaspberryPiFoundation/editor-api/blob/main/lib/tasks/project_components/persuasive_data_presentation_iss_starter/project_config.yml).
 
 ## Getting the projects created in the database
 Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-ui/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
