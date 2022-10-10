@@ -1,5 +1,5 @@
 NAME: "Hello 🌍🌎🌏"
-IDENTIFIER: "python-hello-starter"
+IDENTIFIER: "hello-world-starter"
 COMPONENTS:
   - name: "main"
     extension: "py"
