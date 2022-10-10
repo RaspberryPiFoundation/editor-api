@@ -1,5 +1,5 @@
 NAME: "Hello 🌍🌎🌏 Example"
-IDENTIFIER: "python-emoji-example"
+IDENTIFIER: "hello-world-solution"
 COMPONENTS:
   - name: "main"
     extension: "py"
