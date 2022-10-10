@@ -1,12 +1,17 @@
-#!/bin/python3
-
-from emoji import * 
-from datetime import *
+from datetime import datetime
 from random import randint
 
-# Put function definitions under here
+# Emoji variables to use in your project
+world = '🌍🌎🌏'
+python = 'Python 🐍'
+
+# Emojis to copy and paste into your code 
+# 📅🕒🎨🎮🔬🎉🕶️🎲🦄🚀💯⭐💛
+# 😃😜❤️📚⚽🎾👟♻️🌳🔥✨🥺🌈
 
 # Useful characters :',()*_/.#
 
+# Function definitions        
+  
 # Put code to run under here
 
