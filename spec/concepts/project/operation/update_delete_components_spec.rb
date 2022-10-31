@@ -34,7 +34,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
 
       it 'deletes the correct component' do
         update
-        expect(Component.find_by(id: component_to_delete.id)).to eq(nil)
+        expect(Component.find_by(id: component_to_delete.id)).to be_nil
       end
     end
   end

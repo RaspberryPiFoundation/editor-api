@@ -14,7 +14,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
 
   describe '.call' do
     it 'returns success' do
-      expect(create_project.success?).to eq(true)
+      expect(create_project.success?).to be(true)
     end
 
     it 'creates a new project' do
@@ -57,7 +57,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
       end
 
       it 'returns success' do
-        expect(create_project_with_content.success?).to eq(true)
+        expect(create_project_with_content.success?).to be(true)
       end
 
       it 'returns project with correct component content' do
@@ -74,7 +74,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
       end
 
       it 'returns failure' do
-        expect(create_project.failure?).to eq(true)
+        expect(create_project.failure?).to be(true)
       end
 
       it 'returns error message' do

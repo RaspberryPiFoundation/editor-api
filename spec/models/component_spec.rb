@@ -17,7 +17,7 @@ RSpec.describe Component, type: :model do
     describe 'validations' do
       it 'returns valid? false when name changed' do
         component.name = 'updated'
-        expect(component.valid?).to eq(false)
+        expect(component.valid?).to be(false)
       end
 
       it 'sets error message when name changed' do
@@ -29,7 +29,7 @@ RSpec.describe Component, type: :model do
 
       it 'returns valid? false when extension changed' do
         component.extension = 'txt'
-        expect(component.valid?).to eq(false)
+        expect(component.valid?).to be(false)
       end
 
       it 'sets error message when extension changed' do

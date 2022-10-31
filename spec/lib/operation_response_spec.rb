@@ -8,7 +8,7 @@ RSpec.describe OperationResponse do
     context 'when :error not present' do
       it 'returns true' do
         response = described_class.new
-        expect(response.success?).to eq(true)
+        expect(response.success?).to be(true)
       end
     end
 
@@ -16,7 +16,7 @@ RSpec.describe OperationResponse do
       it 'returns false' do
         response = described_class.new
         response[:error] = 'An error'
-        expect(response.success?).to eq(false)
+        expect(response.success?).to be(false)
       end
     end
   end
@@ -25,7 +25,7 @@ RSpec.describe OperationResponse do
     context 'when :error not present' do
       it 'returns false' do
         response = described_class.new
-        expect(response.failure?).to eq(false)
+        expect(response.failure?).to be(false)
       end
     end
 
@@ -33,7 +33,7 @@ RSpec.describe OperationResponse do
       it 'returns true' do
         response = described_class.new
         response[:error] = 'An error'
-        expect(response.failure?).to eq(true)
+        expect(response.failure?).to be(true)
       end
     end
   end
