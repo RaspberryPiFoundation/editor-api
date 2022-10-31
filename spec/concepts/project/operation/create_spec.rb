@@ -82,7 +82,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
         expect(create_project[:error]).to eq('Error creating project')
       end
 
-      it 'sents the exception to Sentry' do
+      it 'sent the exception to Sentry' do
         create_project
         expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
