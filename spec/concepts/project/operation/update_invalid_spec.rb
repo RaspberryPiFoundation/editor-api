@@ -28,7 +28,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
   describe '.call' do
     context 'when updated project component is invalid' do
       it 'returns failure? true' do
-        expect(update.failure?).to eq(true)
+        expect(update.failure?).to be(true)
       end
 
       it 'does not amend any project properties' do

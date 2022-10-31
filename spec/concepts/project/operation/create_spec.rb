@@ -14,7 +14,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
 
   describe '.call' do
     it 'returns success' do
-      expect(create_project.success?).to eq(true)
+      expect(create_project.success?).to be(true)
     end
 
     it 'creates a new project' do
@@ -57,7 +57,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
       end
 
       it 'returns success' do
-        expect(create_project_with_content.success?).to eq(true)
+        expect(create_project_with_content.success?).to be(true)
       end
 
       it 'returns project with correct component content' do
@@ -71,14 +71,20 @@ RSpec.describe Project::Operation::Create, type: :unit do
         mock_project = instance_double(Project)
         allow(mock_project).to receive(:components).and_raise('Some error')
         allow(Project).to receive(:new).and_return(mock_project)
+        allow(Sentry).to receive(:capture_exception)
       end
 
       it 'returns failure' do
-        expect(create_project.failure?).to eq(true)
+        expect(create_project.failure?).to be(true)
       end
 
       it 'returns error message' do
         expect(create_project[:error]).to eq('Error creating project')
+      end
+
+      it 'sent the exception to Sentry' do
+        create_project
+        expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
     end
   end

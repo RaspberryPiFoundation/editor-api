@@ -33,7 +33,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
 
     it 'returns success' do
       result = create_remix
-      expect(result.success?).to eq(true)
+      expect(result.success?).to be(true)
     end
 
     it 'creates new project' do
@@ -104,7 +104,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
 
       it 'returns failure' do
         result = create_remix
-        expect(result.failure?).to eq(true)
+        expect(result.failure?).to be(true)
       end
 
       it 'returns error message' do
@@ -122,7 +122,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
 
       it 'returns failure' do
         result = create_remix
-        expect(result.failure?).to eq(true)
+        expect(result.failure?).to be(true)
       end
 
       it 'returns error message' do
@@ -143,7 +143,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
       end
 
       it 'returns failure' do
-        expect(create_remix.failure?).to eq(true)
+        expect(create_remix.failure?).to be(true)
       end
 
       it 'sets error message' do

@@ -2,9 +2,7 @@
 
 class OperationResponse < Hash
   def success?
-    return false unless self[:error].nil?
-
-    true
+    fetch(:error, nil).nil?
   end
 
   def failure?

@@ -30,7 +30,7 @@ RSpec.describe 'Project index requests', type: :request do
     it 'returns users projects' do
       get '/api/projects'
       returned = JSON.parse(response.body)
-      expect(returned.all? { |proj| proj['user_id'] == user_id }).to eq(true)
+      expect(returned.all? { |proj| proj['user_id'] == user_id }).to be(true)
     end
   end
 

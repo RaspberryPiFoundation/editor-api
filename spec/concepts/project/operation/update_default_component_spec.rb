@@ -18,7 +18,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
       end
 
       it 'returns failure? true' do
-        expect(update.failure?).to eq(true)
+        expect(update.failure?).to be(true)
       end
 
       it 'returns error message' do
