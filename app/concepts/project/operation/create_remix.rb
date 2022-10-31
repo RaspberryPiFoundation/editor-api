@@ -1,16 +1,19 @@
 # frozen_string_literal: true
+require 'operation_response'
 
 class Project
   module Operation
     class CreateRemix
-      require 'operation_response'
-
       class << self
         def call(params:, user_id:, original_project:)
           response = OperationResponse.new
 
           validate_params(response, params, user_id, original_project)
-          remix_project(response, params, user_id, original_project)
+          remix_project(response, params, user_id, original_project) if response.success?
+          response
+        rescue StandardError => e
+          Sentry.capture_exception(e)
+          response[:error] = I18n.t('errors.project.remixing.cannot_save')
           response
         end
 
@@ -22,11 +25,9 @@ class Project
         end
 
         def remix_project(response, params, user_id, original_project)
-          return if response[:error]
-
           response[:project] = create_remix(original_project, params, user_id)
 
-          response[:error] = I18n.t('errors.project.remixing.cannot_save') unless response[:project].save
+          response[:project].save!
           response
         end
 
@@ -43,6 +44,7 @@ class Project
           params[:components].each do |x|
             remix.components.build(x.slice(:name, :extension, :content, :index))
           end
+
           remix
         end
       end

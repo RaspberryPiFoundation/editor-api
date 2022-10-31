@@ -1,22 +1,25 @@
 # frozen_string_literal: true
 
+require 'operation_response'
+
 class Project
   module Operation
     class Update
-      require 'operation_response'
-
-      def self.call(params:, project:)
-        response = setup_response(project)
-
-        setup_deletions(response, params)
-        update_project_attributes(response, params)
-        update_component_attributes(response, params)
-        persist_changes(response)
-
-        response
-      end
-
       class << self
+        def call(params:, project:)
+          response = setup_response(project)
+
+          setup_deletions(response, params)
+          update_project_attributes(response, params)
+          update_component_attributes(response, params)
+          persist_changes(response)
+          response
+        rescue StandardError => e
+          Sentry.capture_exception(e)
+          response[:error] ||= 'Error persisting changes'
+          response
+        end
+
         private
 
         def setup_response(project)
@@ -41,13 +44,13 @@ class Project
         end
 
         def update_project_attributes(response, params)
-          return if response[:error]
+          return if response.failure?
 
           response[:project].assign_attributes(params.slice(:name))
         end
 
         def update_component_attributes(response, params)
-          return if response[:error]
+          return if response.failure?
 
           params[:components].each do |component_params|
             if component_params[:id].present?
@@ -60,14 +63,11 @@ class Project
         end
 
         def persist_changes(response)
-          return if response[:error]
+          return if response.failure?
 
           ActiveRecord::Base.transaction do
             response[:project].save!
             response[:project].components.where(id: response[:component_ids_to_delete]).destroy_all
-          rescue StandardError
-            # TODO: log error?
-            response[:error] = 'Error persisting changes'
           end
         end
       end
