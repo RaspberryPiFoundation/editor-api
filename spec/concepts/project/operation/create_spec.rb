@@ -71,6 +71,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
         mock_project = instance_double(Project)
         allow(mock_project).to receive(:components).and_raise('Some error')
         allow(Project).to receive(:new).and_return(mock_project)
+        allow(Sentry).to receive(:capture_exception)
       end
 
       it 'returns failure' do
@@ -79,6 +80,11 @@ RSpec.describe Project::Operation::Create, type: :unit do
 
       it 'returns error message' do
         expect(create_project[:error]).to eq('Error creating project')
+      end
+
+      it 'sents the exception to Sentry' do
+        create_project
+        expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
     end
   end
