@@ -1,13 +1,22 @@
 # frozen_string_literal: true
 
+require 'operation_response'
+
 class Project
   module Operation
     class Create
-      require 'operation_response'
-
-      DEFAULT_COMPONENT = { name: 'main', extension: 'py', default: true, index: 0 }.freeze
-      DEFAULT_PROJECT = { type: 'python', name: 'Untitled project', components: [DEFAULT_COMPONENT],
-                          image_list: [] }.freeze
+      DEFAULT_COMPONENT = {
+        name: 'main',
+        extension: 'py',
+        default: true,
+        index: 0
+      }.freeze
+      DEFAULT_PROJECT = {
+        type: 'python',
+        name: 'Untitled project',
+        components: [DEFAULT_COMPONENT],
+        image_list: []
+      }.freeze
 
       class << self
         def call(user_id:, params:)
@@ -26,8 +35,8 @@ class Project
           response[:project] = new_project
           response[:project].save!
           response
-        rescue StandardError
-          # TODO: log error
+        rescue StandardError => e
+          Sentry.capture_exception(e)
           response[:error] = 'Error creating project'
           response
         end

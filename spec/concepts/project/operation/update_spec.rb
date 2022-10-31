@@ -30,7 +30,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
       let(:component_params) { [default_component_params, edited_component_params] }
 
       it 'returns success? true' do
-        expect(update.success?).to eq(true)
+        expect(update.success?).to be(true)
       end
 
       it 'updates project properties' do
@@ -54,7 +54,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
       it 'creates component with correct properties' do
         update
         created_component = project.components.find_by(**new_component_params)
-        expect(created_component).not_to eq(nil)
+        expect(created_component).not_to be_nil
       end
     end
   end
