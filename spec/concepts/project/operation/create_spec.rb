@@ -45,15 +45,15 @@ RSpec.describe Project::Operation::Create, type: :unit do
 
       let(:project_params) do
         ActionController::Parameters.new({
-          type: 'python',
-          components: [{
-            name: 'main',
-            extension: 'py',
-            content: 'print("hello world")',
-            index: 0,
-            default: true
-          }]
-        })
+                                           type: 'python',
+                                           components: [{
+                                             name: 'main',
+                                             extension: 'py',
+                                             content: 'print("hello world")',
+                                             index: 0,
+                                             default: true
+                                           }]
+                                         })
       end
 
       it 'returns success' do
