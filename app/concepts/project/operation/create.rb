@@ -22,7 +22,7 @@ class Project
         def call(user_id:, params:)
           response = OperationResponse.new
 
-          project = DEFAULT_PROJECT.merge(
+          project_hash = DEFAULT_PROJECT.merge(
             params.to_hash.deep_transform_keys do |key|
               key.to_sym
             rescue StandardError
@@ -30,21 +30,26 @@ class Project
             end
           )
 
-          new_project = Project.new(project_type: project[:type], user_id: user_id, name: project[:name])
-          new_project.components.build(project[:components])
-
-          puts('attaching images')
-          project[:image_list].each do |image|
-            new_project.images.attach(image.blob)
-          end
-
-          response[:project] = new_project
+          response[:project] = build_project(project_hash, user_id)
           response[:project].save!
           response
         rescue StandardError => e
           Sentry.capture_exception(e)
           response[:error] = 'Error creating project'
           response
+        end
+
+        private
+
+        def build_project(project_hash, user_id)
+          new_project = Project.new(project_type: project_hash[:type], user_id: user_id, name: project_hash[:name])
+          new_project.components.build(project_hash[:components])
+
+          project_hash[:image_list].each do |image|
+            new_project.images.attach(image.blob)
+          end
+
+          new_project
         end
       end
     end
