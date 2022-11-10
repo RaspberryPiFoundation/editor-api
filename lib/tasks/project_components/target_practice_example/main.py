@@ -29,19 +29,19 @@ def setup():
 
 def draw():
 # Things to do in every frame
-  fill('cyan')
-  rect(0, 0, 400, 250) # Sky
-  fill('lightgreen')
-  rect(0, 250, 400, 150) # Grass
-  fill('sienna') 
-  triangle(150, 350, 200, 150, 250, 350) # Stand 
-  fill('blue')
-  circle(200, 200, 170) # Outer circle 
-  fill('red')   
-  circle(200, 200, 110) # Inner circle   
-  fill('yellow')   
-  circle(200, 200, 30) # Middle  
-  shoot_arrow()
+    fill('cyan')
+    rect(0, 0, 400, 250) # Sky
+    fill('lightgreen')
+    rect(0, 250, 400, 150) # Grass
+    fill('sienna') 
+    triangle(150, 350, 200, 150, 250, 350) # Stand 
+    fill('blue')
+    circle(200, 200, 170) # Outer circle 
+    fill('red')   
+    circle(200, 200, 110) # Inner circle   
+    fill('yellow')   
+    circle(200, 200, 30) # Middle  
+    shoot_arrow()
   
 # Keep this to run your code
 run(frame_rate=2)
