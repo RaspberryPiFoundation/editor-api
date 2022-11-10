@@ -10,11 +10,10 @@ def setup():
 # Setup your game here
     size(400, 400) # width and height
 
-
 def draw():
 # Things to do in every frame
-  fill('cyan')
-  rect(0, 0, 400, 250) # Sky
+    fill('cyan')
+    rect(0, 0, 400, 250) # Sky    
   
 # Keep this to run your code
 run(frame_rate=2)
