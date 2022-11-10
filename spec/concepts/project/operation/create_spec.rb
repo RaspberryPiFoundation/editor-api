@@ -6,13 +6,15 @@ RSpec.describe Project::Operation::Create, type: :unit do
   subject(:create_project) { described_class.call(user_id: user_id, params: project_params) }
 
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let(:project_params) { {} }
 
   before do
     mock_phrase_generation
+    ActionController::Parameters.permit_all_parameters = true
   end
 
   describe '.call' do
+    let(:project_params) { ActionController::Parameters.new({}) }
+
     it 'returns success' do
       expect(create_project.success?).to be(true)
     end
@@ -42,7 +44,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
       subject(:create_project_with_content) { described_class.call(user_id: user_id, params: project_params) }
 
       let(:project_params) do
-        {
+        ActionController::Parameters.new({
           type: 'python',
           components: [
             {
@@ -53,7 +55,7 @@ RSpec.describe Project::Operation::Create, type: :unit do
               default: true
             }
           ]
-        }
+        })
       end
 
       it 'returns success' do
