@@ -1,5 +1,5 @@
 NAME: "Target Practice Example"
-IDENTIFIER: "target-practice-example"
+IDENTIFIER: "target-practice-solution"
 COMPONENTS:
   - name: "main"
     extension: "py"
