@@ -37,13 +37,13 @@ RSpec.describe 'Images requests', type: :request do
       it 'returns success response' do
         post "/api/projects/#{project.identifier}/images", params: params
 
-        expect(response.status).to eq(200)
+        expect(response).to have_http_status(:ok)
       end
 
       it 'returns 404 response if invalid project' do
         post '/api/projects/no-such-project/images'
 
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -54,7 +54,7 @@ RSpec.describe 'Images requests', type: :request do
 
       it 'returns forbidden response' do
         post "/api/projects/#{project.identifier}/images", params: params
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:forbidden)
       end
     end
 
@@ -62,7 +62,7 @@ RSpec.describe 'Images requests', type: :request do
       it 'returns unauthorized' do
         post "/api/projects/#{project.identifier}/images"
 
-        expect(response.status).to eq(401)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

@@ -19,7 +19,7 @@ RSpec.describe 'Create project requests', type: :request do
 
       it 'returns success' do
         post '/api/projects'
-        expect(response.status).to eq(200)
+        expect(response).to have_http_status(:ok)
       end
     end
 
@@ -34,14 +34,14 @@ RSpec.describe 'Create project requests', type: :request do
 
       it 'returns error' do
         post '/api/projects'
-        expect(response.status).to eq(500)
+        expect(response).to have_http_status(:internal_server_error)
       end
     end
 
     context 'when no auth user' do
       it 'returns unauthorized' do
         post '/api/projects'
-        expect(response.status).to eq(401)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

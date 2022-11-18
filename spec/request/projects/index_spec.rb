@@ -18,7 +18,7 @@ RSpec.describe 'Project index requests', type: :request do
 
     it 'returns success response' do
       get '/api/projects'
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns correct number of projects' do
@@ -37,7 +37,7 @@ RSpec.describe 'Project index requests', type: :request do
   context 'when no user' do
     it 'returns unauthorized' do
       get '/api/projects'
-      expect(response.status).to eq(401)
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end

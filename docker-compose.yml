@@ -2,19 +2,16 @@ version: "3.9"
 services:
   db:
     image: postgres:14.1
-    command: postgres -c listen_addresses='*'
     environment:
       - POSTGRES_USER
       - POSTGRES_PASSWORD
       - POSTGRES_DB
-    ports:
-      - "5434:5432"
+
   web:
     build: .
     command: bash -c "rm -f tmp/pids/server.pid && bundle exec rails s -p 3009 -b '0.0.0.0'"
     volumes:
       - .:/app
-      - bundle:/usr/local/bundle
     ports:
       - "3009:3009"
     depends_on:
@@ -22,6 +19,3 @@ services:
     stdin_open: true
     tty: true
 
-volumes:
-  pg-data: null
-  bundle: null

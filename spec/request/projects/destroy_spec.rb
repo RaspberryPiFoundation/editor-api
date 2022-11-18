@@ -15,7 +15,7 @@ RSpec.describe 'Project delete requests', type: :request do
     context 'when deleting a project the user owns' do
       it 'returns success' do
         delete "/api/projects/#{project.identifier}"
-        expect(response.status).to eq(200)
+        expect(response).to have_http_status(:ok)
       end
 
       it "deletes user's project" do
@@ -30,7 +30,7 @@ RSpec.describe 'Project delete requests', type: :request do
 
       it 'returns forbidden' do
         delete "/api/projects/#{non_owned_project.identifier}"
-        expect(response.status).to eq(403)
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
@@ -38,7 +38,7 @@ RSpec.describe 'Project delete requests', type: :request do
   context 'when no user' do
     it 'returns unauthorized' do
       delete '/api/projects/project-identifier'
-      expect(response.status).to eq(401)
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end

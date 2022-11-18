@@ -48,7 +48,7 @@ module Api
 
     def html_project
       content = <<~CON
-        <html>\n  <head>\n    <link rel=\"stylesheet\" type=\"text/css\" href=\"style.css\">\n
+        <html>\n  <head>\n    <link rel="stylesheet" type="text/css" href="style.css">\n
           </head> <body>\n    <h1>Heading</h1>\n    <p>Paragraph</p>\n  </body>\n</html>
       CON
 
