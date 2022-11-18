@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Component, type: :model do
+RSpec.describe Component do
   subject { build(:component) }
 
   it { is_expected.to belong_to(:project) }

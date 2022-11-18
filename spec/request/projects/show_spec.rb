@@ -18,7 +18,7 @@ RSpec.describe 'Project show requests', type: :request do
   it 'returns success response' do
     get "/api/projects/#{project.identifier}"
 
-    expect(response.status).to eq(200)
+    expect(response).to have_http_status(:ok)
   end
 
   it 'returns json' do
@@ -34,6 +34,6 @@ RSpec.describe 'Project show requests', type: :request do
   it 'returns 404 response if invalid project' do
     get '/api/projects/no-such-project'
 
-    expect(response.status).to eq(404)
+    expect(response).to have_http_status(:not_found)
   end
 end

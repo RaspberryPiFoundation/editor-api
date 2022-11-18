@@ -27,14 +27,14 @@ RSpec.describe 'Remix requests', type: :request do
       it 'returns success response' do
         post "/api/projects/#{original_project.identifier}/remix", params: { project: project_params }
 
-        expect(response.status).to eq(200)
+        expect(response).to have_http_status(:ok)
       end
 
       it 'returns 404 response if invalid project' do
         project_params[:identifier] = 'no-such-project'
         post '/api/projects/no-such-project/remix', params: { project: project_params }
 
-        expect(response.status).to eq(404)
+        expect(response).to have_http_status(:not_found)
       end
     end
 
@@ -49,7 +49,7 @@ RSpec.describe 'Remix requests', type: :request do
       it 'returns 400' do
         post "/api/projects/#{original_project.identifier}/remix", params: { project: project_params }
 
-        expect(response.status).to eq(400)
+        expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns error message' do
@@ -63,7 +63,7 @@ RSpec.describe 'Remix requests', type: :request do
       it 'returns unauthorized' do
         post "/api/projects/#{original_project.identifier}/remix"
 
-        expect(response.status).to eq(401)
+        expect(response).to have_http_status(:unauthorized)
       end
     end
   end

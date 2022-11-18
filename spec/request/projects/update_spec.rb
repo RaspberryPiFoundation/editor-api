@@ -34,7 +34,7 @@ RSpec.describe 'Project update requests', type: :request do
 
     it 'returns success response' do
       put "/api/projects/#{project.identifier}", params: params
-      expect(response.status).to eq(200)
+      expect(response).to have_http_status(:ok)
     end
 
     it 'returns updated project json' do
@@ -55,7 +55,7 @@ RSpec.describe 'Project update requests', type: :request do
 
       it 'returns error response' do
         put "/api/projects/#{project.identifier}", params: params
-        expect(response.status).to eq(400)
+        expect(response).to have_http_status(:bad_request)
       end
     end
   end
@@ -70,7 +70,7 @@ RSpec.describe 'Project update requests', type: :request do
 
     it 'returns forbidden response' do
       put "/api/projects/#{project.identifier}", params: params
-      expect(response.status).to eq(403)
+      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -78,7 +78,7 @@ RSpec.describe 'Project update requests', type: :request do
     it 'returns unauthorized' do
       put "/api/projects/#{project.identifier}"
 
-      expect(response.status).to eq(401)
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end
