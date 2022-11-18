@@ -1,5 +1,5 @@
 NAME: "Target Practice"
-IDENTIFIER: "python-archery-starter"
+IDENTIFIER: "target-practice-starter"
 COMPONENTS:
   - name: "main"
     extension: "py"
