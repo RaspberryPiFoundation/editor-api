@@ -2,7 +2,8 @@
 
 module Api
   class DefaultProjectsController < ApiController
-    require 'phrase_identifier'
+    before_action :require_oauth_user, only: %i[u create]
+    include 'phrase_identifier'
 
     def show
       data = if params[:type] == 'html'

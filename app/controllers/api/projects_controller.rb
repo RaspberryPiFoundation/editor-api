@@ -2,7 +2,7 @@
 
 module Api
   class ProjectsController < ApiController
-    before_action :require_oauth_user, only: %i[update index destroy create]
+    before_action :require_oauth_user, only: %i[update index destroy]
     before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
@@ -17,7 +17,8 @@ module Api
     end
 
     def create
-      result = Project::Operation::Create.call(params: project_params, user_id: current_user)
+      project_hash = project_params.merge(user_id: current_user)
+      result = Project::Operation::Create.call(project_hash:)
 
       if result.success?
         @project = result[:project]
@@ -28,7 +29,7 @@ module Api
     end
 
     def update
-      result = Project::Operation::Update.call(params: project_params, project: @project)
+      result = Project::Operation::Update.call(project: @project, params: project_params, user_id: current_user)
 
       if result.success?
         render :show, formats: [:json]
@@ -53,14 +54,14 @@ module Api
     end
 
     def project_params
-      params.permit(project: [
+      params.fetch(:project, {}).permit(
                       :name,
                       :project_type,
                       {
                         image_list: [],
                         components: %i[id name extension content index default]
                       }
-                    ]).fetch(:project, {})
+                    )
     end
   end
 end
