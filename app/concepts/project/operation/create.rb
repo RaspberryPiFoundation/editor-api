@@ -2,7 +2,7 @@
 
 require 'operation_response'
 
-class Project::Create
+class Project::Operation::Create
   class << self
     def call(project_hash:)
       response = OperationResponse.new
