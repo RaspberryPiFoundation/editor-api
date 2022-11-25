@@ -18,18 +18,20 @@ RSpec.describe Project::Create, type: :unit do
     context 'with valid content' do
       subject(:create_project_with_content) { described_class.call(project_hash:) }
 
-      let(:project_hash) {{
-                                           project_type: 'python',
-                                           components: [{
-                                             name: 'main',
-                                             extension: 'py',
-                                             content: 'print("hello world")',
-                                             index: 0,
-                                             default: true
-                                           }],
-                                           image_list: [],
-                                           user_id:
-      }}
+      let(:project_hash) do
+        {
+          project_type: 'python',
+          components: [{
+            name: 'main',
+            extension: 'py',
+            content: 'print("hello world")',
+            index: 0,
+            default: true
+          }],
+          image_list: [],
+          user_id:
+        }
+      end
 
       it 'returns success' do
         expect(create_project_with_content.success?).to be(true)

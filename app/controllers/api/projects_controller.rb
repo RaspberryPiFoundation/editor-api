@@ -30,7 +30,7 @@ module Api
 
     def update
       update_hash = project_params.merge(user_id: current_user)
-      result = Project::Update.call(project: @project,update_hash:)
+      result = Project::Update.call(project: @project, update_hash:)
 
       if result.success?
         render :show, formats: [:json]

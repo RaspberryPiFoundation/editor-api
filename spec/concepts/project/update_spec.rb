@@ -60,7 +60,7 @@ RSpec.describe Project::Update, type: :unit do
   end
 
   def component_properties_hash(component)
-    component.attributes.symbolize_keys().slice(
+    component.attributes.symbolize_keys.slice(
       :name,
       :content,
       :extension,
@@ -69,7 +69,7 @@ RSpec.describe Project::Update, type: :unit do
   end
 
   def default_component_hash
-    default_component.attributes.symbolize_keys().slice(
+    default_component.attributes.symbolize_keys.slice(
       :id,
       :name,
       :content,
