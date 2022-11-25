@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Images requests', type: :request do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let(:project) { create(:project, user_id: user_id) }
+  let(:project) { create(:project, user_id:) }
   let(:image_filename) { 'test_image_1.png' }
   let(:params) { { images: [fixture_file_upload(image_filename, 'image/png')] } }
   let(:expected_json) do
@@ -25,7 +25,7 @@ RSpec.describe 'Images requests', type: :request do
       end
 
       it 'attaches file to project' do
-        expect { post "/api/projects/#{project.identifier}/images", params: params }.to change { project.images.count }.by(1)
+        expect { post "/api/projects/#{project.identifier}/images", params: }.to change { project.images.count }.by(1)
       end
 
       it 'returns file list' do

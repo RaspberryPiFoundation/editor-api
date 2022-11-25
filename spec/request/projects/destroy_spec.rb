@@ -6,7 +6,7 @@ RSpec.describe 'Project delete requests', type: :request do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
 
   context 'when user is logged in' do
-    let!(:project) { create(:project, user_id: user_id) }
+    let!(:project) { create(:project, user_id:) }
 
     before do
       mock_oauth_user(user_id)

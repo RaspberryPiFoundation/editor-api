@@ -2,15 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Operation::Update, type: :unit do
-  subject(:update) { described_class.call(params: project_params, project: project) }
+RSpec.describe Project::Update, type: :unit do
+  subject(:update) { described_class.call(project:, update_hash:) }
 
   let!(:project) { create(:project, :with_default_component) }
   let(:default_component) { project.components.first }
 
   describe '.call' do
     context 'when default file is removed' do
-      let(:project_params) do
+      let(:update_hash) do
         {
           name: 'updated project name',
           components: []
@@ -35,7 +35,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
     end
 
     context 'when default file properties are changed' do
-      let(:default_component_params) do
+      let(:default_component_hash) do
         default_component.attributes.symbolize_keys.slice(
           :id,
           :name,
@@ -45,25 +45,25 @@ RSpec.describe Project::Operation::Update, type: :unit do
         )
       end
 
-      let(:project_params) do
+      let(:update_hash) do
         {
           name: 'updated project name',
-          components: [default_component_params]
+          components: [default_component_hash]
         }
       end
 
       it 'does not update file name' do
-        default_component_params[:name] = 'Updated name'
+        default_component_hash[:name] = 'Updated name'
         expect { update }.not_to change { default_component.reload.name }
       end
 
       it 'does not update file extension' do
-        default_component_params[:extension] = 'txt'
+        default_component_hash[:extension] = 'txt'
         expect { update }.not_to change { default_component.reload.extension }
       end
 
       it 'does not update project' do
-        default_component_params[:name] = 'Updated name'
+        default_component_hash[:name] = 'Updated name'
         expect { update }.not_to change { project.reload.name }
       end
     end

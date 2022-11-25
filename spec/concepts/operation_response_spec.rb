@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-require 'spec_helper'
-require_relative '../../lib/operation_response'
+require 'rails_helper'
 
 RSpec.describe OperationResponse do
   describe '#success?' do

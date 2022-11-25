@@ -6,7 +6,7 @@ module Api
       before_action :require_oauth_user
 
       def create
-        result = Project::Operation::CreateRemix.call(params: remix_params,
+        result = Project::CreateRemix.call(params: remix_params,
                                                       user_id: oauth_user_id,
                                                       original_project: project)
 

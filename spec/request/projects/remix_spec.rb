@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require_relative '../../../lib/operation_response'
 
 RSpec.describe 'Remix requests', type: :request do
   let!(:original_project) { create(:project) }
@@ -43,7 +42,7 @@ RSpec.describe 'Remix requests', type: :request do
         mock_oauth_user(user_id)
         error_response = OperationResponse.new
         error_response[:error] = 'Something went wrong'
-        allow(Project::Operation::CreateRemix).to receive(:call).and_return(error_response)
+        allow(Project::CreateRemix).to receive(:call).and_return(error_response)
       end
 
       it 'returns 400' do

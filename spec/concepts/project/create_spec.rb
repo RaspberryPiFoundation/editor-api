@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Operation::Create, type: :unit do
-  subject(:create_project) { described_class.call(user_id: user_id, params: project_params) }
+RSpec.describe Project::Create, type: :unit do
+  subject(:create_project) { described_class.call(project_hash:) }
 
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
 
@@ -13,48 +13,23 @@ RSpec.describe Project::Operation::Create, type: :unit do
   end
 
   describe '.call' do
-    let(:project_params) { ActionController::Parameters.new({}) }
+    let(:project_hash) { ActionController::Parameters.new({}).merge(user_id:) }
 
-    it 'returns success' do
-      expect(create_project.success?).to be(true)
-    end
+    context 'with valid content' do
+      subject(:create_project_with_content) { described_class.call(project_hash:) }
 
-    it 'creates a new project' do
-      expect { create_project }.to change(Project, :count).by(1)
-    end
-
-    it 'assigns project to user' do
-      created_project = create_project[:project]
-      expect(created_project.user_id).to eq(user_id)
-    end
-
-    it 'returns project with single component' do
-      components = create_project[:project].components
-      expect(components.length).to eq(1)
-    end
-
-    it 'returns project with default main component' do
-      component = create_project[:project].components.first
-      attrs = component.attributes.symbolize_keys.slice(:name, :extension, :content, :default, :index)
-      expected = { name: 'main', extension: 'py', content: nil, default: true, index: 0 }
-      expect(attrs).to eq(expected)
-    end
-
-    context 'when initial project present' do
-      subject(:create_project_with_content) { described_class.call(user_id: user_id, params: project_params) }
-
-      let(:project_params) do
-        ActionController::Parameters.new({
-                                           type: 'python',
+      let(:project_hash) {{
+                                           project_type: 'python',
                                            components: [{
                                              name: 'main',
                                              extension: 'py',
                                              content: 'print("hello world")',
                                              index: 0,
                                              default: true
-                                           }]
-                                         })
-      end
+                                           }],
+                                           image_list: [],
+                                           user_id:
+      }}
 
       it 'returns success' do
         expect(create_project_with_content.success?).to be(true)
