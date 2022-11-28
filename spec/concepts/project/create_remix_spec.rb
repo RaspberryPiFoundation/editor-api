@@ -2,8 +2,8 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Operation::CreateRemix, type: :unit do
-  subject(:create_remix) { described_class.call(params: remix_params, user_id: user_id, original_project: original_project) }
+RSpec.describe Project::CreateRemix, type: :unit do
+  subject(:create_remix) { described_class.call(params: remix_params, user_id:, original_project:) }
 
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let!(:original_project) { create(:project, :with_components, :with_attached_image) }
@@ -118,7 +118,7 @@ RSpec.describe Project::Operation::CreateRemix, type: :unit do
     end
 
     context 'when original project is not present' do
-      subject(:create_remix) { described_class.call(params: remix_params, user_id: user_id, original_project: nil) }
+      subject(:create_remix) { described_class.call(params: remix_params, user_id:, original_project: nil) }
 
       it 'returns failure' do
         result = create_remix

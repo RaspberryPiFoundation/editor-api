@@ -2,7 +2,7 @@
 
 module Api
   class DefaultProjectsController < ApiController
-    require 'phrase_identifier'
+    before_action :require_oauth_user, only: %i[create]
 
     def show
       data = if params[:type] == 'html'
@@ -23,7 +23,7 @@ module Api
 
     def create
       identifier = PhraseIdentifier.generate
-      @project = Project.new(identifier: identifier, project_type: 'python')
+      @project = Project.new(identifier:, project_type: 'python')
       @project.components << Component.new(python_component)
       @project.save
 
@@ -55,7 +55,7 @@ module Api
       {
         type: 'html',
         components: [
-          { lang: 'html', name: 'index', content: content },
+          { lang: 'html', name: 'index', content: },
           { lang: 'css', name: 'style', content: "h1 {\n  color: blue;\n}" },
           { lang: 'css', name: 'test', content: "p {\n  background-color: red;\n}" }
         ]

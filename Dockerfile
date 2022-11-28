@@ -3,8 +3,7 @@ FROM ruby:3.1
 RUN apt-get update -qq && apt-get install -y nodejs postgresql-client
 WORKDIR /app
 COPY Gemfile /app/Gemfile
-COPY Gemfile.lock /app/Gemfile.lock
-RUN bundle install
+RUN bundle install && cp Gemfile.lock /tmp
 
 # Add a script to be executed every time the container starts.
 COPY entrypoint.sh /usr/bin/
