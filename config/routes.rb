@@ -2,7 +2,7 @@
 
 Rails.application.routes.draw do
   namespace :api do
-    resource :default_project, only: %i[show create] do
+    resource :default_project, only: %i[show] do
       get '/html', to: 'default_projects#html'
       get '/python', to: 'default_projects#python'
     end

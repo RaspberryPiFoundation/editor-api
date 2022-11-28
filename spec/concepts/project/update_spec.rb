@@ -2,13 +2,13 @@
 
 require 'rails_helper'
 
-RSpec.describe Project::Operation::Update, type: :unit do
+RSpec.describe Project::Update, type: :unit do
   subject(:update) do
-    params = {
+    update_hash = {
       name: 'updated project name',
-      components: component_params
+      components: component_hash
     }
-    described_class.call(params: params, project: project)
+    described_class.call(project:, update_hash:)
   end
 
   let!(:project) { create(:project, :with_default_component, :with_components) }
@@ -16,7 +16,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
   let(:default_component) { project.components.first }
 
   describe '.call' do
-    let(:edited_component_params) do
+    let(:edited_component_hash) do
       {
         id: editable_component.id,
         name: 'updated component name',
@@ -27,7 +27,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
     end
 
     context 'when only amending components' do
-      let(:component_params) { [default_component_params, edited_component_params] }
+      let(:component_hash) { [default_component_hash, edited_component_hash] }
 
       it 'returns success? true' do
         expect(update.success?).to be(true)
@@ -40,12 +40,12 @@ RSpec.describe Project::Operation::Update, type: :unit do
       it 'updates component properties' do
         expect { update }
           .to change { component_properties_hash(editable_component.reload) }
-          .to(edited_component_params.slice(:name, :content, :extension, :index))
+          .to(edited_component_hash.slice(:name, :content, :extension, :index))
       end
     end
 
     context 'when a new component has been added' do
-      let(:component_params) { [default_component_params, edited_component_params, new_component_params] }
+      let(:component_hash) { [default_component_hash, edited_component_hash, new_component_hash] }
 
       it 'creates a new component' do
         expect { update }.to change(Component, :count).by(1)
@@ -53,17 +53,22 @@ RSpec.describe Project::Operation::Update, type: :unit do
 
       it 'creates component with correct properties' do
         update
-        created_component = project.components.find_by(**new_component_params)
+        created_component = project.components.find_by(**new_component_hash)
         expect(created_component).not_to be_nil
       end
     end
   end
 
   def component_properties_hash(component)
-    component.attributes.symbolize_keys.slice(:name, :content, :extension, :index)
+    component.attributes.symbolize_keys.slice(
+      :name,
+      :content,
+      :extension,
+      :index
+    )
   end
 
-  def default_component_params
+  def default_component_hash
     default_component.attributes.symbolize_keys.slice(
       :id,
       :name,
@@ -73,7 +78,7 @@ RSpec.describe Project::Operation::Update, type: :unit do
     )
   end
 
-  def new_component_params
+  def new_component_hash
     {
       name: 'new component',
       content: 'new component content',
