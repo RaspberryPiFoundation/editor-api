@@ -20,25 +20,25 @@ RSpec.describe 'Project show requests', type: :request do
       mock_oauth_user(project.user_id)
     end
 
-    context 'loading own project' do
+    context 'when loading own project' do
       it 'returns success response' do
         get "/api/projects/#{project.identifier}"
-    
+
         expect(response).to have_http_status(:ok)
       end
-    
+
       it 'returns json' do
         get "/api/projects/#{project.identifier}"
         expect(response.content_type).to eq('application/json; charset=utf-8')
       end
-    
+
       it 'returns the project json' do
         get "/api/projects/#{project.identifier}"
         expect(response.body).to eq(project_json)
       end
     end
 
-    context 'loading another user\'s project' do
+    context 'when loading another user\'s project' do
       let!(:another_project) { create(:project) }
       let(:another_project_json) do
         {
@@ -50,23 +50,22 @@ RSpec.describe 'Project show requests', type: :request do
           image_list: []
         }.to_json
       end
-    
+
       it 'returns forbidden response' do
         get "/api/projects/#{another_project.identifier}"
-    
+
         expect(response).to have_http_status(:forbidden)
       end
-    
-      it 'does not return the project json' do 
+
+      it 'does not return the project json' do
         get "/api/projects/#{another_project.identifier}"
         expect(response.body).not_to include(another_project_json)
       end
-
     end
   end
 
   context 'when user is not logged in' do
-    context 'loading a starter project' do
+    context 'when loading a starter project' do
       let!(:starter_project) { create(:project, user_id: nil) }
       let(:starter_project_json) do
         {
@@ -101,14 +100,14 @@ RSpec.describe 'Project show requests', type: :request do
       end
     end
 
-    context 'loading an owned project' do 
+    context 'when loading an owned project' do
       it 'returns forbidden response' do
         get "/api/projects/#{project.identifier}"
-    
+
         expect(response).to have_http_status(:forbidden)
       end
-    
-      it 'does not return the project json' do 
+
+      it 'does not return the project json' do
         get "/api/projects/#{project.identifier}"
         expect(response.body).not_to include(project_json)
       end
