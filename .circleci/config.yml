@@ -31,7 +31,8 @@ jobs:
     steps:
       - checkout
       # - browser-tools/install-firefox
-      - ruby/install-deps
+      - ruby/install-deps:
+          key: gems-v2-
       - run:
           command: 'dockerize -wait tcp://localhost:5432 -timeout 1m'
           name: Wait for DB
