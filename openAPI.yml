@@ -1,0 +1,44 @@
+openapi: 3.0.0
+info:
+  title: Raspberry Pi Code Editor API
+  description: API that serves the Rasperry Pi Code Editor at https://editor.raspberrypi.org
+  version: 0.1.0
+
+servers:
+  - url: https://editor-api.raspberrypi.org/api
+    description: Production server
+  - url: https://staging-editor-api.raspberrypi.org/api
+    description: Staging server
+
+paths:
+  /projects/{identifier}:
+    get:
+      summary: Returns the project with the given identifier
+      responses:
+        '200':
+          description: A project object
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  identifier:
+                    type: string
+                    example: python-emoji-example
+                  project_type:
+                    type: string
+                    example: python
+                  name:
+                    type: string
+                    example: Hello World
+                  user_id:
+                    type: string
+                    format: uuid
+                    example: 3e1f2179-261a-4ebe-92b5-2c4b5c93193b
+                  components:
+                    type: array
+                  image_list:
+                    type: array
+        '404':
+          description: A project with the specified identifier was not found.
+
