@@ -18,8 +18,6 @@ class ApiController < ActionController::API
     return @current_user if @current_user
 
     token = request.headers['Authorization']
-    return nil unless token
-
     @current_user = HydraAdminApi.fetch_oauth_user_id(token:)
   end
 
