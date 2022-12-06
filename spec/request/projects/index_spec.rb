@@ -10,6 +10,8 @@ RSpec.describe 'Project index requests', type: :request do
   end
 
   context 'when user is logged in' do
+    let(:headers) { { Authorization: 'dummy-token' } }
+
     before do
       # create non user projects
       create_list(:project, 2)
@@ -17,24 +19,24 @@ RSpec.describe 'Project index requests', type: :request do
     end
 
     it 'returns success response' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns correct number of projects' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       returned = JSON.parse(response.body)
       expect(returned.length).to eq(2)
     end
 
     it 'returns users projects' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       returned = JSON.parse(response.body)
       expect(returned.all? { |proj| proj['user_id'] == user_id }).to be(true)
     end
   end
 
-  context 'when no user' do
+  context 'when no token is given' do
     it 'returns unauthorized' do
       get '/api/projects'
       expect(response).to have_http_status(:unauthorized)

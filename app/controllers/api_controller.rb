@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class ApiController < ActionController::API
-  include OauthUser
+require 'hydra_admin_api'
 
+class ApiController < ActionController::API
   unless Rails.application.config.consider_all_requests_local
     rescue_from ActiveRecord::RecordNotFound, with: -> { notfound }
     rescue_from CanCan::AccessDenied, with: -> { denied }
@@ -10,13 +10,17 @@ class ApiController < ActionController::API
 
   private
 
-  def require_oauth_user
-    head :unauthorized unless oauth_user_id
+  def authorize_user
+    head :unauthorized unless current_user
   end
 
   def current_user
-    # current_user is required by CanCanCan
-    oauth_user_id
+    return @current_user if @current_user
+
+    token = request.headers['Authorization']
+    return nil unless token
+
+    @current_user = HydraAdminApi.fetch_oauth_user_id(token:)
   end
 
   def notfound
