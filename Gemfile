@@ -21,6 +21,7 @@ gem 'stimulus-rails'
 gem 'turbo-rails'
 
 group :development, :test do
+  gem 'climate_control'
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'faker'
