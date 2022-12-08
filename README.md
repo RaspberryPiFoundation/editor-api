@@ -11,6 +11,12 @@ From the project directory build the app using docker:
 docker-compose build
 ```
 
+Set up the database:
+
+```
+docker compose run api rails db:setup
+```
+
 # Running the app
 
 Start the application and its dependencies via docker:
