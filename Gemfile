@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '~> 3.1.0'
 
-gem 'aws-sdk-s3', require: false
+gem 'aws-sdk-s3'
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'faraday'
@@ -16,9 +16,6 @@ gem 'puma', '~> 5.6'
 gem 'rack-cors'
 gem 'rails', '~> 7.0.0'
 gem 'sentry-rails', '~> 5.5.0'
-gem 'sprockets-rails'
-gem 'stimulus-rails'
-gem 'turbo-rails'
 
 group :development, :test do
   gem 'dotenv-rails'
