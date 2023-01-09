@@ -26,6 +26,8 @@ class Project
       end
 
       def setup_deletions(response, update_hash)
+        return if update_hash[:components].nil?
+
         existing_component_ids = response[:project].components.pluck(:id)
         updated_component_ids = update_hash[:components].pluck(:id)
         response[:component_ids_to_delete] = existing_component_ids - updated_component_ids
@@ -47,7 +49,7 @@ class Project
       end
 
       def update_component_attributes(response, update_hash)
-        return if response.failure?
+        return if response.failure? || update_hash[:components].nil?
 
         update_hash[:components].each do |component_params|
           if component_params[:id].present?
