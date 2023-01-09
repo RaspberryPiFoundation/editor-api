@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Project index requests', type: :request do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
+  let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
   before do
     create_list(:project, 2, user_id:)
@@ -31,6 +32,12 @@ RSpec.describe 'Project index requests', type: :request do
       get '/api/projects'
       returned = JSON.parse(response.body)
       expect(returned.all? { |proj| proj['user_id'] == user_id }).to be(true)
+    end
+
+    it 'returns all keys in response' do
+      get '/api/projects'
+      returned = JSON.parse(response.body)
+      returned.each { |project| expect(project.keys).to eq(project_keys) }
     end
   end
 
