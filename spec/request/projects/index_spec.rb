@@ -41,6 +41,25 @@ RSpec.describe 'Project index requests', type: :request do
     end
   end
 
+  context 'when user has multiple pages worth of projects' do
+    before do
+      create_list(:project, 10, user_id:)
+      mock_oauth_user(user_id)
+    end
+
+    it 'returns 8 on the first page' do
+      get '/api/projects?page=1'
+      returned = JSON.parse(response.body)
+      expect(returned.length).to eq(8)
+    end
+
+    it 'returns the next 8 projects on next page' do
+      get '/api/projects?page=2'
+      returned = JSON.parse(response.body)
+      expect(returned.length).to eq(4)
+    end
+  end
+
   context 'when no user' do
     it 'returns unauthorized' do
       get '/api/projects'

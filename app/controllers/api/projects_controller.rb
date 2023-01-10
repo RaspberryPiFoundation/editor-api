@@ -10,7 +10,7 @@ module Api
 
     def index
       paginated_projects = @projects.page(params[:page]).per(8)
-      render index: paginated_projects, formats: [:json]
+      render json: paginated_projects
     end
 
     def show
