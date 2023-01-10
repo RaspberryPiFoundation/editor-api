@@ -9,7 +9,7 @@ module Api
     skip_load_resource only: :create
 
     def index
-      paginated_projects = projects.page(params[:page]).per(8)
+      paginated_projects = @projects.page(params[:page]).per(8)
       render index: paginated_projects, formats: [:json]
     end
 
