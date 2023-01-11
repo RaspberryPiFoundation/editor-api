@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Project index requests', type: :request do
+  include PaginationLinksMock
+
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
@@ -41,26 +43,40 @@ RSpec.describe 'Project index requests', type: :request do
     end
   end
 
-  context 'when user has multiple pages worth of projects' do
+  context 'when the projects index has pagination' do
     before do
       create_list(:project, 10, user_id:)
       mock_oauth_user(user_id)
     end
 
-    it 'returns 8 on the first page' do
-      get '/api/projects?page=1'
+    it 'returns the default number of projects on the first page' do
+      get '/api/projects'
       returned = JSON.parse(response.body)
-      pp('***')
-      pp(response.header)
       expect(returned.length).to eq(8)
     end
 
-    it 'returns the next 8 projects on next page' do
+    it 'returns the next set of projects on the next page' do
       get '/api/projects?page=2'
       returned = JSON.parse(response.body)
-      pp('***')
-      pp(response.header)
       expect(returned.length).to eq(4)
+    end
+
+    it 'has the correct response headers for the first page' do
+      last_link = page_links(2, 'last')
+      next_link = page_links(2, 'next')
+      expected_link_header = [last_link, next_link].join(', ')
+
+      get '/api/projects'
+      expect(response.headers['Link']).to eq expected_link_header
+    end
+
+    it 'has the correct response headers for the next page' do
+      first_link = page_links(1, 'first')
+      prev_link = page_links(1, 'prev')
+      expected_link_header = [first_link, prev_link].join(', ')
+
+      get '/api/projects?page=2'
+      expect(response.headers['Link']).to eq expected_link_header
     end
   end
 
