@@ -49,6 +49,25 @@ RSpec.describe 'Project update requests', type: :request do
       expect(Project::Update).to have_received(:call)
     end
 
+    context 'when no components specified' do
+      let(:params) { { project: { name: 'updated project name' } } }
+
+      it 'returns success response' do
+        put "/api/projects/#{project.identifier}", params: params
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns json with updated project properties' do
+        put "/api/projects/#{project.identifier}", params: params
+        expect(response.body).to include('updated project name')
+      end
+
+      it 'returns json with previous project components' do
+        put "/api/projects/#{project.identifier}", params: params
+        expect(response.body).to include(project.components.first.attributes[:content].to_s)
+      end
+    end
+
     context 'when update is invalid' do
       let(:params) { { project: { components: [] } } }
 

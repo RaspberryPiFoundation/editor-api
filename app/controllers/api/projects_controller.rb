@@ -58,6 +58,7 @@ module Api
 
     def project_params
       params.fetch(:project, {}).permit(
+        :identifier,
         :name,
         :project_type,
         {
