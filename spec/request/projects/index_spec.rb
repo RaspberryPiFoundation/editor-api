@@ -50,12 +50,16 @@ RSpec.describe 'Project index requests', type: :request do
     it 'returns 8 on the first page' do
       get '/api/projects?page=1'
       returned = JSON.parse(response.body)
+      pp('***')
+      pp(response.header)
       expect(returned.length).to eq(8)
     end
 
     it 'returns the next 8 projects on next page' do
       get '/api/projects?page=2'
       returned = JSON.parse(response.body)
+      pp('***')
+      pp(response.header)
       expect(returned.length).to eq(4)
     end
   end

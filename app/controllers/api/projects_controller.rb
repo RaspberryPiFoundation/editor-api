@@ -5,6 +5,7 @@ module Api
     before_action :require_oauth_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
+    after_action :set_pagination_link_header, only: [:index]
     load_and_authorize_resource
     skip_load_resource only: :create
 
@@ -64,6 +65,25 @@ module Api
           components: %i[id name extension content index default]
         }
       )
+    end
+
+    def set_pagination_link_header
+      params_page = request.query_parameters[:page].to_i
+      total_pages = @projects.page(1).per(8).total_pages
+      first_page = @projects.page(params_page).per(8).first_page?
+      last_page = @projects.page(params_page).per(9).last_page?
+
+      page = {}
+      page[:current] = params_page
+      page[:total] = total_pages
+      page[:first] = 1 if page[:total] > 1 && !first_page
+      page[:last] = total_pages if total_pages > 1 && !last_page
+      page[:next] = params_page + 1 unless last_page
+      page[:prev] = params_page - 1 unless first_page
+
+      pp(page)
+
+      headers['Link'] = 'Link data'
     end
   end
 end
