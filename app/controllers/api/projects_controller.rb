@@ -74,8 +74,6 @@ module Api
       last_page = @projects.page(params_page).per(9).last_page?
 
       page = {}
-      page[:current] = params_page
-      page[:total] = total_pages
       page[:first] = 1 if page[:total] > 1 && !first_page
       page[:last] = total_pages if total_pages > 1 && !last_page
       page[:next] = params_page + 1 unless last_page
