@@ -68,16 +68,11 @@ module Api
     end
 
     def pagination_link_header
-      params_page = params.key?(:page) ? params[:page].to_i : 1
-      total_pages = @projects.page(1).per(8).total_pages
-      first_page = @projects.page(params_page).per(8).first_page?
-      last_page = @projects.page(params_page).per(9).last_page?
-
       pagination_links = []
       pagination_links << page_links(1, 'first') if total_pages > 1 && !first_page
       pagination_links << page_links(total_pages, 'last') if total_pages > 1 && !last_page
-      pagination_links << page_links(params_page + 1, 'next') unless last_page
-      pagination_links << page_links(params_page - 1, 'prev') unless first_page
+      pagination_links << page_links(page + 1, 'next') unless last_page
+      pagination_links << page_links(page - 1, 'prev') unless first_page
 
       headers['Link'] = pagination_links.join('; ')
     end
@@ -87,15 +82,20 @@ module Api
       "<#{request.base_url}/api/projects?#{page_info}>, rel=\"#{rel_type}\""
     end
 
-    # def pagination_links(page)
-    #   pagination_links = []
+    def page
+      params.key?(:page) ? params[:page].to_i : 1
+    end
 
-    #   page.each do |k, v|
-    #     page_query = request.query_parameters.merge({ page: v })
-    #     pagination_links << "<#{request.base_url}/api/projects?#{page_query.to_param}>, rel=\"#{k}\""
-    #   end
+    def total_pages
+      @projects.page(1).per(8).total_pages
+    end
 
-    #   headers['Link'] = pagination_links.join('; ')
-    # end
+    def first_page
+      @projects.page(page).per(8).first_page?
+    end
+
+    def last_page
+      @projects.page(page).per(9).last_page?
+    end
   end
 end
