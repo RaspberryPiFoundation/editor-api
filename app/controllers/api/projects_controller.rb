@@ -10,7 +10,7 @@ module Api
     skip_load_resource only: :create
 
     def index
-      @paginated_projects = @projects.page(params[:page]).per(8)
+      @paginated_projects = @projects.page(params[:page])
       render index: @paginated_projects, formats: [:json]
     end
 
@@ -75,12 +75,12 @@ module Api
       pagination_links << page_links(page + 1, 'next') unless last_page
       pagination_links << page_links(page - 1, 'prev') unless first_page
 
-      headers['Link'] = pagination_links.join('; ')
+      headers['Link'] = pagination_links.join(', ')
     end
 
     def page_links(to_page, rel_type)
       page_info = "page=#{to_page}"
-      "<#{request.base_url}/api/projects?#{page_info}>, rel=\"#{rel_type}\""
+      "<#{request.base_url}/api/projects?#{page_info}>; rel=\"#{rel_type}\""
     end
 
     def page
@@ -88,15 +88,15 @@ module Api
     end
 
     def total_pages
-      @projects.page(1).per(8).total_pages
+      @projects.page(1).total_pages
     end
 
     def first_page
-      @projects.page(page).per(8).first_page?
+      @projects.page(page).first_page?
     end
 
     def last_page
-      @projects.page(page).per(9).last_page?
+      @projects.page(page).last_page?
     end
   end
 end
