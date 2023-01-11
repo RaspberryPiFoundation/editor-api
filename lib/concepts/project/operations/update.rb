@@ -53,12 +53,16 @@ class Project
 
         update_hash[:components].each do |component_params|
           if component_params[:id].present?
-            component = response[:project].components.select { |c| c.id == component_params[:id] }.first
-            component.assign_attributes(component_params)
+            overwrite_component_attributes(response, component_params)
           else
             response[:project].components.build(component_params)
           end
         end
+      end
+
+      def overwrite_component_attributes(response, component_params)
+        component = response[:project].components.select { |c| c.id == component_params[:id] }.first
+        component.assign_attributes(component_params)
       end
 
       def persist_changes(response)
