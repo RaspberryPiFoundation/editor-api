@@ -70,15 +70,18 @@ module Api
 
     def pagination_link_header
       pagination_links = []
-      pagination_links << page_links(1, 'first') if total_pages > 1 && !first_page
-      pagination_links << page_links(total_pages, 'last') if total_pages > 1 && !last_page
-      pagination_links << page_links(page + 1, 'next') unless last_page
-      pagination_links << page_links(page - 1, 'prev') unless first_page
+      pagination_links << page_links(first_page, 'first')
+      pagination_links << page_links(last_page, 'last')
+      pagination_links << page_links(next_page, 'next')
+      pagination_links << page_links(prev_page, 'prev')
 
+      pagination_links.compact_blank!
       headers['Link'] = pagination_links.join(', ')
     end
 
     def page_links(to_page, rel_type)
+      return if to_page.nil?
+
       page_info = "page=#{to_page}"
       "<#{request.base_url}/api/projects?#{page_info}>; rel=\"#{rel_type}\""
     end
@@ -92,11 +95,19 @@ module Api
     end
 
     def first_page
-      @projects.page(page).first_page?
+      @projects.page(page).first_page? ? nil : 1
     end
 
     def last_page
-      @projects.page(page).last_page?
+      @projects.page(page).last_page? ? nil : total_pages
+    end
+
+    def next_page
+      @projects.page(page).next_page
+    end
+
+    def prev_page
+      @projects.page(page).prev_page
     end
   end
 end
