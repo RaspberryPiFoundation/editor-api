@@ -5,7 +5,7 @@ module Api
     before_action :require_oauth_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
-    after_action :set_pagination_link_header, only: [:index]
+    after_action :pagination_link_header, only: [:index]
     load_and_authorize_resource
     skip_load_resource only: :create
 
@@ -67,21 +67,35 @@ module Api
       )
     end
 
-    def set_pagination_link_header
-      params_page = request.query_parameters[:page].to_i
+    def pagination_link_header
+      params_page = params.key?(:page) ? params[:page].to_i : 1
       total_pages = @projects.page(1).per(8).total_pages
       first_page = @projects.page(params_page).per(8).first_page?
       last_page = @projects.page(params_page).per(9).last_page?
 
-      page = {}
-      page[:first] = 1 if page[:total] > 1 && !first_page
-      page[:last] = total_pages if total_pages > 1 && !last_page
-      page[:next] = params_page + 1 unless last_page
-      page[:prev] = params_page - 1 unless first_page
+      pagination_links = []
+      pagination_links << page_links(1, 'first') if total_pages > 1 && !first_page
+      pagination_links << page_links(total_pages, 'last') if total_pages > 1 && !last_page
+      pagination_links << page_links(params_page + 1, 'next') unless last_page
+      pagination_links << page_links(params_page - 1, 'prev') unless first_page
 
-      pp(page)
-
-      headers['Link'] = 'Link data'
+      headers['Link'] = pagination_links.join('; ')
     end
+
+    def page_links(to_page, rel_type)
+      page_info = "page=#{to_page}"
+      "<#{request.base_url}/api/projects?#{page_info}>, rel=\"#{rel_type}\""
+    end
+
+    # def pagination_links(page)
+    #   pagination_links = []
+
+    #   page.each do |k, v|
+    #     page_query = request.query_parameters.merge({ page: v })
+    #     pagination_links << "<#{request.base_url}/api/projects?#{page_query.to_param}>, rel=\"#{k}\""
+    #   end
+
+    #   headers['Link'] = pagination_links.join('; ')
+    # end
   end
 end
