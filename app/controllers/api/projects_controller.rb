@@ -53,7 +53,7 @@ module Api
     end
 
     def load_projects
-      @projects = Project.where(user_id: current_user)
+      @projects = Project.where(user_id: current_user).order(updated_at: :desc)
     end
 
     def project_params
