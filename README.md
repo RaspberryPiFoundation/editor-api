@@ -27,9 +27,9 @@ docker-compose up
 
 ## Updating gems inside the container
 
-This can be done with the `bin/with_builder.sh` script:
+This can be done with the `bin/with-builder.sh` script:
 ```
-./bin/with_builder.sh bundle update
+./bin/with-builder.sh bundle update
 ```
 which should update the Gems in the container, without the need for rebuilding.
 
