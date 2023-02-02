@@ -1,0 +1,8 @@
+NAME: 'Blank HTML Starter'
+IDENTIFIER: 'blank-html-starter'
+COMPONENTS:
+  - name: 'main'
+    extension: 'html'
+    location: 'main.html'
+    index: 0
+    default: true
