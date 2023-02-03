@@ -8,6 +8,9 @@ Rails.application.routes.draw do
     end
 
     resources :projects, only: %i[index show update destroy create] do
+      collection do
+        post :upload
+      end
       resource :remix, only: %i[create], controller: 'projects/remixes'
       resource :images, only: %i[create], controller: 'projects/images'
     end

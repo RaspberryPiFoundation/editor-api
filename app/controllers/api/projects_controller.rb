@@ -44,6 +44,11 @@ module Api
       head :ok
     end
 
+    def upload
+      puts 'hello there'
+      head :ok
+    end
+
     private
 
     def load_project
