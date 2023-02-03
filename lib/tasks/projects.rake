@@ -32,7 +32,8 @@ end
 
 def find_project(proj_config)
   if Project.find_by(identifier: proj_config['IDENTIFIER']).nil?
-    project = Project.new(identifier: proj_config['IDENTIFIER'], name: proj_config['NAME'])
+    project = Project.new(identifier: proj_config['IDENTIFIER'], name: proj_config['NAME'],
+                          project_type: proj_config['TYPE'] ||= 'python')
   else
     project = Project.find_by(identifier: proj_config['IDENTIFIER'])
     project.name = proj_config['NAME']

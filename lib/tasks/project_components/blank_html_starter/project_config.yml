@@ -1,0 +1,14 @@
+NAME: 'Blank HTML & CSS Starter'
+IDENTIFIER: 'blank-html-starter'
+TYPE: 'html'
+COMPONENTS:
+  - name: 'index'
+    extension: 'html'
+    location: 'index.html'
+    index: 0
+    default: true
+  - name: 'styles'
+    extension: 'css'
+    location: styles.css
+    index: 1
+    default: false
