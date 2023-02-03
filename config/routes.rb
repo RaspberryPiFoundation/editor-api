@@ -10,8 +10,8 @@ Rails.application.routes.draw do
     resources :projects, only: %i[index show update destroy create] do
       resource :remix, only: %i[create], controller: 'projects/remixes'
       resource :images, only: %i[create], controller: 'projects/images'
-    end 
+    end
   end
-  
+
   resource :github_webhooks, only: :create, defaults: { formats: :json }
 end
