@@ -12,4 +12,6 @@ Rails.application.routes.draw do
       resource :images, only: %i[create], controller: 'projects/images'
     end
   end
+
+  resource :github_webhooks, only: :create, defaults: { formats: :json }
 end

@@ -35,3 +35,6 @@ services:
       - POSTGRES_DB
       - POSTGRES_PASSWORD
       - POSTGRES_USER
+  smee:
+    image: deltaprojects/smee-client
+    command: -u $SMEE_TUNNEL -t http://api:3009/github_webhooks
