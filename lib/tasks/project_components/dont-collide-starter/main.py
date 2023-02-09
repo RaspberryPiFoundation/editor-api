@@ -1,6 +1,6 @@
 #!/bin/python3
 
-from p5 import *
+import py5
 from random import randint, seed
 
 # Include global variables here
@@ -15,4 +15,4 @@ def draw():
 
   
 # Keep this to run your code
-run()
+py5.run_sketch()
