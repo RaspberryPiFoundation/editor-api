@@ -5,26 +5,26 @@ require 'yaml'
 namespace :projects do
   desc 'Import starter projects'
   task create_starter: :environment do
-    code_formats = [".py", '.csv', '.txt']
+    code_formats = ['.py', '.csv', '.txt']
     image_formats = ['.png', '.jpg', '.jpeg']
 
     Dir.each_child("#{File.dirname(__FILE__)}/project_components") do |dir|
       proj_config = YAML.safe_load(File.read("#{File.dirname(__FILE__)}/project_components/#{dir}/project_config.yml"))
       project = find_project(proj_config)
       files = Dir.children("#{File.dirname(__FILE__)}/project_components/#{dir}")
-      code_files = files.filter{ |file| code_formats.include? File.extname(file) }
-      image_files = files.filter{ |file| image_formats.include? File.extname(file) }
+      code_files = files.filter { |file| code_formats.include? File.extname(file) }
+      image_files = files.filter { |file| image_formats.include? File.extname(file) }
 
       code_files.each do |file|
-          name = File.basename(file, '.*')
-          extension = File.extname(file).delete('.')
-          code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{File.basename(file)}")
-          default = (File.basename(file)=='main.py')
-          project_component = Component.new(name:, extension:, content: code, default:)
-          project.components << project_component
+        name = File.basename(file, '.*')
+        extension = File.extname(file).delete('.')
+        code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{File.basename(file)}")
+        default = (File.basename(file) == 'main.py')
+        project_component = Component.new(name:, extension:, content: code, default:)
+        project.components << project_component
       end
       delete_removed_images(project, image_files)
-      image_files.each do |image| 
+      image_files.each do |image|
         attach_image_if_needed(project, image, dir)
       end
 

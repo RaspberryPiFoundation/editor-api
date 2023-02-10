@@ -81,7 +81,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
     end
 
     context 'when a new component has been added before remixing' do
-      let(:new_component_params) { { name: 'added_component', extension: 'py', content: 'some added component content'} }
+      let(:new_component_params) { { name: 'added_component', extension: 'py', content: 'some added component content' } }
 
       before do
         remix_params[:components] << new_component_params
