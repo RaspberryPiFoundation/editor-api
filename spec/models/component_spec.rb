@@ -8,8 +8,6 @@ RSpec.describe Component do
   it { is_expected.to belong_to(:project) }
   it { is_expected.to validate_presence_of(:name) }
   it { is_expected.to validate_presence_of(:extension) }
-  it { is_expected.to validate_presence_of(:index) }
-  it { is_expected.to validate_uniqueness_of(:index).scoped_to(:project_id) }
 
   context 'when default component' do
     let(:component) { create(:default_python_component) }

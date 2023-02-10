@@ -25,7 +25,7 @@ namespace :projects do
       end
       delete_removed_images(project, image_files)
       image_files.each do |image| 
-        attach_image_if_needed(project, image)
+        attach_image_if_needed(project, image, dir)
       end
 
       # project_images = proj_config['IMAGES'] || []
@@ -65,20 +65,21 @@ def delete_removed_images(project, images_to_attach)
   end
 end
 
-def attach_image_if_needed(project, image)
+def attach_image_if_needed(project, image, dir)
   image_name = File.basename(image)
   existing_image = project.images.find { |i| i.blob.filename == image_name }
 
   if existing_image
-    return if existing_image.blob.checksum == image_checksum(image)
+    return if existing_image.blob.checksum == image_checksum(image_name, dir)
 
     existing_image.purge
   end
-  project.images.attach(image)
+  project.images.attach(io: File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}"),
+                        filename: image_name)
 end
 
-def image_checksum(image)
-  io = File.open(image)
+def image_checksum(image_name, dir)
+  io = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{image_name}")
   OpenSSL::Digest.new('MD5').tap do |checksum|
     while (chunk = io.read(5.megabytes))
       checksum << chunk

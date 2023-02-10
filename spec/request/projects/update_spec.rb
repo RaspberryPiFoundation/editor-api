@@ -14,8 +14,7 @@ RSpec.describe 'Project update requests', type: :request do
         :id,
         :name,
         :content,
-        :extension,
-        :index
+        :extension
       )
     end
 
