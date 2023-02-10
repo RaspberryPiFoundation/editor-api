@@ -38,4 +38,4 @@ group :test do
   gem 'webmock'
 end
 
-gem "good_job", "~> 3.12"
+gem 'good_job', '~> 3.12'
