@@ -37,3 +37,5 @@ group :test do
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webmock'
 end
+
+gem 'good_job', '~> 3.12'
