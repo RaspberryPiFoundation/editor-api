@@ -3,28 +3,6 @@
 class ProjectImporter
   attr_reader :name, :identifier, :images, :components, :type
 
-  # Example of components and images input data structure
-  # components = [
-  #   {
-  #     filename: "index"
-  #     extension: "html"
-  #     contents: "<html></html>"
-  #     default: true
-  # },
-  # {
-  #   filename: "styles"
-  #   extension: "css"
-  #   contents: "html { color: pink } "
-  #   default: false
-  # }]
-
-  # images = {
-  #   [
-  #     filename: "foo.png"
-  #     contents: # binary
-  #   ]
-  # }
-
   def initialize(name:, identifier:, type:, components:, images: [])
     @name = name
     @identifier = identifier
@@ -38,14 +16,12 @@ class ProjectImporter
       delete_components
 
       components.each do |component|
-        project_component = Component.new(*component)
+        project_component = Component.new(**component)
         project.components << project_component
       end
 
       delete_removed_images
-      project_images.each do |image_name|
-        attach_image_if_needed(project, image_name, dir)
-      end
+      attach_images_if_needed
 
       project.save!
     end
@@ -54,7 +30,7 @@ class ProjectImporter
   private
 
   def project
-    @project ||= Project.find_or_initialze_by(identifier:)
+    @project ||= Project.find_or_initialize_by(identifier:)
   end
 
   def delete_components
@@ -73,16 +49,17 @@ class ProjectImporter
   end
 
   def attach_images_if_needed
-    existing_image = project.images.find { |i| i.blob.filename == image_name }
+    images.each do |image|
+      existing_image = project.images.find { |i| i.blob.filename == image[:filename] }
 
-    if existing_image
-      return if existing_image.blob.checksum == image_checksum(image_name)
+      if existing_image
+        return if existing_image.blob.checksum == image_checksum(image[:io])
 
-      existing_image.purge!
+        existing_image.purge!
+      end
+
+      project.images.attach!(*image)
     end
-
-    project.images.attach!(io: image.io,
-                           filename: image.filename)
   end
 
   def image_checksum(io)
