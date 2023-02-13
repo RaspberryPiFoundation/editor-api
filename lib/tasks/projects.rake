@@ -34,16 +34,16 @@ end
 
 private
 
-  def component(file, dir)
-    name = File.basename(file, '.*')
-    extension = File.extname(file).delete('.')
-    code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{File.basename(file)}")
-    default = (File.basename(file) == 'main.py')
-    component = { name:, extension:, content: code, default: }
-  end
+def component(file, dir)
+  name = File.basename(file, '.*')
+  extension = File.extname(file).delete('.')
+  code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{File.basename(file)}")
+  default = (File.basename(file) == 'main.py')
+  component = { name:, extension:, content: code, default: }
+end
 
-  def image(file, dir)
-    filename = File.basename(file)
-    io = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{filename}")
-    image = { filename:, io: }
-  end
+def image(file, dir)
+  filename = File.basename(file)
+  io = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{filename}")
+  image = { filename:, io: }
+end

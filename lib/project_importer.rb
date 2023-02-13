@@ -38,28 +38,33 @@ class ProjectImporter
   end
 
   def delete_removed_images
-    existing_images = project.images.map { |x| x.blob.filename.to_s }
-    diff = existing_images - images.pluck(:filename)
-    return if diff.empty?
+    return if removed_image_names.empty?
 
-    diff.each do |filename|
+    removed_image_names.each do |filename|
       img = project.images.find { |i| i.blob.filename == filename }
       img.purge!
     end
   end
 
+  def removed_image_names
+    existing_images = project.images.map { |x| x.blob.filename.to_s }
+    existing_images - images.pluck(:filename)
+  end
+
   def attach_images_if_needed
     images.each do |image|
-      existing_image = project.images.find { |i| i.blob.filename == image[:filename] }
-
+      existing_image = find_existing_image(filename)
       if existing_image
-        return if existing_image.blob.checksum == image_checksum(image[:io])
+        next if existing_image.blob.checksum == image_checksum(image[:io])
 
         existing_image.purge!
       end
-
       project.images.attach!(*image)
     end
+  end
+
+  def find_existing_image(filename)
+    project.images.find { |i| i.blob.filename == filename }
   end
 
   def image_checksum(io)
