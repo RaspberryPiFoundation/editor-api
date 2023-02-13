@@ -3,8 +3,8 @@
 class GithubWebhooksController < ActionController::API
   include GithubWebhook::Processor
 
-  def github_push(_payload)
-    # TODO: handle push webhook
+  def github_push(payload)
+    UploadJob.perform_later if payload['ref'] == ENV.fetch('GITHUB_WEBHOOK_REF')
     head :ok
   end
 
