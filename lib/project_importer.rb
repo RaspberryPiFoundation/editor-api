@@ -53,7 +53,7 @@ class ProjectImporter
 
   def attach_images_if_needed
     images.each do |image|
-      existing_image = find_existing_image(filename)
+      existing_image = find_existing_image(image[:filename])
       if existing_image
         next if existing_image.blob.checksum == image_checksum(image[:io])
 
