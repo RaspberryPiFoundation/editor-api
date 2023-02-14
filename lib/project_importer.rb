@@ -13,6 +13,8 @@ class ProjectImporter
 
   def import!
     Project.transaction do
+      project.name = name
+      project.project_type = type
       delete_components
 
       components.each do |component|
@@ -42,7 +44,7 @@ class ProjectImporter
 
     removed_image_names.each do |filename|
       img = project.images.find { |i| i.blob.filename == filename }
-      img.purge!
+      img.purge
     end
   end
 
@@ -57,9 +59,9 @@ class ProjectImporter
       if existing_image
         next if existing_image.blob.checksum == image_checksum(image[:io])
 
-        existing_image.purge!
+        existing_image.purge
       end
-      project.images.attach!(*image)
+      project.images.attach(**image)
     end
   end
 
