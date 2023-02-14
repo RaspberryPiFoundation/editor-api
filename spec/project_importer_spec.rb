@@ -20,9 +20,32 @@ RSpec.describe ProjectImporter do
   end
 
   context 'when the project does not already exist in the database' do
+    let(:project) { Project.find_by(identifier: importer.identifier) }
+
     it 'saves the project to the database' do
       expect { importer.import! }.to change(Project, :count).by(1)
     end
+
+    it 'names the project correctly' do
+      importer.import!
+      expect(project.name).to eq(importer.name)
+    end
+
+    it 'gives the project the correct type' do
+      importer.import!
+      expect(project.project_type).to eq(importer.type)
+    end
+
+    it 'creates the project components' do
+      importer.import!
+      expect(project.components.count).to eq(2)
+    end
+
+    it 'creates the project images' do
+      importer.import!
+      expect(project.images.count).to eq(1)
+    end
+
   end
 
   context 'when the project already exists in the database' do
