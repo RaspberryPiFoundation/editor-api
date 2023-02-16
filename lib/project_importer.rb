@@ -13,15 +13,9 @@ class ProjectImporter
 
   def import!
     Project.transaction do
-      project.name = name
-      project.project_type = type
+      setup_project
       delete_components
-
-      components.each do |component|
-        project_component = Component.new(**component)
-        project.components << project_component
-      end
-
+      create_components
       delete_removed_images
       attach_images_if_needed
 
@@ -35,8 +29,20 @@ class ProjectImporter
     @project ||= Project.find_or_initialize_by(identifier:)
   end
 
+  def setup_project
+    project.name = name
+    project.project_type = type
+  end
+
   def delete_components
     project.components.each(&:destroy)
+  end
+
+  def create_components
+    components.each do |component|
+      project_component = Component.new(**component)
+      project.components << project_component
+    end
   end
 
   def delete_removed_images
