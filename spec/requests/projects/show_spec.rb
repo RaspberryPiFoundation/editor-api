@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Project show requests', type: :request do
+RSpec.describe 'Project show requests' do
   let!(:project) { create(:project) }
   let(:project_json) do
     {
