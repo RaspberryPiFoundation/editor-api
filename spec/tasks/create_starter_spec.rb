@@ -3,7 +3,9 @@
 require 'rails_helper'
 Rails.application.load_tasks
 
-describe 'projects:create_starter' do
+describe 'projects:create_starter', type: :task do
+  subject { task.execute }
+
   it 'runs' do
     project_config = { 'NAME' => 'My amazing project', 'IDENTIFIER' => 'my-amazing-project', 'TYPE' => 'python' }
     allow(YAML).to receive(:safe_load).and_return(project_config)
