@@ -9,8 +9,6 @@ describe 'projects:create_starter', type: :task do
   subject { task.execute }
 
   let(:project_config) { { 'NAME' => 'My amazing project', 'IDENTIFIER' => 'my-amazing-project', 'TYPE' => 'python' } }
-  let(:components) { [] }
-  let(:images) { [] }
 
   it 'runs' do
     allow(YAML).to receive(:safe_load).and_return(project_config)
@@ -20,9 +18,10 @@ describe 'projects:create_starter', type: :task do
 
   it 'calls the ProjectImporter' do
     expected_config = { components: [], identifier: 'my-amazing-project', images: [], name: 'My amazing project', type: 'python' }
+
     allow(ProjectImporter).to receive(:new)
     ProjectImporter.new(name: project_config['NAME'], identifier: project_config['IDENTIFIER'],
-                        type: project_config['TYPE'] ||= 'python', components:, images:)
+                        type: project_config['TYPE'] ||= 'python', components: [], images: [])
     expect(ProjectImporter).to have_received(:new).with(expected_config)
   end
 end
