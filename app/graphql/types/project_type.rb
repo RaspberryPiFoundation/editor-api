@@ -2,8 +2,9 @@
 
 module Types
   class ProjectType < Types::BaseObject
-    field :id, ID, null: false
-    field :user_id, ID
+    implements GraphQL::Types::Relay::Node
+
+    field :user_id, Types::UuidType
     field :name, String
     field :identifier, String, null: false
     field :project_type, String, null: false

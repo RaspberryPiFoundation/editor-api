@@ -10,5 +10,6 @@ class Ability
     return if user.blank?
 
     can %i[create read show index destroy update], Project, user_id: user
+    can %i[create read show index destroy update], Component, project: { user_id: user }
   end
 end

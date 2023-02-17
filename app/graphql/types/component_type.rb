@@ -2,8 +2,9 @@
 
 module Types
   class ComponentType < Types::BaseObject
-    field :id, ID, null: false
-    field :project_id, ID
+    implements GraphQL::Types::Relay::Node
+
+    field :project, ProjectType
     field :name, String, null: false
     field :extension, String, null: false
     field :content, String

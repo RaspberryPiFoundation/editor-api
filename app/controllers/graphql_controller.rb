@@ -36,6 +36,8 @@ class GraphqlController < ApplicationController
 
   # Handle variables in form data, JSON body, or a blank value
   def variables
+    variables_param = params[:variables]
+
     case params[:variables]
     when String
       if variables_param.present?
