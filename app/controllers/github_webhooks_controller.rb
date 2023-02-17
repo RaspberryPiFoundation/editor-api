@@ -4,7 +4,7 @@ class GithubWebhooksController < ActionController::API
   include GithubWebhook::Processor
 
   def github_push(payload)
-    UploadJob.perform_later if payload[:ref] == ENV.fetch('GITHUB_WEBHOOK_REF') && edited_code?(payload)
+    UploadJob.perform_later(payload) if payload[:ref] == ENV.fetch('GITHUB_WEBHOOK_REF') && edited_code?(payload)
   end
 
   private
