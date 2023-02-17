@@ -1,16 +1,45 @@
+"""
+A file that makes up part of a project
+"""
 type Component implements Node {
+  """
+  The contents of the component
+  """
   content: String
+
+  """
+  The time it was created
+  """
   createdAt: ISO8601DateTime!
+
+  """
+  True if this is the default component of a project, e.g. main.py, index.html
+  """
   default: Boolean!
+
+  """
+  The file extension name of the component, e.g. py, html, css, csv
+  """
   extension: String!
 
   """
   ID of the object.
   """
   id: ID!
-  index: Int
+
+  """
+  The file basename of the component, e.g. main, index, styles
+  """
   name: String!
+
+  """
+  The project this component belongs to
+  """
   project: Project
+
+  """
+  The time it was last changed
+  """
   updatedAt: ISO8601DateTime!
 }
 
@@ -49,11 +78,33 @@ type ComponentEdge {
   node: Component
 }
 
+"""
+Represents a project component during a mutation
+"""
 input ComponentInput {
+  """
+  The text content of the component
+  """
   content: String
+
+  """
+  If this is the default component on a project
+  """
   default: Boolean
+
+  """
+  The file extension of the component, e.g. html, csv, py
+  """
   extension: String
+
+  """
+  The name of the file
+  """
   name: String
+
+  """
+  The ID of the project this component should be assocated with
+  """
   projectId: ID
 }
 
@@ -65,6 +116,10 @@ input CreateProjectInput {
   A unique identifier for the client performing the mutation.
   """
   clientMutationId: String
+
+  """
+  The project details to create
+  """
   project: ProjectInput!
 }
 
@@ -76,6 +131,10 @@ type CreateProjectPayload {
   A unique identifier for the client performing the mutation.
   """
   clientMutationId: String
+
+  """
+  The project that has been created
+  """
   project: Project
 }
 
@@ -84,10 +143,23 @@ An ISO 8601-encoded datetime
 """
 scalar ISO8601DateTime
 
+"""
+An image
+"""
 type Image {
+  """
+  The time the image was created
+  """
   createdAt: ISO8601DateTime!
+
+  """
+  The original filename of the image
+  """
   filename: String!
-  id: ID!
+
+  """
+  The URL where the image can be downloaded from
+  """
   url: String
 }
 
@@ -127,6 +199,9 @@ type ImageEdge {
 }
 
 type Mutation {
+  """
+  A mutation to create a project
+  """
   createProject(
     """
     Parameters for CreateProject
@@ -170,6 +245,9 @@ type PageInfo {
   startCursor: String
 }
 
+"""
+A project comprising of a number of components and images
+"""
 type Project implements Node {
   """
   All components associated with this project
@@ -195,12 +273,20 @@ type Project implements Node {
     """
     last: Int
   ): ComponentConnection
+
+  """
+  The created at timestamp
+  """
   createdAt: ISO8601DateTime!
 
   """
   ID of the object.
   """
   id: ID!
+
+  """
+  The easy-to-rememeber identifier of the project
+  """
   identifier: String!
 
   """
@@ -227,10 +313,30 @@ type Project implements Node {
     """
     last: Int
   ): ImageConnection
+
+  """
+  The name of the project
+  """
   name: String
+
+  """
+  The type of project, e.g. python, html
+  """
   projectType: String!
+
+  """
+  If present, the project this one was remixed from
+  """
   remixedFrom: Project
+
+  """
+  The last updated timestamp
+  """
   updatedAt: ISO8601DateTime!
+
+  """
+  The project creator's user ID
+  """
   userId: Uuid
 }
 
@@ -269,11 +375,33 @@ type ProjectEdge {
   node: Project
 }
 
+"""
+Represents a project during a mutation
+"""
 input ProjectInput {
+  """
+  Any project components
+  """
   components: [ComponentInput!]
+
+  """
+  The project identifier
+  """
   identifier: String
+
+  """
+  The name of the project
+  """
   name: String
+
+  """
+  The type of project, e.g. python, html
+  """
   projectType: String
+
+  """
+  The ID of the project this project has been remixed from
+  """
   remixedFromId: ID
 }
 
@@ -335,7 +463,6 @@ type Query {
 }
 
 """
-Represents textual data as UTF-8 character sequences. This type is most often
-used by GraphQL to represent free-form human-readable text.
+A globally unique ID
 """
 scalar Uuid
