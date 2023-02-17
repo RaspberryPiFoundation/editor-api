@@ -20,8 +20,7 @@ RSpec.describe Project::Update, type: :unit do
       id: editable_component.id,
       name: nil,
       content: 'updated content',
-      extension: 'py',
-      index: 5
+      extension: 'py'
     }
   end
 
@@ -46,7 +45,7 @@ RSpec.describe Project::Update, type: :unit do
   end
 
   def component_properties_hash(component)
-    component.attributes.symbolize_keys.slice(:name, :content, :extension, :index)
+    component.attributes.symbolize_keys.slice(:name, :content, :extension)
   end
 
   def default_component_hash
@@ -54,8 +53,7 @@ RSpec.describe Project::Update, type: :unit do
       :id,
       :name,
       :content,
-      :extension,
-      :index
+      :extension
     )
   end
 
@@ -63,8 +61,7 @@ RSpec.describe Project::Update, type: :unit do
     {
       name: 'new component',
       content: 'new component content',
-      extension: 'py',
-      index: 99
+      extension: 'py'
     }
   end
 end
