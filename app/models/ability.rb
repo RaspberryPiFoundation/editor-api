@@ -4,7 +4,8 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    can :read, Project, user_id: nil
+    can %i[read show], Project, user_id: nil
+    can %i[read show], Component, project: { user_id: nil }
 
     return if user.blank?
 
