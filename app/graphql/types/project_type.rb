@@ -29,7 +29,7 @@ module Types
     end
 
     def self.authorized?(object, context)
-      super && context[:current_ability]&.can?(:read, object)
+      super && context[:current_ability]&.can?(:show, object)
     end
   end
 end

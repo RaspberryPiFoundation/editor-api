@@ -20,7 +20,7 @@ module Types
     end
 
     def projects
-      Project.accessible_by(context[:current_ability], :read)
+      Project.accessible_by(context[:current_ability], :show)
     end
   end
 end
