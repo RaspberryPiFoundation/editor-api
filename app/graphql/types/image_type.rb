@@ -2,9 +2,10 @@
 
 module Types
   class ImageType < Types::BaseObject
-    field :id, ID, null: false
-    field :filename, String, null: false
-    field :url, String
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
+    description 'An image'
+
+    field :filename, String, null: false, description: 'The original filename of the image'
+    field :url, String, description: 'The URL where the image can be downloaded from'
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false, description: 'The time the image was created'
   end
 end

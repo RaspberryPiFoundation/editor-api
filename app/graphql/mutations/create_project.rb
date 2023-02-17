@@ -2,9 +2,10 @@
 
 module Mutations
   class CreateProject < BaseMutation
-    field :project, Types::ProjectType
+    description 'A mutation to create a new project'
 
-    argument :project, Types::ProjectInputType, required: true
+    field :project, Types::ProjectType, description: 'The project that has been created'
+    argument :project, Types::ProjectInputType, required: true, description: 'The project details to create'
 
     def resolve(project:)
       project_hash = project.to_h.merge(user_id: context[:current_user_id])

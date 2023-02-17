@@ -265,6 +265,8 @@ GEM
       unicode-display_width (>= 1.4.0, < 3.0)
     rubocop-ast (1.23.0)
       parser (>= 3.1.1.0)
+    rubocop-graphql (0.19.0)
+      rubocop (>= 0.87, < 2)
     rubocop-rails (2.17.3)
       activesupport (>= 4.2.0)
       rack (>= 1.1)
@@ -330,6 +332,7 @@ DEPENDENCIES
   rspec-rails
   rspec_junit_formatter
   rubocop
+  rubocop-graphql
   rubocop-rails
   rubocop-rspec
   sentry-rails (~> 5.5.0)

@@ -2,15 +2,16 @@
 
 module Types
   class ProjectType < Types::BaseObject
+    description 'A project comprising of a number of components and images'
     implements GraphQL::Types::Relay::Node
 
-    field :user_id, Types::UuidType
-    field :name, String
-    field :identifier, String, null: false
-    field :project_type, String, null: false
-    field :created_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false
-    field :remixed_from, ProjectType
+    field :user_id, Types::UuidType, description: 'The project creator\'s user ID'
+    field :name, String, description: 'The name of the project'
+    field :identifier, String, null: false, description: 'The easy-to-rememeber identifier of the project'
+    field :project_type, String, null: false, description: 'The type of project, e.g. python, html'
+    field :created_at, GraphQL::Types::ISO8601DateTime, null: false, description: 'The created at timestamp'
+    field :updated_at, GraphQL::Types::ISO8601DateTime, null: false, description: 'The last updated timestamp'
+    field :remixed_from, ProjectType, method: :parent, description: 'If present, the project this one was remixed from'
 
     field :components, Types::ComponentType.connection_type,
           description: 'All components associated with this project'
@@ -22,10 +23,6 @@ module Types
 
     def images
       object.images.to_a
-    end
-
-    def remixed_from
-      object.parent
     end
 
     def self.authorized?(object, context)
