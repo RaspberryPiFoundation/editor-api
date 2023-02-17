@@ -2,14 +2,24 @@
 
 module Mutations
   class CreateProject < BaseMutation
-    field :project, Types::ProjectType, null: false
-    field :errors, [String], null: false
+    field :project, Types::ProjectType
 
     argument :project, Types::ProjectInputType, required: true
 
     def resolve(project:)
-      params = project.to_h.merge(user_id: context[:current_user_id])
-      { project: Project.create(**params) }
+      project_hash = project.to_h.merge(user_id: context[:current_user_id])
+      r = Project::Create.call(project_hash: )
+      if r.success?
+        { project: r[:project] }
+      else
+        raise GraphQL::ExecutionError, r[:error]
+      end
+    end
+
+    def ready?(**args)
+      return true if context[:current_ability]&.can?(:create, Project, user_id: context[:current_user_id])
+
+      raise GraphQL::ExecutionError, "You are not permitted to create a project"
     end
   end
 end
