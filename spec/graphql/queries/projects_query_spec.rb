@@ -18,6 +18,7 @@ RSpec.describe 'projects { }' do
 
   context 'when fetching project IDs' do
     let(:query) { 'query { projects { edges { node { id } } } }' }
+
     it { expect(query).to be_a_valid_graphql_query }
 
     context 'with an unowned project' do
@@ -37,7 +38,6 @@ RSpec.describe 'projects { }' do
         expect(result.dig('data', 'projects', 'edges')).to be_empty
       end
     end
-
 
     context 'when logged in' do
       let(:current_user_id) { SecureRandom.uuid }

@@ -72,6 +72,10 @@ RSpec.configure do |config|
     metadata[:type] = :graphql_query
   end
 
+  config.define_derived_metadata(file_path: %r{/spec/graphql/mutations}) do |metadata|
+    metadata[:type] = :graphql_mutation
+  end
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
@@ -81,6 +85,8 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include ValidGraphqlQueryMatcher, type: :graphql_query
   config.include GraphqlQueryHelpers, type: :graphql_query
+  config.include ValidGraphqlQueryMatcher, type: :graphql_mutation
+  config.include GraphqlQueryHelpers, type: :graphql_mutation
 
   config.include PhraseIdentifierMock
   config.include OauthUserMock

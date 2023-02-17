@@ -14,3 +14,12 @@ inherit_from:
 inherit_mode:
   merge:
     - Exclude
+
+RSpec/DescribeClass:
+   IgnoredMetadata:
+     type:
+       - graphql_query
+       - graphql_mutation
+
+RSpec/NestedGroups:
+  Max: 4
