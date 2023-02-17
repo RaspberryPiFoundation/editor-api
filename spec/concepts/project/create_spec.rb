@@ -25,7 +25,6 @@ RSpec.describe Project::Create, type: :unit do
             name: 'main',
             extension: 'py',
             content: 'print("hello world")',
-            index: 0,
             default: true
           }],
           image_list: [],

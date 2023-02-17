@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_02_09_171350) do
+ActiveRecord::Schema[7.0].define(version: 2023_02_10_142728) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -50,9 +50,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_02_09_171350) do
     t.string "content"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.integer "index"
     t.boolean "default", default: false, null: false
-    t.index ["index", "project_id"], name: "index_components_on_index_and_project_id", unique: true
     t.index ["project_id"], name: "index_components_on_project_id"
   end
 

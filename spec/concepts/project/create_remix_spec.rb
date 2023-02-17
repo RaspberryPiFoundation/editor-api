@@ -17,8 +17,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
           id: component.id,
           name: component.name,
           extension: component.extension,
-          content: 'some updated component content',
-          index: component.index
+          content: 'some updated component content'
         }
       ]
     }
@@ -82,7 +81,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
     end
 
     context 'when a new component has been added before remixing' do
-      let(:new_component_params) { { name: 'added_component', extension: 'py', content: 'some added component content', index: 9999 } }
+      let(:new_component_params) { { name: 'added_component', extension: 'py', content: 'some added component content' } }
 
       before do
         remix_params[:components] << new_component_params
@@ -94,7 +93,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
 
       it 'persists the new component' do
         remixed_project = create_remix[:project]
-        expect(remixed_project.components.last.attributes.symbolize_keys).to include(new_component_params)
+        expect(remixed_project.components.first.attributes.symbolize_keys).to include(new_component_params)
       end
     end
 
@@ -136,7 +135,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
     end
 
     context 'when project components are invalid' do
-      let(:invalid_component_params) { { name: 'added_component', extension: 'py', content: '' } }
+      let(:invalid_component_params) { { name: 'added_component', content: '' } }
 
       before do
         remix_params[:components] << invalid_component_params
@@ -156,8 +155,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
     {
       name: component.name,
       content: component.content,
-      extension: component.extension,
-      index: component.index
+      extension: component.extension
     }
   end
 end
