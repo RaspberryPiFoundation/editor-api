@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Images requests', type: :request do
+RSpec.describe 'Images requests' do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let(:project) { create(:project, user_id:) }
   let(:image_filename) { 'test_image_1.png' }
