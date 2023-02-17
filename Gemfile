@@ -10,6 +10,9 @@ gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'faraday'
 gem 'github_webhook', '~> 1.4'
+gem 'globalid'
+gem 'good_job', '~> 3.12'
+gem 'graphql'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
@@ -37,5 +40,3 @@ group :test do
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webmock'
 end
-
-gem 'good_job', '~> 3.12'

@@ -1,0 +1,130 @@
+type Component {
+  content: String
+  createdAt: ISO8601DateTime!
+  default: Boolean!
+  extension: String!
+  id: ID!
+  index: Int
+  name: String!
+  projectId: ID
+  updatedAt: ISO8601DateTime!
+}
+
+"""
+The connection type for Component.
+"""
+type ComponentConnection {
+  """
+  A list of edges.
+  """
+  edges: [ComponentEdge]
+
+  """
+  A list of nodes.
+  """
+  nodes: [Component]
+
+  """
+  Information to aid in pagination.
+  """
+  pageInfo: PageInfo!
+}
+
+"""
+An edge in a connection.
+"""
+type ComponentEdge {
+  """
+  A cursor for use in pagination.
+  """
+  cursor: String!
+
+  """
+  The item at the end of the edge.
+  """
+  node: Component
+}
+
+"""
+An ISO 8601-encoded datetime
+"""
+scalar ISO8601DateTime
+
+type Mutation {
+  """
+  An example field added by the generator
+  """
+  testField: String!
+}
+
+"""
+Information about pagination in a connection.
+"""
+type PageInfo {
+  """
+  When paginating forwards, the cursor to continue.
+  """
+  endCursor: String
+
+  """
+  When paginating forwards, are there more items?
+  """
+  hasNextPage: Boolean!
+
+  """
+  When paginating backwards, are there more items?
+  """
+  hasPreviousPage: Boolean!
+
+  """
+  When paginating backwards, the cursor to continue.
+  """
+  startCursor: String
+}
+
+type Project {
+  """
+  All components associated with this project
+  """
+  components(
+    """
+    Returns the elements in the list that come after the specified cursor.
+    """
+    after: String
+
+    """
+    Returns the elements in the list that come before the specified cursor.
+    """
+    before: String
+
+    """
+    Returns the first _n_ elements from the list.
+    """
+    first: Int
+
+    """
+    Returns the last _n_ elements from the list.
+    """
+    last: Int
+  ): ComponentConnection
+  createdAt: ISO8601DateTime!
+  id: ID!
+  identifier: String!
+  name: String
+  projectType: String!
+  remixedFromId: ID
+  updatedAt: ISO8601DateTime!
+  userId: ID
+}
+
+type Query {
+  """
+  Find a project by identifier
+  """
+  projects(
+    """
+    Project identifier
+    """
+    identifier: String!
+  ): Project
+}
