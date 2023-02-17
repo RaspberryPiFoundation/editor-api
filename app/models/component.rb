@@ -4,7 +4,6 @@ class Component < ApplicationRecord
   belongs_to :project
   validates :name, presence: true
   validates :extension, presence: true
-  validates :index, presence: true, uniqueness: { scope: :project_id }
   validate :default_component_protected_properties, on: :update
 
   private

@@ -14,8 +14,7 @@ RSpec.describe Project::Update, type: :unit do
       :id,
       :name,
       :content,
-      :extension,
-      :index
+      :extension
     )
   end
 

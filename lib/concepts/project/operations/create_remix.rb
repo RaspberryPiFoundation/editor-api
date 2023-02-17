@@ -42,7 +42,7 @@ class Project
         end
 
         params[:components].each do |x|
-          remix.components.build(x.slice(:name, :extension, :content, :index))
+          remix.components.build(x.slice(:name, :extension, :content))
         end
 
         remix
