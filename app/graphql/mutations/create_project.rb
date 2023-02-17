@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Mutations
   class CreateProject < BaseMutation
     field :project, Types::ProjectType, null: false
