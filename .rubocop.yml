@@ -21,9 +21,6 @@ GraphQL/OrderedFields:
   Exclude:
     - app/graphql/types/*.rb  # follow the same order as the migration instead
 
-Rails/FilePath:
-  Enabled: false  # we don't use windows and the paths look nicer when not following this
-
 RSpec/NestedGroups:
   Max: 4
 
