@@ -15,6 +15,7 @@ gem "graphql-client"
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
+gem 'open-uri'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.6'
 gem 'rack-cors'

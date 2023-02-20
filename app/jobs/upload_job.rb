@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'open-uri'
+require 'project_importer'
+
 class UploadJob < ApplicationJob
   ProjectContentQuery = GitHub::Client.parse <<-'GRAPHQL'
     query($owner: String!, $repository: String!, $expression: String!) {
@@ -31,34 +34,33 @@ class UploadJob < ApplicationJob
   GRAPHQL
 
   def perform(payload)
-    puts 'hello world'
-    # pp modified_code_projects(payload)
-    response = GitHub::Client.query ProjectContentQuery, variables: {repository: payload[:repository][:name], owner: payload[:repository][:owner][:name], expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:en/code"}
+    repository = payload[:repository][:name]
+    owner = payload[:repository][:owner][:name]
+    response = GitHub::Client.query ProjectContentQuery, variables: {repository: repository, owner: owner, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:en/code"}
     response.data.repository.object.entries.each do |project_dir|
       components = []
       images = []
 
       project_dir.object.entries.each do |file|
-        if file.name == 'proj_config.yml'
-          # it's the config
+        if file.name == 'project_config.yml'
           @proj_config = YAML.safe_load(file.object.text)
-
-        elsif !file.object.isBinary
-          # It's a component
-          name = file.name
-          extension = file.extension
+        elsif file.object.text
+          name = file.name.chomp(file.extension)
+          extension = file.extension[1..-1]
           content = file.object.text
           default = file.name == 'main.py'
-          components << {name:, extension:, content:, default:}
+          components << {name: name, extension: extension, content: content, default: default}
         else
-          # It's an image
-          name = file.name
-          images << {name:}
+          filename = file.name
+          directory = project_dir.name
+          url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/en/code/#{directory}/#{filename}"
+          images << {filename: filename, io: URI.parse(url).open}
         end
       end
+
       project_importer = ProjectImporter.new(name: @proj_config['NAME'], identifier: @proj_config['IDENTIFIER'],
-        type: @proj_config['TYPE'] ||= 'python', components:, images:)
-        project_importer.import!
+        type: @proj_config['TYPE'] ||= 'python', components: components, images: images)
+      project_importer.import!
     end
   end
 
