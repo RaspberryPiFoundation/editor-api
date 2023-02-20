@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
 module GraphqlQueryHelpers
-  def execute_query(query:, context: graphql_context, variables: {})
+  def execute_query(query:, context: query_context, variables: {})
     EditorApiSchema.execute(query:, context:, variables:).as_json
   end
 
-  def graphql_context
+  def query_context
     if defined? current_user_id
       { current_user_id:, current_ability: Ability.new(current_user_id) }
     else

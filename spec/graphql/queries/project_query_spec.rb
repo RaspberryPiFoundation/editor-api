@@ -72,9 +72,9 @@ RSpec.describe 'query { project { ... } }' do
     end
 
     context 'when the graphql context is not set' do
-      let(:graphql_context) { nil }
+      let(:query_context) { nil }
 
-      it 'returns no projects' do
+      it 'returns no project' do
         expect(result.dig('data', 'project')).to be_nil
       end
     end
