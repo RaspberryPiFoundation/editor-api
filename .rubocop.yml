@@ -17,10 +17,6 @@ GraphQL/ObjectDescription:
     - app/graphql/types/node_type.rb
     - app/graphql/types/query_type.rb
 
-GraphQL/OrderedFields:
-  Exclude:
-    - app/graphql/types/*.rb  # follow the same order as the migration instead
-
 RSpec/NestedGroups:
   Max: 4
 
