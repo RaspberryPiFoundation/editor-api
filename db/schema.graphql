@@ -118,9 +118,24 @@ input CreateProjectInput {
   clientMutationId: String
 
   """
-  The project details to create
+  Any project components
   """
-  project: ProjectInput!
+  components: [ComponentInput!]
+
+  """
+  The name of the project
+  """
+  name: String
+
+  """
+  The type of project, e.g. python, html
+  """
+  projectType: String
+
+  """
+  The ID of the project this project has been remixed from
+  """
+  remixedFromId: ID
 }
 
 """
@@ -375,36 +390,6 @@ type ProjectEdge {
   node: Project
 }
 
-"""
-Represents a project during a mutation
-"""
-input ProjectInput {
-  """
-  Any project components
-  """
-  components: [ComponentInput!]
-
-  """
-  The project identifier
-  """
-  identifier: String
-
-  """
-  The name of the project
-  """
-  name: String
-
-  """
-  The type of project, e.g. python, html
-  """
-  projectType: String
-
-  """
-  The ID of the project this project has been remixed from
-  """
-  remixedFromId: ID
-}
-
 type Query {
   """
   Fetches an object given its ID.
@@ -437,7 +422,7 @@ type Query {
   ): Project
 
   """
-  All projects
+  All viewable projects
   """
   projects(
     """
@@ -459,6 +444,11 @@ type Query {
     Returns the last _n_ elements from the list.
     """
     last: Int
+
+    """
+    Filter by user ID
+    """
+    userId: String
   ): ProjectConnection
 }
 

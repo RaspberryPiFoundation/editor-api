@@ -6,31 +6,34 @@ RSpec.describe 'POST /graphql' do
   subject { response }
 
   let(:params) { {} }
+  let(:headers) { {} }
   let(:json_response) { JSON.parse(response.body) }
 
-  before { post graphql_path, params: }
+  before { post graphql_path, params:, headers: }
+
+  it { is_expected.to be_ok }
+
+  it 'returns errors' do
+    expect(json_response['errors']).to be_a Array
+  end
 
   context 'with a query' do
-    let(:params) { { query: query_string } }
-    let(:query_string) { '' }
+    let(:params) { { query: } }
+    let(:query) { '' }
 
-    it 'returns test data' do
+    it { is_expected.to be_ok }
+
+    it 'returns errors' do
       expect(json_response['errors']).to be_a Array
     end
 
-    context 'with the venues when no data' do
-      let(:query_string) { '{ projects }' }
+    context 'with a valid query' do
+      let(:query) { '{ node("xyz") }' }
 
-      it 'returns test data' do
-        expect(json_response.dig('data', 'projects')).to be_nil
-      end
-    end
+      it { is_expected.to be_ok }
 
-    context 'with the venue when no data' do
-      let(:query_string) { '{ project }' }
-
-      it 'returns error if' do
-        expect(json_response['errors']).to be_a Array
+      it 'returns data' do
+        expect(json_response.dig('data', 'node')).to be_nil
       end
     end
   end

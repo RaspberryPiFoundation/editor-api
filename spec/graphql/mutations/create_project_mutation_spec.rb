@@ -9,16 +9,14 @@ RSpec.describe 'mutation CreateProject() { ... }' do
   let(:variables) do
     {
       project: {
-        project: {
-          name: 'Untitled project',
-          projectType: 'python',
-          components: [{
-            content: 'Insert Python Here',
-            default: true,
-            extension: 'py',
-            name: 'main'
-          }]
-        }
+        name: 'Untitled project',
+        projectType: 'python',
+        components: [{
+          content: 'Insert Python Here',
+          default: true,
+          extension: 'py',
+          name: 'main'
+        }]
       }
     }
   end

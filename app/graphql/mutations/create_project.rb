@@ -5,14 +5,21 @@ module Mutations
     description 'A mutation to create a new project'
 
     field :project, Types::ProjectType, description: 'The project that has been created'
-    argument :project, Types::ProjectInputType, required: true, description: 'The project details to create'
 
-    def resolve(project:)
-      project_hash = project.to_h.merge(user_id: context[:current_user_id])
-      r = Project::Create.call(project_hash:)
-      raise GraphQL::ExecutionError, r[:error] unless r.success?
+    argument :components, [Types::ComponentInputType], required: false, description: 'Any project components'
+    argument :name, String, required: false, description: 'The name of the project'
+    argument :project_type, String, required: false, description: 'The type of project, e.g. python, html'
+    argument :remixed_from_id, ID, required: false,
+                                   description: 'The ID of the project this project has been remixed from'
 
-      { project: r[:project] }
+    def resolve(**input)
+      project_hash = input.merge(user_id: context[:current_user_id],
+                                 components: input[:components].map(&:to_h))
+
+      response = Project::Create.call(project_hash:)
+      raise GraphQL::ExecutionError, response[:error] unless response.success?
+
+      { project: response[:project] }
     end
 
     def ready?(**_args)

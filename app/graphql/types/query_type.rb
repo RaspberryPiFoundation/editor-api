@@ -13,14 +13,19 @@ module Types
       argument :identifier, String, required: true, description: 'Project identifier'
     end
 
-    field :projects, Types::ProjectType.connection_type, 'All projects'
+    field :projects, Types::ProjectType.connection_type, 'All viewable projects' do
+      argument :user_id, String, required: false, description: 'Filter by user ID'
+    end
 
     def project(identifier:)
       Project.find_by(identifier:)
     end
 
-    def projects
-      Project.accessible_by(context[:current_ability], :show)
+    def projects(user_id: nil)
+      query = Project
+      query = query.where(user_id: user_id) if user_id
+
+      query.accessible_by(context[:current_ability], :show)
     end
   end
 end
