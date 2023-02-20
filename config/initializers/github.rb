@@ -1,13 +1,15 @@
+# frozen_string_literal: true
+
 require 'graphql/client/http'
 
 module GitHub
-  GITHUB_ACCESS_TOKEN = ENV['GITHUB_ACCESS_TOKEN']
+  GITHUB_ACCESS_TOKEN = ENV.fetch('GITHUB_ACCESS_TOKEN', nil)
   URL = 'https://api.github.com/graphql'
   HttpAdapter = GraphQL::Client::HTTP.new(URL) do
-    def headers(context)
+    def headers
       {
-        "Authorization" => "Bearer #{ENV.fetch('GITHUB_AUTH_TOKEN')}",
-        "User-Agent" => 'Ruby'
+        'Authorization' => "Bearer #{ENV.fetch('GITHUB_AUTH_TOKEN')}",
+        'User-Agent' => 'Ruby'
       }
     end
   end
