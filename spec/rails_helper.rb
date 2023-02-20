@@ -68,12 +68,8 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
 
-  config.define_derived_metadata(file_path: %r{/spec/graphql/queries}) do |metadata|
+  config.define_derived_metadata(file_path: %r{/spec/graphql/(queries|mutations)}) do |metadata|
     metadata[:type] = :graphql_query
-  end
-
-  config.define_derived_metadata(file_path: %r{/spec/graphql/mutations}) do |metadata|
-    metadata[:type] = :graphql_mutation
   end
 
   # Filter lines from Rails gems in backtraces.
@@ -85,8 +81,6 @@ RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
   config.include ValidGraphqlQueryMatcher, type: :graphql_query
   config.include GraphqlQueryHelpers, type: :graphql_query
-  config.include ValidGraphqlQueryMatcher, type: :graphql_mutation
-  config.include GraphqlQueryHelpers, type: :graphql_mutation
 
   config.include PhraseIdentifierMock
   config.include OauthUserMock
