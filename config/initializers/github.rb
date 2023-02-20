@@ -6,7 +6,7 @@ module GitHub
   GITHUB_AUTH_TOKEN = ENV.fetch('GITHUB_ACCESS_TOKEN', nil)
   URL = 'https://api.github.com/graphql'
   HttpAdapter = GraphQL::Client::HTTP.new(URL) do
-    def headers
+    def headers(_context)
       {
         'Authorization' => "Bearer #{GITHUB_AUTH_TOKEN}",
         'User-Agent' => 'Ruby'
