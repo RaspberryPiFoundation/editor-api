@@ -25,7 +25,7 @@ module Types
       query = Project
       query = query.where(user_id: user_id) if user_id
 
-      query.accessible_by(context[:current_ability], :show)
+      query.accessible_by(context[:current_ability], :show).order(updated_at: :desc)
     end
   end
 end
