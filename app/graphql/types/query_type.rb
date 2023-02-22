@@ -21,11 +21,11 @@ module Types
       Project.find_by(identifier:)
     end
 
-    def projects(user_id: nil)
-      query = Project
-      query = query.where(user_id: user_id) if user_id
+    def projects(user_id: nil, page: 1)
+      results = Project.accessible_by(context[:current_ability], :show).order(updated_at: :desc)
+      results = results.where(user_id: user_id) if user_id
 
-      query.accessible_by(context[:current_ability], :show).order(updated_at: :desc)
+      results
     end
   end
 end
