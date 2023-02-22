@@ -34,6 +34,7 @@ group :development, :test do
 end
 
 group :test do
+  gem 'climate_control'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webmock'
 end
