@@ -61,6 +61,11 @@ type ComponentConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+
+  """
+  Total number of nodes available
+  """
+  totalCount: Int!
 }
 
 """
@@ -196,6 +201,11 @@ type ImageConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+
+  """
+  Total number of nodes available
+  """
+  totalCount: Int!
 }
 
 """
@@ -373,6 +383,11 @@ type ProjectConnection {
   Information to aid in pagination.
   """
   pageInfo: PageInfo!
+
+  """
+  Total number of nodes available
+  """
+  totalCount: Int!
 }
 
 """
