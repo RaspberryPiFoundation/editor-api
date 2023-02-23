@@ -21,9 +21,9 @@ module Types
       Project.find_by(identifier:)
     end
 
-    def projects(user_id: nil, page: 1)
+    def projects(user_id: nil)
       results = Project.accessible_by(context[:current_ability], :show).order(updated_at: :desc)
-      results = results.where(user_id: user_id) if user_id
+      results = results.where(user_id:) if user_id
 
       results
     end

@@ -8,7 +8,7 @@ module Types
     field :total_count, Int, null: false, description: 'Total number of nodes available'
 
     def total_count
-      object.send(:relation_count, object.items)
+      object.items.size
     end
   end
 end

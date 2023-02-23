@@ -5,8 +5,9 @@ require 'rails_helper'
 RSpec.describe 'projects { }' do
   # NB: This is mostly tested via the `project_query_spec.rb`
   subject(:result) { execute_query(query:, variables:) }
+
   let(:current_user_id) { nil }
-  let(:variables) { { } }
+  let(:variables) { {} }
 
   context 'when introspecting projects' do
     let(:query) { 'query { projects { __typename } }' }
