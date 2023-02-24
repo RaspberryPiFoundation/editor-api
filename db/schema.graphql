@@ -95,17 +95,17 @@ input ComponentInput {
   """
   If this is the default component on a project
   """
-  default: Boolean
+  default: Boolean!
 
   """
   The file extension of the component, e.g. html, csv, py
   """
-  extension: String
+  extension: String!
 
   """
   The name of the file
   """
-  name: String
+  name: String!
 
   """
   The ID of the project this component should be assocated with
@@ -130,12 +130,12 @@ input CreateProjectInput {
   """
   The name of the project
   """
-  name: String
+  name: String!
 
   """
   The type of project, e.g. python, html
   """
-  projectType: String
+  projectType: String!
 
   """
   The ID of the project this project has been remixed from
@@ -173,7 +173,7 @@ type Image {
   createdAt: ISO8601DateTime!
 
   """
-  The original filename of the image
+  The filename of the image
   """
   filename: String!
 

@@ -8,15 +8,15 @@ module Mutations
 
     # rubocop:disable GraphQL/ExtractInputType
     argument :components, [Types::ComponentInputType], required: false, description: 'Any project components'
-    argument :name, String, required: false, description: 'The name of the project'
-    argument :project_type, String, required: false, description: 'The type of project, e.g. python, html'
+    argument :name, String, required: true, description: 'The name of the project'
+    argument :project_type, String, required: true, description: 'The type of project, e.g. python, html'
     argument :remixed_from_id, ID, required: false,
                                    description: 'The ID of the project this project has been remixed from'
     # rubocop:enable GraphQL/ExtractInputType
 
     def resolve(**input)
       project_hash = input.merge(user_id: context[:current_user_id],
-                                 components: input[:components].map(&:to_h))
+                                 components: input[:components]&.map(&:to_h))
 
       response = Project::Create.call(project_hash:)
       raise GraphQL::ExecutionError, response[:error] unless response.success?
