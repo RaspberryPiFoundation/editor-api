@@ -92,7 +92,7 @@ RSpec.describe UploadJob do
   end
 
   before do
-    allow(GitHub::Client).to receive(:query).and_return(graphql_response)
+    allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
     stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/en/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
     allow(ProjectImporter).to receive(:new).and_call_original
   end
@@ -101,9 +101,9 @@ RSpec.describe UploadJob do
     expect { described_class.perform_later(payload) }.to enqueue_job
   end
 
-  it 'requests data from GitHub' do
+  it 'requests data from Github' do
     described_class.perform_now(payload)
-    expect(GitHub::Client).to have_received(:query).with(UploadJob::ProjectContentQuery, variables:)
+    expect(GithubApi::Client).to have_received(:query).with(UploadJob::ProjectContentQuery, variables:)
   end
 
   it 'imports the project in the correct format' do
