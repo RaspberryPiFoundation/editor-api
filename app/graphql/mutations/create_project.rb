@@ -10,8 +10,6 @@ module Mutations
     argument :components, [Types::ComponentInputType], required: false, description: 'Any project components'
     argument :name, String, required: true, description: 'The name of the project'
     argument :project_type, String, required: true, description: 'The type of project, e.g. python, html'
-    argument :remixed_from_id, ID, required: false,
-                                   description: 'The ID of the project this project has been remixed from'
     # rubocop:enable GraphQL/ExtractInputType
 
     def resolve(**input)
