@@ -16,10 +16,10 @@ module GithubApi
   end
 
   SCHEMA_SOURCE = if File.exist? SCHEMA_FILENAME
-                     SCHEMA_FILENAME
+                    SCHEMA_FILENAME
                   else
-                     self::HttpAdapter
-                   end
+                    self::HttpAdapter
+                  end
 
   Schema = GraphQL::Client.load_schema(SCHEMA_SOURCE)
   Client = GraphQL::Client.new(schema: Schema, execute: HttpAdapter)
