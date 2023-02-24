@@ -136,11 +136,6 @@ input CreateProjectInput {
   The type of project, e.g. python, html
   """
   projectType: String!
-
-  """
-  The ID of the project this project has been remixed from
-  """
-  remixedFromId: ID
 }
 
 """
