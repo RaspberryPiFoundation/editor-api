@@ -2,9 +2,10 @@
 
 require 'open-uri'
 require 'project_importer'
+require 'github_api'
 
 class UploadJob < ApplicationJob
-  ProjectContentQuery = GitHub::Client.parse <<-'GRAPHQL'
+  ProjectContentQuery = GithubApi::Client.parse <<-'GRAPHQL'
     query($owner: String!, $repository: String!, $expression: String!) {
       repository(owner: $owner, name: $repository) {
         object(expression: $expression) {
@@ -48,7 +49,7 @@ class UploadJob < ApplicationJob
   private
 
   def load_projects_data(repository, owner)
-    GitHub::Client.query(
+    GithubApi::Client.query(
       ProjectContentQuery,
       variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:en/code" }
     )
