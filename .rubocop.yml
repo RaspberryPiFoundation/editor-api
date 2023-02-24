@@ -1,16 +1,27 @@
 ---
+require: rubocop-graphql
 inherit_from:
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-base.yml
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rails.yml
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rspec.yml
   - .rubocop_todo.yml
 
-# RPF Digital Products house styles
-
-  # Include your pre-existing rubocop_todo.yaml here, if you have one.
-  # - .rubocop_todo.yml
-
 # Allow the Exclude arrays to be merged.
 inherit_mode:
   merge:
     - Exclude
+
+GraphQL/ObjectDescription:
+  Exclude:
+    - app/graphql/types/mutation_type.rb
+    - app/graphql/types/node_type.rb
+    - app/graphql/types/query_type.rb
+
+RSpec/NestedGroups:
+  Max: 4
+
+RSpec/DescribeClass:
+  Exclude:
+    - "spec/graphql/queries/**"
+    - "spec/graphql/mutations/**"
+

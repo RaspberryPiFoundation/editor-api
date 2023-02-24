@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'phrase_identifier'
+
 module PhraseIdentifierMock
   def mock_phrase_generation(phrase = nil)
     # This could cause problems if tests require multiple phrases to be generated
