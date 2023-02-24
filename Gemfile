@@ -12,6 +12,8 @@ gem 'faraday'
 gem 'github_webhook', '~> 1.4'
 gem 'graphql'
 gem 'graphql-client'
+gem 'globalid'
+gem 'good_job', '~> 3.12'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
@@ -31,6 +33,7 @@ group :development, :test do
   gem 'rspec_junit_formatter'
   gem 'rspec-rails'
   gem 'rubocop', require: false
+  gem 'rubocop-graphql', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
   gem 'simplecov', require: false
@@ -41,5 +44,3 @@ group :test do
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webmock'
 end
-
-gem 'good_job', '~> 3.12'
