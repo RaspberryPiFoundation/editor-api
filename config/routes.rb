@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  post '/graphql', to: 'graphql#execute'
+
   namespace :api do
     resource :default_project, only: %i[show] do
       get '/html', to: 'default_projects#html'
