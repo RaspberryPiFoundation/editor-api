@@ -81,7 +81,7 @@ RSpec.describe 'Project index requests' do
     end
   end
 
-  context 'when no user' do
+  context 'when no token is given' do
     it 'returns unauthorized' do
       get '/api/projects'
       expect(response).to have_http_status(:unauthorized)
