@@ -31,7 +31,7 @@ RSpec.describe GithubWebhooksController do
 
   shared_examples 'upload job' do
     it 'schedules the job' do
-      expect(UploadJob).to have_received(:perform_later)
+      expect(UploadJob).to have_received(:perform_later).with(params)
     end
   end
 
