@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  post '/graphql', to: 'graphql#execute'
+
   namespace :api do
     resource :default_project, only: %i[show] do
       get '/html', to: 'default_projects#html'
@@ -12,4 +14,6 @@ Rails.application.routes.draw do
       resource :images, only: %i[create], controller: 'projects/images'
     end
   end
+
+  resource :github_webhooks, only: :create, defaults: { formats: :json }
 end

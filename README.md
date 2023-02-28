@@ -27,9 +27,9 @@ docker-compose up
 
 ## Updating gems inside the container
 
-This can be done with the `bin/with_builder.sh` script:
+This can be done with the `bin/with-builder.sh` script:
 ```
-./bin/with_builder.sh bundle update
+./bin/with-builder.sh bundle update
 ```
 which should update the Gems in the container, without the need for rebuilding.
 
@@ -39,3 +39,8 @@ Add a comma separated list to the relevant enviroment settings. E.g for developm
 
 ```
 ALLOWED_ORIGINS=localhost:3002,localhost:3000
+```
+
+# Webhooks
+
+This API receives push event data from the [Raspberry Pi Learning](https://github.com/raspberrypilearning) organisation via webhooks. These webhooks are mediated locally through `smee`, which runs in a Docker container. The webhook data is processed using the `github_webhooks` gem in the `github_webhooks_controller`.

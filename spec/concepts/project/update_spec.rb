@@ -21,8 +21,7 @@ RSpec.describe Project::Update, type: :unit do
         id: editable_component.id,
         name: 'updated component name',
         content: 'updated content',
-        extension: 'py',
-        index: 5
+        extension: 'py'
       }
     end
 
@@ -40,7 +39,7 @@ RSpec.describe Project::Update, type: :unit do
       it 'updates component properties' do
         expect { update }
           .to change { component_properties_hash(editable_component.reload) }
-          .to(edited_component_hash.slice(:name, :content, :extension, :index))
+          .to(edited_component_hash.slice(:name, :content, :extension))
       end
     end
 
@@ -57,14 +56,33 @@ RSpec.describe Project::Update, type: :unit do
         expect(created_component).not_to be_nil
       end
     end
+
+    context 'when a component has been removed' do
+      let(:component_hash) { [default_component_hash] }
+
+      it 'deletes a component' do
+        expect { update }.to change(Component, :count).by(-1)
+      end
+    end
+
+    context 'when no components have been specified' do
+      let(:component_hash) { nil }
+
+      it 'keeps the same number of components' do
+        expect { update }.not_to change(Component, :count)
+      end
+
+      it 'updates project properties' do
+        expect { update }.to change { project.reload.name }.to('updated project name')
+      end
+    end
   end
 
   def component_properties_hash(component)
     component.attributes.symbolize_keys.slice(
       :name,
       :content,
-      :extension,
-      :index
+      :extension
     )
   end
 
@@ -73,8 +91,7 @@ RSpec.describe Project::Update, type: :unit do
       :id,
       :name,
       :content,
-      :extension,
-      :index
+      :extension
     )
   end
 
@@ -82,8 +99,7 @@ RSpec.describe Project::Update, type: :unit do
     {
       name: 'new component',
       content: 'new component content',
-      extension: 'py',
-      index: 99
+      extension: 'py'
     }
   end
 end

@@ -68,10 +68,20 @@ RSpec.configure do |config|
   # https://relishapp.com/rspec/rspec-rails/docs
   config.infer_spec_type_from_file_location!
 
+  config.define_derived_metadata(file_path: %r{/spec/graphql/(queries|mutations)}) do |metadata|
+    metadata[:type] = :graphql_query
+  end
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:
   # config.filter_gems_from_backtrace("gem name")
+
+  # To be able to use build(:object) instead of FactoryBot.build(:object):
+  config.include FactoryBot::Syntax::Methods
+  config.include ValidGraphqlQueryMatcher, type: :graphql_query
+  config.include GraphqlQueryHelpers, type: :graphql_query
+
   config.include PhraseIdentifierMock
   config.include OauthUserMock
 end

@@ -26,6 +26,8 @@ class Project
       end
 
       def setup_deletions(response, update_hash)
+        return if update_hash[:components].nil?
+
         existing_component_ids = response[:project].components.pluck(:id)
         updated_component_ids = update_hash[:components].pluck(:id)
         response[:component_ids_to_delete] = existing_component_ids - updated_component_ids
@@ -47,16 +49,20 @@ class Project
       end
 
       def update_component_attributes(response, update_hash)
-        return if response.failure?
+        return if response.failure? || update_hash[:components].nil?
 
         update_hash[:components].each do |component_params|
           if component_params[:id].present?
-            component = response[:project].components.select { |c| c.id == component_params[:id] }.first
-            component.assign_attributes(component_params)
+            overwrite_component_attributes(response, component_params)
           else
             response[:project].components.build(component_params)
           end
         end
+      end
+
+      def overwrite_component_attributes(response, component_params)
+        component = response[:project].components.select { |c| c.id == component_params[:id] }.first
+        component.assign_attributes(component_params)
       end
 
       def persist_changes(response)
