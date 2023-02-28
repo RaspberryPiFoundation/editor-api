@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Project index requests' do
   include PaginationLinksMock
 
+  let(:headers) { { Authorization: 'dummy-token' } }
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
@@ -20,24 +21,24 @@ RSpec.describe 'Project index requests' do
     end
 
     it 'returns success response' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns correct number of projects' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       returned = JSON.parse(response.body)
       expect(returned.length).to eq(2)
     end
 
     it 'returns users projects' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       returned = JSON.parse(response.body)
       expect(returned.all? { |proj| proj['user_id'] == user_id }).to be(true)
     end
 
     it 'returns all keys in response' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       returned = JSON.parse(response.body)
       returned.each { |project| expect(project.keys).to eq(project_keys) }
     end
@@ -50,13 +51,13 @@ RSpec.describe 'Project index requests' do
     end
 
     it 'returns the default number of projects on the first page' do
-      get '/api/projects'
+      get '/api/projects', headers: headers
       returned = JSON.parse(response.body)
       expect(returned.length).to eq(8)
     end
 
     it 'returns the next set of projects on the next page' do
-      get '/api/projects?page=2'
+      get '/api/projects?page=2', headers: headers
       returned = JSON.parse(response.body)
       expect(returned.length).to eq(4)
     end
@@ -66,7 +67,7 @@ RSpec.describe 'Project index requests' do
       next_link = page_links(2, 'next')
       expected_link_header = [last_link, next_link].join(', ')
 
-      get '/api/projects'
+      get '/api/projects', headers: headers
       expect(response.headers['Link']).to eq expected_link_header
     end
 
@@ -75,7 +76,7 @@ RSpec.describe 'Project index requests' do
       prev_link = page_links(1, 'prev')
       expected_link_header = [first_link, prev_link].join(', ')
 
-      get '/api/projects?page=2'
+      get '/api/projects?page=2', headers: headers
       expect(response.headers['Link']).to eq expected_link_header
     end
   end

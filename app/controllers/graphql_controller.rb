@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-class GraphqlController < ApplicationController
-  include AuthenticationConcern
-  include ActiveStorage::SetCurrent if Rails.env.development?
-
-  skip_before_action :verify_authenticity_token
-
+class GraphqlController < ApiController
   # If accessing from outside this domain, nullify the session
   # This allows for outside API access while preventing CSRF attacks,
   # but you'll have to authenticate your user separately
