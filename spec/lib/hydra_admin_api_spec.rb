@@ -3,7 +3,6 @@
 require 'rails_helper'
 require 'hydra_admin_api'
 
-# rubocop:disable RSpec/MultipleMemoizedHelpers
 RSpec.describe HydraAdminApi do
   let(:hydra_admin_url) { 'https://hydra.com/admin' }
   let(:hydra_admin_api_key) { 'secret' }
@@ -55,4 +54,3 @@ RSpec.describe HydraAdminApi do
     end
   end
 end
-# rubocop:enable RSpec/MultipleMemoizedHelpers

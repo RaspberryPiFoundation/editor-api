@@ -23,7 +23,6 @@ gem 'rails', '~> 7.0.0'
 gem 'sentry-rails', '~> 5.5.0'
 
 group :development, :test do
-  gem 'climate_control'
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'faker'

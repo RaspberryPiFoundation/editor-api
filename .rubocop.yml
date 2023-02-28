@@ -25,3 +25,5 @@ RSpec/DescribeClass:
     - "spec/graphql/queries/**"
     - "spec/graphql/mutations/**"
 
+RSpec/MultipleMemoizedHelpers:
+  Max: 8
