@@ -3,14 +3,10 @@
 module Mutations
   class CreateProject < BaseMutation
     description 'A mutation to create a new project'
+    input_object_class Types::CreateProjectInputType
 
     field :project, Types::ProjectType, description: 'The project that has been created'
 
-    # rubocop:disable GraphQL/ExtractInputType
-    argument :components, [Types::ComponentInputType], required: false, description: 'Any project components'
-    argument :name, String, required: true, description: 'The name of the project'
-    argument :project_type, String, required: true, description: 'The type of project, e.g. python, html'
-    # rubocop:enable GraphQL/ExtractInputType
 
     def resolve(**input)
       project_hash = input.merge(user_id: context[:current_user_id],
