@@ -10,7 +10,7 @@ RSpec.describe 'Project delete requests' do
     let(:headers) { { Authorization: 'dummy-token' } }
 
     before do
-      mock_oauth_user(user_id)
+      stub_fetch_oauth_user_id(user_id)
     end
 
     context 'when deleting a project the user owns' do

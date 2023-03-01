@@ -17,7 +17,7 @@ RSpec.describe 'Project index requests' do
     before do
       # create non user projects
       create_list(:project, 2)
-      mock_oauth_user(user_id)
+      stub_fetch_oauth_user_id(user_id)
     end
 
     it 'returns success response' do
@@ -47,7 +47,7 @@ RSpec.describe 'Project index requests' do
   context 'when the projects index has pagination' do
     before do
       create_list(:project, 10, user_id:)
-      mock_oauth_user(user_id)
+      stub_fetch_oauth_user_id(user_id)
     end
 
     it 'returns the default number of projects on the first page' do

@@ -28,7 +28,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      mock_oauth_user(project.user_id)
+      stub_fetch_oauth_user_id(project.user_id)
     end
 
     it 'returns success response' do
@@ -83,7 +83,7 @@ RSpec.describe 'Project update requests' do
     let(:params) { { project: { components: [] } } }
 
     before do
-      mock_oauth_user
+      stub_fetch_oauth_user_id
     end
 
     it 'returns forbidden response' do

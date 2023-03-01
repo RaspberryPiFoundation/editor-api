@@ -11,7 +11,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project is successful' do
       before do
-        mock_oauth_user(user_id)
+        stub_fetch_oauth_user_id(user_id)
 
         response = OperationResponse.new
         response[:project] = project
@@ -27,7 +27,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project fails' do
       before do
-        mock_oauth_user(user_id)
+        stub_fetch_oauth_user_id(user_id)
 
         response = OperationResponse.new
         response[:error] = 'Error creating project'

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApiController < ActionController::API
-  include AuthenticationConcern
+  include Identifiable
 
   unless Rails.application.config.consider_all_requests_local
     rescue_from ActiveRecord::RecordNotFound, with: -> { notfound }
@@ -9,8 +9,6 @@ class ApiController < ActionController::API
   end
 
   private
-
-  alias current_user current_user_id
 
   def authorize_user
     head :unauthorized unless current_user

@@ -20,7 +20,7 @@ RSpec.describe 'Project show requests' do
     let(:headers) { { Authorization: 'dummy-token' } }
 
     before do
-      mock_oauth_user(project.user_id)
+      stub_fetch_oauth_user_id(project.user_id)
     end
 
     context 'when loading own project' do

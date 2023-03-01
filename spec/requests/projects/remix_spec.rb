@@ -21,7 +21,7 @@ RSpec.describe 'Remix requests' do
     let(:headers) { { Authorization: 'dummy-token' } }
 
     before do
-      mock_oauth_user(user_id)
+      stub_fetch_oauth_user_id(user_id)
     end
 
     it 'returns success response' do
@@ -39,7 +39,7 @@ RSpec.describe 'Remix requests' do
 
     context 'when project can not be saved' do
       before do
-        mock_oauth_user(user_id)
+        stub_fetch_oauth_user_id(user_id)
         error_response = OperationResponse.new
         error_response[:error] = 'Something went wrong'
         allow(Project::CreateRemix).to receive(:call).and_return(error_response)

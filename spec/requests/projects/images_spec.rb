@@ -23,7 +23,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: 'dummy-token' } }
 
       before do
-        mock_oauth_user(project.user_id)
+        stub_fetch_oauth_user_id(project.user_id)
       end
 
       it 'attaches file to project' do
@@ -53,7 +53,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: 'dummy-token' } }
 
       before do
-        mock_oauth_user
+        stub_fetch_oauth_user_id
       end
 
       it 'returns forbidden response' do
