@@ -16,5 +16,6 @@ module Identifiable
     @current_user_id ||= identify_user
   end
 
+  # current_user is required by CanCanCan
   alias current_user current_user_id
 end
