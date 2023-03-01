@@ -186,6 +186,8 @@ GEM
     nio4r (2.5.8)
     nokogiri (1.14.2-aarch64-linux)
       racc (~> 1.4)
+    nokogiri (1.14.2-x86_64-linux)
+      racc (~> 1.4)
     open-uri (0.3.0)
       stringio
       time
@@ -322,6 +324,7 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  x86_64-linux
 
 DEPENDENCIES
   aws-sdk-s3
