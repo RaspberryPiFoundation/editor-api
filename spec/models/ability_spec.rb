@@ -10,7 +10,6 @@ RSpec.describe Ability do
   let(:starter_project) { build(:project, user_id: nil) }
 
   describe 'Project' do
-
     context 'when no user' do
       let(:user) { nil }
 
@@ -61,7 +60,7 @@ RSpec.describe Ability do
 
   describe 'Component' do
     let(:starter_project_component) { build(:component, project: starter_project) }
-    let(:component) { build(:component, project: project) }
+    let(:component) { build(:component, project:) }
 
     context 'when no user' do
       let(:user) { nil }
