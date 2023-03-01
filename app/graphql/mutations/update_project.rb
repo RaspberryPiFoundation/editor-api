@@ -19,7 +19,7 @@ module Mutations
 
       return { project: } if project.update(input.slice(:project_type, :name))
 
-      raise GraphQL::ExecutionError, project.errors.full_messages.join(", ")
+      raise GraphQL::ExecutionError, project.errors.full_messages.join(', ')
     end
 
     def ready?(**_args)

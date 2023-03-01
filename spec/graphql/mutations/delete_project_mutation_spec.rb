@@ -49,7 +49,6 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
         end
       end
 
-
       context 'with another users project' do
         let(:current_user_id) { SecureRandom.uuid }
 
