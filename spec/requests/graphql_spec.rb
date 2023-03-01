@@ -7,7 +7,7 @@ RSpec.describe 'POST /graphql' do
 
   let(:params) { {} }
   let(:headers) { {} }
-  let(:json_response) { JSON.parse(response.body) }
+  let(:json_response) { response.parsed_body }
 
   before { post graphql_path, params:, headers: }
 

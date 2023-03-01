@@ -5,7 +5,7 @@ require 'project_importer'
 require 'github_api'
 
 class UploadJob < ApplicationJob
-  ProjectContentQuery = GithubApi::Client.parse <<-'GRAPHQL'
+  ProjectContentQuery = GithubApi::Client.parse <<-GRAPHQL
     query($owner: String!, $repository: String!, $expression: String!) {
       repository(owner: $owner, name: $repository) {
         object(expression: $expression) {

@@ -26,19 +26,19 @@ RSpec.describe 'Project index requests' do
 
     it 'returns correct number of projects' do
       get '/api/projects'
-      returned = JSON.parse(response.body)
+      returned = response.parsed_body
       expect(returned.length).to eq(2)
     end
 
     it 'returns users projects' do
       get '/api/projects'
-      returned = JSON.parse(response.body)
+      returned = response.parsed_body
       expect(returned.all? { |proj| proj['user_id'] == user_id }).to be(true)
     end
 
     it 'returns all keys in response' do
       get '/api/projects'
-      returned = JSON.parse(response.body)
+      returned = response.parsed_body
       returned.each { |project| expect(project.keys).to eq(project_keys) }
     end
   end
@@ -51,13 +51,13 @@ RSpec.describe 'Project index requests' do
 
     it 'returns the default number of projects on the first page' do
       get '/api/projects'
-      returned = JSON.parse(response.body)
+      returned = response.parsed_body
       expect(returned.length).to eq(8)
     end
 
     it 'returns the next set of projects on the next page' do
       get '/api/projects?page=2'
-      returned = JSON.parse(response.body)
+      returned = response.parsed_body
       expect(returned.length).to eq(4)
     end
 

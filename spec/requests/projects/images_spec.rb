@@ -29,13 +29,13 @@ RSpec.describe 'Images requests' do
       end
 
       it 'returns file list' do
-        post "/api/projects/#{project.identifier}/images", params: params
+        post("/api/projects/#{project.identifier}/images", params:)
 
         expect(response.body).to eq(expected_json)
       end
 
       it 'returns success response' do
-        post "/api/projects/#{project.identifier}/images", params: params
+        post("/api/projects/#{project.identifier}/images", params:)
 
         expect(response).to have_http_status(:ok)
       end
@@ -53,7 +53,7 @@ RSpec.describe 'Images requests' do
       end
 
       it 'returns forbidden response' do
-        post "/api/projects/#{project.identifier}/images", params: params
+        post("/api/projects/#{project.identifier}/images", params:)
         expect(response).to have_http_status(:forbidden)
       end
     end
