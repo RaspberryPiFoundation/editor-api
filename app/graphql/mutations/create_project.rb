@@ -7,7 +7,6 @@ module Mutations
 
     field :project, Types::ProjectType, description: 'The project that has been created'
 
-
     def resolve(**input)
       project_hash = input.merge(user_id: context[:current_user_id],
                                  components: input[:components]&.map(&:to_h))
