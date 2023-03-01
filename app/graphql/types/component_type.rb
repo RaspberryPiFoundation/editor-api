@@ -14,5 +14,9 @@ module Types
     field :name, String, null: false, description: 'The file basename of the component, e.g. main, index, styles'
     field :project, ProjectType, description: 'The project this component belongs to'
     field :updated_at, GraphQL::Types::ISO8601DateTime, null: false, description: 'The time it was last changed'
+
+    def self.authorized?(object, context)
+      super && context[:current_ability]&.can?(:show, object)
+    end
   end
 end

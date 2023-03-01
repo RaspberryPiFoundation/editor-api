@@ -7,7 +7,25 @@ class EditorApiSchema < GraphQL::Schema
   # For batch-loading (see https://graphql-ruby.org/dataloader/overview.html)
   use GraphQL::Dataloader
 
+  # Prevent overly-complex queries
+  max_complexity 500
+
+  # Prevent deeply-nested queries
+  max_depth 10
+
+  # Stop validating when it encounters this many errors:
+  validate_max_errors 100
+
+  default_max_page_size 10
+
   # GraphQL-Ruby calls this when something goes wrong while running a query:
+  def self.type_error(err, context)
+    # if err.is_a?(GraphQL::InvalidNullError)
+    #   # report to your bug tracker here
+    #   return nil
+    # end
+    super
+  end
 
   # Union and Interface Resolution
   def self.resolve_type(_abstract_type, obj, _ctx)
@@ -32,10 +50,6 @@ class EditorApiSchema < GraphQL::Schema
           "The field #{error.field.graphql_name} on " \
           "an object of type #{error.type.graphql_name} was hidden due to permissions"
   end
-
-  # Stop validating when it encounters this many errors:
-  validate_max_errors 100
-  default_max_page_size 10
 
   # Relay-style Object Identification:
 
