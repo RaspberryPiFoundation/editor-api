@@ -53,7 +53,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: 'dummy-token' } }
 
       before do
-        stub_fetch_oauth_user_id
+        stub_fetch_oauth_user_id(SecureRandom.uuid)
       end
 
       it 'returns forbidden response' do
