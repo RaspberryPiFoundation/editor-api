@@ -25,14 +25,14 @@ RSpec.describe 'Remix requests' do
     end
 
     it 'returns success response' do
-      post "/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers: headers
+      post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
 
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns 404 response if invalid project' do
       project_params[:identifier] = 'no-such-project'
-      post '/api/projects/no-such-project/remix', params: { project: project_params }, headers: headers
+      post('/api/projects/no-such-project/remix', params: { project: project_params }, headers:)
 
       expect(response).to have_http_status(:not_found)
     end
@@ -46,13 +46,13 @@ RSpec.describe 'Remix requests' do
       end
 
       it 'returns 400' do
-        post "/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers: headers
+        post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
 
         expect(response).to have_http_status(:bad_request)
       end
 
       it 'returns error message' do
-        post "/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers: headers
+        post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
 
         expect(response.body).to eq({ error: 'Something went wrong' }.to_json)
       end

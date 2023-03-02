@@ -15,7 +15,7 @@ RSpec.describe 'Project delete requests' do
 
     context 'when deleting a project the user owns' do
       it 'returns success' do
-        delete "/api/projects/#{project.identifier}", headers: headers
+        delete("/api/projects/#{project.identifier}", headers:)
 
         expect(response).to have_http_status(:ok)
       end
@@ -31,7 +31,7 @@ RSpec.describe 'Project delete requests' do
       let(:non_owned_project) { create(:project) }
 
       it 'returns forbidden' do
-        delete "/api/projects/#{non_owned_project.identifier}", headers: headers
+        delete("/api/projects/#{non_owned_project.identifier}", headers:)
 
         expect(response).to have_http_status(:forbidden)
       end
