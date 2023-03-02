@@ -2,7 +2,7 @@
 
 module Api
   class DefaultProjectsController < ApiController
-    before_action :require_oauth_user, only: %i[create]
+    before_action :authorize_user, only: %i[create]
 
     def show
       data = if params[:type] == 'html'
