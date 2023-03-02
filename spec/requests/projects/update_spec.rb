@@ -32,12 +32,12 @@ RSpec.describe 'Project update requests' do
     end
 
     it 'returns success response' do
-      put "/api/projects/#{project.identifier}", params: params, headers: headers
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns updated project json' do
-      put "/api/projects/#{project.identifier}", params: params, headers: headers
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response.body).to include('updated component content')
     end
 
@@ -45,7 +45,7 @@ RSpec.describe 'Project update requests' do
       mock_response = instance_double(OperationResponse)
       allow(mock_response).to receive(:success?).and_return(true)
       allow(Project::Update).to receive(:call).and_return(mock_response)
-      put "/api/projects/#{project.identifier}", params: params, headers: headers
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(Project::Update).to have_received(:call)
     end
 
@@ -53,17 +53,17 @@ RSpec.describe 'Project update requests' do
       let(:params) { { project: { name: 'updated project name' } } }
 
       it 'returns success response' do
-        put "/api/projects/#{project.identifier}", params: params, headers: headers
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns json with updated project properties' do
-        put "/api/projects/#{project.identifier}", params: params, headers: headers
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response.body).to include('updated project name')
       end
 
       it 'returns json with previous project components' do
-        put "/api/projects/#{project.identifier}", params: params, headers: headers
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response.body).to include(project.components.first.attributes[:content].to_s)
       end
     end
@@ -72,7 +72,7 @@ RSpec.describe 'Project update requests' do
       let(:params) { { project: { components: [] } } }
 
       it 'returns error response' do
-        put "/api/projects/#{project.identifier}", params: params, headers: headers
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response).to have_http_status(:bad_request)
       end
     end
@@ -87,7 +87,7 @@ RSpec.describe 'Project update requests' do
     end
 
     it 'returns forbidden response' do
-      put "/api/projects/#{project.identifier}", params: params, headers: headers
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response).to have_http_status(:forbidden)
     end
   end
@@ -100,7 +100,7 @@ RSpec.describe 'Project update requests' do
     end
 
     it 'returns unauthorized' do
-      put "/api/projects/#{project.identifier}", headers: headers
+      put("/api/projects/#{project.identifier}", headers:)
 
       expect(response).to have_http_status(:unauthorized)
     end

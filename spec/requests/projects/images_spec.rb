@@ -31,19 +31,19 @@ RSpec.describe 'Images requests' do
       end
 
       it 'returns file list' do
-        post "/api/projects/#{project.identifier}/images", params: params, headers: headers
+        post("/api/projects/#{project.identifier}/images", params:, headers:)
 
         expect(response.body).to eq(expected_json)
       end
 
       it 'returns success response' do
-        post "/api/projects/#{project.identifier}/images", params: params, headers: headers
+        post("/api/projects/#{project.identifier}/images", params:, headers:)
 
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns 404 response if invalid project' do
-        post '/api/projects/no-such-project/images', headers: headers
+        post('/api/projects/no-such-project/images', headers:)
 
         expect(response).to have_http_status(:not_found)
       end
@@ -57,14 +57,14 @@ RSpec.describe 'Images requests' do
       end
 
       it 'returns forbidden response' do
-        post "/api/projects/#{project.identifier}/images", params: params, headers: headers
+        post("/api/projects/#{project.identifier}/images", params:, headers:)
         expect(response).to have_http_status(:forbidden)
       end
     end
 
     context 'when auth token is missing' do
       it 'returns unauthorized' do
-        post "/api/projects/#{project.identifier}/images", headers: headers
+        post("/api/projects/#{project.identifier}/images", headers:)
 
         expect(response).to have_http_status(:unauthorized)
       end
