@@ -20,47 +20,51 @@ RSpec.describe 'Images requests' do
 
   describe 'create' do
     context 'when auth is correct' do
+      let(:headers) { { Authorization: 'dummy-token' } }
+
       before do
-        mock_oauth_user(user_id)
+        stub_fetch_oauth_user_id(project.user_id)
       end
 
       it 'attaches file to project' do
-        expect { post "/api/projects/#{project.identifier}/images", params: }.to change { project.images.count }.by(1)
+        expect { post "/api/projects/#{project.identifier}/images", params:, headers: }.to change { project.images.count }.by(1)
       end
 
       it 'returns file list' do
-        post "/api/projects/#{project.identifier}/images", params: params
+        post "/api/projects/#{project.identifier}/images", params: params, headers: headers
 
         expect(response.body).to eq(expected_json)
       end
 
       it 'returns success response' do
-        post "/api/projects/#{project.identifier}/images", params: params
+        post "/api/projects/#{project.identifier}/images", params: params, headers: headers
 
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns 404 response if invalid project' do
-        post '/api/projects/no-such-project/images'
+        post '/api/projects/no-such-project/images', headers: headers
 
         expect(response).to have_http_status(:not_found)
       end
     end
 
     context 'when authed user is not creator' do
+      let(:headers) { { Authorization: 'dummy-token' } }
+
       before do
-        mock_oauth_user
+        stub_fetch_oauth_user_id(SecureRandom.uuid)
       end
 
       it 'returns forbidden response' do
-        post "/api/projects/#{project.identifier}/images", params: params
+        post "/api/projects/#{project.identifier}/images", params: params, headers: headers
         expect(response).to have_http_status(:forbidden)
       end
     end
 
-    context 'when auth is invalid' do
+    context 'when auth token is missing' do
       it 'returns unauthorized' do
-        post "/api/projects/#{project.identifier}/images"
+        post "/api/projects/#{project.identifier}/images", headers: headers
 
         expect(response).to have_http_status(:unauthorized)
       end

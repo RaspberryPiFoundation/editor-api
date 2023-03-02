@@ -83,7 +83,7 @@ RSpec.configure do |config|
   config.include GraphqlQueryHelpers, type: :graphql_query
 
   config.include PhraseIdentifierMock
-  config.include OauthUserMock
+  config.include HydraAdminApiMock, type: :request
 end
 
 Shoulda::Matchers.configure do |config|
