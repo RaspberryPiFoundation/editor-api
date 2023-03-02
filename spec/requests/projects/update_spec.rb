@@ -3,11 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Project update requests' do
+  let(:headers) { { Authorization: 'dummy-token' } }
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let(:project) { create(:project, user_id:) }
 
   context 'when authed user is project creator' do
-    let(:project) { create(:project, :with_default_component, user_id:) }
+    let(:project) { create(:project, :with_default_component) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(
@@ -27,16 +28,16 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      mock_oauth_user(user_id)
+      stub_fetch_oauth_user_id(project.user_id)
     end
 
     it 'returns success response' do
-      put("/api/projects/#{project.identifier}", params:)
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response).to have_http_status(:ok)
     end
 
     it 'returns updated project json' do
-      put("/api/projects/#{project.identifier}", params:)
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response.body).to include('updated component content')
     end
 
@@ -44,7 +45,7 @@ RSpec.describe 'Project update requests' do
       mock_response = instance_double(OperationResponse)
       allow(mock_response).to receive(:success?).and_return(true)
       allow(Project::Update).to receive(:call).and_return(mock_response)
-      put("/api/projects/#{project.identifier}", params:)
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(Project::Update).to have_received(:call)
     end
 
@@ -52,17 +53,17 @@ RSpec.describe 'Project update requests' do
       let(:params) { { project: { name: 'updated project name' } } }
 
       it 'returns success response' do
-        put("/api/projects/#{project.identifier}", params:)
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns json with updated project properties' do
-        put("/api/projects/#{project.identifier}", params:)
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response.body).to include('updated project name')
       end
 
       it 'returns json with previous project components' do
-        put("/api/projects/#{project.identifier}", params:)
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response.body).to include(project.components.first.attributes[:content].to_s)
       end
     end
@@ -71,7 +72,7 @@ RSpec.describe 'Project update requests' do
       let(:params) { { project: { components: [] } } }
 
       it 'returns error response' do
-        put("/api/projects/#{project.identifier}", params:)
+        put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response).to have_http_status(:bad_request)
       end
     end
@@ -82,18 +83,24 @@ RSpec.describe 'Project update requests' do
     let(:params) { { project: { components: [] } } }
 
     before do
-      mock_oauth_user(user_id)
+      stub_fetch_oauth_user_id(SecureRandom.uuid)
     end
 
     it 'returns forbidden response' do
-      put("/api/projects/#{project.identifier}", params:)
+      put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response).to have_http_status(:forbidden)
     end
   end
 
-  context 'when auth is invalid' do
+  context 'when auth token is invalid' do
+    let(:project) { create(:project) }
+
+    before do
+      allow(HydraAdminApi).to receive(:fetch_oauth_user_id).and_return(nil)
+    end
+
     it 'returns unauthorized' do
-      put "/api/projects/#{project.identifier}"
+      put("/api/projects/#{project.identifier}", headers:)
 
       expect(response).to have_http_status(:unauthorized)
     end

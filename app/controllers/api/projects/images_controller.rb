@@ -3,7 +3,7 @@
 module Api
   module Projects
     class ImagesController < ApiController
-      before_action :require_oauth_user
+      before_action :authorize_user
 
       def create
         @project = Project.find_by!(identifier: params[:project_id])

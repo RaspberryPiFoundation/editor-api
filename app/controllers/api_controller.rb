@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ApiController < ActionController::API
-  include OauthUser
+  include Identifiable
 
   unless Rails.application.config.consider_all_requests_local
     rescue_from ActiveRecord::RecordNotFound, with: -> { notfound }
@@ -10,13 +10,8 @@ class ApiController < ActionController::API
 
   private
 
-  def require_oauth_user
-    head :unauthorized unless oauth_user_id
-  end
-
-  def current_user
-    # current_user is required by CanCanCan
-    oauth_user_id
+  def authorize_user
+    head :unauthorized unless current_user
   end
 
   def notfound

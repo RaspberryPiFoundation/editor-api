@@ -3,11 +3,11 @@
 module Api
   module Projects
     class RemixesController < ApiController
-      before_action :require_oauth_user
+      before_action :authorize_user
 
       def create
         result = Project::CreateRemix.call(params: remix_params,
-                                           user_id: oauth_user_id,
+                                           user_id: current_user,
                                            original_project: project)
 
         if result.success?

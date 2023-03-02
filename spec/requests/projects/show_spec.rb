@@ -14,26 +14,29 @@ RSpec.describe 'Project show requests' do
       image_list: []
     }.to_json
   end
+  let(:headers) { {} }
 
   context 'when user is logged in' do
+    let(:headers) { { Authorization: 'dummy-token' } }
+
     before do
-      mock_oauth_user(project.user_id)
+      stub_fetch_oauth_user_id(project.user_id)
     end
 
     context 'when loading own project' do
       it 'returns success response' do
-        get "/api/projects/#{project.identifier}"
+        get("/api/projects/#{project.identifier}", headers:)
 
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns json' do
-        get "/api/projects/#{project.identifier}"
+        get("/api/projects/#{project.identifier}", headers:)
         expect(response.content_type).to eq('application/json; charset=utf-8')
       end
 
       it 'returns the project json' do
-        get "/api/projects/#{project.identifier}"
+        get("/api/projects/#{project.identifier}", headers:)
         expect(response.body).to eq(project_json)
       end
     end
@@ -52,13 +55,13 @@ RSpec.describe 'Project show requests' do
       end
 
       it 'returns forbidden response' do
-        get "/api/projects/#{another_project.identifier}"
+        get("/api/projects/#{another_project.identifier}", headers:)
 
         expect(response).to have_http_status(:forbidden)
       end
 
       it 'does not return the project json' do
-        get "/api/projects/#{another_project.identifier}"
+        get("/api/projects/#{another_project.identifier}", headers:)
         expect(response.body).not_to include(another_project_json)
       end
     end
@@ -79,36 +82,36 @@ RSpec.describe 'Project show requests' do
       end
 
       it 'returns success response' do
-        get "/api/projects/#{starter_project.identifier}"
+        get("/api/projects/#{starter_project.identifier}", headers:)
 
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns json' do
-        get "/api/projects/#{starter_project.identifier}"
+        get("/api/projects/#{starter_project.identifier}", headers:)
         expect(response.content_type).to eq('application/json; charset=utf-8')
       end
 
       it 'returns the project json' do
-        get "/api/projects/#{starter_project.identifier}"
+        get("/api/projects/#{starter_project.identifier}", headers:)
         expect(response.body).to eq(starter_project_json)
       end
 
       it 'returns 404 response if invalid project' do
-        get '/api/projects/no-such-project'
+        get('/api/projects/no-such-project', headers:)
         expect(response).to have_http_status(:not_found)
       end
     end
 
     context 'when loading an owned project' do
       it 'returns forbidden response' do
-        get "/api/projects/#{project.identifier}"
+        get("/api/projects/#{project.identifier}", headers:)
 
         expect(response).to have_http_status(:forbidden)
       end
 
       it 'does not return the project json' do
-        get "/api/projects/#{project.identifier}"
+        get("/api/projects/#{project.identifier}", headers:)
         expect(response.body).not_to include(project_json)
       end
     end
