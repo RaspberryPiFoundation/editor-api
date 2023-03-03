@@ -69,7 +69,7 @@ class UploadJob < ApplicationJob
       elsif file.object.text
         components << component(file)
       else
-        images << image(file, project_dir, repository, owner)
+        images << image(file, project_dir, locale, repository, owner)
       end
     end
     { **@proj_config, locale:, components:, images: }
@@ -83,10 +83,10 @@ class UploadJob < ApplicationJob
     { name:, extension:, content:, default: }
   end
 
-  def image(file, project_dir, repository, owner)
+  def image(file, project_dir, locale, repository, owner)
     filename = file.name
     directory = project_dir.name
-    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/en/code/#{directory}/#{filename}"
+    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
     { filename:, io: URI.parse(url).open }
   end
 end

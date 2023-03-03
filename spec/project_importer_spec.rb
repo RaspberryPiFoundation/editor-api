@@ -9,6 +9,7 @@ RSpec.describe ProjectImporter do
       name: 'My amazing project',
       identifier: 'my-amazing-project',
       type: 'python',
+      locale: 'ja-JP',
       components: [
         { name: 'main', extension: 'py', content: 'print(\'hello\')', default: true },
         { name: 'amazing', extension: 'py', content: 'print(\'this is amazing\')' }
@@ -55,7 +56,8 @@ RSpec.describe ProjectImporter do
         :with_components,
         :with_attached_image,
         component_count: 2,
-        identifier: 'my-amazing-project'
+        identifier: 'my-amazing-project',
+        locale: 'ja-JP'
       )
     end
 

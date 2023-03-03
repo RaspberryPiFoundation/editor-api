@@ -14,10 +14,10 @@ RSpec.describe UploadJob do
     GraphQL::Client::Response.new(raw_response, data: UploadJob::ProjectContentQuery.new(raw_response['data'], GraphQL::Client::Errors.new))
   end
   let(:payload) do
-    { repository: { name: 'my-amazing-repo', owner: { name: 'me' } } }
+    { repository: { name: 'my-amazing-repo', owner: { name: 'me' } }, commits: [ { added: ['ja-JP/code/dont-collide-starter/main.py'], modified: [], removed: [] } ] }
   end
   let(:variables) do
-    { repository: 'my-amazing-repo', owner: 'me', expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:en/code" }
+    { repository: 'my-amazing-repo', owner: 'me', expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:ja-JP/code" }
   end
 
   let(:raw_response) do
@@ -74,6 +74,7 @@ RSpec.describe UploadJob do
       name: "Don't Collide!",
       identifier: 'dont-collide-starter',
       type: 'python',
+      locale: 'ja-JP',
       components: [
         {
           name: 'main',
@@ -93,7 +94,7 @@ RSpec.describe UploadJob do
 
   before do
     allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
-    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/en/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
     allow(ProjectImporter).to receive(:new).and_call_original
   end
 
@@ -114,7 +115,7 @@ RSpec.describe UploadJob do
 
   it 'requests the image from the correct URL' do
     described_class.perform_now(payload)
-    expect(WebMock).to have_requested(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/en/code/dont-collide-starter/astronaut1.png').once
+    expect(WebMock).to have_requested(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').once
   end
 
   it 'saves the project to the database' do
