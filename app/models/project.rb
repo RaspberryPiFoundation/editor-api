@@ -4,7 +4,7 @@ require 'phrase_identifier'
 
 class Project < ApplicationRecord
   before_validation :check_unique_not_null, on: :create
-  validates :identifier, presence: true, uniqueness: true
+  validates :identifier, presence: true, uniqueness: { scope: :project_locale }
   belongs_to :parent, class_name: 'Project', foreign_key: 'remixed_from_id', optional: true, inverse_of: :remixes
   has_many :components, -> { order(default: :desc, name: :asc) }, dependent: :destroy, inverse_of: :project
   has_many :remixes, class_name: 'Project', foreign_key: 'remixed_from_id', dependent: :nullify, inverse_of: :parent
