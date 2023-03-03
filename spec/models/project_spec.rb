@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Project do
+  subject { create(:project) }
+  let(:invalid_project) { build(:project, identifier: subject.identifier, locale: subject.locale) }
+  let(:valid_project) { build(:project, identifier: subject.identifier, locale: 'es-LA') }
+
   describe 'associations' do
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:remixes).dependent(:nullify) }
@@ -14,21 +18,30 @@ RSpec.describe Project do
     end
   end
 
-  describe 'identifier not nil' do
-    it 'generates an identifier if not present' do
-      proj = build(:project, identifier: nil)
-      expect { proj.valid? }
-        .to change { proj.identifier.nil? }
-        .from(true)
-        .to(false)
+  describe 'validations' do
+    it { is_expected.to validate_presence_of(:identifier) }
+
+    it 'validates uniqueness of identifier within locale' do
+      expect(invalid_project).to be_invalid
+    end
+
+    it 'permits duplicate identifiers in different locales' do
+      expect(valid_project).to be_valid
     end
   end
 
-  describe 'identifier unique' do
-    it do
-      project1 = create(:project)
-      project2 = build(:project, identifier: project1.identifier)
-      expect { project2.valid? }.to change(project2, :identifier)
+  describe 'check_unique_not_null' do
+    it 'generates an identifier if nil' do
+      unsaved_project = build(:project, identifier: nil)
+      expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
+    end
+
+    it 'generates identifier if non-unique within locale' do
+      expect { invalid_project.valid? }.to change(invalid_project, :identifier)
+    end
+
+    it 'does not change identifier if duplicated in different locale' do
+      expect { valid_project.valid? }.not_to change(valid_project, :identifier)
     end
   end
 end

@@ -6,6 +6,7 @@ FactoryBot.define do
     name { Faker::Book.title }
     identifier { "#{Faker::Verb.base}-#{Faker::Verb.base}-#{Faker::Verb.base}" }
     project_type { 'python' }
+    locale { ['en', 'ja-JP', 'fr-FR'].sample }
 
     trait :with_components do
       transient do

@@ -14,7 +14,7 @@ RSpec.describe UploadJob do
     GraphQL::Client::Response.new(raw_response, data: UploadJob::ProjectContentQuery.new(raw_response['data'], GraphQL::Client::Errors.new))
   end
   let(:payload) do
-    { repository: { name: 'my-amazing-repo', owner: { name: 'me' } }, commits: [ { added: ['ja-JP/code/dont-collide-starter/main.py'], modified: [], removed: [] } ] }
+    { repository: { name: 'my-amazing-repo', owner: { name: 'me' } }, commits: [{ added: ['ja-JP/code/dont-collide-starter/main.py'], modified: [], removed: [] }] }
   end
   let(:variables) do
     { repository: 'my-amazing-repo', owner: 'me', expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:ja-JP/code" }
