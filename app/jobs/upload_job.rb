@@ -35,16 +35,10 @@ class UploadJob < ApplicationJob
   GRAPHQL
 
   def perform(payload)
-    repository = payload[:repository][:name]
-    owner = payload[:repository][:owner][:name]
-    commits = payload[:commits]
-    modified_paths = commits.map { |commit| commit[:added] | commit[:modified] | commit[:removed] }.flatten
-    modified_locales = modified_paths.map { |path| path.split('/')[0] }.uniq
-    modified_locales.each do |locale|
-      projects_data = load_projects_data(locale, repository, owner)
-
+    modified_locales(payload).each do |locale|
+      projects_data = load_projects_data(locale, repository(payload), owner(payload))
       projects_data.data.repository.object.entries.each do |project_dir|
-        project = format_project(project_dir, locale, repository, owner)
+        project = format_project(project_dir, locale, repository(payload), owner(payload))
         project_importer = ProjectImporter.new(**project)
         project_importer.import!
       end
@@ -52,6 +46,12 @@ class UploadJob < ApplicationJob
   end
 
   private
+
+  def modified_locales(payload)
+    commits = payload[:commits]
+    modified_paths = commits.map { |commit| commit[:added] | commit[:modified] | commit[:removed] }.flatten
+    modified_paths.map { |path| path.split('/')[0] }.uniq
+  end
 
   def load_projects_data(locale, repository, owner)
     GithubApi::Client.query(
@@ -88,5 +88,13 @@ class UploadJob < ApplicationJob
     directory = project_dir.name
     url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
     { filename:, io: URI.parse(url).open }
+  end
+
+  def repository(payload)
+    payload[:repository][:name]
+  end
+
+  def owner(payload)
+    payload[:repository][:owner][:name]
   end
 end

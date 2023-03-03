@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Project do
   subject { create(:project) }
+
   let(:invalid_project) { build(:project, identifier: subject.identifier, locale: subject.locale) }
   let(:valid_project) { build(:project, identifier: subject.identifier, locale: 'es-LA') }
 
