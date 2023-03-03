@@ -15,6 +15,6 @@ class Project < ApplicationRecord
 
   def check_unique_not_null
     self.identifier ||= PhraseIdentifier.generate
-    self.identifier = PhraseIdentifier.generate until Project.find_by(identifier: self.identifier).nil?
+    self.identifier = PhraseIdentifier.generate until Project.find_by(identifier: self.identifier, project_locale: self.project_locale).nil?
   end
 end
