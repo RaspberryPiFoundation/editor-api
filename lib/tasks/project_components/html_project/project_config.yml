@@ -1,0 +1,9 @@
+NAME: "My First Webpage"
+IDENTIFIER: "my-first-webpage"
+TYPE: "html"
+COMPONENTS:
+  - name: "index"
+    extension: "html"
+    location: "index.html"
+    index: 0
+    default: true
