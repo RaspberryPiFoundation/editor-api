@@ -11,7 +11,7 @@ class EditorApiSchema < GraphQL::Schema
   max_complexity 500
 
   # Prevent deeply-nested queries
-  max_depth 10
+  max_depth 100
 
   # Stop validating when it encounters this many errors:
   validate_max_errors 100
