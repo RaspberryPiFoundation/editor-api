@@ -355,14 +355,14 @@ type Project implements Node {
   ): ImageConnection
 
   """
+  The locale of project, e.g. en, fr-FR
+  """
+  locale: String
+
+  """
   The name of the project
   """
   name: String
-
-  """
-  The locale of project, e.g. en, fr-FR
-  """
-  projectLocale: String
 
   """
   The type of project, e.g. python, html

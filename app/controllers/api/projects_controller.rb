@@ -61,7 +61,7 @@ module Api
         :identifier,
         :name,
         :project_type,
-        :project_locale,
+        :locale,
         {
           image_list: [],
           components: %i[id name extension content index default]

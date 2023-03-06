@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-json.call(@project, :identifier, :project_type, :project_locale, :name, :user_id)
+json.call(@project, :identifier, :project_type, :locale, :name, :user_id)
 
 json.parent(@project.parent, :name, :identifier) if @project.parent
 

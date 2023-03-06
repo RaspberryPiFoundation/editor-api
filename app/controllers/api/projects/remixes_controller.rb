@@ -28,7 +28,7 @@ module Api
         params.require(:project)
               .permit(:name,
                       :identifier,
-                      :project_locale,
+                      :locale,
                       components: %i[id name extension content index])
       end
     end
