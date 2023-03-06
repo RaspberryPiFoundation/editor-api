@@ -355,7 +355,7 @@ type Project implements Node {
   ): ImageConnection
 
   """
-  The locale of project, e.g. en, fr-FR
+  The locale of the project, e.g. en, fr-FR
   """
   locale: String
 
