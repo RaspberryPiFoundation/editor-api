@@ -16,6 +16,6 @@ class GithubWebhooksController < ActionController::API
   def edited_code?(payload)
     commits = payload[:commits]
     modified_paths = commits.map { |commit| commit[:added] | commit[:modified] | commit[:removed] }.flatten
-    modified_paths.count { |path| path.start_with?('en/code') }.positive?
+    modified_paths.count { |path| path.split('/')[1] == 'code' }.positive?
   end
 end

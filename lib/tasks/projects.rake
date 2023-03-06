@@ -26,7 +26,8 @@ namespace :projects do
       end
 
       project_importer = ProjectImporter.new(name: proj_config['NAME'], identifier: proj_config['IDENTIFIER'],
-                                             type: proj_config['TYPE'] ||= 'python', components:, images:)
+                                             type: proj_config['TYPE'] ||= 'python',
+                                             locale: proj_config['LOCALE'] ||= 'en', components:, images:)
       project_importer.import!
     end
   end
