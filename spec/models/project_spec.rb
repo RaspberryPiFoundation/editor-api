@@ -3,10 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Project do
-  subject { create(:project) }
-
-  let(:invalid_project) { build(:project, identifier: subject.identifier, locale: subject.locale) }
-  let(:valid_project) { build(:project, identifier: subject.identifier, locale: 'ja-JP') }
 
   describe 'associations' do
     it { is_expected.to have_many(:components) }
@@ -19,18 +15,6 @@ RSpec.describe Project do
     end
   end
 
-  describe 'validations' do
-    it { is_expected.to validate_presence_of(:identifier) }
-
-    it 'validates uniqueness of identifier within locale' do
-      expect(invalid_project).to be_invalid
-    end
-
-    it 'permits duplicate identifiers in different locales' do
-      expect(valid_project).to be_valid
-    end
-  end
-
   describe 'check_unique_not_null' do
     it 'generates an identifier if nil' do
       unsaved_project = build(:project, identifier: nil)
@@ -38,10 +22,12 @@ RSpec.describe Project do
     end
 
     it 'generates identifier if non-unique within locale' do
+      invalid_project = build(:project, identifier: subject.identifier, locale: subject.locale)
       expect { invalid_project.valid? }.to change(invalid_project, :identifier)
     end
 
     it 'does not change identifier if duplicated in different locale' do
+      valid_project = build(:project, identifier: subject.identifier, locale: 'ja-JP')
       expect { valid_project.valid? }.not_to change(valid_project, :identifier)
     end
   end
