@@ -31,5 +31,10 @@ RSpec.describe Project do
       valid_project = build(:project, identifier: saved_project.identifier, locale: 'ja-JP')
       expect { valid_project.valid? }.not_to change(valid_project, :identifier)
     end
+
+    it 'changes indentifier if duplicated with nil locale' do
+      user_project = build(:project, identifier: saved_project.identifier, locale: nil)
+      expect { user_project.valid? }.to change(user_project, :identifier)
+    end
   end
 end
