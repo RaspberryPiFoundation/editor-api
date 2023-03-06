@@ -360,6 +360,11 @@ type Project implements Node {
   name: String
 
   """
+  The locale of project, e.g. en, fr-FR
+  """
+  projectLocale: String
+
+  """
   The type of project, e.g. python, html
   """
   projectType: String!
