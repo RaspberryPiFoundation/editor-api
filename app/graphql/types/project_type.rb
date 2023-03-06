@@ -11,7 +11,7 @@ module Types
     field :identifier, String, null: false, description: 'The easy-to-rememeber identifier of the project'
     field :images, Types::ImageType.connection_type,
           description: 'All images associated with this project'
-    field :locale, String, description: 'The locale of project, e.g. en, fr-FR'
+    field :locale, String, description: 'The locale of the project, e.g. en, fr-FR'
     field :name, String, description: 'The name of the project'
     field :project_type, String, null: false, description: 'The type of project, e.g. python, html'
     field :remixed_from, ProjectType, method: :parent, description: 'If present, the project this one was remixed from'
