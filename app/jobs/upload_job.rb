@@ -35,27 +35,32 @@ class UploadJob < ApplicationJob
   GRAPHQL
 
   def perform(payload)
-    repository = payload[:repository][:name]
-    owner = payload[:repository][:owner][:name]
-    projects_data = load_projects_data(repository, owner)
-
-    projects_data.data.repository.object.entries.each do |project_dir|
-      project = format_project(project_dir, repository, owner)
-      project_importer = ProjectImporter.new(**project)
-      project_importer.import!
+    modified_locales(payload).each do |locale|
+      projects_data = load_projects_data(locale, repository(payload), owner(payload))
+      projects_data.data.repository.object.entries.each do |project_dir|
+        project = format_project(project_dir, locale, repository(payload), owner(payload))
+        project_importer = ProjectImporter.new(**project)
+        project_importer.import!
+      end
     end
   end
 
   private
 
-  def load_projects_data(repository, owner)
+  def modified_locales(payload)
+    commits = payload[:commits]
+    modified_paths = commits.map { |commit| commit[:added] | commit[:modified] | commit[:removed] }.flatten
+    modified_paths.map { |path| path.split('/')[0] }.uniq
+  end
+
+  def load_projects_data(locale, repository, owner)
     GithubApi::Client.query(
       ProjectContentQuery,
-      variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:en/code" }
+      variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:#{locale}/code" }
     )
   end
 
-  def format_project(project_dir, repository, owner)
+  def format_project(project_dir, locale, repository, owner)
     components = []
     images = []
     project_dir.object.entries.each do |file|
@@ -64,10 +69,10 @@ class UploadJob < ApplicationJob
       elsif file.object.text
         components << component(file)
       else
-        images << image(file, project_dir, repository, owner)
+        images << image(file, project_dir, locale, repository, owner)
       end
     end
-    { **@proj_config, components:, images: }
+    { **@proj_config, locale:, components:, images: }
   end
 
   def component(file)
@@ -78,10 +83,18 @@ class UploadJob < ApplicationJob
     { name:, extension:, content:, default: }
   end
 
-  def image(file, project_dir, repository, owner)
+  def image(file, project_dir, locale, repository, owner)
     filename = file.name
     directory = project_dir.name
-    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/en/code/#{directory}/#{filename}"
+    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
     { filename:, io: URI.parse(url).open }
+  end
+
+  def repository(payload)
+    payload[:repository][:name]
+  end
+
+  def owner(payload)
+    payload[:repository][:owner][:name]
   end
 end

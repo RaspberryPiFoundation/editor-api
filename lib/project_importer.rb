@@ -1,14 +1,15 @@
 # frozen_string_literal: true
 
 class ProjectImporter
-  attr_reader :name, :identifier, :images, :components, :type
+  attr_reader :name, :identifier, :images, :components, :type, :locale
 
-  def initialize(name:, identifier:, type:, components:, images: [])
-    @name = name
-    @identifier = identifier
-    @components = components
-    @images = images
-    @type = type
+  def initialize(**kwargs)
+    @name = kwargs[:name]
+    @identifier = kwargs[:identifier]
+    @components = kwargs[:components]
+    @images = kwargs[:images]
+    @type = kwargs[:type]
+    @locale = kwargs[:locale]
   end
 
   def import!
@@ -26,7 +27,7 @@ class ProjectImporter
   private
 
   def project
-    @project ||= Project.find_or_initialize_by(identifier:)
+    @project ||= Project.find_or_initialize_by(identifier:, locale:)
   end
 
   def setup_project
