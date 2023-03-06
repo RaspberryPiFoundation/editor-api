@@ -6,7 +6,7 @@ RSpec.describe Project do
   subject { create(:project) }
 
   let(:invalid_project) { build(:project, identifier: subject.identifier, locale: subject.locale) }
-  let(:valid_project) { build(:project, identifier: subject.identifier, locale: 'es-LA') }
+  let(:valid_project) { build(:project, identifier: subject.identifier, locale: 'ja-JP') }
 
   describe 'associations' do
     it { is_expected.to have_many(:components) }

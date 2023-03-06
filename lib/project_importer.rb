@@ -3,13 +3,13 @@
 class ProjectImporter
   attr_reader :name, :identifier, :images, :components, :type, :locale
 
-  def initialize(name:, identifier:, type:, locale:, components:, images: [])
-    @name = name
-    @identifier = identifier
-    @components = components
-    @images = images
-    @type = type
-    @locale = locale
+  def initialize(**kwargs)
+    @name = kwargs[:name]
+    @identifier = kwargs[:identifier]
+    @components = kwargs[:components]
+    @images = kwargs[:images]
+    @type = kwargs[:type]
+    @locale = kwargs[:locale]
   end
 
   def import!
