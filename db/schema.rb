@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_03_02_145905) do
+ActiveRecord::Schema[7.0].define(version: 2023_03_03_123149) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -121,8 +121,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_03_02_145905) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.uuid "remixed_from_id"
-    t.string "project_locale"
-    t.index ["identifier"], name: "index_projects_on_identifier", unique: true
+    t.string "locale"
+    t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
+    t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
   end
 
