@@ -6,8 +6,6 @@ class PhraseIdentifier
     phrase
   end
 
-  private
-
   def self.unique?(phrase)
     !phrase.nil? && Project.find_by(identifier: phrase).nil?
   end
