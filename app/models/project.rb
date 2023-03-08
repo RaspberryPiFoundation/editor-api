@@ -17,15 +17,6 @@ class Project < ApplicationRecord
 
   def check_unique_not_null
     self.identifier ||= PhraseIdentifier.generate
-    self.identifier = PhraseIdentifier.generate until allowed_identifier?
-  end
-
-  def allowed_identifier?
-    if locale.nil?
-      Project.find_by(identifier: self.identifier).nil?
-    else
-      Project.find_by(identifier: self.identifier, locale:).nil?
-    end
   end
 
   def identifier_cannot_be_taken_by_another_user

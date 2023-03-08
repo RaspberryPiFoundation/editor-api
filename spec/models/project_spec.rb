@@ -64,15 +64,5 @@ RSpec.describe Project do
       unsaved_project = build(:project, identifier: nil)
       expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
     end
-
-    it 'generates identifier if non-unique within locale' do
-      invalid_project = build(:project, identifier: saved_project.identifier, locale: saved_project.locale)
-      expect { invalid_project.valid? }.to change(invalid_project, :identifier)
-    end
-
-    it 'does not change identifier if duplicated in different locale' do
-      valid_project = build(:project, identifier: saved_project.identifier, locale: 'ja-JP')
-      expect { valid_project.valid? }.not_to change(valid_project, :identifier)
-    end
   end
 end

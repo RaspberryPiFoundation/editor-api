@@ -35,6 +35,8 @@ class Project
         remix = original_project.dup.tap do |proj|
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
+          proj.identifier = PhraseIdentifier.generate
+          proj.locale = nil
         end
 
         original_project.images.each do |image|
