@@ -28,29 +28,30 @@ RSpec.describe Project do
       expect(valid_project).to be_valid
     end
 
-    context 'same identifier and same user' do
+    context 'with same identifier and same user as existing project' do
       let(:user_id) { project.user_id }
 
       it 'is invalid if identifier in use by same user in the same locale' do
-        new_project = build(:project, identifier: identifier, user_id: user_id, locale: project.locale)
+        new_project = build(:project, identifier:, user_id:, locale: project.locale)
         expect(new_project).to be_invalid
       end
 
       it 'is valid if identifier only in use by the user in the another locale' do
-        new_project = build(:project, identifier: identifier, user_id: user_id, locale: 'another_locale')
+        new_project = build(:project, identifier:, user_id:, locale: 'another_locale')
         expect(new_project).to be_valid
       end
     end
-  
-    context 'same identifier but different user' do
+
+    context 'with same identifier but different user as existing project' do
       let(:user_id) { 'another_user' }
+
       it 'is invalid if identifier in use by another user in same locale' do
-        new_project = build(:project, identifier: identifier, user_id: user_id, locale: project.locale)
+        new_project = build(:project, identifier:, user_id:, locale: project.locale)
         expect(new_project).to be_invalid
       end
 
       it 'is invalid if identifier in use in another locale by another user' do
-        new_project = build(:project, identifier: identifier, user_id: user_id, locale: 'another_locale')
+        new_project = build(:project, identifier:, user_id:, locale: 'another_locale')
         expect(new_project).to be_invalid
       end
     end

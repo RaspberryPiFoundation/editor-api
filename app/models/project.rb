@@ -24,13 +24,13 @@ class Project < ApplicationRecord
     if locale.nil?
       Project.find_by(identifier: self.identifier).nil?
     else
-      Project.find_by(identifier: self.identifier, locale: self.locale).nil?
+      Project.find_by(identifier: self.identifier, locale:).nil?
     end
   end
 
   def identifier_cannot_be_taken_by_another_user
-    if (!Project.where(identifier: self.identifier).where.not(user_id: self.user_id).empty?)
-      errors.add(:identifier, "can't be taken by another user")
-    end
+    return if Project.where(identifier: self.identifier).where.not(user_id:).empty?
+
+    errors.add(:identifier, "can't be taken by another user")
   end
 end
