@@ -21,10 +21,10 @@ RSpec.describe ProjectImporter do
   end
 
   context 'when the project with correct locale does not already exist in the database' do
-    let(:project) { Project.find_by(identifier: importer.identifier, locale: importer.locale) }
+    let(:project) { Project.find_by(identifier: importer.identifier, user_id: nil, locale: importer.locale) }
 
     before do
-      create(:project, identifier: importer.identifier)
+      create(:project, identifier: importer.identifier, user_id: nil)
     end
 
     it 'saves the project to the database' do
