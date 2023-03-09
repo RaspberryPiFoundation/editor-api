@@ -5,17 +5,19 @@ require 'rails_helper'
 RSpec.describe 'mutation RemixProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
-  let(:mutation) { 'mutation RemixProject($id: String!, $name: String, $components: [ProjectComponentInput!]) {
+  let(:mutation) do
+    'mutation RemixProject($id: String!, $name: String, $components: [ProjectComponentInput!]) {
     remixProject(input: { id: $id, name: $name, components: $components }) {
       project {
         id
       }
     }
   }
-  ' }
+  '
+  end
   let(:project) { create(:project, :with_default_component, user_id: SecureRandom.uuid) }
   let(:project_id) { project.to_gid_param }
-  let(:variables) {{id: project_id}}
+  let(:variables) { { id: project_id } }
 
   before do
     project
@@ -65,7 +67,6 @@ RSpec.describe 'mutation RemixProject() { ... }' do
     let(:returned_gid) { result.dig('data', 'remixProject', 'project', 'id') }
     let(:remixed_project) { GlobalID.find(returned_gid) }
 
-
     it 'creates a project' do
       expect { result }.to change(Project, :count).by(1)
     end
@@ -75,7 +76,6 @@ RSpec.describe 'mutation RemixProject() { ... }' do
     end
 
     context 'when name and components not specified' do
-
       it 'uses original project name' do
         expect(remixed_project.name).to eq(project.name)
       end
@@ -90,8 +90,8 @@ RSpec.describe 'mutation RemixProject() { ... }' do
         variables[:name] = 'My amazing remix'
         variables[:components] = [
           {
-            name: "main",
-            extension: "py",
+            name: 'main',
+            extension: 'py',
             default: true,
             content: "print('this is amazing')"
           }
