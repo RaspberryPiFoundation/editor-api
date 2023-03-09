@@ -8,7 +8,7 @@ module Mutations
     field :component, Types::ComponentType, description: 'The component that has been created'
 
     def resolve(**input)
-      project = GlobalID.find("Z2lkOi8vYXBwL1Byb2plY3QvMmNmOTllOWItNGQzZS00MDQ2LWFjMWEtY2Q3MzMwNTFiNjA2")
+      project = GlobalID.find(input[:id])
 
       raise GraphQL::ExecutionError, 'Project not found' unless project
 
