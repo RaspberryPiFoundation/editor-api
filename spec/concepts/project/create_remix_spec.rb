@@ -45,6 +45,11 @@ RSpec.describe Project::CreateRemix, type: :unit do
       expect(remixed_project.identifier).not_to eq(original_project.identifier)
     end
 
+    it 'sets new project locale to nil' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.locale).to be_nil
+    end
+
     it 'assigns user_id to new project' do
       remixed_project = create_remix[:project]
       expect(remixed_project.user_id).to eq(user_id)
