@@ -8,6 +8,7 @@ RSpec.describe 'Project show requests' do
     {
       identifier: project.identifier,
       project_type: 'python',
+      locale: project.locale,
       name: project.name,
       user_id: project.user_id,
       components: [],
@@ -74,6 +75,7 @@ RSpec.describe 'Project show requests' do
         {
           identifier: starter_project.identifier,
           project_type: 'python',
+          locale: starter_project.locale,
           name: starter_project.name,
           user_id: starter_project.user_id,
           components: [],
