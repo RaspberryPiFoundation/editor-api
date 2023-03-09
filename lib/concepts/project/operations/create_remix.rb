@@ -46,11 +46,11 @@ class Project
 
       def format_project(original_project, params, user_id)
         original_project.dup.tap do |proj|
+          proj.identifier = PhraseIdentifier.generate
+          proj.locale = nil
           proj.name = params[:name]
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
-          proj.identifier = PhraseIdentifier.generate
-          proj.locale = nil
         end
       end
     end
