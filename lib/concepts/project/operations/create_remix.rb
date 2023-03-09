@@ -31,7 +31,7 @@ class Project
       end
 
       def create_remix(original_project, params, user_id)
-        remix = format_project(original_project, user_id)
+        remix = format_project(original_project, params, user_id)
 
         original_project.images.each do |image|
           remix.images.attach(image.blob)
@@ -44,8 +44,9 @@ class Project
         remix
       end
 
-      def format_project(original_project, user_id)
+      def format_project(original_project, params, user_id)
         original_project.dup.tap do |proj|
+          proj.name = params[:name]
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
           proj.identifier = PhraseIdentifier.generate
