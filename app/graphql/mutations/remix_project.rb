@@ -8,20 +8,19 @@ module Mutations
     field :project, Types::ProjectType, description: 'The project that has been created'
 
     def resolve(**input)
-      project = Project.find_by(identifier: input[:identifier], locale: input[:locale])
+      original_project = GlobalID.find(input[:id])
+      raise GraphQL::ExecutionError, 'Project not found' unless original_project
 
-      # unless context[:current_ability]&.can?(:read, project)
-      #   pp context[:current_ability]
-      #   pp context[:current_user_id]
-      #   raise GraphQL::ExecutionError, 'You are not permitted to read that project'
-      # end
+      unless context[:current_ability]&.can?(:show, original_project)
+        raise GraphQL::ExecutionError, 'You are not permitted to read that project'
+      end
 
-      remix_params = {
-        name: project.name,
-        identifier: project.identifier,
-        components: project.components
+      params = {
+        name: input[:name],
+        identifier: original_project.identifier,
+        components: input[:components].map{|component| component.to_h}
       }
-      response = Project::CreateRemix.call(params: remix_params, user_id: context[:current_user_id], original_project: project)
+      response = Project::CreateRemix.call(params: params, user_id: context[:current_user_id], original_project: original_project)
       raise GraphQL::ExecutionError, response[:error] unless response.success?
 
       { project: response[:project] }
