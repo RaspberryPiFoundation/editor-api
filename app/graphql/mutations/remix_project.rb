@@ -10,17 +10,15 @@ module Mutations
     def resolve(**input)
       original_project = GlobalID.find(input[:id])
       raise GraphQL::ExecutionError, 'Project not found' unless original_project
-
-      unless context[:current_ability]&.can?(:show, original_project)
-        raise GraphQL::ExecutionError, 'You are not permitted to read that project'
-      end
+      raise GraphQL::ExecutionError, 'You are not permitted to read this project' unless can_read?(original_project)
 
       params = {
         name: input[:name] || original_project.name,
         identifier: original_project.identifier,
-        components: input[:components] ? input[:components]&.map(&:to_h) : original_project.components
+        components: remix_components(input, original_project)
       }
-      response = Project::CreateRemix.call(params: params, user_id: context[:current_user_id], original_project: original_project)
+      response = Project::CreateRemix.call(params:, user_id: context[:current_user_id],
+                                           original_project:)
       raise GraphQL::ExecutionError, response[:error] unless response.success?
 
       { project: response[:project] }
@@ -34,6 +32,14 @@ module Mutations
 
     def can_create_project?
       context[:current_ability]&.can?(:create, Project, user_id: context[:current_user_id])
+    end
+
+    def can_read?(original_project)
+      context[:current_ability]&.can?(:show, original_project)
+    end
+
+    def remix_components(input, original_project)
+      input[:components] ? input[:components]&.map(&:to_h) : original_project.components
     end
   end
 end
