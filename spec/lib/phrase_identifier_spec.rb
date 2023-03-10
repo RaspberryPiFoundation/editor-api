@@ -9,7 +9,7 @@ RSpec.describe PhraseIdentifier do
 
     context 'when there are words in the database' do
       let(:words) { %w[a b c] }
-      let(:phrase_regex) { /^(#{Regexp.union(words)})-(#{Regexp.union(words)})-(#{Regexp.union(words)})$/ }
+      let(:phrase_regex) { /^[abc]-[abc]-[abc]$/ }
 
       before do
         Word.delete_all
