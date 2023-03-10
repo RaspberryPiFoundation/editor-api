@@ -8,29 +8,26 @@ module Mutations
     field :component, Types::ComponentType, description: 'The component that has been created'
 
     def resolve(**input)
-      project = GlobalID.find(input[:id])
+      project = GlobalID.find(input[:project_id])
 
       raise GraphQL::ExecutionError, 'Project not found' unless project
 
-      unless context[:current_ability].can?(:update, project)
+      component = Component.new input
+      component.project = project
+
+      unless context[:current_ability].can?(:create, component)
         raise GraphQL::ExecutionError,
-              'You are not permitted to update this project'
+              'You are not permitted to update this component'
       end
 
-      newc = []
-      input[:components].each {|component|
-        newc.append(Component.new component.to_h)
-      }
 
-      return { project: } if project.update({components: project.components.append(newc)})
+      return { component: } if component.save()
 
-      raise GraphQL::ExecutionError, project.errors.full_messages.join(', ')
+      raise GraphQL::ExecutionError, component.errors.full_messages.join(', ')
     end
 
     def ready?(**_args)
-      print("here2")
-      print("uid",context[:current_user_id])
-      return true if context[:current_ability]&.can?(:create, Component, user_id: context[:current_user_id])
+      return true if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user_id]))
 
       raise GraphQL::ExecutionError, 'You are not permitted to create a component'
     end
