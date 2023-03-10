@@ -6,13 +6,6 @@ require 'hydra_admin_api'
 RSpec.describe HydraAdminApi do
   let(:hydra_admin_url) { 'https://hydra.com/admin' }
   let(:hydra_admin_api_key) { 'secret' }
-  let(:bypass_auth) { nil }
-
-  around do |example|
-    ClimateControl.modify(BYPASS_AUTH: bypass_auth) do
-      example.run
-    end
-  end
 
   before do
     stub_const('HydraAdminApi::ADMIN_URL', hydra_admin_url)
@@ -45,12 +38,30 @@ RSpec.describe HydraAdminApi do
       it { is_expected.to be_nil }
     end
 
+    context 'when a token is not set' do
+      let(:args) { { token: nil } }
+
+      it { is_expected.to be_nil }
+    end
+
     context 'when BYPASS_AUTH is set' do
-      let(:bypass_auth) { 'yes' }
+      before do
+        stub_const('HydraAdminApi::BYPASS_AUTH', 'yes')
+      end
 
       # Default bypass ID from
       # https://github.com/RaspberryPiFoundation/rpi-auth/blob/main/lib/rpi_auth/engine.rb#L17
       it { is_expected.to eq 'b6301f34-b970-4d4f-8314-f877bad8b150' }
+
+      context 'when BYPASS_AUTH_USER_ID is set' do
+        let(:bypass_auth_user_id) { 'some-user-id-here' }
+
+        before do
+          stub_const('HydraAdminApi::BYPASS_AUTH_USER_ID', bypass_auth_user_id)
+        end
+
+        it { is_expected.to eq bypass_auth_user_id }
+      end
     end
   end
 end
