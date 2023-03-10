@@ -491,9 +491,9 @@ type Query {
     identifier: String!
 
     """
-    Project locale
+    List of preferred project locales, defaults to ["en"]
     """
-    locale: String
+    preferredLocales: [String!]
   ): Project
 
   """

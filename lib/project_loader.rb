@@ -3,14 +3,13 @@
 class ProjectLoader
   attr_reader :identifier, :locale
 
-  def initialize(identifier, locale)
+  def initialize(identifier, locales)
     @identifier = identifier
-    @locale = locale
+    @locales = [*locales, 'en', nil]
   end
 
   def load
-    project = Project.find_by(identifier:, locale:)
-    project ||= Project.find_by(identifier:, locale: 'en') unless locale == 'en'
-    project || Project.find_by(identifier:, locale: nil)
+    projects = Project.where(identifier:, locale: @locales)
+    projects.sort_by{ |project| @locales.find_index(project.locale) }.first
   end
 end
