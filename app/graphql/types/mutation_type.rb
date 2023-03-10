@@ -8,6 +8,7 @@ module Types
     field :delete_project, mutation: Mutations::DeleteProject, description: 'Delete an existing project'
     field :remix_project, mutation: Mutations::RemixProject, description: 'Remix a project'
     field :update_project, mutation: Mutations::UpdateProject, description: 'Update fields on an existing project'
+    field :update_component, mutation: Mutations::UpdateComponent, description: 'Update fields on an existing component'
     # rubocop:enable GraphQL/ExtractType
   end
 end
