@@ -19,7 +19,7 @@ module Types
     end
 
     def project(identifier:, locale: 'en')
-      project_loader = project_loader.new(identifier, locale)
+      project_loader = ProjectLoader.new(identifier, locale)
       project_loader.load
     end
 

@@ -51,7 +51,7 @@ module Api
     private
 
     def load_project
-      project_loader = project_loader.new(params[:id], params[:locale])
+      project_loader = ProjectLoader.new(params[:id], params[:locale])
       @project = project_loader.load
     end
 

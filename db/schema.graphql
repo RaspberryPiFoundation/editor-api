@@ -489,6 +489,11 @@ type Query {
     Project identifier
     """
     identifier: String!
+
+    """
+    Project locale
+    """
+    locale: String
   ): Project
 
   """
