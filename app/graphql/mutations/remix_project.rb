@@ -39,7 +39,7 @@ module Mutations
     end
 
     def remix_components(input, original_project)
-      input[:components] ? input[:components]&.map(&:to_h) : original_project.components
+      input[:components]&.map(&:to_h) || original_project.components
     end
   end
 end
