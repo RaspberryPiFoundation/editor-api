@@ -11,14 +11,16 @@ module Types
 
     field :project, Types::ProjectType, 'Find a project by identifier' do
       argument :identifier, String, required: true, description: 'Project identifier'
+      argument :locale, String, required: false, description: 'Project locale'
     end
 
     field :projects, Types::ProjectType.connection_type, 'All viewable projects' do
       argument :user_id, String, required: false, description: 'Filter by user ID'
     end
 
-    def project(identifier:)
-      Project.find_by(identifier:)
+    def project(identifier:, locale: 'en')
+      project_loader = project_loader.new(identifier, locale)
+      project_loader.load
     end
 
     def projects(user_id: nil)

@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'project_loader'
+
 module Api
   class ProjectsController < ApiController
     before_action :authorize_user, only: %i[create update index destroy]
@@ -49,7 +51,8 @@ module Api
     private
 
     def load_project
-      @project = Project.find_by!(identifier: params[:id])
+      project_loader = project_loader.new(params[:id], params[:locale])
+      @project = project_loader.load
     end
 
     def load_projects
