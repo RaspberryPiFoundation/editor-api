@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
+require 'project_loader'
 
 RSpec.describe 'query { project { ... } }' do
   subject(:result) { execute_query(query:, variables:) }
@@ -13,10 +14,10 @@ RSpec.describe 'query { project { ... } }' do
     it { expect(query).not_to be_a_valid_graphql_query }
   end
 
-  context 'with an identifier' do
-    let(:query) { 'query ($identifier: String!) { project(identifier: $identifier) { id } }' }
+  context 'with an identifier and locales' do
+    let(:query) { 'query ($identifier: String!, $preferred_locales: [String!]) { project(identifier: $identifier, preferredLocales: $preferred_locales) { id } }' }
     let(:project) { create(:project, user_id: nil) }
-    let(:variables) { { identifier: project.identifier } }
+    let(:variables) { { identifier: project.identifier, preferred_locales: [project.locale] } }
 
     it { expect(query).to be_a_valid_graphql_query }
 
@@ -41,7 +42,8 @@ RSpec.describe 'query { project { ... } }' do
     end
 
     context 'when introspecting project components' do
-      let(:query) { 'query ($identifier: String!) { project(identifier: $identifier) { components { __typename } } }' }
+
+      let(:query) { 'query ($identifier: String!, $preferred_locales: [String!]) { project(identifier: $identifier, preferredLocales: $preferred_locales) { components { __typename } } }' }
 
       it { expect(query).to be_a_valid_graphql_query }
 
@@ -51,7 +53,7 @@ RSpec.describe 'query { project { ... } }' do
     end
 
     context 'when introspecting project images' do
-      let(:query) { 'query ($identifier: String!) { project(identifier: $identifier) { images { __typename } } }' }
+      let(:query) { 'query ($identifier: String!, $preferred_locales: [String!]) { project(identifier: $identifier, preferredLocales: $preferred_locales) { images { __typename } } }' }
 
       it { expect(query).to be_a_valid_graphql_query }
 
@@ -61,7 +63,7 @@ RSpec.describe 'query { project { ... } }' do
     end
 
     context 'when introspecting a remixed project parent' do
-      let(:query) { 'query ($identifier: String!) { project(identifier: $identifier) { remixedFrom { __typename } } }' }
+      let(:query) { 'query ($identifier: String!, $preferred_locales: [String!]) { project(identifier: $identifier, preferredLocales: $preferred_locales) { remixedFrom { __typename } } }' }
       let(:project) { create(:project, user_id: nil, parent: create(:project, user_id: nil)) }
 
       it { expect(query).to be_a_valid_graphql_query }
