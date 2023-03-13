@@ -670,11 +670,6 @@ input UpdateComponentInput {
   The name of the file
   """
   name: String!
-
-  """
-  The easy-to-rememeber identifier of the project
-  """
-  projectId: String!
 }
 
 """
