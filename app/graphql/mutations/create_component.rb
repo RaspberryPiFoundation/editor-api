@@ -20,14 +20,15 @@ module Mutations
               'You are not permitted to update this component'
       end
 
-
-      return { component: } if component.save()
+      return { component: } if component.save
 
       raise GraphQL::ExecutionError, component.errors.full_messages.join(', ')
     end
 
     def ready?(**_args)
-      return true if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user_id]))
+      if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user_id]))
+        return true
+      end
 
       raise GraphQL::ExecutionError, 'You are not permitted to create a component'
     end

@@ -9,15 +9,15 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
   let(:project_id) { project.to_gid_param }
 
   let(:mutation) { 'mutation CreateComponent($component: CreateComponentInput!) { createComponent(input: $component) { component { id } } }' }
-  #let(:project_id) { 'dummy-id' }
+  # let(:project_id) { 'dummy-id' }
   let(:variables) do
     {
       component: {
         projectId: project_id,
-        name:"test",
-        extension:"py",
-        content:"blah",
-        default:false
+        name: 'test',
+        extension: 'py',
+        content: 'blah',
+        default: false
       }
     }
   end
@@ -47,11 +47,12 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     let(:project) { create(:project, user_id: current_user_id) }
 
     it 'returns the component ID' do
-      expect(result.dig('data', 'createComponent', 'component', 'id')).not_to be_nil 
+      expect(result.dig('data', 'createComponent', 'component', 'id')).not_to be_nil
     end
 
     context 'when project id doesnt exist' do
       let(:project_id) { 'dummy-id' }
+
       it 'returns an error' do
         expect(result.dig('errors', 0, 'message')).not_to be_blank
       end
@@ -59,6 +60,7 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
 
     context 'when project id exists but belongs to someone else' do
       let(:project) { create(:project) }
+
       it 'returns an error' do
         expect(result.dig('errors', 0, 'message')).not_to be_blank
       end
@@ -70,11 +72,10 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
         allow(component).to receive(:save).and_return(false)
         allow(Component).to receive(:new).and_return(component)
       end
+
       it 'returns an error' do
         expect(result.dig('errors', 0, 'message')).not_to be_nil
       end
     end
-
-
   end
 end
