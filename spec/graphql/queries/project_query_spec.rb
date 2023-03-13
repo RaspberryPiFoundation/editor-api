@@ -42,7 +42,6 @@ RSpec.describe 'query { project { ... } }' do
     end
 
     context 'when introspecting project components' do
-
       let(:query) { 'query ($identifier: String!, $preferred_locales: [String!]) { project(identifier: $identifier, preferredLocales: $preferred_locales) { components { __typename } } }' }
 
       it { expect(query).to be_a_valid_graphql_query }
