@@ -103,6 +103,13 @@ RSpec.describe 'Project show requests' do
         get('/api/projects/no-such-project', headers:)
         expect(response).to have_http_status(:not_found)
       end
+
+      it 'creates a new ProjectLoader with the correct parameters' do
+        allow(ProjectLoader).to receive(:new).and_call_original
+        get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}", headers:)
+        expect(ProjectLoader).to have_received(:new)
+          .with(starter_project.identifier, [starter_project.locale])
+      end
     end
 
     context 'when loading an owned project' do
