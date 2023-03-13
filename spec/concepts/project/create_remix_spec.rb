@@ -10,7 +10,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
   let(:remix_params) do
     component = original_project.components.first
     {
-      name: original_project.name,
+      name: 'My remixed project',
       identifier: original_project.identifier,
       components: [
         {
@@ -45,6 +45,16 @@ RSpec.describe Project::CreateRemix, type: :unit do
       expect(remixed_project.identifier).not_to eq(original_project.identifier)
     end
 
+    it 'sets new project locale to nil' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.locale).to be_nil
+    end
+
+    it 'renames the project' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.name).to eq('My remixed project')
+    end
+
     it 'assigns user_id to new project' do
       remixed_project = create_remix[:project]
       expect(remixed_project.user_id).to eq(user_id)
@@ -53,8 +63,8 @@ RSpec.describe Project::CreateRemix, type: :unit do
     it 'duplicates properties on new project' do
       remixed_project = create_remix[:project]
 
-      remixed_attrs = remixed_project.attributes.symbolize_keys.slice(:name, :project_type)
-      original_attrs = original_project.attributes.symbolize_keys.slice(:name, :project_type)
+      remixed_attrs = remixed_project.attributes.symbolize_keys.slice(:project_type)
+      original_attrs = original_project.attributes.symbolize_keys.slice(:project_type)
       expect(remixed_attrs).to eq(original_attrs)
     end
 

@@ -9,6 +9,7 @@ RSpec.describe ProjectImporter do
       name: 'My amazing project',
       identifier: 'my-amazing-project',
       type: 'python',
+      locale: 'ja-JP',
       components: [
         { name: 'main', extension: 'py', content: 'print(\'hello\')', default: true },
         { name: 'amazing', extension: 'py', content: 'print(\'this is amazing\')' }
@@ -19,8 +20,12 @@ RSpec.describe ProjectImporter do
     )
   end
 
-  context 'when the project does not already exist in the database' do
-    let(:project) { Project.find_by(identifier: importer.identifier) }
+  context 'when the project with correct locale does not already exist in the database' do
+    let(:project) { Project.find_by(identifier: importer.identifier, user_id: nil, locale: importer.locale) }
+
+    before do
+      create(:project, identifier: importer.identifier, user_id: nil)
+    end
 
     it 'saves the project to the database' do
       expect { importer.import! }.to change(Project, :count).by(1)
@@ -55,7 +60,8 @@ RSpec.describe ProjectImporter do
         :with_components,
         :with_attached_image,
         component_count: 2,
-        identifier: 'my-amazing-project'
+        identifier: 'my-amazing-project',
+        locale: 'ja-JP'
       )
     end
 

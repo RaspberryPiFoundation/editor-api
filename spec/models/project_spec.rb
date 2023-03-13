@@ -14,21 +14,55 @@ RSpec.describe Project do
     end
   end
 
-  describe 'identifier not nil' do
-    it 'generates an identifier if not present' do
-      proj = build(:project, identifier: nil)
-      expect { proj.valid? }
-        .to change { proj.identifier.nil? }
-        .from(true)
-        .to(false)
+  describe 'validations' do
+    let(:project) { create(:project) }
+    let(:identifier) { project.identifier }
+
+    it 'is invalid if no user or locale' do
+      invalid_project = build(:project, locale: nil, user_id: nil)
+      expect(invalid_project).to be_invalid
+    end
+
+    it 'is valid if user but no locale' do
+      valid_project = build(:project, locale: nil)
+      expect(valid_project).to be_valid
+    end
+
+    context 'with same identifier and same user as existing project' do
+      let(:user_id) { project.user_id }
+
+      it 'is invalid if identifier in use by same user in the same locale' do
+        new_project = build(:project, identifier:, user_id:, locale: project.locale)
+        expect(new_project).to be_invalid
+      end
+
+      it 'is valid if identifier only in use by the user in the another locale' do
+        new_project = build(:project, identifier:, user_id:, locale: 'another_locale')
+        expect(new_project).to be_valid
+      end
+    end
+
+    context 'with same identifier but different user as existing project' do
+      let(:user_id) { 'another_user' }
+
+      it 'is invalid if identifier in use by another user in same locale' do
+        new_project = build(:project, identifier:, user_id:, locale: project.locale)
+        expect(new_project).to be_invalid
+      end
+
+      it 'is invalid if identifier in use in another locale by another user' do
+        new_project = build(:project, identifier:, user_id:, locale: 'another_locale')
+        expect(new_project).to be_invalid
+      end
     end
   end
 
-  describe 'identifier unique' do
-    it do
-      project1 = create(:project)
-      project2 = build(:project, identifier: project1.identifier)
-      expect { project2.valid? }.to change(project2, :identifier)
+  describe 'check_unique_not_null' do
+    let(:saved_project) { create(:project) }
+
+    it 'generates an identifier if nil' do
+      unsaved_project = build(:project, identifier: nil)
+      expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
     end
   end
 end
