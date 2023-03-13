@@ -10,6 +10,6 @@ class ProjectLoader
 
   def load
     projects = Project.where(identifier:, locale: @locales)
-    projects.sort_by{ |project| @locales.find_index(project.locale) }.first
+    projects.min_by { |project| @locales.find_index(project.locale) }
   end
 end
