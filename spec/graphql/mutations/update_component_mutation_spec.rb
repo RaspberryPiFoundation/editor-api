@@ -24,7 +24,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
   context 'with an existing component' do
     let(:project) { create(:project, user_id: SecureRandom.uuid, project_type: :python) }
     let(:project_id) { project.to_gid_param }
-    let(:component) { create(:component, project:, name: 'bob', extension: 'py', content: '') }
+    let(:component) { create(:component, project:, name: 'bob', extension: 'html', content: 'new', default: true) }
     let(:component_id) { component.to_gid_param }
 
     before do
@@ -55,6 +55,18 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
       it 'updates the component name' do
         expect { result }.to change { component.reload.name }.from(component.name).to(variables.dig(:component, :name))
+      end
+
+      it 'updates the component content' do
+        expect { result }.to change { component.reload.content }.from(component.content).to(variables.dig(:component, :content))
+      end
+
+      it 'updates the component extension' do
+        expect { result }.to change { component.reload.extension }.from(component.extension).to(variables.dig(:component, :extension))
+      end
+
+      it 'updates the component default' do
+        expect { result }.to change { component.reload.default }.from(component.default).to(variables.dig(:component, :default))
       end
 
       context 'when the component cannot be found' do

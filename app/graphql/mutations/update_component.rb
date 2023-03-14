@@ -17,7 +17,7 @@ module Mutations
               'You are not permitted to update this component'
       end
 
-      return { component: } if component.update(input.slice(:content, :name))
+      return { component: } if component.update(input.slice(:content, :name, :extension, :default))
 
       raise GraphQL::ExecutionError, component.errors.full_messages.join(', ')
     end
