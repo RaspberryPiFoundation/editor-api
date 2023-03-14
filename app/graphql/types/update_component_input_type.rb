@@ -9,6 +9,5 @@ module Types
     argument :extension, String, required: true, description: 'The file extension of the component, e.g. html, csv, py'
     argument :id, String, required: true, description: 'The ID of the component to update'
     argument :name, String, required: true, description: 'The name of the file'
-    # argument :project_id, String, required: true, description: 'The easy-to-rememeber identifier of the project'
   end
 end
