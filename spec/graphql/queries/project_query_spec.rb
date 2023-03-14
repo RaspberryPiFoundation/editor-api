@@ -25,7 +25,7 @@ RSpec.describe 'query { project { ... } }' do
       allow(ProjectLoader).to receive(:new).and_call_original
       result
       expect(ProjectLoader).to have_received(:new)
-      .with(project.identifier, [project.locale, 'another_locale'])
+        .with(project.identifier, [project.locale, 'another_locale'])
     end
 
     it 'returns the project global id' do
