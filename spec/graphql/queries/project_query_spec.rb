@@ -21,15 +21,15 @@ RSpec.describe 'query { project { ... } }' do
 
     it { expect(query).to be_a_valid_graphql_query }
 
-    it 'returns the project global id' do
-      expect(result.dig('data', 'project', 'id')).to eq project.to_gid_param
-    end
-
     it 'instantiates ProjectLoader with correct arguments' do
       allow(ProjectLoader).to receive(:new).and_call_original
       result
       expect(ProjectLoader).to have_received(:new)
       .with(project.identifier, [project.locale, 'another_locale'])
+    end
+
+    it 'returns the project global id' do
+      expect(result.dig('data', 'project', 'id')).to eq project.to_gid_param
     end
 
     context 'with a unknown id' do
