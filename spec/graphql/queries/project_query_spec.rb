@@ -17,12 +17,19 @@ RSpec.describe 'query { project { ... } }' do
   context 'with an identifier and locales' do
     let(:query) { 'query ($identifier: String!, $preferred_locales: [String!]) { project(identifier: $identifier, preferredLocales: $preferred_locales) { id } }' }
     let(:project) { create(:project, user_id: nil) }
-    let(:variables) { { identifier: project.identifier, preferred_locales: [project.locale] } }
+    let(:variables) { { identifier: project.identifier, preferred_locales: [project.locale, 'another_locale'] } }
 
     it { expect(query).to be_a_valid_graphql_query }
 
     it 'returns the project global id' do
       expect(result.dig('data', 'project', 'id')).to eq project.to_gid_param
+    end
+
+    it 'instantiates ProjectLoader with correct arguments' do
+      allow(ProjectLoader).to receive(:new).and_call_original
+      result
+      expect(ProjectLoader).to have_received(:new)
+      .with(project.identifier, [project.locale, 'another_locale'])
     end
 
     context 'with a unknown id' do
