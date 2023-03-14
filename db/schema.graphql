@@ -664,7 +664,7 @@ input UpdateComponentInput {
   """
   The ID of the component to update
   """
-  id: String
+  id: String!
 
   """
   The name of the file
