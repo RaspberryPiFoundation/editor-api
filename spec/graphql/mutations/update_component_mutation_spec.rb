@@ -22,9 +22,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing component' do
-    let(:project) { create(:project, user_id: SecureRandom.uuid, project_type: :python) }
-    let(:project_id) { project.to_gid_param }
-    let(:component) { create(:component, project:, name: 'bob', extension: 'html', content: 'new', default: true) }
+    let(:component) { create(:component, name: 'bob', extension: 'html', content: 'new', default: true) }
     let(:component_id) { component.to_gid_param }
 
     before do
@@ -51,7 +49,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user_id) { project.user_id }
+      let(:current_user_id) { component.project.user_id }
 
       it 'updates the component name' do
         expect { result }.to change { component.reload.name }.from(component.name).to(variables.dig(:component, :name))
