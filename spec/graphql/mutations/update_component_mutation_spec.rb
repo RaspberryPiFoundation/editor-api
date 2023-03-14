@@ -32,7 +32,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
     context 'when unauthenticated' do
       it 'does not update a component' do
-        expect { result }.not_to change(component, :name)
+        expect { result }.not_to change { component.reload.name }
       end
 
       it 'returns an error' do
@@ -44,7 +44,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
       let(:graphql_context) { nil }
 
       it 'does not update a component' do
-        expect { result }.not_to change(component, :name)
+        expect { result }.not_to change { component.reload.name }
       end
     end
 
