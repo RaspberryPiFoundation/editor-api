@@ -1,0 +1,55 @@
+name: RaspberryPiFoundation/editor-api/test
+on:
+  push:
+    branches:
+    - main
+env:
+  GITHUB_AUTH_TOKEN: xxxxf7C3
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: cimg/ruby:3.2-browsers
+    services:
+      postgres:
+        image: circleci/postgres:12.0-alpine-ram
+        env:
+          POSTGRES_DB: choco_cake_test
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: choco
+      redis:
+        image: redis:6.2-alpine
+    env:
+      BUNDLE_JOBS: '3'
+      BUNDLE_RETRY: '3'
+      PAGER: ''
+      POSTGRES_DB: choco_cake_test
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: choco
+      POSTGRES_HOST: 127.0.0.1
+      RAILS_ENV: test
+      CIRCLE_TOKEN:
+      GITHUB_TOKEN:
+    steps:
+    - name: Set up bundler cache
+      uses: ruby/setup-ruby@v1.144.0
+      with:
+        ruby-version: 3.0.2
+        bundler-cache: true
+    - uses: actions/checkout@v3.3.0
+    - run: bundle check || bundle install
+      env:
+        BUNDLE_DEPLOYMENT: true
+    - name: Wait for DB
+      run: dockerize -wait tcp://localhost:5432 -timeout 1m
+    - name: Install postgres client, jq, curl, imagemagick
+      run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client jq curl imagemagick
+    - name: Database setup
+      run: bin/rails db:setup --trace
+    - run: bundle exec rspec spec --profile 10 --format RspecJunitFormatter --out /tmp/test-results/rspec/results.xml --format progress
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: coverage
+    - name: Post test coverage to Github
+      run: bash -ue .circleci/record_coverage
+      if: always()
