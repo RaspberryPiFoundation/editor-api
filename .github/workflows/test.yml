@@ -26,7 +26,7 @@ jobs:
       POSTGRES_DB: editor_api_test
       POSTGRES_PASSWORD: password
       POSTGRES_USER: choco
-      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_HOST: postgres
       RAILS_ENV: test
 
     steps:
