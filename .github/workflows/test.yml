@@ -30,20 +30,17 @@ jobs:
       RAILS_ENV: test
 
     steps:
+    - uses: actions/checkout@v3.3.0
+
     - name: Set up bundler cache
       uses: ruby/setup-ruby@v1.144.0
       with:
         ruby-version: 3.2.1
         bundler-cache: true
 
-    - uses: actions/checkout@v3.3.0
-
     - run: bundle check || bundle install
       env:
         BUNDLE_DEPLOYMENT: true
-
-    - name: Wait for DB
-      run: dockerize -wait tcp://localhost:5432 -timeout 1m
 
     - name: Install postgres client, jq, curl, imagemagick
       run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client jq curl imagemagick
