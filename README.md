@@ -35,7 +35,7 @@ which should update the Gems in the container, without the need for rebuilding.
 
 ## CORS Allowed Origins
 
-Add a comma separated list to the relevant enviroment settings. E.g for development in the `.env` file:
+Add a comma separated list to the relevant environment settings. E.g for development in the `.env` file:
 
 ```
 ALLOWED_ORIGINS=localhost:3002,localhost:3000
@@ -53,5 +53,5 @@ This can also be bypassed for development work, by setting `BYPASS_AUTH` to `yes
 
 # ⚠️ REST API is deprecated
 
-We're moving towards using a GraphQL API replacement for all endpoints currently using REST.  As such no further work will be conducted on the REST api endpoints in `app/controllers/api`, and we'd expect all requests to be mediated via the GraphQL API.  There is a [GraphiQL](https://github.com/graphql/graphiql) instance availabe at the root of the API where queries can be tested.
+We're moving towards using a GraphQL API replacement for all endpoints currently using REST.  As such no further work will be conducted on the REST API endpoints in `app/controllers/api`, and we'd expect all requests to be mediated via the GraphQL API.  There is a [GraphiQL](https://github.com/graphql/graphiql) instance available at the root of the API where queries can be tested.
 
