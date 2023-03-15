@@ -10,9 +10,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
-    container:
-      image: ubuntu:latest
-
     services:
       postgres:
         image: postgres:15.0-alpine
@@ -20,6 +17,8 @@ jobs:
           POSTGRES_DB: editor_api_test
           POSTGRES_PASSWORD: password
           POSTGRES_USER: user
+        ports:
+          - "5432:5432"
       redis:
         image: redis:6.2-alpine
 
@@ -30,7 +29,7 @@ jobs:
       POSTGRES_DB: editor_api_test
       POSTGRES_PASSWORD: password
       POSTGRES_USER: user
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: localhost
       RAILS_ENV: test
 
     steps:
