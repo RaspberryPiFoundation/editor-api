@@ -2,20 +2,17 @@ name: RaspberryPiFoundation/editor-api/code_quality
 on:
   push:
     branches:
-    - main
-env:
-  GITHUB_AUTH_TOKEN: xxxxf7C3
+    - '**'
+
 jobs:
   rubocop:
     if: github.ref != 'refs/heads/master' && github.ref != 'refs/heads/main'
     runs-on: ubuntu-latest
-    container:
-      image: ruby:3.2
     steps:
     - name: Set up bundler cache
       uses: ruby/setup-ruby@v1.144.0
       with:
-        ruby-version: 3.0.2
+        ruby-version: 3.2.1
         bundler-cache: true
     - uses: actions/checkout@v3.3.0
     - run: bundle check || bundle install
