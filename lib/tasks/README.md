@@ -27,7 +27,7 @@ Every directory representing a `project` must contain a `project_config.yml`. Th
 An example `project_config.yml` with all of the above properties can be seen [here](https://github.com/RaspberryPiFoundation/editor-api/blob/main/lib/tasks/project_components/persuasive_data_presentation_iss_starter/project_config.yml).
 
 ## Getting the projects created in the database
-Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-ui/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
+Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-api/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
 
 ## Amending existing projects
 Existing `project`s can be ammended by updating the content in the directory corresponding to that `project`. Please create a pull request with the required changes as described above and we will ensure they are applied once the pull request has been merged.
