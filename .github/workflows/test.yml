@@ -1,4 +1,4 @@
-name: Test
+name: test
 on:
   push:
     branches:
@@ -9,6 +9,9 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    container:
+      image: ruby:3.2-slim-bullseye
 
     services:
       postgres:
@@ -29,23 +32,24 @@ jobs:
       POSTGRES_DB: editor_api_test
       POSTGRES_PASSWORD: password
       POSTGRES_USER: user
-      POSTGRES_HOST: localhost
+      POSTGRES_HOST: postgres
       RAILS_ENV: test
 
     steps:
     - uses: actions/checkout@v3.3.0
 
-    - name: Set up bundler cache
-      uses: ruby/setup-ruby@v1.144.0
+    - name: Setup bundler cache
+      uses: actions/cache@v3
       with:
-        bundler-cache: true
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
 
-    - run: bundle check || bundle install
-      env:
-        BUNDLE_DEPLOYMENT: true
-
-    - name: Install postgres client, jq, curl, imagemagick
-      run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends postgresql-client jq curl imagemagick
+    - name: Bundle install
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
 
     - name: Database setup
       run: bin/rails db:setup --trace
