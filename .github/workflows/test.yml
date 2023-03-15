@@ -9,13 +9,17 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+
+    container:
+      image: ubuntu-latest
+
     services:
       postgres:
         image: postgres:15.0-alpine
         env:
           POSTGRES_DB: editor_api_test
           POSTGRES_PASSWORD: password
-          POSTGRES_USER: choco
+          POSTGRES_USER: user
       redis:
         image: redis:6.2-alpine
 
@@ -25,7 +29,7 @@ jobs:
       PAGER: ''
       POSTGRES_DB: editor_api_test
       POSTGRES_PASSWORD: password
-      POSTGRES_USER: choco
+      POSTGRES_USER: user
       POSTGRES_HOST: postgres
       RAILS_ENV: test
 
@@ -35,7 +39,6 @@ jobs:
     - name: Set up bundler cache
       uses: ruby/setup-ruby@v1.144.0
       with:
-        ruby-version: 3.2.1
         bundler-cache: true
 
     - run: bundle check || bundle install
@@ -53,3 +56,4 @@ jobs:
     - uses: actions/upload-artifact@v3.1.1
       with:
         path: coverage
+
