@@ -10,13 +10,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v3.3.0
+
     - name: Set up bundler cache
       uses: ruby/setup-ruby@v1.144.0
       with:
-        ruby-version: 3.2.1
         bundler-cache: true
+
+    - name: Install packages needed for build
+      run: apt-get update && apt-get install --yes --no-install-recommends build-essential libpq-dev libxml2-dev libxslt1-dev git
+
     - run: bundle check || bundle install
       env:
         BUNDLE_DEPLOYMENT: true
+
     - name: Inspecting with Rubocop
       run: bundle exec rubocop --format progress
