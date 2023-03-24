@@ -6,7 +6,7 @@ RSpec.describe 'Project delete requests' do
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
 
   context 'when user is logged in' do
-    let!(:project) { create(:project, user_id:) }
+    let!(:project) { create(:project, user_id:, locale: nil) }
     let(:headers) { { Authorization: 'dummy-token' } }
 
     before do
@@ -28,7 +28,7 @@ RSpec.describe 'Project delete requests' do
     end
 
     context 'when attempting to delete another users project' do
-      let(:non_owned_project) { create(:project) }
+      let(:non_owned_project) { create(:project, locale: nil) }
 
       it 'returns forbidden' do
         delete("/api/projects/#{non_owned_project.identifier}", headers:)
