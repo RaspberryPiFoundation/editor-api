@@ -6,6 +6,8 @@ class GraphqlController < ApiController
   # but you'll have to authenticate your user separately
   # protect_from_forgery with: :null_session
 
+  include ActiveStorage::SetCurrent
+
   def execute
     result = EditorApiSchema.execute(query, variables:, context:, operation_name:)
     render json: result
