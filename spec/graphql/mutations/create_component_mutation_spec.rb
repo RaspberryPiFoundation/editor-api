@@ -22,7 +22,6 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     }
   end
 
-
   shared_examples 'a no-op' do |error_code: :UNSET|
     it 'does not create a component' do
       expect { result }.not_to change(Component, :count)
@@ -32,8 +31,6 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
       expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
     end
   end
-
-
 
   it { expect(mutation).to be_a_valid_graphql_query }
 
