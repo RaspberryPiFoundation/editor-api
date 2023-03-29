@@ -23,7 +23,10 @@ module Mutations
     end
 
     def ready?(...)
-      raise EditorApiError::Unauthorized, 'You must be logged in to delete a project' unless context[:current_user_id]
+      unless context[:current_user_id]
+        raise EditorApiError::Unauthorized,
+              'You must be authenticated to delete a project'
+      end
 
       return true if context[:current_ability]&.can?(:destroy, Project, user_id: context[:current_user_id])
 

@@ -23,7 +23,10 @@ module Mutations
     end
 
     def ready?(...)
-      raise EditorApiError::Unauthorized, 'You must be logged in to update a component' unless context[:current_user_id]
+      unless context[:current_user_id]
+        raise EditorApiError::Unauthorized,
+              'You must be authenticated to update a component'
+      end
 
       return true if context[:current_ability]&.can?(:update, Component, user_id: context[:current_user_id])
 

@@ -26,7 +26,10 @@ module Mutations
     end
 
     def ready?(...)
-      raise EditorApiError::Unauthorized, 'You must be logged in to create a component' unless context[:current_user_id]
+      unless context[:current_user_id]
+        raise EditorApiError::Unauthorized,
+              'You must be authenticated to create a component'
+      end
 
       if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user_id]))
         return true
