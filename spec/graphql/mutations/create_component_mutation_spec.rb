@@ -22,28 +22,29 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     }
   end
 
-  it { expect(mutation).to be_a_valid_graphql_query }
 
-  context 'when unauthenticated' do
+  shared_examples 'a no-op' do |error_code: :UNSET|
     it 'does not create a component' do
       expect { result }.not_to change(Component, :count)
     end
 
     it 'returns an error' do
-      expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
     end
+  end
+
+
+
+  it { expect(mutation).to be_a_valid_graphql_query }
+
+  context 'when unauthenticated' do
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when the graphql context is unset' do
     let(:graphql_context) { nil }
 
-    it 'does not create a component' do
-      expect { result }.not_to change(Component, :count)
-    end
-
-    it 'returns an error' do
-      expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
-    end
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when authenticated' do
@@ -60,29 +61,19 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
         allow(Ability).to receive(:new).and_return(ability)
       end
 
-      it 'does not create a component' do
-        expect { result }.not_to change(Component, :count)
-      end
-
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'FORBIDDEN'
-      end
+      it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
     end
 
     context 'when project id doesnt exist' do
       let(:project_id) { 'dummy-id' }
 
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'NOT_FOUND'
-      end
+      it_behaves_like 'a no-op', error_code: 'NOT_FOUND'
     end
 
     context 'when project id exists but belongs to someone else' do
       let(:project) { create(:project) }
 
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'FORBIDDEN'
-      end
+      it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
     end
 
     context 'when project component fails to save' do
