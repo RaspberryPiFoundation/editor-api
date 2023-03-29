@@ -10,10 +10,10 @@ module Mutations
 
     def resolve(**input)
       component = GlobalID.find(input[:id])
-      raise GraphQL::ExecutionError, 'Component not found' unless component
+      raise EditorApiError::NotFound, 'Component not found' unless component
 
       unless context[:current_ability].can?(:update, component)
-        raise GraphQL::ExecutionError,
+        raise EditorApiError::Forbidden,
               'You are not permitted to update this component'
       end
 
@@ -22,10 +22,12 @@ module Mutations
       raise GraphQL::ExecutionError, component.errors.full_messages.join(', ')
     end
 
-    def ready?(**_args)
+    def ready?(...)
+      raise EditorApiError::Unauthorized, 'You must be logged in to update a component' unless context[:current_user_id]
+
       return true if context[:current_ability]&.can?(:update, Component, user_id: context[:current_user_id])
 
-      raise GraphQL::ExecutionError, 'You are not permitted to update a component'
+      raise EditorApiError::Forbidden, 'You are not permitted to update a component'
     end
   end
 end

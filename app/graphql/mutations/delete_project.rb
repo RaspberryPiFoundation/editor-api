@@ -11,10 +11,10 @@ module Mutations
     def resolve(**input)
       project = GlobalID.find(input[:id])
 
-      raise GraphQL::ExecutionError, 'Project not found' unless project
+      raise EditorApiError::NotFound, 'Project not found' unless project
 
       unless context[:current_ability].can?(:destroy, project)
-        raise GraphQL::ExecutionError, 'You are not permitted to delete that project'
+        raise EditorApiError::Forbidden, 'You are not permitted to delete that project'
       end
 
       return { id: project.id } if project.destroy
@@ -23,9 +23,11 @@ module Mutations
     end
 
     def ready?(...)
+      raise EditorApiError::Unauthorized, 'You must be logged in to delete a project' unless context[:current_user_id]
+
       return true if context[:current_ability]&.can?(:destroy, Project, user_id: context[:current_user_id])
 
-      raise GraphQL::ExecutionError, 'You are not permitted to delete projects'
+      raise EditorApiError::Forbidden, 'You are not permitted to delete projects'
     end
   end
 end

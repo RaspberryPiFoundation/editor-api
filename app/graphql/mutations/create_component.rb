@@ -10,13 +10,13 @@ module Mutations
     def resolve(**input)
       project = GlobalID.find(input[:project_id])
 
-      raise GraphQL::ExecutionError, 'Project not found' unless project
+      raise EditorApiError::NotFound, 'Project not found' unless project
 
       component = Component.new input
       component.project = project
 
       unless context[:current_ability].can?(:create, component)
-        raise GraphQL::ExecutionError,
+        raise EditorApiError::Forbidden,
               'You are not permitted to update this component'
       end
 
@@ -25,12 +25,14 @@ module Mutations
       raise GraphQL::ExecutionError, component.errors.full_messages.join(', ')
     end
 
-    def ready?(**_args)
+    def ready?(...)
+      raise EditorApiError::Unauthorized, 'You must be logged in to create a component' unless context[:current_user_id]
+
       if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user_id]))
         return true
       end
 
-      raise GraphQL::ExecutionError, 'You are not permitted to create a component'
+      raise EditorApiError::Forbidden, 'You are not permitted to create a component'
     end
   end
 end

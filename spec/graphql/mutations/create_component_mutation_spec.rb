@@ -30,7 +30,7 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     end
 
     it 'returns an error' do
-      expect(result.dig('errors', 0, 'message')).not_to be_blank
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
     end
   end
 
@@ -39,6 +39,10 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
 
     it 'does not create a component' do
       expect { result }.not_to change(Component, :count)
+    end
+
+    it 'returns an error' do
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
     end
   end
 
@@ -50,11 +54,26 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
       expect(result.dig('data', 'createComponent', 'component', 'id')).not_to be_nil
     end
 
+    context 'when the user is not allowed to update components' do
+      before do
+        ability = instance_double(Ability, can?: false)
+        allow(Ability).to receive(:new).and_return(ability)
+      end
+
+      it 'does not create a component' do
+        expect { result }.not_to change(Component, :count)
+      end
+
+      it 'returns an error' do
+        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'FORBIDDEN'
+      end
+    end
+
     context 'when project id doesnt exist' do
       let(:project_id) { 'dummy-id' }
 
       it 'returns an error' do
-        expect(result.dig('errors', 0, 'message')).not_to be_blank
+        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'NOT_FOUND'
       end
     end
 
@@ -62,7 +81,7 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
       let(:project) { create(:project) }
 
       it 'returns an error' do
-        expect(result.dig('errors', 0, 'message')).not_to be_blank
+        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'FORBIDDEN'
       end
     end
 

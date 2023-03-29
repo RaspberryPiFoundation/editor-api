@@ -34,7 +34,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
       end
 
       it 'returns an error' do
-        expect(result.dig('errors', 0, 'message')).not_to be_blank
+        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
       end
     end
 
@@ -43,6 +43,10 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
 
       it 'does not update a project' do
         expect { result }.not_to change(project, :name)
+      end
+
+      it 'returns an error' do
+        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
       end
     end
 
@@ -57,11 +61,26 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
         expect { result }.to change { project.reload.project_type }.from(project.project_type).to('html')
       end
 
+      context 'when the user is not allowed to update Projects' do
+        before do
+          ability = instance_double(Ability, can?: false)
+          allow(Ability).to receive(:new).and_return(ability)
+        end
+
+        it 'does not update a project' do
+          expect { result }.not_to change(project, :name)
+        end
+
+        it 'returns an error' do
+          expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'FORBIDDEN'
+        end
+      end
+
       context 'when the project cannot be found' do
         let(:project_id) { 'dummy' }
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not found/)
+          expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'NOT_FOUND'
         end
       end
 

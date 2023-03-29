@@ -19,6 +19,16 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     }
   end
 
+  shared_examples 'a no-op' do |error_code: 'UNSET'|
+    it 'does not update the component' do
+      expect { result }.not_to change { component.reload.name }
+    end
+
+    it 'returns an error' do
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
+    end
+  end
+
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing component' do
@@ -31,21 +41,13 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     end
 
     context 'when unauthenticated' do
-      it 'does not update a component' do
-        expect { result }.not_to change { component.reload.name }
-      end
-
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'message')).not_to be_blank
-      end
+      it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
     end
 
     context 'when the graphql context is unset' do
       let(:graphql_context) { nil }
 
-      it 'does not update a component' do
-        expect { result }.not_to change { component.reload.name }
-      end
+      it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
     end
 
     context 'when authenticated' do
@@ -67,20 +69,25 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
         expect { result }.to change { component.reload.default }.from(component.default).to(variables.dig(:component, :default))
       end
 
+      context 'when the user is not allowed to update components' do
+        before do
+          ability = instance_double(Ability, can?: false)
+          allow(Ability).to receive(:new).and_return(ability)
+        end
+
+        it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
+      end
+
       context 'when the component cannot be found' do
         let(:component_id) { 'dummy' }
 
-        it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not found/)
-        end
+        it_behaves_like 'a no-op', error_code: 'NOT_FOUND'
       end
 
       context 'with another users component' do
         let(:current_user_id) { SecureRandom.uuid }
 
-        it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not permitted/)
-        end
+        it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
       end
 
       context 'when component update fails' do

@@ -35,18 +35,20 @@ class EditorApiSchema < GraphQL::Schema
     when Component
       Types::ComponentType
     else
-      raise("Unexpected object: #{obj}")
+      raise EditorApiError::GraphqlValidationFailed,
+            "Unexpected object: #{obj}"
     end
   end
 
   def self.unauthorized_object(error)
     # Add a top-level error to the response instead of returning nil:
-    raise GraphQL::ExecutionError, "An object of type #{error.type.graphql_name} was hidden due to permissions"
+    raise EditorApiError::Forbidden,
+          "An object of type #{error.type.graphql_name} was hidden due to permissions"
   end
 
   def self.unauthorized_field(error)
     # Add a top-level error to the response instead of returning nil:
-    raise GraphQL::ExecutionError,
+    raise EditorApiError::Forbidden,
           "The field #{error.field.graphql_name} on " \
           "an object of type #{error.type.graphql_name} was hidden due to permissions"
   end

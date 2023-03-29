@@ -15,12 +15,18 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   }
   '
   end
-  let(:project) { create(:project, :with_default_component, user_id: SecureRandom.uuid) }
+  let!(:project) { create(:project, :with_default_component, user_id: SecureRandom.uuid) }
   let(:project_id) { project.to_gid_param }
   let(:variables) { { id: project_id } }
 
-  before do
-    project
+  shared_examples 'a no-op' do |error_code: 'UNSET'|
+    it 'does not create a project' do
+      expect { result }.not_to change(Project, :count)
+    end
+
+    it 'returns an error' do
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
+    end
   end
 
   it { expect(mutation).to be_a_valid_graphql_query }
@@ -28,38 +34,31 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   context 'when unauthenticated' do
     let(:current_user_id) { nil }
 
-    it 'does not create a project' do
-      expect { result }.not_to change(Project, :count)
-    end
-
-    it 'returns "not permitted to create" error' do
-      expect(result.dig('errors', 0, 'message')).to match(/not permitted to create/)
-    end
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when original project not found' do
     let(:project_id) { SecureRandom.uuid }
     let(:current_user_id) { SecureRandom.uuid }
 
-    it 'returns "not found" error' do
-      expect(result.dig('errors', 0, 'message')).to match(/not found/)
-    end
-
-    it 'does not create a project' do
-      expect { result }.not_to change(Project, :count)
-    end
+    it_behaves_like 'a no-op', error_code: 'NOT_FOUND'
   end
 
   context 'when user cannot view original project' do
     let(:current_user_id) { SecureRandom.uuid }
 
-    it 'returns "not permitted to read" error' do
-      expect(result.dig('errors', 0, 'message')).to match(/not permitted to read/)
+    it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
+  end
+
+  context 'when authenticated but the user is not allowed to remix projects' do
+    let(:current_user_id) { SecureRandom.uuid }
+
+    before do
+      ability = instance_double(Ability, can?: false)
+      allow(Ability).to receive(:new).and_return(ability)
     end
 
-    it 'does not create a project' do
-      expect { result }.not_to change(Project, :count)
-    end
+    it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
   end
 
   context 'when authenticated and project exists' do

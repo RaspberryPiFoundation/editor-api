@@ -17,10 +17,15 @@ module Mutations
       { project: response[:project] }
     end
 
-    def ready?(**_args)
-      return true if context[:current_ability]&.can?(:create, Project, user_id: context[:current_user_id])
+    def ready?(...)
+      unless context[:current_user_id]
+        raise EditorApiError::Unauthorized,
+              'You must be authenticated to create a project'
+      end
 
-      raise GraphQL::ExecutionError, 'You are not permitted to create a project'
+      return true if context[:current_ability].can?(:create, Project, user_id: context[:current_user_id])
+
+      raise EditorApiError::Forbidden, 'You are not permitted to create a project'
     end
   end
 end

@@ -21,24 +21,26 @@ RSpec.describe 'mutation CreateProject() { ... }' do
     }
   end
 
-  it { expect(mutation).to be_a_valid_graphql_query }
-
-  context 'when unauthenticated' do
+  shared_examples 'a no-op' do |error_code: 'UNSET'|
     it 'does not create a project' do
       expect { result }.not_to change(Project, :count)
     end
 
     it 'returns an error' do
-      expect(result.dig('errors', 0, 'message')).not_to be_blank
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
     end
+  end
+
+  it { expect(mutation).to be_a_valid_graphql_query }
+
+  context 'when unauthenticated' do
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when the graphql context is unset' do
     let(:graphql_context) { nil }
 
-    it 'does not create a project' do
-      expect { result }.not_to change(Project, :count)
-    end
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when authenticated' do
@@ -48,6 +50,15 @@ RSpec.describe 'mutation CreateProject() { ... }' do
 
     it 'returns the project ID' do
       expect(result.dig('data', 'createProject', 'project', 'id')).to eq Project.first.to_gid_param
+    end
+
+    context 'when the user is not allowed to create projects' do
+      before do
+        ability = instance_double(Ability, can?: false)
+        allow(Ability).to receive(:new).and_return(ability)
+      end
+
+      it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
     end
 
     context 'when project creation fails' do

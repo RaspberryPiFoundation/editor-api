@@ -9,8 +9,9 @@ module Mutations
 
     def resolve(**input)
       original_project = GlobalID.find(input[:id])
-      raise GraphQL::ExecutionError, 'Project not found' unless original_project
-      raise GraphQL::ExecutionError, 'You are not permitted to read this project' unless can_read?(original_project)
+
+      raise EditorApiError::NotFound, 'Project not found' unless original_project
+      raise EditorApiError::Forbidden, 'You are not permitted to read this project' unless can_read?(original_project)
 
       params = {
         name: input[:name] || original_project.name,
@@ -24,10 +25,15 @@ module Mutations
       { project: response[:project] }
     end
 
-    def ready?(**_args)
+    def ready?(...)
+      unless context[:current_user_id]
+        raise EditorApiError::Unauthorized,
+              'You must be authenticated to remix a project'
+      end
+
       return true if can_create_project?
 
-      raise GraphQL::ExecutionError, 'You are not permitted to create a project'
+      raise EditorApiError::Forbidden, 'You are not permitted to remix projects'
     end
 
     def can_create_project?
