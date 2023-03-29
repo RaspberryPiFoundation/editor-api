@@ -19,14 +19,14 @@ class EditorApiError
   # https://www.apollographql.com/docs/apollo-server/data/errors/#built-in-error-codes
 
   CODES = [
-    :GRAPHQL_PARSE_FAILED, # The GraphQL operation string contains a syntax error.
-    :GRAPHQL_VALIDATION_FAILED, # The GraphQL operation is not valid against the server's schema.
-    :BAD_USER_INPUT, # The GraphQL operation includes an invalid value for a field argument.
-    :BAD_REQUEST, # An error occurred before your server could attempt to parse the given GraphQL operation.
-    :UNAUTHORIZED, # User needs to be authorized before this request can be fulfilled
-    :FORBIDDEN, # User is not permitted to make the request
-    :NOT_FOUND, # The object is not found
-    :INTERNAL_SERVER_ERROR # Something else..
+    'GRAPHQL_PARSE_FAILED', # The GraphQL operation string contains a syntax error.
+    'GRAPHQL_VALIDATION_FAILED', # The GraphQL operation is not valid against the server's schema.
+    'BAD_USER_INPUT', # The GraphQL operation includes an invalid value for a field argument.
+    'BAD_REQUEST', # An error occurred before your server could attempt to parse the given GraphQL operation.
+    'UNAUTHORIZED', # User needs to be authorized before this request can be fulfilled
+    'FORBIDDEN', # User is not permitted to make the request
+    'NOT_FOUND', # The object is not found
+    'INTERNAL_SERVER_ERROR' # Something else..
   ].freeze
 
   CODES.each do |code|
@@ -34,7 +34,7 @@ class EditorApiError
       const_set :CODE, code
     end
 
-    const_set code.to_s.downcase.camelize, klass
+    const_set code.downcase.camelize, klass
   end
 end
 # rubocop:enable GraphQL/ObjectDescription
