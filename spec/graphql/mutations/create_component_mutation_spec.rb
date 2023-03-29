@@ -22,7 +22,7 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     }
   end
 
-  shared_examples 'a no-op' do |error_code: :UNSET|
+  shared_examples 'a no-op' do |error_code:|
     it 'does not create a component' do
       expect { result }.not_to change(Component, :count)
     end

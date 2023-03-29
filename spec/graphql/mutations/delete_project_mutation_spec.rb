@@ -9,7 +9,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   let(:project_id) { 'dummy-id' }
   let(:variables) { { project: { id: project_id } } }
 
-  shared_examples 'a no-op' do |error_code: :UNSET|
+  shared_examples 'a no-op' do |error_code:|
     it 'does not delete a project' do
       result
       expect { project.reload }.not_to raise_error

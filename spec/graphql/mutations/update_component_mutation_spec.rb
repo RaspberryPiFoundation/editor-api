@@ -19,7 +19,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     }
   end
 
-  shared_examples 'a no-op' do |error_code: 'UNSET'|
+  shared_examples 'a no-op' do |error_code:|
     it 'does not update the component' do
       expect { result }.not_to change { component.reload.name }
     end

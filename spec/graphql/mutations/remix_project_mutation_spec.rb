@@ -19,7 +19,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   let(:project_id) { project.to_gid_param }
   let(:variables) { { id: project_id } }
 
-  shared_examples 'a no-op' do |error_code: 'UNSET'|
+  shared_examples 'a no-op' do |error_code:|
     it 'does not create a project' do
       expect { result }.not_to change(Project, :count)
     end

@@ -17,6 +17,16 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     }
   end
 
+  shared_examples 'a no-op' do |error_code:|
+    it 'does not update a project' do
+      expect { result }.not_to change { project.reload.name }
+    end
+
+    it 'returns an error' do
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
+    end
+  end
+
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
@@ -29,25 +39,13 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     end
 
     context 'when unauthenticated' do
-      it 'does not update a project' do
-        expect { result }.not_to change(project, :name)
-      end
-
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
-      end
+      it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
     end
 
     context 'when the graphql context is unset' do
       let(:graphql_context) { nil }
 
-      it 'does not update a project' do
-        expect { result }.not_to change(project, :name)
-      end
-
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'UNAUTHORIZED'
-      end
+      it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
     end
 
     context 'when authenticated' do
@@ -67,29 +65,19 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
           allow(Ability).to receive(:new).and_return(ability)
         end
 
-        it 'does not update a project' do
-          expect { result }.not_to change(project, :name)
-        end
-
-        it 'returns an error' do
-          expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'FORBIDDEN'
-        end
+        it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
       end
 
       context 'when the project cannot be found' do
         let(:project_id) { 'dummy' }
 
-        it 'returns an error' do
-          expect(result.dig('errors', 0, 'extensions', 'code')).to eq 'NOT_FOUND'
-        end
+        it_behaves_like 'a no-op', error_code: 'NOT_FOUND'
       end
 
       context 'with another users project' do
         let(:current_user_id) { SecureRandom.uuid }
 
-        it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not permitted/)
-        end
+        it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
       end
 
       context 'when project update fails' do
