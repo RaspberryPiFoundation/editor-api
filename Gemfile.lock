@@ -305,7 +305,7 @@ GEM
     simplecov_json_formatter (0.1.4)
     stringio (3.0.5)
     thor (1.2.1)
-    time (0.2.1)
+    time (0.2.2)
       date
     timeout (0.3.2)
     tzinfo (2.0.6)
