@@ -9,6 +9,11 @@ module Types
     # Add root-level fields here.
     # They will be entry points for queries on your schema.
 
+    field :error_explanation, Types::ErrorExplanationType, 'Get explanation for error message and python code' do
+      argument :error, String, required: true, description: 'The error message that happened when running the code'
+      argument :code, String, required: true, description: 'The python source code that caused the error'
+    end
+
     field :project, Types::ProjectType, 'Find a project by identifier' do
       argument :identifier, String, required: true, description: 'Project identifier'
       argument :preferred_locales, [String], required: false,
@@ -29,6 +34,10 @@ module Types
       results = results.where(user_id:) if user_id
 
       results
+    end
+
+    def error_explanation(error: "", code: "")
+      Resolvers::ErrorExplanationResolver.get_error_explanation(error:, code: )
     end
   end
 end
