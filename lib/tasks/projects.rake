@@ -3,7 +3,7 @@
 require 'yaml'
 require 'project_importer'
 
-CODE_FORMATS = ['.py', '.csv', '.txt'].freeze
+CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
 IMAGE_FORMATS = ['.png', '.jpg', '.jpeg'].freeze
 
 namespace :projects do
