@@ -1,0 +1,95 @@
+.spinme {
+  animation: rotate-center linear 8s 2; /* Time taken for animation and number of repetitions */
+  display: inline-block; /* Important to allow rotation */
+}
+
+@keyframes rotate-center {
+/* The spin me animation code */
+  0% { /* Rotate from 0 to 360 degrees */
+    transform: rotate(0);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.bounceme {
+  animation: bounce ease 2s 3; /* runs the 'bounce' animation with ease timing (slow start and end) for two seconds. Runs the animation twice. */
+  display: inline-block;
+}
+
+@keyframes bounce {
+  /* The bounce animation code */
+  0% {
+    transform: scale(1, 1) translateY(0); /* Starting position and actual size */
+  }
+  10% {
+    transform: scale(1.1, 0.9) translateY(0); /* Grow width and shrink height for pre bounce squash effect */
+  }
+  30% {
+    transform: scale(1, 1) translateY(-6rem); /* Return to actual size and move emoji up 100px from current position */
+  }
+  50% {
+    transform: scale(1, 1) translateY(0); /* Move emoji back to starting position */
+  }
+}
+
+.scaleme {
+  animation: scale ease 2s infinite; /* runs the 'scale' animation with ease timing (slow start and end) for two seconds. Runs the animation twice. */
+  display: inline-block;
+}
+
+@keyframes scale {
+  /* The twinkle animation code */
+  0% {
+    transform: scale(1, 1);
+  }
+  20% {
+    transform: scale(1.1, 1.1);
+  }
+  40% {
+    transform: scale(1.2, 1.2);
+  }
+  60% {
+    transform: scale(1.1, 1.1);
+  }
+  80% {
+    transform: scale(1, 1);
+  }
+}
+
+.rollmeleft {
+  animation: rollleft ease 8s 1;
+  display: inline-block;
+}
+
+@keyframes rollleft {
+  /* The roll animation code */
+  from {
+    transform: translate(-60vw) rotate(0deg);
+    transform-origin: center;
+  }
+
+  to {
+    transform: translate(0vw) rotate(360deg);
+    transform-origin: center;
+  }
+}
+
+.rollmeright {
+  animation: rollright ease 8s 1;
+  display: inline-block;
+}
+
+@keyframes rollright {
+  /* The roll animation code */
+  from {
+    transform: translate(60vw) rotate(360deg);
+    transform-origin: center;
+  }
+
+  to {
+    transform: translate(0vw) rotate(00deg);
+    transform-origin: center;
+  }
+}
