@@ -12,7 +12,6 @@ COMPONENTS:
     location: style.css
     index: 1
     default: false
-    default: false
   - name: 'default'
     extension: 'css'
     location: default.css
