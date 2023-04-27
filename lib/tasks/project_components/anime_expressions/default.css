@@ -1,0 +1,20 @@
+
+/* Set up colour palette and fonts using variables */
+
+:root {
+  --primary: #bccad0;
+  --onprimary:#4f4e4e;
+  --secondary: #495054;
+  --onsecondary:#ffffff;
+  --tertiary:#747474;
+  --ontertiary: #ffffff;
+  --page:#ffffff;
+  --onpage:#000000;
+  --detail: #9ba8ae;
+  --detail2: #000000;
+
+  --body-font: 1rem Verdana, sans-serif;
+  --header-font: lighter 3rem 'Luckiest Guy', cursive;
+  --title-font: lighter 2rem 'Luckiest Guy', cursive;
+  --quote-font: lighter 1.5rem 'Luckiest Guy', cursive;
+}
