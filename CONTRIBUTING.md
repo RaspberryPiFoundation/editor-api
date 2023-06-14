@@ -37,7 +37,7 @@ Signing the CLA might sound scary but it's actually very simple and can be done 
 
 ## 4. How we use your code and licensing
 
-By submitting a pull request, you are agreeing to your code and contribution to this project being licensed and shared as part of [our Open Source licence][licence].
+By submitting a pull request and signing the CLA, you are agreeing to your code and contribution to this project being licensed and shared as part of [our Open Source licence][licence].
  
 **♥️♥️♥️  Thank you!  Your contribution helps us improve our products, which help young people around the world take part in digital making!**
 
