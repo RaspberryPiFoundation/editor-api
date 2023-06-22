@@ -1,5 +1,5 @@
 # Import library code
-from p5 import *
+import py5
 from random import randint
 
 # The mouse_pressed function goes here
@@ -8,12 +8,13 @@ from random import randint
 
 def setup():
 # Setup your game here
-    size(400, 400) # width and height
+    py5.size(400, 400) # width and height
+    py5.frame_rate(2)
 
 def draw():
 # Things to do in every frame
-    fill('cyan')
-    rect(0, 0, 400, 250) # Sky    
+    py5.fill('cyan')
+    py5.rect(0, 0, 400, 250) # Sky    
   
 # Keep this to run your code
-run(frame_rate=2)
+py5.run_sketch()

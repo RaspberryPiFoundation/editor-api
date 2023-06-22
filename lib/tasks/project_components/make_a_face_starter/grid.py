@@ -1,37 +1,37 @@
-from p5 import *
+import py5
 
 def grid():
-  push_matrix()
-  stroke(200)
-  fill(0)
-  line(0, height/2, width, height/2)
-  line(width/2, 0, width/2, height)
-  x_coords = [0, width/2, width]
-  y_coords = [0, height/2, height]
+  py5.push_matrix()
+  py5.stroke(200)
+  py5.fill(0)
+  py5.line(0, py5.height/2, py5.width, py5.height/2)
+  py5.line(py5.width/2, 0, py5.width/2, py5.height)
+  x_coords = [0, py5.width/2, py5.width]
+  y_coords = [0, py5.height/2, py5.height]
 
   for x in x_coords:
     for y in y_coords:
       show_coord(x, y)
 
-  pop_matrix()
+  py5.pop_matrix()
 
 def show_coord(x, y):
-  if x == width:
-    x_align = RIGHT
+  if x == py5.width:
+    x_align = py5.RIGHT
   elif x == 0:
-    x_align = LEFT
+    x_align = py5.LEFT
   else:
-    x_align = CENTER
+    x_align = py5.CENTER
 
-  if y == height:
-    y_align = BASELINE
+  if y == py5.height:
+    y_align = py5.BASELINE
   elif y == 0:
-    y_align = TOP
+    y_align = py5.TOP
   else:
-    y_align = CENTER
+    y_align = py5.CENTER
 
-  push_matrix()
-  fill(100)
-  text_align(x_align, y_align)
-  text('(' + str(int(x)) + ', ' + str(int(y)) + ')', x, y)
-  pop_matrix()
+  py5.push_matrix()
+  py5.fill(100)
+  py5.text_align(x_align, y_align)
+  py5.text('(' + str(int(x)) + ', ' + str(int(y)) + ')', x, y)
+  py5.pop_matrix()

@@ -1,7 +1,5 @@
-#!/bin/python3
-
 # Import library code
-from p5 import *
+import py5
 from random import randint
 
 # Setup global variables
@@ -21,45 +19,45 @@ def draw_rocket():
     fuel -= burn # burn fuel
     print('Fuel left: ', fuel)
   
-    no_stroke() # Turn off the stroke
+    py5.no_stroke() # Turn off the stroke
   
     for i in range(25): # draw 25 burning exhaust ellipses
-      fill(255, 255 - i*10, 0) # yellow
-      ellipse(width/2, rocket_y + i, 8, 3) # i increases each time the loop repeats
+      py5.fill(255, 255 - i*10, 0) # yellow
+      py5.ellipse(py5.width/2, rocket_y + i, 8, 3) # i increases each time the loop repeats
     
-    fill(200, 200, 200, 100) # transparent grey
+    py5.fill(200, 200, 200, 100) # transparent grey
     for i in range(20): # draw 20 random smoke ellipses
-      ellipse(width/2 + randint(-5, 5), rocket_y + randint(20, 50), randint(5, 10), randint(5, 10))
+      py5.ellipse(py5.width/2 + randint(-5, 5), rocket_y + randint(20, 50), randint(5, 10), randint(5, 10))
   
   if fuel < burn and rocket_y > orbit_y: # No more fuel and not in orbit
-    tint(255, 0, 0) # Failure
+    py5.tint(255, 0, 0) # Failure
   elif fuel < 1000 and rocket_y <= orbit_y:
-    tint(0, 255, 0) # Success
+    py5.tint(0, 255, 0) # Success
   elif fuel >= 1000 and rocket_y <= orbit_y: 
-    tint(255, 200, 0) # Too much fuel
+    py5.tint(255, 200, 0) # Too much fuel
   
-  image(rocket, width/2, rocket_y, 64, 64)
-  no_tint()
+  py5.image(rocket, py5.width/2, rocket_y, 64, 64)
+  py5.no_tint()
   
 
 # The draw_background function goes here
 def draw_background():
-  background(0) # short for background(0, 0, 0) - black 
-  image(planet, width/2, height, 300, 300) # draw the image
+  py5.background(0) # short for background(0, 0, 0) - black
+  py5.image(planet, py5.width/2, py5.height, 300, 300) # draw the image
   
-  no_fill() # Turn off any fill
-  stroke(255) # Set a white stroke
-  stroke_weight(2)
-  ellipse(width/2, height, orbit_radius*2, orbit_radius*2)
+  py5.no_fill() # Turn off any fill
+  py5.stroke(255) # Set a white stroke
+  py5.stroke_weight(2)
+  py5.ellipse(py5.width/2, py5.height, orbit_radius*2, orbit_radius*2)
   
 
 def setup():
   # Setup your animation here
-  size(screen_size, screen_size)
-  image_mode(CENTER)
+  py5.size(screen_size, screen_size)
+  py5.image_mode(py5.CENTER)
   global planet, rocket
-  planet = load_image('planet.png') # your chosen planet
-  rocket = load_image('rocket.png')
+  planet = py5.load_image('planet.png') # your chosen planet
+  rocket = py5.load_image('rocket.png')
 
 
 def draw():
@@ -69,4 +67,4 @@ def draw():
   
 
 fuel = int(input('How many kilograms of fuel do you want to use?'))
-run()
+py5.run_sketch()

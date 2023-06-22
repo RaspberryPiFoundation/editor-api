@@ -1,7 +1,7 @@
 #!/bin/python3
 
 # Import library code
-from p5 import *
+import py5
 from random import randint
 
 # Setup global variables
@@ -25,4 +25,4 @@ def draw():
     
 
 
-run()
+py5.run_sketch()

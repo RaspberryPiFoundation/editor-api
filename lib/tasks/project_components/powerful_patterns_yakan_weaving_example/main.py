@@ -1,48 +1,48 @@
 #!/bin/python3
 
-from p5 import *
-from math import random
+import py5
 
 def motif():
   motif_size = 100
 
   #Thread colours
-  ORANGE = Color(254, 96, 1)
-  PURPLE = Color(135, 18, 192)
-  YELLOW = Color(243, 200, 19)
-  BLUE = Color(83, 171, 176)
+  ORANGE = py5.color(254, 96, 1)
+  PURPLE = py5.color(135, 18, 192)
+  YELLOW = py5.color(243, 200, 19)
+  BLUE = py5.color(83, 171, 176)
 
   # Squares
-  fill(ORANGE)
-  rect(0, 0, motif_size/2, motif_size/2)
-  fill(PURPLE)
-  rect(50, 0, motif_size/2, motif_size/2)
-  fill(YELLOW)
-  rect(0, 50, motif_size/2, motif_size/2)
-  fill(BLUE)
-  rect(50, 50, motif_size/2, motif_size/2)
-  fill(PURPLE)
-  rect(0, 0, motif_size/4, motif_size/4)
-  fill(ORANGE)
-  rect(50, 0, motif_size/4, motif_size/4)
-  fill(BLUE)
-  rect(0, 50, motif_size/4, motif_size/4)
-  fill(YELLOW)
-  rect(50, 50, motif_size/4, motif_size/4)
+  py5.fill(ORANGE)
+  py5.rect(0, 0, motif_size/2, motif_size/2)
+  py5.fill(PURPLE)
+  py5.rect(50, 0, motif_size/2, motif_size/2)
+  py5.fill(YELLOW)
+  py5.rect(0, 50, motif_size/2, motif_size/2)
+  py5.fill(BLUE)
+  py5.rect(50, 50, motif_size/2, motif_size/2)
+  py5.fill(PURPLE)
+  py5.rect(0, 0, motif_size/4, motif_size/4)
+  py5.fill(ORANGE)
+  py5.rect(50, 0, motif_size/4, motif_size/4)
+  py5.fill(BLUE)
+  py5.rect(0, 50, motif_size/4, motif_size/4)
+  py5.fill(YELLOW)
+  py5.rect(50, 50, motif_size/4, motif_size/4)
 
 def rotate_motif():
 
   for shape in range(5): # row of shapes
-    push_matrix() # save settings
-    rotate(radians(45)) # turn shape 45 degrees
+    py5.push_matrix() # save settings
+    py5.rotate(py5.radians(45)) # turn shape 45 degrees
     motif()
-    pop_matrix() # go back to saved settings
-    translate(motif_width, 0) # move horizontally
+    py5.pop_matrix() # go back to saved settings
+    py5.translate(motif_width, 0) # move horizontally
 
 def setup():
-  size(400, 400)
-  background(250, 5, 94) # pink
-  no_stroke()
+  py5.size(400, 400)
+  py5.frame_rate(3)
+  py5.background(250, 5, 94) # pink
+  py5.no_stroke()
   print('This is 🇵🇭 Yakan weaving ')
 
 def draw():
@@ -50,14 +50,14 @@ def draw():
   global motif_width
   motif_width = 150
 
-  translate(-motif_width/2, -motif_width/2) # to start with half motifs
+  py5.translate(-motif_width/2, -motif_width/2) # to start with half motifs
 
-  if frame_count < 20: # maximum rows
-    for row in range(frame_count):
+  if py5.frame_count < 20: # maximum rows
+    for row in range(py5.frame_count):
       rotate_motif()
       if row / 2 == 0: # to offset pattern on next row
-        translate(-motif_width * 5 + 75, 80)
+        py5.translate(-motif_width * 5 + 75, 80)
       else:
-        translate(-motif_width * 5 - 75, 80)
+        py5.translate(-motif_width * 5 - 75, 80)
 
-run(frame_rate=3)
+py5.run_sketch()
