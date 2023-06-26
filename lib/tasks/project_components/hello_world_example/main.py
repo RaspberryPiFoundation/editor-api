@@ -4,7 +4,7 @@ from random import randint
 # Emoji variables to use in your project
 world = '🌍🌎🌏'
 python = 'Python 🐍'
-fire = 🔥
+fire = '🔥'
 
 # Emojis to copy and paste into your code 
 # 📅🕒🎨🎮🔬🎉🕶️🎲🦄🚀💯⭐💛
@@ -17,7 +17,7 @@ def roll_dice():
     max = input('How many sides for a 🎲?: ') # Wait for input from the user    
     print('Rolling a', max, 'sided dice ...') # Use the number the user entered  
     roll = randint(1, int(max)) # Generate a random number between 1 and 6    
-    print(roll, '🔥' * roll) # Repeat the fire emoji to match the dice roll
+    print(roll, fire * roll) # Repeat the fire emoji to match the dice roll
   
 # Put code to run under here
 print('Hello', world) 
