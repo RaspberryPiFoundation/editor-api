@@ -24,7 +24,7 @@ print('Hello', world)
 print('Welcome to', python) 
 print(python, 'is very good at maths!')   
 print(230 * 5782 ** 2 / 23781) # Print the result of the sum  
-print('The 📅 🕒 is', datetime.now()) # Print with emojis 
+print('The date and time is', datetime.now()) # Print the current date and time
 
 roll_dice() # Call the roll dice function
 print('I ❤️ rainbows 🌈')   
