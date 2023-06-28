@@ -1,7 +1,5 @@
 # The Raspberry Pi Foundation Code Editor - API
 
-TEST CHANGE
-
 This document discusses the components used to build the Raspberry Pi Foundation Code Editor. It's a good starting point both for working on the editor itself and for using ideas or components from the editor in other projects.
 
 The document assumes some familiarity with the app as a user. [Try it out](https://editor.raspberrypi.org) before reading further.
