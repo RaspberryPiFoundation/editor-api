@@ -40,7 +40,7 @@ def draw():
     fill('red')   
     circle(200, 200, 110) # Inner circle   
     fill('yellow')   
-    circle(200, 200, 30) # Middle  
+    circle(200, 200, 30) # Middle circle
     shoot_arrow()
   
 # Keep this to run your code
