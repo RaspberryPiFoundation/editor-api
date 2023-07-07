@@ -30,7 +30,7 @@ def quadrant():
   
 def outer():
 
-  # Thehe cake is wrapped in an outer layer
+  # The cake is wrapped in an outer layer
   yellowgreen = Color(154, 205, 50) 
   
   no_fill() # Don't cover up the cake quadrants!
