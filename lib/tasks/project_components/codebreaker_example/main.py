@@ -3,7 +3,7 @@ from pygal import Bar
 from frequency import english
 
 # Set up data structures 
-alphabet = list(' abcdefghijklmnopqrstuvwxyz ') #  List from a string
+alphabet = list(' abcdefghijklmnopqrstuvwxyz ')  # List from a string
 code = {}
 
 # Create the atbash code by reversing the alphabet
