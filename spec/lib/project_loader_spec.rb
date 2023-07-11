@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'project_loader'
 
-RSpec.describe ProjectLoader do
+RSpec.describe ProjectLoader, :sample_words do
   let(:identifier) { PhraseIdentifier.generate }
   let(:preferred_locales) { %w[locale1 locale2] }
   let(:loaded_project) do

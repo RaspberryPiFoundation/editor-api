@@ -62,7 +62,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
     end
   end
 
-  context 'when authenticated and project exists' do
+  context 'when authenticated and project exists', :sample_words do
     let(:current_user_id) { project.user_id }
     let(:returned_gid) { result.dig('data', 'remixProject', 'project', 'id') }
     let(:remixed_project) { GlobalID.find(returned_gid) }
