@@ -16,4 +16,4 @@ def draw():
 
   
 # Keep this to run your code
-run()
+run(frame_rate = 5)
