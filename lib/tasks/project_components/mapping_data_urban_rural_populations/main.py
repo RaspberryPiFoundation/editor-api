@@ -66,11 +66,11 @@ def draw():
 # Put code to run every frame here
   no_stroke()
   image(
-    map, # The image to draw
-    0, # The x of the top-left corner
-    0, # The y of the top-left corner
-    width, # The width of the image
-    height # The height of the image
+    map,  # The image to draw
+    0,  # The x of the top-left corner
+    0,  # The y of the top-left corner
+    width,  # The width of the image
+    height  # The height of the image
     )
   draw_data()
   
@@ -89,6 +89,6 @@ def mouse_pressed():
 answer = None
 
 while answer not in ['u', 'r']:
-  answer = input('Please enter u to see places that are mostly urban, or r to see places that are mostly rural.')
+  answer = input('Please enter u to see places that are mostly urban, or r to see places that are mostly rural: ')
 
 run()
