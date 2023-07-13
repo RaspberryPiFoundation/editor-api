@@ -29,7 +29,7 @@ def draw():
 
 def mouse_pressed():
 # Put code to run when the mouse is pressed here
-  pixel_colour = Color(get(mouse_x, mouse_y))
+  pixel_colour = Color(get(mouse_x, mouse_y)).hex
   if pixel_colour in colours:
     facts = colours[pixel_colour]
     print(facts['name'])
@@ -52,9 +52,9 @@ def load_data(file_name):
       region_list.append(region_dict)
 
 
-def draw_pin(x, y, color):
+def draw_pin(x, y, colour):
   no_stroke()
-  fill(color)
+  fill(colour)
   ellipse(x, y, 10, 10)
 
 
@@ -66,7 +66,7 @@ def draw_data():
     region_x = region_coords['x'] # Get the x coordinate
     region_y = region_coords['y'] # Get the y coordinate
     region_colour = Color(i, 100, 0) # Set the pin colour
-    colours[region_colour] = region
+    colours[region_colour.hex] = region
     draw_pin(region_x, region_y, region_colour)
     i -= 1
 
