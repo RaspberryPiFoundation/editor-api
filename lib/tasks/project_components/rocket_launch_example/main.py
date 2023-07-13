@@ -27,8 +27,8 @@ def draw_rocket():
             fill(255, 255 - i * 10, 0)
             ellipse(width/2, rocket_y + i, 8, 3)
     
-        fill(200, 200, 200, 100) #Transparent grey   
-        for i in range(20): #Draw 20 random smoke ellipses    
+        fill(200, 200, 200, 100)  # Transparent grey   
+        for i in range(20):  # Draw 20 random smoke ellipses    
             ellipse(width/2 + randint(-5, 5), rocket_y + randint(20, 50), randint(5, 10), randint(5, 10)) 
 
     if fuel < burn and rocket_y > orbit_y:
