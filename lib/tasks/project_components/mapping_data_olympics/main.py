@@ -38,7 +38,7 @@ def draw_data():
     host_count = region['host_count']
     region_colour = Color(0, 0, blue_value)
     draw_pin(region_x, region_y, region_colour, host_count)
-    colours[region_colour] = region
+    colours[region_colour.hex] = region
     blue_value -= 1
   
   
@@ -65,7 +65,7 @@ def draw():
   
 def mouse_pressed():
 # Put code to run when the mouse is pressed here
-  pixel_colour = Color(get(mouse_x, mouse_y))
+  pixel_colour = Color(get(mouse_x, mouse_y)).hex
   
   if pixel_colour in colours:
     info = colours[pixel_colour]
