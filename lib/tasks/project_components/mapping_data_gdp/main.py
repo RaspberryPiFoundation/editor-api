@@ -21,7 +21,7 @@ def draw_data():
     region_y = region_coords['y'] # Get the y coordinate
     #print(region_name, region_x, region_y)
     region_colour = Color(red_value, 0, 0) # Set the pin colour
-    colours[region_colour] = region
+    colours[region_colour.hex] = region
     draw_pin(region_x, region_y, region_colour) # Draw the pin
     red_value -= 1 # Change the red value
 
@@ -48,7 +48,7 @@ def draw():
 
 # Put code to run when the mouse is pressed here
 def mouse_pressed():
-  pixel_colour = Color(get(mouse_x, mouse_y))
+  pixel_colour = Color(get(mouse_x, mouse_y)).hex
   if pixel_colour in colours:
     facts = colours[pixel_colour]
     print(facts['region'])
