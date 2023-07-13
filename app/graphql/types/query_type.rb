@@ -12,6 +12,7 @@ module Types
     field :error_explanation, Types::ErrorExplanationType, 'Get explanation for error message and python code' do
       argument :error, String, required: true, description: 'The error message that happened when running the code'
       argument :code, String, required: true, description: 'The python source code that caused the error'
+      argument :system_prompt, String, required: false, description: 'The system prompt used to query ChatGPT'
     end
 
     field :project, Types::ProjectType, 'Find a project by identifier' do
@@ -36,8 +37,8 @@ module Types
       results
     end
 
-    def error_explanation(error: "", code: "")
-      Resolvers::ErrorExplanationResolver.get_error_explanation(error:, code: )
+    def error_explanation(error: "", code: "", system_prompt: "You are a teacher talking to a 12 year old child.")
+      Resolvers::ErrorExplanationResolver.get_error_explanation(error:, code:, system_prompt:)
     end
   end
 end
