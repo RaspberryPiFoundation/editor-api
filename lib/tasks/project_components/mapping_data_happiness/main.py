@@ -18,11 +18,11 @@ def setup():
 def draw():
 # Put code to run every frame here
   image(
-    map, # The image to draw
-    0, # The x of the top-left corner
-    0, # The y of the top-left corner
-    width, # The width of the image
-    height # The height of the image
+    map,  # The image to draw
+    0,  # The x of the top-left corner
+    0,  # The y of the top-left corner
+    width,  # The width of the image
+    height  # The height of the image
     )
   draw_data()
 
@@ -61,11 +61,11 @@ def draw_pin(x, y, colour):
 def draw_data():
   i = 255
   for region in region_list:
-    region_name = region['name'] # Get the name of the region
-    region_coords = get_region_coords(region_name) # Use the name to get coordinates
-    region_x = region_coords['x'] # Get the x coordinate
-    region_y = region_coords['y'] # Get the y coordinate
-    region_colour = Color(i, 100, 0) # Set the pin colour
+    region_name = region['name']  # Get the name of the region
+    region_coords = get_region_coords(region_name)  # Use the name to get coordinates
+    region_x = region_coords['x']  # Get the x coordinate
+    region_y = region_coords['y']  # Get the y coordinate
+    region_colour = Color(i, 100, 0)  # Set the pin colour
     colours[region_colour.hex] = region
     draw_pin(region_x, region_y, region_colour)
     i -= 1
