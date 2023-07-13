@@ -40,7 +40,7 @@ def draw_data():
       region_y = region_coords['y']
       region_colour = Color(red_value, 255, 0)
       draw_pin(region_x, region_y, region_colour)
-      colours[region_colour] = region
+      colours[region_colour.hex] = region
       red_value -= 1
     elif answer == 'r' and region['percentage urban'] < 50.0:
       region_name = region['name']
@@ -49,7 +49,7 @@ def draw_data():
       region_y = region_coords['y']
       region_colour = Color(red_value, 255, 0)
       draw_pin(region_x, region_y, region_colour)
-      colours[region_colour] = region
+      colours[region_colour.hex] = region
       red_value -= 1
   
   
@@ -76,7 +76,7 @@ def draw():
   
 def mouse_pressed():
 # Put code to run when the mouse is pressed here
-  pixel_colour = Color(get(mouse_x, mouse_y))
+  pixel_colour = Color(get(mouse_x, mouse_y)).hex
   
   if pixel_colour in colours:
     info = colours[pixel_colour]
