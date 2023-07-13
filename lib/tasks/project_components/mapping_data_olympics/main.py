@@ -55,11 +55,11 @@ def draw():
 # Put code to run every frame here
   no_stroke()
   image(
-    map, # The image to draw
-    0, # The x of the top-left corner
-    0, # The y of the top-left corner
-    width, # The width of the image
-    height # The height of the image
+    map,  # The image to draw
+    0,  # The x of the top-left corner
+    0,  # The y of the top-left corner
+    width,  # The width of the image
+    height  # The height of the image
     )
   draw_data()
   
