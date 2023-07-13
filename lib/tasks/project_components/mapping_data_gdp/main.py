@@ -8,39 +8,39 @@ colours = {}
 
 def draw_pin(x, y, colour):
   fill(colour)
-  ellipse(x, y, 10, 10) # x, y, width, height
+  ellipse(x, y, 10, 10)  # x, y, width, height
 
 def draw_data():
   
-  red_value = 255 # Set a starting value for red
+  red_value = 255  # Set a starting value for red
   
   for region in region_list:
-    region_name = region['region'] # Get the name of the region
-    region_coords = get_region_coords(region_name) # Use the name to get coordinates
-    region_x = region_coords['x'] # Get the x coordinate
-    region_y = region_coords['y'] # Get the y coordinate
+    region_name = region['region']  # Get the name of the region
+    region_coords = get_region_coords(region_name)  # Use the name to get coordinates
+    region_x = region_coords['x']  # Get the x coordinate
+    region_y = region_coords['y']  # Get the y coordinate
     #print(region_name, region_x, region_y)
-    region_colour = Color(red_value, 0, 0) # Set the pin colour
+    region_colour = Color(red_value, 0, 0)  # Set the pin colour
     colours[region_colour.hex] = region
-    draw_pin(region_x, region_y, region_colour) # Draw the pin
-    red_value -= 1 # Change the red value
+    draw_pin(region_x, region_y, region_colour)  # Draw the pin
+    red_value -= 1  # Change the red value
 
 # Put code to run once here
 def setup():
   global map
   load_data('gdp.csv')
   size(991, 768)
-  map = load_image('old-map.jpg') # Replace with your image
+  map = load_image('old-map.jpg')  # Replace with your image
 
 
 # Put code to run every frame here
 def draw():
   image(
-    map, # The image to draw
-    0, # The x of the top-left corner
-    0, # The y of the top-left corner
-    width, # The width of the image
-    height # The height of the image
+    map,  # The image to draw
+    0,  # The x of the top-left corner
+    0,  # The y of the top-left corner
+    width,  # The width of the image
+    height  # The height of the image
     )
   draw_pin(300, 300, Color(255,0,0))
   draw_data()
