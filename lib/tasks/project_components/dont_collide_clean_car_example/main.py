@@ -57,9 +57,8 @@ def draw_player():
 
 def setup():
     # Setup your animation here
-    global car
-    
     size(400, 400)
+    global car
     car = load_image('car.png')
     image_mode(CENTER)
   
