@@ -11,28 +11,18 @@ from xy import get_xy_coords
 colours = {}
 
 # Draw the volcano on the map
-def draw_volcano(colour, x, y):
-    
+def draw_volcano(colour, x, y): 
     fill(colour)
     ellipse(x, y, 12, 12)
 
 def setup():
-  
     size(991, 768)
     global map
     map = load_image('mercator.jpeg')
     load_data('volcano-data.csv')
-    image(
-        map,  # The image to draw
-        0,  # The x of the top-left corner
-        0,  # The y of the top-left corner
-        width,  # The width of the image
-        height  # The height of the image
-    )
     draw_data()
 
 def load_data(file_name):
-  
     # Create a dictionary for each siting based on the data in the csv file
     
     global volcano_eruptions
@@ -48,12 +38,12 @@ def load_data(file_name):
                 'year': info[0],
                 'region': info[5]
             }
-            volcano_eruptions.append(volcano_dict)  # Store dictionary in a list
+            volcano_eruptions.append(volcano_dict) # Store dictionary in a list
 
 def draw_data():
-  
     no_stroke()
-    
+
+    red_value = 255
     # Use the lat and long data to calculate the x y coords for the shape
     for eruption in volcano_eruptions:
         longitude = float(eruption['longitude'])
@@ -61,7 +51,7 @@ def draw_data():
         region_coords = get_xy_coords(longitude, latitude)
         region_x = region_coords['x']
         region_y = region_coords['y']
-        colour = Color(randint(0,255), randint(0,255), randint(0,255))  # Select a random colour
+        colour = Color(red_value, 100, 100) # Select a random colour
         colours[colour.hex] = eruption
         draw_volcano(colour, region_x, region_y)
 
@@ -76,7 +66,13 @@ def mouse_pressed():
         print('Region not detected')
 
 def draw():
-    pass
-
+    image(
+        map, # The image to draw
+        0, # The x of the top-left corner
+        0, # The y of the top-left corner
+        width, # The width of the image
+        height # The height of the image
+    )
+    draw_data()
   
 run()
