@@ -23,11 +23,11 @@ def setup():
     map = load_image('mercator.jpeg')
     load_data('volcano-data.csv')
     image(
-        map, # The image to draw
-        0, # The x of the top-left corner
-        0, # The y of the top-left corner
-        width, # The width of the image
-        height # The height of the image
+        map,  # The image to draw
+        0,  # The x of the top-left corner
+        0,  # The y of the top-left corner
+        width,  # The width of the image
+        height  # The height of the image
     )
     draw_data()
 
@@ -48,7 +48,7 @@ def load_data(file_name):
                 'year': info[0],
                 'region': info[5]
             }
-            volcano_eruptions.append(volcano_dict) # Store dictionary in a list
+            volcano_eruptions.append(volcano_dict)  # Store dictionary in a list
 
 def draw_data():
   
@@ -61,7 +61,7 @@ def draw_data():
         region_coords = get_xy_coords(longitude, latitude)
         region_x = region_coords['x']
         region_y = region_coords['y']
-        colour = Color(randint(0,255), randint(0,255), randint(0,255)) # Select a random colour
+        colour = Color(randint(0,255), randint(0,255), randint(0,255))  # Select a random colour
         colours[colour.hex] = eruption
         draw_volcano(colour, region_x, region_y)
 
