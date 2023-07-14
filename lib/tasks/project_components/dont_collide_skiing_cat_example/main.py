@@ -47,13 +47,12 @@ def draw_player():
         speed = 0
     
   
-def setup():
-    global skiing, crashed
-    
+def setup(): 
     # Setup your animation here
     size(400, 400)
     text_size(40)
     text_align(CENTER, TOP)  # position around the centre
+    global skiing, crashed
     skiing = load_image('skiing.png')
     crashed = load_image('fallenover.png')
   
