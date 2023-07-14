@@ -65,7 +65,7 @@ def load_data(file_name):
                 'latitude': info[6],
                 'longitude': info[7]
             }
-            ufo_sightings.append(ufo_dict) # Store dictionary in a list
+            ufo_sightings.append(ufo_dict)  # Store dictionary in a list
 
 def draw_data():
   
@@ -88,11 +88,11 @@ def draw_data():
 def draw():
 
     image(
-        map, # The image to draw
-        0, # The x of the top-left corner
-        0, # The y of the top-left corner
-        width, # The width of the image
-        height # The height of the image
+        map,  # The image to draw
+        0,  # The x of the top-left corner
+        0,  # The y of the top-left corner
+        width,  # The width of the image
+        height  # The height of the image
     )
     draw_data()
 
