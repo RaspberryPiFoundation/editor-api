@@ -4,7 +4,7 @@ from random import randint
 
 # The mouse_pressed function goes here
 def mouse_pressed():
-    if hit_colour == Color('blue'): # Like functions, 'if' statements are indented 
+    if hit_colour == Color('blue'):  # Like functions, 'if' statements are indented 
         print('You hit the outer circle, 50 points!') 
     elif hit_colour == Color('red'):    
         print('You hit the inner circle, 200 points!')   
@@ -15,32 +15,32 @@ def mouse_pressed():
     
 # The shoot_arrow function goes here
 def shoot_arrow():
-    global hit_colour # Can be used in other functions 
-    arrow_x = randint(100, 300) # Store a random number between 100 and 300
-    arrow_y = randint(100, 300) # Store a random number between 100 and 300
-    hit_colour = get(arrow_x, arrow_y) # Get the hit colour 
-    fill('sienna') # Set the arrow to fill colour to brown   
-    circle(arrow_x, arrow_y, 15) # Draw a small circle at random coordinates 
+    global hit_colour  # Can be used in other functions 
+    arrow_x = randint(100, 300)  # Store a random number between 100 and 300
+    arrow_y = randint(100, 300)  # Store a random number between 100 and 300
+    hit_colour = get(arrow_x, arrow_y)  # Get the hit colour 
+    fill('sienna')  # Set the arrow to fill colour to brown   
+    circle(arrow_x, arrow_y, 15)  # Draw a small circle at random coordinates 
 
 def setup():
 # Setup your game here
-    size(400, 400) # width and height
+    size(400, 400)  # width and height
     no_stroke()
 
 def draw():
 # Things to do in every frame
     fill('cyan')
-    rect(0, 0, 400, 250) # Sky
+    rect(0, 0, 400, 250)  # Sky
     fill('lightgreen')
-    rect(0, 250, 400, 150) # Grass
+    rect(0, 250, 400, 150)  # Grass
     fill('sienna') 
-    triangle(150, 350, 200, 150, 250, 350) # Stand 
+    triangle(150, 350, 200, 150, 250, 350)  # Stand 
     fill('blue')
-    circle(200, 200, 170) # Outer circle 
+    circle(200, 200, 170)  # Outer circle 
     fill('red')   
-    circle(200, 200, 110) # Inner circle   
+    circle(200, 200, 110)  # Inner circle   
     fill('yellow')   
-    circle(200, 200, 30) # Middle circle
+    circle(200, 200, 30)  # Middle circle
     shoot_arrow()
   
 # Keep this to run your code
