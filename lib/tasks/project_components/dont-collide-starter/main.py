@@ -7,11 +7,11 @@ from random import randint, seed
 
 
 def setup():
-# Put code to run once here
+    # Put code to run once here
 
 
 def draw():
-# Put code to run every frame here
+    # Put code to run every frame here
 
   
 # Keep this to run your code
