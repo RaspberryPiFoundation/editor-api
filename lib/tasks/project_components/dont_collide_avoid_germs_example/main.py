@@ -81,7 +81,6 @@ def draw_player():
         level = 0
   
 def draw_obstacles():
-  
     global level
     
     seed(41143644)
