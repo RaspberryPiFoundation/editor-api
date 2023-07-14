@@ -100,11 +100,11 @@ def display_lives():
 
 def setup():
     # Setup your animation here
+    size(400, 400)
     global rocket, rock, random_seed
     
     text_size(40)
     text_align(CENTER, TOP)  # position around the centre, top
-    size(400, 400)
     
     rocket = load_image('rocket.png')
     rock = load_image('moon.png')
