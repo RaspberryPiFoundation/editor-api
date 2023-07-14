@@ -40,7 +40,7 @@ def rotate_motif():
 
 def setup():
     size(400, 400)
-    background(250, 5, 94) # pink
+    background(250, 5, 94)  # pink
     no_stroke()
     print('This is 🇵🇭 Yakan weaving ')
 
