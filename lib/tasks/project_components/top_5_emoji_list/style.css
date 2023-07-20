@@ -1,0 +1,310 @@
+/* Colour pairings */
+
+.primary {
+  background: var(--primary);
+  color: var(--onprimary);
+}
+
+.secondary {
+  background: var(--secondary);
+  color: var(--onsecondary);
+}
+
+.tertiary {
+  background: var(--tertiary);
+  color: var(--ontertiary);
+}
+
+.page {
+  background: var(--page);
+  color: var(--onpage);
+}
+
+/* Apply everywhere */
+
+* {
+  margin: 0rem;
+  padding: 0rem;
+  box-sizing: border-box; /* Padding and border don't make a box bigger */
+}
+
+html,
+body {
+  width: 100%;
+  margin: 0rem auto;
+  background: var(--page);
+  color: var(--onpage);
+  font: var(--body-font);
+  min-height: 100vh; /* Make the content fill the page so the footer is at the bottom */
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* add a background image to body */
+
+body {
+  background-image: url('emojis.png'); /* Uncomment and change filename to add a background image
+  /*background-repeat: repeat;*/ /* Make the image repeat */
+  /*background-size: cover;*/ /* Make the image cover the whole container */
+}
+
+/* The main content of the page between the header and footer */
+main {
+  background: var(--primary); /* Colour the background */
+  color: var(--onprimary); /* Colour the text */
+  margin: 0 auto; /* Center if the browser is really wide */
+  min-width: 25rem; /* Don't let the content get too narrow */
+  max-width: 70rem; /*  Don't let the content get too wide */
+  padding: 0;
+  padding-top: 0.5rem; /* Padding at the top */
+  margin-bottom: 1em; /* Gap before the footer */
+}
+
+/* Header and footer element styles */
+
+header,
+footer {
+  text-align: center;
+  width: 100%; /* Fill the full width of the window */
+  margin: 0; /* Remove the default margin */
+  min-height: 3rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+/* Section styles */
+
+section {
+  padding: 1rem 2rem;
+  margin: 1rem auto;
+}
+
+/* Border styles */
+
+.border-bottom {
+  border-bottom: 20px solid var(--detail); /* Add a solid */
+}
+
+.border-top {
+  border-top: 10px solid var(--detail2); /* Add a solid line above the footer */
+}
+
+/* Add a transparent effect */
+
+.transparent {
+  opacity: 0.95;
+}
+
+/* Styles just for h1 elements */
+
+h1 {
+  font: var(--header-font); /* Font style stored in the header-font variable */
+  padding: 2rem;
+  margin: 0; /* Center if the browser is really wide */
+}
+
+/* Styles just for h2 elements */
+
+h2 {
+  font: var(--title-font); /* Font style stored in the title-font variable */
+  text-align: center; /* Align the text */
+  padding: 1.5rem; /* Add some space all around the heading */
+}
+
+/* Highlight key words in bold and apply an alternative text colour */
+
+strong {
+  color: var(--detail2); /* Text colour stored in the caption variable */
+  font-weight: bold; /* Makes text weight stronger than the default*/
+}
+
+/* Style for ordered and unordered lists */
+
+ol,
+ul {
+  display: inline-block;
+  text-align: left;
+  padding-left: 2rem;
+}
+
+/* Padding around paragraphs */
+
+p {
+  padding: 1rem 1rem;
+}
+
+/* Style for links */
+
+a:link,
+a:visited {
+  font-weight: bold;
+  color: inherit; /* Use the colour of the parent element */
+}
+
+.xcenter {
+  text-align: center;
+}
+
+.ycenter {
+  display: flex;
+  justify-content: center;
+  flex-flow: column;
+}
+
+/* Styles just for the .wrap class */
+
+.wrap {
+  /* Make content wrap over mutiple rows */
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  box-sizing: border-box;
+  gap: 0rem 0rem; /* horizontal and vertical gap */ 
+}
+
+/* For creating fancy boxes */
+
+.dashed-border {
+  border: 0.25rem dashed var(--detail2);
+}
+
+.solid-border {
+  border: 0.25rem solid var(--detail2);
+}
+
+/* Styles for the div tags that are inside a .wrap class */
+
+.wrap > div {
+  width: 14rem;
+  padding: 0rem;
+}
+
+/* Styles for the img tags that are inside a .wrap class */
+
+.wrap > img {
+  width: 14rem;
+  display: block;
+}
+
+/* Styles for the p tags that are inside a .wrap class */
+
+.wrap > p,
+.wrap > span {
+  width: 14rem;
+  display: block;
+}
+
+/* Specific styles for this project */
+
+.bigfont {
+  font-size: 3rem;
+}
+
+.hugefont {
+  /* Used to make a large emoji */
+  font-size: 6rem;
+  text-align: center;
+  padding: 1rem;
+}
+
+.wrap .narrow {
+  width: 10rem;
+}
+
+.wrap .wide {
+  width: 20rem;
+}
+
+blockquote {
+  font: var(--quote-font);
+  color: var(--detail);
+  text-align: center;
+  padding: 0rem;
+  max-width: 25rem;
+}
+
+cite {
+  color: var(--detail);
+  font-size: small;
+}
+
+/* Specific styles for this project */
+
+.tile {
+  height: 9.4rem;
+}
+
+.rounded {
+  border-radius: 1rem;
+}
+
+.gradient1 {
+  background-image: linear-gradient(
+    to bottom right,
+    var(--secondary),
+    var(--detail)
+  );
+  color: var(--onsecondary);
+}
+
+.gradient2 {
+  background-image: linear-gradient(
+    to top right,
+    var(--tertiary),
+    var(--detail2)
+  );
+  color: var(--ontertiary);
+}
+
+.shadow {
+   box-shadow: 5px 5px 3px 0px #888888; /* right and bottom shadow size, blur, spread and colour */
+   /*box-shadow: 5px 5px 4px 2px var(--detail);*/
+}
+
+.wrap .card {
+  width: 12rem;
+  height: 12rem;
+  border: 0.1rem solid transparent;
+}
+
+.card-content {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 1s;
+  transform-style: preserve-3d;
+  perspective: 60rem;
+}
+
+.card:hover .card-content {
+  transform: rotateY(180deg);
+}
+
+.card-face {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  backface-visibility: hidden;
+}
+
+.card p {
+  padding: 0.5rem;
+}
+
+/* Printed photo style */
+
+.photo {
+  border: 1px solid #D0D0D0; /* Add a solid border */
+  width: 14rem;
+  height: 15rem;
+  background: #ffffff;
+  padding-top: 1rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  padding-bottom: 3rem;
+  box-shadow: 8px 8px 10px 4px #888888; /* right and bottom shadow, blur, spread and colour */
+  transform: rotate(3deg);
+}

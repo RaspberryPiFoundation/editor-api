@@ -1,0 +1,20 @@
+
+/* Candy colour palette & fonts */
+
+:root {
+  --primary: #ebeaeb;
+  --onprimary: #625d61;
+  --secondary: #f5bdd5;
+  --onsecondary: #1D3D58;
+  --tertiary: #b5a9b2;
+  --ontertiary: #422215;
+  --page: #ffffff;
+  --onpage: #000000;
+  --detail: #e697b9;
+  --detail2: #415a89;
+
+  --body-font: 1rem 'Verdana', sans-serif;
+  --header-font: 3rem 'Fredoka One', cursive;
+  --title-font: 2rem 'Fredoka One', cursive;
+  --quote-font: lighter 1.5rem 'Chewy', cursive;
+}

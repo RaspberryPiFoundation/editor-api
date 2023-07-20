@@ -1,0 +1,19 @@
+
+/* Set up colour palette and fonts using variables */
+
+:root {
+  --primary: #ffffff;
+  --secondary: #ffcd4c;
+  --tertiary: #01b0fe;
+  --page: #ffffff;
+  --onprimary: #664300;
+  --onsecondary: #664300;
+  --onpage: #ffffff;
+  --detail: #f49104;
+  --detail2: #3a96dd;
+
+  --body-font: lighter 1.1rem 'Chewy', cursive;
+  --header-font: lighter 3rem 'Chewy', cursive;
+  --title-font: lighter 2rem 'Chewy', cursive;
+  --quote-font: lighter 1.5rem 'Chewy', cursive;
+}

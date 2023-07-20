@@ -40,7 +40,7 @@ def draw_data():
       region_y = region_coords['y']
       region_colour = Color(red_value, 255, 0)
       draw_pin(region_x, region_y, region_colour)
-      colours[region_colour] = region
+      colours[region_colour.hex] = region
       red_value -= 1
     elif answer == 'r' and region['percentage urban'] < 50.0:
       region_name = region['name']
@@ -49,7 +49,7 @@ def draw_data():
       region_y = region_coords['y']
       region_colour = Color(red_value, 255, 0)
       draw_pin(region_x, region_y, region_colour)
-      colours[region_colour] = region
+      colours[region_colour.hex] = region
       red_value -= 1
   
   
@@ -66,17 +66,17 @@ def draw():
 # Put code to run every frame here
   no_stroke()
   image(
-    map, # The image to draw
-    0, # The x of the top-left corner
-    0, # The y of the top-left corner
-    width, # The width of the image
-    height # The height of the image
+    map,  # The image to draw
+    0,  # The x of the top-left corner
+    0,  # The y of the top-left corner
+    width,  # The width of the image
+    height  # The height of the image
     )
   draw_data()
   
 def mouse_pressed():
 # Put code to run when the mouse is pressed here
-  pixel_colour = Color(get(mouse_x, mouse_y))
+  pixel_colour = Color(get(mouse_x, mouse_y)).hex
   
   if pixel_colour in colours:
     info = colours[pixel_colour]
@@ -89,6 +89,6 @@ def mouse_pressed():
 answer = None
 
 while answer not in ['u', 'r']:
-  answer = input('Please enter u to see places that are mostly urban, or r to see places that are mostly rural.')
+  answer = input('Please enter u to see places that are mostly urban, or r to see places that are mostly rural: ')
 
 run()

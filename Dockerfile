@@ -3,6 +3,8 @@ RUN gem install bundler \
   && apt-get update \
   && apt-get upgrade --yes \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
+RUN apt-get update && apt-get install -y sudo curl wget vim git zsh docker.io
+RUN sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 ENV TZ='Europe/London'
 ENV RUBYOPT='-W:no-deprecated -W:no-experimental'
 
