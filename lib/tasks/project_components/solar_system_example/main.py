@@ -109,15 +109,15 @@ def draw():
 
 def mouse_pressed():
     # Put code to run when the mouse is pressed here
-    pixel_colour = Color(get(mouse_x, mouse_y))
+    pixel_colour = Color(get(mouse_x, mouse_y)).hex  # Here the RGB value is converted to Hex so it can be used in a string comparison later
 
-    if pixel_colour == mercury['colour']:
+    if pixel_colour == mercury['colour'].hex:
         print(mercury['name'])
         print(mercury['info'])
-    elif pixel_colour == venus['colour']:
+    elif pixel_colour == venus['colour'].hex:
         print(venus['name'])
         print(venus['info'])
-    elif pixel_colour == earth['colour']:
+    elif pixel_colour == earth['colour'].hex:
         print(earth['name'])
         print(earth['info'])
   
