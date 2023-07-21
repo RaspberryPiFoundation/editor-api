@@ -4,11 +4,11 @@ from random import randint
 
 # The mouse_pressed function goes here
 def mouse_pressed():
-    if hit_colour == Color('blue'):  # Like functions, 'if' statements are indented 
+    if hit_colour == Color('blue').hex:  # Like functions, 'if' statements are indented 
         print('You hit the outer circle, 50 points!') 
-    elif hit_colour == Color('red'):    
+    elif hit_colour == Color('red').hex:    
         print('You hit the inner circle, 200 points!')   
-    elif hit_colour == Color('yellow'):    
+    elif hit_colour == Color('yellow').hex:    
         print('You hit the middle, 500 points!')   
     else:   
         print('You missed! No points!')    
@@ -18,7 +18,7 @@ def shoot_arrow():
     global hit_colour  # Can be used in other functions 
     arrow_x = randint(100, 300)  # Store a random number between 100 and 300
     arrow_y = randint(100, 300)  # Store a random number between 100 and 300
-    hit_colour = get(arrow_x, arrow_y)  # Get the hit colour 
+    hit_colour = get(arrow_x, arrow_y).hex  # Get the hit colour 
     fill('sienna')  # Set the arrow to fill colour to brown   
     circle(arrow_x, arrow_y, 15)  # Draw a small circle at random coordinates 
 
