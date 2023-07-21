@@ -9,14 +9,9 @@ colours = {}
 
 def setup():
     # Put code to run once here
-    global map
-    load_data('happy.csv')
     size(991, 768)
+    load_data('happy.csv')
     map = load_image('tech_map.jpg')
-
-
-def draw():
-    # Put code to run every frame here
     image(
         map,  # The image to draw
         0,  # The x of the top-left corner
@@ -24,6 +19,10 @@ def draw():
         width,  # The width of the image
         height  # The height of the image
     )
+
+
+def draw():
+    # Put code to run every frame here
     draw_data()
 
 

@@ -8,13 +8,9 @@ colours = {}
 
 # Put code to run once here
 def setup():
-    global map
-    load_data('pop.csv')
     size(991, 768)
+    load_data('pop.csv')
     map = load_image('mercator_bw.png')
-
-# Put code to run every frame here
-def draw():
     image(
         map,  # The image to draw
         0,  # The x of the top-left corner
@@ -22,7 +18,9 @@ def draw():
         width,  # The width of the image
         height  # The height of the image
     )
-    #draw_pin(300, 300, Color(255, 0, 0))
+
+# Put code to run every frame here
+def draw():
     draw_data()
 
 def draw_pin(x_coord, y_coord, colour):
@@ -35,7 +33,7 @@ def load_data(file_name):
         for line in f:
             info = line.split(',')
             region_dict = {
-                'name': info[0],
+                'region': info[0],
                 'population': info[1],
                 'population density': info[2]
             }
@@ -44,7 +42,7 @@ def load_data(file_name):
 def draw_data():
     green_value = 255
     for region in region_list:
-        region_name = region['name']  # Get the name of the region
+        region_name = region['region']  # Get the name of the region
         region_coords = get_region_coords(region_name)  # Use the name to get coordinates
         region_x = region_coords['x']  # Get the x coordinate
         region_y = region_coords['y']  # Get the y coordinate
@@ -60,7 +58,7 @@ def mouse_pressed():
     
     if pixel_colour in colours:
         facts = colours[pixel_colour]
-        print('Name: ', facts['name'])
+        print('Name: ', facts['region'])
         print('Population: ', facts['population'])
         print('Population density', facts['population density'])
     else:
