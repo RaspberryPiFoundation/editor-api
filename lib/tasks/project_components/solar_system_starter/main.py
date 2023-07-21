@@ -31,7 +31,7 @@ def draw():
 
 def mouse_pressed():
     # Put code to run when the mouse is pressed here
-    pixel_colour = Color(get(mouse_x, mouse_y))
+    pixel_colour = Color(get(mouse_x, mouse_y)).hex  # Here the RGB value is converted to Hex so it can be used in a string comparison later
 
   
 run(frame_rate=60)
