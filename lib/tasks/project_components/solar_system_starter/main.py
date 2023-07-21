@@ -3,7 +3,7 @@ from p5 import *
 from make_planet import make_planet
 
 def draw_sun():
-    fill(255, 255, 0) # Yellow
+    fill(255, 255, 0)  # Yellow
     ellipse(width / 2 , height / 2, 100, 100)
 
 
