@@ -31,7 +31,6 @@ def draw_data():
     global colours
     colours = {}
     red_value = 255
-
     for region in region_list:
         if answer == 'u' and region['percentage urban'] >= 50.0:
             region_name = region['region']
@@ -89,5 +88,6 @@ answer = None
 
 while answer not in ['u', 'r']:
     answer = input('Please enter u to see places that are mostly urban, or r to see places that are mostly rural: ')
+
 
 run()

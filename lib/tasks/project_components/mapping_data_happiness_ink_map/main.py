@@ -34,6 +34,7 @@ def mouse_pressed():
     except KeyError:
         print('Click on a pin')
 
+
 def load_data(file_name):
     with open(file_name) as f:
         for line in f:

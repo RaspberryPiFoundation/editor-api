@@ -59,6 +59,7 @@ def mouse_pressed():
     else:
         print('Region not detected')
 
+
 def load_data(file_name):
     with open(file_name) as f:
         for line in f:

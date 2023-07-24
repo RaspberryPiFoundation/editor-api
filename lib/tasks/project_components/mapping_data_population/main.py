@@ -22,6 +22,7 @@ def setup():
         width,  # The width of the image
         height  # The height of the image
     )
+    draw_pin(300, 300, Color(255, 0, 0))
     draw_data()
 
 
@@ -65,5 +66,6 @@ def mouse_pressed():
         print('Population density', facts['population density'])
     else:
         print('Region not detected')
+
 
 run()
