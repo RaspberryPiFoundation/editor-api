@@ -6,9 +6,6 @@ from regions import get_region_coords
 def setup():
     pass
 
-# Put code to run every frame here
-def draw():
-    pass
 
 # Put code to run when the mouse is pressed here
 def mouse_pressed():
