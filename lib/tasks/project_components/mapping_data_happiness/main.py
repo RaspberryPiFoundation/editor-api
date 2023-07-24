@@ -22,10 +22,6 @@ def setup():
         width,  # The width of the image
         height  # The height of the image
     )
-
-
-def draw():
-    # Put code to run every frame here
     draw_data()
 
 
