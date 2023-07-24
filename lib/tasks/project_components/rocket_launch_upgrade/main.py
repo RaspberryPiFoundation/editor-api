@@ -65,7 +65,7 @@ def draw_background():
 
 
 def setup():
-    # Setup your animation here
+    # Setup your animation here 
     size(screen_size, screen_size)
     image_mode(CENTER)
     global planet, rocket
