@@ -5,12 +5,15 @@ from regions import get_region_coords
 region_list = []
 colours = {}
 
+def preload():
+    global map
+    map = load_image('mercator_bw.png')
+
 # Put code to run once here
 def setup():
     size(991, 768)
     load_data('carbon.csv')
     print(region_list)
-    map = load_image('mercator_bw.png')
     image(
         map,  # The image to draw
         0,  # The x of the top-left corner
