@@ -52,11 +52,15 @@ def draw_data():
             colours[region_colour.hex] = region
             red_value -= 1
   
-  
+
+def preload():
+    global map
+    map = load_image('mercator_bw.png')
+
+
 def setup():
     # Put code to run once here
     size(991, 768)
-    map = load_image('mercator_bw.png')
     load_data('pop.csv')
     image(
         map,  # The image to draw
