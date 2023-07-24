@@ -15,10 +15,22 @@ def draw_volcano(colour, x, y):
     fill(colour)
     ellipse(x, y, 12, 12)
 
-def setup():
-    size(991, 768)
+
+def preload():
     global map
     map = load_image('mercator.jpeg')
+
+
+def setup():
+    size(991, 768)
+    image(
+        map, # The image to draw
+        0, # The x of the top-left corner
+        0, # The y of the top-left corner
+        width, # The width of the image
+        height # The height of the image
+    )
+    draw_data()
     load_data('volcano-data.csv')
     draw_data()
 
@@ -64,15 +76,5 @@ def mouse_pressed():
         print('A volcano erupted in ' + facts['region'] + ' in ' + facts['year'])
     else:
         print('Region not detected')
-
-def draw():
-    image(
-        map, # The image to draw
-        0, # The x of the top-left corner
-        0, # The y of the top-left corner
-        width, # The width of the image
-        height # The height of the image
-    )
-    draw_data()
   
 run()
