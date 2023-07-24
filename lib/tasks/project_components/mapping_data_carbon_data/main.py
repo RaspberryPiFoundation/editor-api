@@ -21,6 +21,7 @@ def setup():
         width,  # The width of the image
         height  # The height of the image
     )
+    draw_data()
 
 def draw_pin(x, y, colour):
     no_stroke()
@@ -45,11 +46,6 @@ def draw_data():
         green_value += 1  #Change the green value
         blue_value -= 1  #Change the blue value
   
-# Put code to run every frame here
-def draw():
-    #draw_pin(200, 200, Color(255,0,0))
-    draw_data()
-
 
 # Put code to run when the mouse is pressed here
 def mouse_pressed():
