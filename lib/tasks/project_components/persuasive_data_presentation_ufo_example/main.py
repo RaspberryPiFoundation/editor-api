@@ -37,12 +37,24 @@ def draw_ufo(shape, x, y):
         fill(misc)
         ellipse(x, y, 10, 10)
 
+
+def preload():
+    global map
+    map = load_image('mercator.jpeg')
+
+
 def setup():
   
     size(991, 768)
-    global map
-    map = load_image('mercator.jpeg')
     load_data('ufo-sightings.csv')
+    image(
+        map,  # The image to draw
+        0,  # The x of the top-left corner
+        0,  # The y of the top-left corner
+        width,  # The width of the image
+        height  # The height of the image
+    )
+    draw_data()
 
 def load_data(file_name):
   
@@ -84,17 +96,6 @@ def draw_data():
         shape = sighting['shape']
         
         draw_ufo(shape, region_x, region_y)
-
-def draw():
-
-    image(
-        map,  # The image to draw
-        0,  # The x of the top-left corner
-        0,  # The y of the top-left corner
-        width,  # The width of the image
-        height  # The height of the image
-    )
-    draw_data()
 
 
 def mouse_pressed():
