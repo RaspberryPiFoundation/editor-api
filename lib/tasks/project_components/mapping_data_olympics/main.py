@@ -59,12 +59,9 @@ def setup():
         width,  # The width of the image
         height  # The height of the image
     )
-  
-
-def draw():
-    # Put code to run every frame here
     no_stroke()
     draw_data()
+
   
 def mouse_pressed():
     # Put code to run when the mouse is pressed here
