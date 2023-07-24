@@ -22,10 +22,8 @@ def setup():
         width,  # The width of the image
         height  # The height of the image
     )
-
-# Put code to run every frame here
-def draw():
     draw_data()
+
 
 def draw_pin(x_coord, y_coord, colour):
     no_stroke()
