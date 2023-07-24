@@ -5,6 +5,9 @@ from regions import get_region_coords
 region_list = []
 colours = {}
 
+def preload():
+    global map
+    map = load_image('old-map.jpg')  # Replace with your image
 
 def draw_pin(x, y, colour):
     fill(colour)
@@ -29,7 +32,6 @@ def draw_data():
 def setup():
     size(991, 768)
     load_data('gdp.csv')
-    map = load_image('old-map.jpg')  # Replace with your image
     image(
         map,  # The image to draw
         0,  # The x of the top-left corner
