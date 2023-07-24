@@ -6,12 +6,15 @@ from random import randint
 region_list = []
 colours = {}
 
+def preload():
+    global map
+    map = load_image('tech_map.jpg')
 
 def setup():
     # Put code to run once here
     size(991, 768)
     load_data('happy.csv')
-    map = load_image('tech_map.jpg')
+
     image(
         map,  # The image to draw
         0,  # The x of the top-left corner
