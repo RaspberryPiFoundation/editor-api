@@ -1,12 +1,10 @@
 #!/bin/python3
 from p5 import *
 
-def setup():
-  
-    size(400, 400)
+
+def preload():
     global iss, be_flag, ca_flag, fr_flag, uk_flag, gm_flag, it_flag, jp_flag
     global ne_flag, ru_flag, us_flag
-    
     iss = load_image('iss.jpg')
     be_flag = load_image('be.jpg')
     ca_flag = load_image('ca.jpg')
@@ -18,7 +16,10 @@ def setup():
     ne_flag = load_image('ne.jpg')
     ru_flag = load_image('ru.jpg')
     us_flag = load_image('us.jpg')
-    
+
+
+def setup():
+    size(400, 400)
     load_data('iss-expedition-data.csv')
     
     date = (expedition_date(chosen_expedition)) 
