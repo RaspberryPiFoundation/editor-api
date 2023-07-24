@@ -6,12 +6,14 @@ from random import randint, seed
 region_list = []
 colours = {}
 
-
+def preload():
+    global map
+    map = load_image('ink_map.jpg')
+    
 def setup():
     # Put code to run once here
     size(991, 768)
     load_data('happy.csv')
-    map = load_image('ink_map.jpg')
     image(
         map,  # The image to draw
         0,  # The x of the top-left corner
