@@ -18,6 +18,12 @@ def load_data(file_name):
             #print(region_dict)
             region_list.append(region_dict)
 
+
+def preload():
+    global map
+    map = load_image('mercator.jpeg')
+
+
 def draw_pin(x, y, colour, host_count):
     no_stroke()
     fill(colour)
@@ -45,7 +51,6 @@ def draw_data():
 def setup():
     # Put code to run once here
     size(991, 768)
-    map = load_image('mercator.jpeg')
     load_data('olympics.csv')
     image(
         map,  # The image to draw
