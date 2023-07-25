@@ -23,6 +23,7 @@ gem 'puma', '~> 5.6'
 gem 'rack-cors'
 gem 'rails', '~> 7.0.0'
 gem 'sentry-rails', '~> 5.5.0'
+gem 'ruby-openai'
 
 group :development, :test do
   gem 'dotenv-rails'
