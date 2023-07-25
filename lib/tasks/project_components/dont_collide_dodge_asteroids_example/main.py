@@ -48,7 +48,7 @@ def draw_player():
     if player_x > width:  # off the right of the screen
         collide3 = safe.hex
       
-    if (collide == safe.hex and collide2.hex == safe.hex and collide3 == safe.hex and collide4 == safe.hex) or invun > 0:
+    if (collide == safe.hex and collide2 == safe.hex and collide3 == safe.hex and collide4 == safe.hex) or invun > 0:
         if lives == 0 and frame_count % 12 == 0:
             tint(200, 0, 0)
       
@@ -62,7 +62,7 @@ def draw_player():
             fill(220, 220, 220, 60)
             ellipse(player_x, player_y + 18, 47, 47)
         
-    elif lives > 0:
+    elif lives > 1:
         lives -= 1
         invun = 50
         tint(200, 0, 0)
