@@ -21,11 +21,12 @@ def main():
             BreedName = info[0]
             Type = info[1]
             AvgPrice = info[2]
+            Intelligence = info[3]
+            Popularity = info[4]
             if Type == 'Toy':
                 chart.add(BreedName, float(AvgPrice))
         chart.render()
-    main()
-      
+        
     if choice == '2':
         chart = Pie(width=600, height=400, title='🐶 Popularity of Toy dogs by breed 🐶 ')
         for line in lines:
@@ -38,20 +39,19 @@ def main():
             if Type == 'Toy':
                 chart.add(BreedName, float(Popularity))
         chart.render()
-        main()
-    
+
     if choice == '3':
-    chart = Bar(width=600, height=400, title='🐶 Intelligence of Toy dogs by breed 🐶')
-    for line in lines:
-        info = line.split(',')
-        BreedName = info[0]
-        Type = info[1]
-        AvgPrice = info[2]
-        Intelligence = info[3]
-        Popularity = info[4]
-        if Type == 'Toy':
-            chart.add(BreedName, float(Intelligence))
-    chart.render()
+        chart = Bar(width=600, height=400, title='🐶 Intelligence of Toy dogs by breed 🐶')
+        for line in lines:
+            info = line.split(',')
+            BreedName = info[0]
+            Type = info[1]
+            AvgPrice = info[2]
+            Intelligence = info[3]
+            Popularity = info[4]
+            if Type == 'Toy':
+                chart.add(BreedName, float(Intelligence))
+        chart.render()
     main()
 
 
