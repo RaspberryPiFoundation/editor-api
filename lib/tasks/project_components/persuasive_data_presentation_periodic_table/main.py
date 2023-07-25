@@ -56,14 +56,14 @@ def mouse_pressed():
 
 def load_pt_data(file_name):
     with open(file_name) as f:
-    for line in f:
-        info = line.strip().split(',')
-        pt_dict[int(info[0])] = {
-            'name': info[1],
-            'period': int(info[7]),
-            'group': int(info[8]),
-            'phase': info[9],
-            'appearance': info[28]
-        }
+        for line in f:
+            info = line.strip().split(',')
+            pt_dict[int(info[0])] = {
+                'name': info[1],
+                'period': int(info[7]),
+                'group': int(info[8]),
+                'phase': info[9],
+                'appearance': info[28]
+            }
 
 run()
