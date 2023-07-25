@@ -12,7 +12,7 @@ def load_data(file_name):
             info = line.split(',')
             # Change the dictionary to match the data you're using
             region_dict = {
-                'region': info[0],
+                'name': info[0],
                 'host_count': int(info[1])
             }
             #print(region_dict)
