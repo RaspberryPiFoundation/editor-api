@@ -63,7 +63,7 @@ def draw_data():
         region_coords = get_region_coords(region_name)  # Use the name to get coordinates
         region_x = region_coords['x']  # Get the x coordinate
         region_y = region_coords['y']  # Get the y coordinate
-        region_colour = Color(i, 100, 0)  # Set the pin colour
+        region_colour = Color(red_value, 100, 0)  # Set the pin colour
         colours[region_colour.hex] = region
         draw_pin(region_x, region_y, region_colour)
         red_value -= 1
