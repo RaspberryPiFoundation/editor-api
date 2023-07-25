@@ -30,7 +30,6 @@ def setup():
         width, # The width of the image
         height # The height of the image
     )
-    draw_data()
     load_data('volcano-data.csv')
     draw_data()
 
