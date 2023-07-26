@@ -1,0 +1,9 @@
+NAME: 'Blank Python Starter'
+IDENTIFIER: 'blank-python-starter'
+TYPE: 'python'
+COMPONENTS:
+  - name: 'main'
+    extension: 'py'
+    location: 'main.py'
+    index: 0
+    default: true
