@@ -84,6 +84,11 @@ RSpec.configure do |config|
 
   config.include PhraseIdentifierMock
   config.include HydraAdminApiMock, type: :request
+
+  if Bullet.enable?
+    config.before { Bullet.start_request }
+    config.after  { Bullet.end_request }
+  end
 end
 
 Shoulda::Matchers.configure do |config|
