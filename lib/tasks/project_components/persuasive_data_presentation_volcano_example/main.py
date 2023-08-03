@@ -54,7 +54,7 @@ def load_data(file_name):
 def draw_data():
     no_stroke()
 
-    red_value = 255
+    blue_value = 0
     # Use the lat and long data to calculate the x y coords for the shape
     for eruption in volcano_eruptions:
         longitude = float(eruption['longitude'])
@@ -62,9 +62,10 @@ def draw_data():
         region_coords = get_xy_coords(longitude, latitude)
         region_x = region_coords['x']
         region_y = region_coords['y']
-        colour = Color(red_value, 100, 100) # Select a random colour
+        colour = Color(255, 100, blue_value) # Select a random colour
         colours[colour.hex] = eruption
         draw_volcano(colour, region_x, region_y)
+        blue_value += 1
 
 
 def mouse_pressed():
