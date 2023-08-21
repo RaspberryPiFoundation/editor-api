@@ -75,6 +75,6 @@ Rails.application.configure do
     Bullet.enable = true
     Bullet.bullet_logger = true
     # may need toggling off if too aggressive
-    Bullet.raise = true # raise an error if n+1 query occurs
+    Bullet.raise = false # raise an error if n+1 query occurs
   end
 end
