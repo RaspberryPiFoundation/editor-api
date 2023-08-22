@@ -1,0 +1,33 @@
+NAME: 'Anime expressions solution'
+IDENTIFIER: 'anime-expressions-solution'
+TYPE: 'html'
+COMPONENTS:
+  - name: 'index'
+    extension: 'html'
+    location: 'index.html'
+    index: 0
+    default: true
+  - name: 'style'
+    extension: 'css'
+    location: style.css
+    index: 1
+    default: false
+  - name: 'candy'
+    extension: 'css'
+    location: candy.css
+    index: 2
+    default: false
+  - name: 'default'
+    extension: 'css'
+    location: default.css
+    index: 3
+    default: false
+  - name: 'vivid'
+    extension: 'css'
+    location: vivid.css
+    index: 4
+    default: false
+IMAGES:
+  - "annoyed.png"
+  - "happy.png"
+  - "love.png"

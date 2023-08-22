@@ -1,0 +1,20 @@
+
+/* Vivid colour palette & fonts */
+
+:root {
+  --primary: #68bbe5;
+  --onprimary: #000000;
+  --secondary: #e2008a;
+  --onsecondary: #000000;
+  --tertiary: #fdf100;
+  --ontertiary: #000000;
+  --page: #ffffff;
+  --onpage: #000000;
+  --detail: #ffa71a;
+  --detail2: #41063c;
+
+  --body-font: 1rem Verdana, sans-serif;
+  --header-font: lighter 3rem "Bangers", cursive;
+  --title-font: lighter 2rem "Bangers", cursive;
+  --quote-font: lighter 1.5rem 'Chewy', cursive;
+} 
