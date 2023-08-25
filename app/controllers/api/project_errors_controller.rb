@@ -12,7 +12,7 @@ module Api
     rescue_from ActiveRecord::RecordInvalid, with: :generic_error_response
 
     def raw_params
-      params.fetch(:project_error, {}).permit(
+      params.permit(
         :project_id,
         :error,
         :error_type,
