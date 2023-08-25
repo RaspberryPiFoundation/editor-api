@@ -91,7 +91,8 @@ RSpec.describe 'Create project error requests' do
     end
 
     context 'with a valid error and error_type' do
-      let(:error_type) { "TestError" }
+      let(:error_type) { 'TestError' }
+
       it_behaves_like 'upload error'
     end
 
@@ -123,7 +124,8 @@ RSpec.describe 'Create project error requests' do
     end
 
     context 'with a valid error and error_type' do
-      let(:error_type) { "TestError" }
+      let(:error_type) { 'TestError' }
+
       it_behaves_like 'upload error'
     end
   end
