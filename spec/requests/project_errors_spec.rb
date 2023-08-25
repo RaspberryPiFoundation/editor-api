@@ -7,10 +7,12 @@ RSpec.describe 'Create project error requests' do
   let(:project) { create(:project, user_id:) }
   let(:error) { 'some random test error message' }
   let(:status) { :created }
+  let(:error_type) { nil }
 
   let(:params) do
     {
       error:,
+      error_type:,
       user_id:,
       project_id: project.identifier
     }
@@ -19,6 +21,7 @@ RSpec.describe 'Create project error requests' do
   let(:expected_body) do
     {
       error:,
+      error_type:,
       user_id:,
       project_id: project.id
     }
@@ -68,19 +71,27 @@ RSpec.describe 'Create project error requests' do
   end
 
   describe 'without a user and project' do
+    let(:error_type) { nil }
     let(:params) do
       {
-        error:
+        error:,
+        error_type:
       }
     end
 
     let(:expected_body) do
       {
-        error:
+        error:,
+        error_type:
       }
     end
 
     context 'with a valid error param' do
+      it_behaves_like 'upload error'
+    end
+
+    context 'with a valid error and error_type' do
+      let(:error_type) { "TestError" }
       it_behaves_like 'upload error'
     end
 
@@ -95,17 +106,24 @@ RSpec.describe 'Create project error requests' do
     let(:params) do
       {
         error:,
+        error_type:,
         project: 'some-made-up-slug'
       }
     end
 
     let(:expected_body) do
       {
-        error:
+        error:,
+        error_type:
       }
     end
 
     context 'with a valid error param' do
+      it_behaves_like 'upload error'
+    end
+
+    context 'with a valid error and error_type' do
+      let(:error_type) { "TestError" }
       it_behaves_like 'upload error'
     end
   end

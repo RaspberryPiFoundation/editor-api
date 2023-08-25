@@ -3,6 +3,7 @@ class CreateProjectErrors < ActiveRecord::Migration[7.0]
     create_table :project_errors, id: :uuid do |t|
       t.references :project, type: :uuid, foreign_key: true
       t.string :error, null: false
+      t.string :error_type
       t.uuid :user_id
       t.timestamps
     end
