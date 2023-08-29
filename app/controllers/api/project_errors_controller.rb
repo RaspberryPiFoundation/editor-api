@@ -25,7 +25,7 @@ module Api
 
       project_id = py_params.delete(:project_id)
 
-      if project_id
+      if project_id.present?
         project = Project.find_by(identifier: project_id)
         py_params[:project_id] = project&.id || nil
       end
