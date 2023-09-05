@@ -21,7 +21,7 @@ def draw_rocket():
     if fuel >= burn and rocket_y > high_orbit_y:  # Still flying
         rocket_y -= speed  # Move the rocket
         fuel -= burn  # Burn fuel
-        print(‘Fuel left: ’, fuel)
+        print('Fuel left: ', fuel)
       
         no_stroke()  # Turn off the stroke
       
@@ -69,8 +69,8 @@ def setup():
     size(screen_size, screen_size)
     image_mode(CENTER)
     global planet, rocket
-    planet = load_image(‘orange_planet.png’)  # Your chosen planet
-    rocket = load_image(‘rocket.png’)
+    planet = load_image('orange_planet.png')  # Your chosen planet
+    rocket = load_image('rocket.png')
 
 
 def draw():
@@ -79,7 +79,7 @@ def draw():
     draw_rocket()
   
 
-fuel = int(input(‘How many kilograms of fuel do you want to use?’))
-burn = int(input(‘How much fuel should the rocket burn each frame?’))
-speed = int(input(‘How far should the rocket travel each frame?’))
+fuel = int(input('How many kilograms of fuel do you want to use?'))
+burn = int(input('How much fuel should the rocket burn each frame?'))
+speed = int(input('How far should the rocket travel each frame?'))
 run()
