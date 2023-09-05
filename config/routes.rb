@@ -2,7 +2,7 @@
 
 Rails.application.routes.draw do
   post '/graphql', to: 'graphql#execute'
-  mount GraphiQL::Rails::Engine, at: "/", graphql_path: "/graphql#execute" if !Rails.env.production?
+  mount GraphiQL::Rails::Engine, at: '/', graphql_path: '/graphql#execute' unless Rails.env.production?
 
   namespace :api do
     resource :default_project, only: %i[show] do
