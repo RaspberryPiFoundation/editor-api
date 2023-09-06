@@ -46,5 +46,7 @@ module App
     end
 
     config.active_job.queue_adapter = :good_job
+
+    config.api_only = false
   end
 end
