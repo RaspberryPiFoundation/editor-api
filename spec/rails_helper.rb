@@ -89,6 +89,10 @@ RSpec.configure do |config|
     config.before { Bullet.start_request }
     config.after  { Bullet.end_request }
   end
+
+  config.before do |example|
+    create_list(:word, 10) if example.metadata[:sample_words]
+  end
 end
 
 Shoulda::Matchers.configure do |config|

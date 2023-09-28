@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Project do
-  describe 'associations' do
+  describe 'associations', :sample_words do
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:remixes).dependent(:nullify) }
     it { is_expected.to have_many(:project_errors).dependent(:nullify) }
@@ -58,7 +58,7 @@ RSpec.describe Project do
     end
   end
 
-  describe 'check_unique_not_null' do
+  describe 'check_unique_not_null', :sample_words do
     let(:saved_project) { create(:project) }
 
     it 'generates an identifier if nil' do
