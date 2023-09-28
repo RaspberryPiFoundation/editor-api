@@ -6,6 +6,7 @@ RSpec.describe Project do
   describe 'associations' do
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:remixes).dependent(:nullify) }
+    it { is_expected.to have_many(:project_errors).dependent(:nullify) }
     it { is_expected.to belong_to(:parent).optional(true) }
     it { is_expected.to have_many_attached(:images) }
 

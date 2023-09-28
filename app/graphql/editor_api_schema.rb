@@ -18,6 +18,9 @@ class EditorApiSchema < GraphQL::Schema
 
   default_max_page_size 10
 
+  # Turn off introspection on production
+  disable_introspection_entry_points if Rails.env.production?
+
   # GraphQL-Ruby calls this when something goes wrong while running a query:
   # def self.type_error(err, context)
   # # if err.is_a?(GraphQL::InvalidNullError)

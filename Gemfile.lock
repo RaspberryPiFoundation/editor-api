@@ -88,6 +88,9 @@ GEM
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     builder (3.2.4)
+    bullet (7.0.7)
+      activesupport (>= 3.0.0)
+      uniform_notifier (~> 1.11)
     byebug (11.1.3)
     cancancan (3.4.0)
     climate_control (1.2.0)
@@ -134,6 +137,9 @@ GEM
       railties (>= 6.0.0)
       thor (>= 0.14.1)
       webrick (>= 1.3)
+    graphiql-rails (1.9.0)
+      railties
+      sprockets-rails
     graphql (2.0.17)
     graphql-client (0.18.0)
       activesupport (>= 3.0)
@@ -290,6 +296,8 @@ GEM
       rubocop-capybara (~> 2.17)
     ruby-progressbar (1.11.0)
     ruby2_keywords (0.0.5)
+    scout_apm (5.3.5)
+      parser
     sentry-rails (5.5.0)
       railties (>= 5.0)
       sentry-ruby (~> 5.5.0)
@@ -303,6 +311,13 @@ GEM
       simplecov_json_formatter (~> 0.1)
     simplecov-html (0.12.3)
     simplecov_json_formatter (0.1.4)
+    sprockets (4.2.0)
+      concurrent-ruby (~> 1.0)
+      rack (>= 2.2.4, < 4)
+    sprockets-rails (3.4.2)
+      actionpack (>= 5.2)
+      activesupport (>= 5.2)
+      sprockets (>= 3.0.0)
     stringio (3.0.5)
     thor (1.2.1)
     time (0.2.1)
@@ -311,6 +326,7 @@ GEM
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unicode-display_width (2.4.2)
+    uniform_notifier (1.16.0)
     uri (0.12.0)
     webmock (3.18.1)
       addressable (>= 2.8.0)
@@ -329,6 +345,7 @@ PLATFORMS
 DEPENDENCIES
   aws-sdk-s3
   bootsnap
+  bullet
   cancancan (~> 3.3)
   climate_control
   dotenv-rails
@@ -338,6 +355,7 @@ DEPENDENCIES
   github_webhook (~> 1.4)
   globalid
   good_job (~> 3.12)
+  graphiql-rails
   graphql
   graphql-client
   importmap-rails
@@ -356,6 +374,7 @@ DEPENDENCIES
   rubocop-graphql
   rubocop-rails
   rubocop-rspec
+  scout_apm
   sentry-rails (~> 5.5.0)
   shoulda-matchers (~> 5.0)
   simplecov
