@@ -17,12 +17,12 @@ from random import randint
 
 def setup():
   # Setup your animation here
-  
+
 
 
 def draw():
   # Things to do in every frame
-    
+
 
 
 run()

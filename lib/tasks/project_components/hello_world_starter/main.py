@@ -6,27 +6,13 @@ world = '🌍🌎🌏'
 python = 'Python 🐍'
 fire = '🔥'
 
-# Emojis to copy and paste into your code 
+# Emojis to copy and paste into your code
 # 📅🕒🎨🎮🔬🎉🕶️🎲🦄🚀💯⭐💛
 # 😃😜❤️📚⚽🎾👟♻️🌳✨🥺🌈
 
 # Useful characters :',()*_/.#
 
-# Function definitions        
-  
+# Function definitions
+
 # Put code to run under here
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 

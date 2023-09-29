@@ -13,6 +13,6 @@ def setup():
 def draw():
     # Put code to run every frame here
 
-  
+
 # Keep this to run your code
 run()
