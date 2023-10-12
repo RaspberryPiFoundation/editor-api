@@ -18,6 +18,8 @@ Project images are uploaded via `POST` requests to `/projects/{project_identfier
 
 A project remix is created via a `POST` request to `projects/{original_project_identifier}/remix`.
 
+A project share duplicates the original project, nulls the user_id and sets `is_live` to false via a `POST` request to `projects/{original_project_identifier}/share`.
+
 ### Requests from UI to API
 
 Currently requests to the API from a specific project page are generally performed via `axios`, with `AsyncThunk`s being used to manage the status of such requests and update the UI accordingly.
@@ -53,9 +55,11 @@ docker-compose up
 #### Updating gems inside the container
 
 This can be done with the `bin/with-builder.sh` script:
+
 ```
 ./bin/with-builder.sh bundle update
 ```
+
 which should update the Gems in the container, without the need for rebuilding.
 
 ### CORS Allowed Origins

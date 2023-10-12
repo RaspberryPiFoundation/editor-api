@@ -5,6 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '~> 3.2.0'
 
+gem 'administrate', '~> 0.16.0'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'

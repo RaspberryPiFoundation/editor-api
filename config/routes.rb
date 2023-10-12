@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  namespace :admin do
+      resources :components
+      resources :projects
+
+      root to: "projects#index"
+    end
   post '/graphql', to: 'graphql#execute'
   mount GraphiQL::Rails::Engine, at: '/', graphql_path: '/graphql#execute' unless Rails.env.production?
 
@@ -11,6 +17,7 @@ Rails.application.routes.draw do
     end
 
     resources :projects, only: %i[index show update destroy create] do
+      resource :share, only: %i[create], controller: 'projects/share'
       resource :remix, only: %i[create], controller: 'projects/remixes'
       resource :images, only: %i[create], controller: 'projects/images'
     end
