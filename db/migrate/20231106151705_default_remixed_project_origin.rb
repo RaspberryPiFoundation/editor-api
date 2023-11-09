@@ -7,14 +7,10 @@ class DefaultRemixedProjectOrigin < ActiveRecord::Migration[7.0]
     elsif Rails.env.production?
       remix_origin = 'editor.raspberrypi.org'
     end
-    Project.find_each do |project|
-      project.update_attribute(:remix_origin, remix_origin) unless project.remixed_from_id.nil?
-    end
+    Project.where.not(remixed_from_id: nil).update(remix_origin: remix_origin)
   end
 
   def down
-    Project.find_each do |project|
-      project.update_attribute(:remix_origin, nil)
-    end
+    Project.update(remix_origin: nil)
   end
 end
