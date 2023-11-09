@@ -37,7 +37,7 @@ RSpec.describe 'Remix requests' do
       expect(response).to have_http_status(:not_found)
     end
 
-    context 'when project can not be saved' do
+    context 'when project cannot be saved' do
       before do
         stub_fetch_oauth_user_id(user_id)
         error_response = OperationResponse.new
