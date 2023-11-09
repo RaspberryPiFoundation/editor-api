@@ -6,11 +6,11 @@ module GraphqlQueryHelpers
   end
 
   def query_context
-    if defined? current_user_id
-      context = { current_user_id:, current_ability: Ability.new(current_user_id) }
-    else
-      context = { current_user_id: nil, current_ability: Ability.new(nil) }
-    end
+    context = if defined? current_user_id
+                { current_user_id:, current_ability: Ability.new(current_user_id) }
+              else
+                { current_user_id: nil, current_ability: Ability.new(nil) }
+              end
     if defined? remix_origin
       { **context, remix_origin: }
     else

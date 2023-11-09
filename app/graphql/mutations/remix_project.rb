@@ -13,11 +13,12 @@ module Mutations
       raise GraphQL::ExecutionError, 'You are not permitted to read this project' unless can_read?(original_project)
 
       params = {
-        name: input[:name] || original_project.name,
+        name: remix_name(input, original_project),
         identifier: original_project.identifier,
-        components: remix_components(input, original_project),
+        components: remix_components(input, original_project)
       }
-      response = Project::CreateRemix.call(params:, remix_origin: context[:remix_origin], user_id: context[:current_user_id],
+
+      response = Project::CreateRemix.call(params:, remix_origin:, user_id: context[:current_user_id],
                                            original_project:)
       raise GraphQL::ExecutionError, response[:error] unless response.success?
 
@@ -40,6 +41,14 @@ module Mutations
 
     def remix_components(input, original_project)
       input[:components]&.map(&:to_h) || original_project.components
+    end
+
+    def remix_origin
+      context[:remix_origin]
+    end
+
+    def remix_name(input, original_project)
+      input[:name] || original_project.name
     end
   end
 end
