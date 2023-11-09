@@ -15,9 +15,9 @@ module Mutations
       params = {
         name: input[:name] || original_project.name,
         identifier: original_project.identifier,
-        components: remix_components(input, original_project)
+        components: remix_components(input, original_project),
       }
-      response = Project::CreateRemix.call(params:, user_id: context[:current_user_id],
+      response = Project::CreateRemix.call(params:, remix_origin: context[:remix_origin], user_id: context[:current_user_id],
                                            original_project:)
       raise GraphQL::ExecutionError, response[:error] unless response.success?
 

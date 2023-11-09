@@ -7,9 +7,9 @@ module GraphqlQueryHelpers
 
   def query_context
     if defined? current_user_id
-      { current_user_id:, current_ability: Ability.new(current_user_id) }
+      { current_user_id:, current_ability: Ability.new(current_user_id), remix_origin: :remix_origin || nil }
     else
-      { current_user_id: nil, current_ability: Ability.new(nil) }
+      { current_user_id: nil, current_ability: Ability.new(nil), remix_origin: :remix_origin || nil }
     end
   end
 end

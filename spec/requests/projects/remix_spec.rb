@@ -18,7 +18,7 @@ RSpec.describe 'Remix requests' do
   end
 
   context 'when auth is correct' do
-    let(:headers) { { Authorization: 'dummy-token' } }
+    let(:headers) { { Authorization: 'dummy-token', Origin: 'editor.com' } }
 
     before do
       stub_fetch_oauth_user_id(user_id)
