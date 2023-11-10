@@ -8,7 +8,8 @@ module Api
       def create
         result = Project::CreateRemix.call(params: remix_params,
                                            user_id: current_user,
-                                           original_project: project)
+                                           original_project: project,
+                                           remix_origin: request.origin)
 
         if result.success?
           @project = result[:project]

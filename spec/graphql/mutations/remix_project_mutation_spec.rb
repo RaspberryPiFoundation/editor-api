@@ -18,6 +18,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   let(:project) { create(:project, :with_default_component, user_id: SecureRandom.uuid) }
   let(:project_id) { project.to_gid_param }
   let(:variables) { { id: project_id } }
+  let(:remix_origin) { 'editor.com' }
 
   before do
     project
@@ -73,6 +74,10 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
     it 'returns graphql id for remixed project' do
       expect(returned_gid).to eq Project.order(created_at: :asc).last.to_gid_param
+    end
+
+    it 'sets the remix origin' do
+      expect(remixed_project.remix_origin).to eq('editor.com')
     end
 
     context 'when name and components not specified' do

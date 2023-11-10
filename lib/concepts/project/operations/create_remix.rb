@@ -5,11 +5,11 @@ require 'operation_response'
 class Project
   class CreateRemix
     class << self
-      def call(params:, user_id:, original_project:)
+      def call(params:, user_id:, original_project:, remix_origin:)
         response = OperationResponse.new
 
-        validate_params(response, params, user_id, original_project)
-        remix_project(response, params, user_id, original_project) if response.success?
+        validate_params(response, params, user_id, original_project, remix_origin)
+        remix_project(response, params, user_id, original_project, remix_origin) if response.success?
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -19,19 +19,19 @@ class Project
 
       private
 
-      def validate_params(response, params, user_id, original_project)
-        valid = params[:identifier].present? && user_id.present? && original_project.present?
+      def validate_params(response, params, user_id, original_project, remix_origin)
+        valid = params[:identifier].present? && user_id.present? && original_project.present? && remix_origin.present?
         response[:error] = I18n.t('errors.project.remixing.invalid_params') unless valid
       end
 
-      def remix_project(response, params, user_id, original_project)
-        response[:project] = create_remix(original_project, params, user_id)
+      def remix_project(response, params, user_id, original_project, remix_origin)
+        response[:project] = create_remix(original_project, params, user_id, remix_origin)
         response[:project].save!
         response
       end
 
-      def create_remix(original_project, params, user_id)
-        remix = format_project(original_project, params, user_id)
+      def create_remix(original_project, params, user_id, remix_origin)
+        remix = format_project(original_project, params, user_id, remix_origin)
 
         original_project.images.each do |image|
           remix.images.attach(image.blob)
@@ -44,13 +44,14 @@ class Project
         remix
       end
 
-      def format_project(original_project, params, user_id)
+      def format_project(original_project, params, user_id, remix_origin)
         original_project.dup.tap do |proj|
           proj.identifier = PhraseIdentifier.generate
           proj.locale = nil
           proj.name = params[:name]
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
+          proj.remix_origin = remix_origin
         end
       end
     end

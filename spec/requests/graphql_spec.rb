@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'POST /graphql' do
   subject(:request) { post(graphql_path, as: :json, params:, headers:) }
 
-  let(:headers) { nil }
+  let(:headers) { { Origin: 'editor.com' } }
   let(:params) { nil }
 
   before do
@@ -58,7 +58,7 @@ RSpec.describe 'POST /graphql' do
   end
 
   context 'when an Authorization header is supplied' do
-    let(:headers) { { Authorization: token } }
+    let(:headers) { { Authorization: token, Origin: 'editor.com' } }
     let(:token) { '' }
 
     it_behaves_like 'an unidentified request'
@@ -84,6 +84,11 @@ RSpec.describe 'POST /graphql' do
         it 'sets the current_user_id in the context' do
           request
           expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user_id:)))
+        end
+
+        it 'sets the request origin from the headers' do
+          request
+          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(remix_origin: 'editor.com')))
         end
       end
     end
