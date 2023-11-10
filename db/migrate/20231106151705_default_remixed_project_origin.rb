@@ -2,7 +2,7 @@ class DefaultRemixedProjectOrigin < ActiveRecord::Migration[7.0]
   def up
     if Rails.env.development?
       remix_origin = 'http://localhost:3010'
-    elsif Rails.env.test?
+    elsif ENV.fetch('SENTRY_CURRENT_ENV') == 'staging'
       remix_origin = 'staging-editor.raspberrypi.org'
     elsif Rails.env.production?
       remix_origin = 'editor.raspberrypi.org'
