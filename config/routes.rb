@@ -11,7 +11,7 @@ Rails.application.routes.draw do
     end
 
     resources :projects, only: %i[index show update destroy create] do
-      resource :remix, only: %i[create], controller: 'projects/remixes'
+      resource :remix, only: %i[show create], controller: 'projects/remixes'
       resource :images, only: %i[create], controller: 'projects/images'
     end
 
