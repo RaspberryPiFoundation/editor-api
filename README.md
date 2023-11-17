@@ -53,10 +53,34 @@ docker-compose up
 #### Updating gems inside the container
 
 This can be done with the `bin/with-builder.sh` script:
+
 ```
 ./bin/with-builder.sh bundle update
 ```
+
 which should update the Gems in the container, without the need for rebuilding.
+
+#### Syncing the database from Production / Staging
+
+##### Prerequisites
+
+- You must have the [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli) installed
+- You must be added to the Heroku app `editor-api-production` to sync from the production database
+- You must be added to the Heroku app `editor-api-staging`, to sync from the staging database
+
+#### Syncing from PRODUCTION...
+
+| ... to ENV    | ... run this:                          |
+| ------------- | -------------------------------------- |
+| Local Dev Env | `./bin/db-sync/production-to-local.sh` |
+
+##### Syncing from STAGING...
+
+| ... to ENV    | ... run this:                       |
+| ------------- | ----------------------------------- |
+| Local Dev Env | `./bin/db-sync/staging-to-local.sh` |
+
+The `*-to-local.sh` scripts will backup the database in your local terminal, then run an instance of the Docker container and run commands to populate your development DB with that data - see [./bin/db-sync/load-local-db.sh](./bin/db-sync/load-local-db.sh)
 
 ### CORS Allowed Origins
 
