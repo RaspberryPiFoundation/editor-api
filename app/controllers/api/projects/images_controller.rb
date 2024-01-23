@@ -5,6 +5,11 @@ module Api
     class ImagesController < ApiController
       before_action :authorize_user
 
+      def show
+        @project = Project.find_by!(identifier: params[:project_id])
+        render '/api/projects/images', formats: [:json]
+      end
+
       def create
         @project = Project.find_by!(identifier: params[:project_id])
         authorize! :update, @project
