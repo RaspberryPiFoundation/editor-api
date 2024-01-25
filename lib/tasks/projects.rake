@@ -4,7 +4,7 @@ require 'yaml'
 require 'project_importer'
 
 CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
-IMAGE_FORMATS = ['.png', '.jpg', '.jpeg'].freeze
+IMAGE_FORMATS = ['.png', '.jpg', '.jpeg', '.webp'].freeze
 
 namespace :projects do
   desc 'Import starter projects'
