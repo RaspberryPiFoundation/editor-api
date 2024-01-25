@@ -7,6 +7,7 @@ module Api
 
       def show
         @project = Project.find_by!(identifier: params[:project_id])
+        authorize! :show, @project
         render '/api/projects/images', formats: [:json]
       end
 
