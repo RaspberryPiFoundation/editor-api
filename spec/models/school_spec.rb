@@ -3,6 +3,15 @@
 require 'rails_helper'
 
 RSpec.describe School do
+  describe 'associations' do
+    it 'has many classes' do
+      school = create(:school)
+      school_class = create(:school_class, school: school)
+
+      expect(school.classes).to eq [school_class]
+    end
+  end
+
   describe 'validations' do
     subject(:school) { build(:school) }
 
