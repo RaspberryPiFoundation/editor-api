@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_01_160923) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_01_165749) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -137,6 +137,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_160923) do
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
+  end
+
+  create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "school_id", null: false
+    t.uuid "teacher_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
+    t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
