@@ -5,10 +5,21 @@ require 'rails_helper'
 RSpec.describe School do
   describe 'associations' do
     it 'has many classes' do
-      school = create(:school)
-      school_class = create(:school_class, school: school)
+      school = create(:school, classes: [build(:school_class), build(:school_class)])
+      expect(school.classes.size).to eq(2)
+    end
 
-      expect(school.classes).to eq [school_class]
+    context 'when a school is destroyed' do
+      let!(:school_class) { create(:school_class, members: [build(:class_member)]) }
+      let!(:school) { create(:school, classes: [school_class]) }
+
+      it 'also destroys school classes to avoid making them invalid' do
+        expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
+      end
+
+      it 'also destroys class members to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassMember, :count).by(-1)
+      end
     end
   end
 
