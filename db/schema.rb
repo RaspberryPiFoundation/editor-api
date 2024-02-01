@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_01_165749) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -42,6 +42,16 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_165749) do
     t.uuid "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "class_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "school_class_id", null: false
+    t.uuid "student_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_class_id", "student_id"], name: "index_class_members_on_school_class_id_and_student_id", unique: true
+    t.index ["school_class_id"], name: "index_class_members_on_school_class_id"
+    t.index ["student_id"], name: "index_class_members_on_student_id"
   end
 
   create_table "components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
