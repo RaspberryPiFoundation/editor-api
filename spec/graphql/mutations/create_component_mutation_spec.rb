@@ -22,24 +22,26 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     }
   end
 
-  it { expect(mutation).to be_a_valid_graphql_query }
-
-  context 'when unauthenticated' do
+  shared_examples 'a no-op' do |error_code:|
     it 'does not create a component' do
       expect { result }.not_to change(Component, :count)
     end
 
     it 'returns an error' do
-      expect(result.dig('errors', 0, 'message')).not_to be_blank
+      expect(result.dig('errors', 0, 'extensions', 'code')).to eq error_code
     end
+  end
+
+  it { expect(mutation).to be_a_valid_graphql_query }
+
+  context 'when unauthenticated' do
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when the graphql context is unset' do
     let(:graphql_context) { nil }
 
-    it 'does not create a component' do
-      expect { result }.not_to change(Component, :count)
-    end
+    it_behaves_like 'a no-op', error_code: 'UNAUTHORIZED'
   end
 
   context 'when authenticated' do
@@ -50,20 +52,25 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
       expect(result.dig('data', 'createComponent', 'component', 'id')).not_to be_nil
     end
 
+    context 'when the user is not allowed to update components' do
+      before do
+        ability = instance_double(Ability, can?: false)
+        allow(Ability).to receive(:new).and_return(ability)
+      end
+
+      it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
+    end
+
     context 'when project id doesnt exist' do
       let(:project_id) { 'dummy-id' }
 
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'message')).not_to be_blank
-      end
+      it_behaves_like 'a no-op', error_code: 'NOT_FOUND'
     end
 
     context 'when project id exists but belongs to someone else' do
       let(:project) { create(:project) }
 
-      it 'returns an error' do
-        expect(result.dig('errors', 0, 'message')).not_to be_blank
-      end
+      it_behaves_like 'a no-op', error_code: 'FORBIDDEN'
     end
 
     context 'when project component fails to save' do

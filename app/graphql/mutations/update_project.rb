@@ -10,10 +10,10 @@ module Mutations
 
     def resolve(**input)
       project = GlobalID.find(input[:id])
-      raise GraphQL::ExecutionError, 'Project not found' unless project
+      raise EditorApiError::NotFound, 'Project not found' unless project
 
       unless context[:current_ability].can?(:update, project)
-        raise GraphQL::ExecutionError,
+        raise EditorApiError::Forbidden,
               'You are not permitted to update this project'
       end
 
@@ -22,10 +22,15 @@ module Mutations
       raise GraphQL::ExecutionError, project.errors.full_messages.join(', ')
     end
 
-    def ready?(**_args)
+    def ready?(...)
+      unless context[:current_user_id]
+        raise EditorApiError::Unauthorized,
+              'You must be authenticated to update a project'
+      end
+
       return true if context[:current_ability]&.can?(:update, Project, user_id: context[:current_user_id])
 
-      raise GraphQL::ExecutionError, 'You are not permitted to update a project'
+      raise EditorApiError::Forbidden, 'You are not permitted to update a project'
     end
   end
 end
