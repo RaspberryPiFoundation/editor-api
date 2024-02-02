@@ -8,7 +8,8 @@ class HydraAdminApi
 
   # The "bypass" user ID from
   # https://github.com/RaspberryPiFoundation/rpi-auth/blob/main/lib/rpi_auth/engine.rb#L17
-  BYPASS_AUTH_USER_ID = 'b6301f34-b970-4d4f-8314-f877bad8b150'
+  BYPASS_AUTH         = ENV.fetch('BYPASS_AUTH', nil)
+  BYPASS_AUTH_USER_ID = ENV.fetch('BYPASS_AUTH_USER_ID', 'b6301f34-b970-4d4f-8314-f877bad8b150')
 
   class << self
     def fetch_oauth_user_id(...)
@@ -19,7 +20,7 @@ class HydraAdminApi
   def fetch_oauth_user_id(token:)
     return nil if token.blank?
 
-    return BYPASS_AUTH_USER_ID if ENV.fetch('BYPASS_AUTH', nil) == 'yes'
+    return BYPASS_AUTH_USER_ID if BYPASS_AUTH == 'yes'
 
     response = post('oauth2/introspect', { token: }, { apikey: ADMIN_API_KEY })
     response.body['sub']
