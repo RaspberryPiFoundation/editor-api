@@ -8,6 +8,7 @@ ruby '~> 3.2.0'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
+gem 'countries'
 gem 'faraday'
 gem 'github_webhook', '~> 1.4'
 gem 'globalid'
