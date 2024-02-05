@@ -7,7 +7,10 @@ RSpec.describe School::Create, type: :unit do
     {
       name: 'Test School',
       organisation_id: '00000000-00000000-00000000-00000000',
-      owner_id: '11111111-11111111-11111111-11111111'
+      owner_id: '11111111-11111111-11111111-11111111',
+      address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
+      municipality: 'Greater London',
+      country_code: 'GB'
     }
   end
 

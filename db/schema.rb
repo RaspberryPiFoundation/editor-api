@@ -163,6 +163,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
     t.uuid "organisation_id", null: false
     t.uuid "owner_id", null: false
     t.string "name", null: false
+    t.string "address_line_1", null: false
+    t.string "address_line_2"
+    t.string "municipality", null: false
+    t.string "administrative_area"
+    t.string "postal_code"
+    t.string "country_code", null: false
     t.datetime "verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

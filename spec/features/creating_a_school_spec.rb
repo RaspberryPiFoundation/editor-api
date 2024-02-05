@@ -9,7 +9,10 @@ RSpec.describe 'Creating a school', type: :request do
   let(:params) do
     {
       name: 'Test School',
-      organisation_id: '00000000-00000000-00000000-00000000'
+      organisation_id: '00000000-00000000-00000000-00000000',
+      address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
+      municipality: 'Greater London',
+      country_code: 'GB'
     }
   end
 

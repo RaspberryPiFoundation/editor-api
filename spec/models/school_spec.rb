@@ -67,5 +67,20 @@ RSpec.describe School do
       school.name = ' '
       expect(school).to be_invalid
     end
+
+    it 'requires an address_line_1' do
+      school.address_line_1 = ' '
+      expect(school).to be_invalid
+    end
+
+    it 'requires a municipality' do
+      school.municipality = ' '
+      expect(school).to be_invalid
+    end
+
+    it 'requires a country_code' do
+      school.country_code = ' '
+      expect(school).to be_invalid
+    end
   end
 end
