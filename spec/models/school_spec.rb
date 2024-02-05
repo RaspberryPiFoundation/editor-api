@@ -82,5 +82,10 @@ RSpec.describe School do
       school.country_code = ' '
       expect(school).to be_invalid
     end
+
+    it "requires an 'ISO 3166-1 alpha-2' country_code" do
+      school.country_code = 'GBR'
+      expect(school).to be_invalid
+    end
   end
 end
