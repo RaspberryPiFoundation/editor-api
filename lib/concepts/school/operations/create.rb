@@ -10,7 +10,8 @@ class School
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = 'Error creating school'
+        errors = response[:school].errors.full_messages.join(',')
+        response[:error] = "Error creating school: #{errors}"
         response
       end
 
