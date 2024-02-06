@@ -12,7 +12,7 @@ module Api
         @school = result[:school]
         render :show, formats: [:json]
       else
-        render json: { error: result[:error] }, status: :internal_server_error
+        render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
 
