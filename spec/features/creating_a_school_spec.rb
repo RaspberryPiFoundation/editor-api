@@ -8,11 +8,13 @@ RSpec.describe 'Creating a school', type: :request do
 
   let(:params) do
     {
-      name: 'Test School',
-      organisation_id: '00000000-00000000-00000000-00000000',
-      address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
-      municipality: 'Greater London',
-      country_code: 'GB'
+      school: {
+        name: 'Test School',
+        organisation_id: '00000000-00000000-00000000-00000000',
+        address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
+        municipality: 'Greater London',
+        country_code: 'GB'
+      }
     }
   end
 
@@ -45,7 +47,7 @@ RSpec.describe 'Creating a school', type: :request do
   end
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
-    post('/api/schools', headers:, params: { name: ' ' })
+    post('/api/schools', headers:, params: { school: { name: ' ' } })
     expect(response).to have_http_status(:unprocessable_entity)
   end
 
