@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'yaml'
-require 'project_importer'
 
 CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
 IMAGE_FORMATS = ['.png', '.jpg', '.jpeg', '.webp'].freeze

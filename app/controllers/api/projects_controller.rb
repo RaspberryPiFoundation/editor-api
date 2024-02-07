@@ -21,7 +21,7 @@ module Api
     end
 
     def create
-      project_hash = project_params.merge(user_id: current_user)
+      project_hash = project_params.merge(user_id: current_user&.id)
       result = Project::Create.call(project_hash:)
 
       if result.success?
@@ -33,7 +33,7 @@ module Api
     end
 
     def update
-      update_hash = project_params.merge(user_id: current_user)
+      update_hash = project_params.merge(user_id: current_user&.id)
       result = Project::Update.call(project: @project, update_hash:)
 
       if result.success?
@@ -56,7 +56,7 @@ module Api
     end
 
     def load_projects
-      @projects = Project.where(user_id: current_user).order(updated_at: :desc)
+      @projects = Project.where(user_id: current_user&.id).order(updated_at: :desc)
     end
 
     def project_params

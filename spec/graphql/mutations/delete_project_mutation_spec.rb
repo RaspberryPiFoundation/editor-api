@@ -12,7 +12,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let!(:project) { create(:project, user_id: SecureRandom.uuid) }
+    let!(:project) { create(:project, user_id: stubbed_user_id) }
     let(:project_id) { project.to_gid_param }
 
     context 'when unauthenticated' do
@@ -34,7 +34,11 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user_id) { project.user_id }
+      let(:current_user) { stubbed_user }
+
+      before do
+        stub_fetch_oauth_user
+      end
 
       it 'deletes the project' do
         result
@@ -50,7 +54,9 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       end
 
       context 'with another users project' do
-        let(:current_user_id) { SecureRandom.uuid }
+        before do
+          stub_fetch_oauth_user(user_index: 1)
+        end
 
         it 'returns an error' do
           expect(result.dig('errors', 0, 'message')).to match(/not permitted/)

@@ -43,8 +43,12 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
   end
 
   context 'when authenticated' do
-    let(:current_user_id) { SecureRandom.uuid }
-    let(:project) { create(:project, user_id: current_user_id) }
+    let(:current_user) { stubbed_user }
+    let(:project) { create(:project, user_id: stubbed_user_id) }
+
+    before do
+      stub_fetch_oauth_user
+    end
 
     it 'returns the component ID' do
       expect(result.dig('data', 'createComponent', 'component', 'id')).not_to be_nil

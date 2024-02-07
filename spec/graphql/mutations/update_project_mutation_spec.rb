@@ -20,12 +20,13 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let(:project) { create(:project, user_id: SecureRandom.uuid, project_type: :python) }
+    let(:project) { create(:project, user_id: stubbed_user_id, project_type: :python) }
     let(:project_id) { project.to_gid_param }
 
     before do
       # Instantiate project
       project
+      stub_fetch_oauth_user
     end
 
     context 'when unauthenticated' do
@@ -47,7 +48,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user_id) { project.user_id }
+      let(:current_user) { stubbed_user }
 
       it 'updates the project name' do
         expect { result }.to change { project.reload.name }.from(project.name).to(variables.dig(:project, :name))
@@ -66,7 +67,9 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
       end
 
       context 'with another users project' do
-        let(:current_user_id) { SecureRandom.uuid }
+        before do
+          stub_fetch_oauth_user(user_index: 1)
+        end
 
         it 'returns an error' do
           expect(result.dig('errors', 0, 'message')).to match(/not permitted/)

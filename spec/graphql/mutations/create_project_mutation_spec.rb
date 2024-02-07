@@ -42,9 +42,12 @@ RSpec.describe 'mutation CreateProject() { ... }' do
   end
 
   context 'when authenticated' do
-    let(:current_user_id) { SecureRandom.uuid }
+    let(:current_user) { stubbed_user }
 
-    before { mock_phrase_generation }
+    before do
+      stub_fetch_oauth_user
+      mock_phrase_generation
+    end
 
     it 'returns the project ID' do
       expect(result.dig('data', 'createProject', 'project', 'id')).to eq Project.first.to_gid_param

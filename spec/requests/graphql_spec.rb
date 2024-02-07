@@ -27,9 +27,9 @@ RSpec.describe 'POST /graphql' do
   end
 
   shared_examples 'an unidentified request' do
-    it 'sets the current_user_id as nil in the context' do
+    it 'sets the current_user as nil in the context' do
       request
-      expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user_id: nil)))
+      expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user: nil)))
     end
   end
 
@@ -68,22 +68,20 @@ RSpec.describe 'POST /graphql' do
 
       context 'when the token is invalid' do
         before do
-          stub_fetch_oauth_user_id(nil)
+          stub_fetch_oauth_user(user_index: nil)
         end
 
         it_behaves_like 'an unidentified request'
       end
 
       context 'when the token is valid' do
-        let(:current_user_id) { SecureRandom.uuid }
-
         before do
-          stub_fetch_oauth_user_id(current_user_id)
+          stub_fetch_oauth_user
         end
 
-        it 'sets the current_user_id in the context' do
+        it 'sets the current_user in the context' do
           request
-          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user_id:)))
+          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user: stubbed_user)))
         end
 
         it 'sets the request origin from the headers' do

@@ -26,7 +26,7 @@ module Mutations
     end
 
     def ready?(**_args)
-      if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user_id]))
+      if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user]&.id))
         return true
       end
 
