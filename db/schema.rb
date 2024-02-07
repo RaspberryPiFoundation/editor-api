@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_10_11_102634) do
+ActiveRecord::Schema[7.0].define(version: 2023_11_06_151705) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -134,6 +134,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_10_11_102634) do
     t.uuid "remixed_from_id"
     t.string "locale"
     t.boolean "is_live"
+    t.string "remix_origin"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"

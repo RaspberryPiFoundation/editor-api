@@ -69,6 +69,7 @@ Rails.application.configure do
 
   # Allow smee requests
   config.hosts << 'smee.io'
+  config.hosts << 'editor-api.rpfdev.com'
 
   # bullet - N+1
   config.after_initialize do

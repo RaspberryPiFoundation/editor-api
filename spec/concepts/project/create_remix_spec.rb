@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Project::CreateRemix, type: :unit do
-  subject(:create_remix) { described_class.call(params: remix_params, user_id:, original_project:) }
+  subject(:create_remix) { described_class.call(params: remix_params, user_id:, original_project:, remix_origin:) }
 
+  let(:remix_origin) { 'editor.com' }
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let!(:original_project) { create(:project, :with_components, :with_attached_image) }
   let(:remix_params) do
@@ -68,6 +69,11 @@ RSpec.describe Project::CreateRemix, type: :unit do
       expect(remixed_attrs).to eq(original_attrs)
     end
 
+    it 'sets remix origin' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.remix_origin).to eq(remix_origin)
+    end
+
     it 'links remix to attached images' do
       remixed_project = create_remix[:project]
       expect(remixed_project.images.length).to eq(original_project.images.length)
@@ -127,7 +133,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
     end
 
     context 'when original project is not present' do
-      subject(:create_remix) { described_class.call(params: remix_params, user_id:, original_project: nil) }
+      subject(:create_remix) { described_class.call(params: remix_params, user_id:, original_project: nil, remix_origin:) }
 
       it 'returns failure' do
         result = create_remix

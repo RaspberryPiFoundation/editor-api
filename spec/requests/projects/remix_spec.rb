@@ -18,52 +18,82 @@ RSpec.describe 'Remix requests' do
   end
 
   context 'when auth is correct' do
-    let(:headers) { { Authorization: 'dummy-token' } }
+    let(:headers) { { Authorization: 'dummy-token', Origin: 'editor.com' } }
 
     before do
       stub_fetch_oauth_user_id(user_id)
     end
 
-    it 'returns success response' do
-      post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
-
-      expect(response).to have_http_status(:ok)
-    end
-
-    it 'returns 404 response if invalid project' do
-      project_params[:identifier] = 'no-such-project'
-      post('/api/projects/no-such-project/remix', params: { project: project_params }, headers:)
-
-      expect(response).to have_http_status(:not_found)
-    end
-
-    context 'when project can not be saved' do
+    describe '#show' do
       before do
-        stub_fetch_oauth_user_id(user_id)
-        error_response = OperationResponse.new
-        error_response[:error] = 'Something went wrong'
-        allow(Project::CreateRemix).to receive(:call).and_return(error_response)
+        create(:project, remixed_from_id: original_project.id, user_id:)
       end
 
-      it 'returns 400' do
-        post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+      it 'returns success response' do
+        get("/api/projects/#{original_project.identifier}/remix", headers:)
 
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:ok)
       end
 
-      it 'returns error message' do
+      it 'returns 404 response if invalid project' do
+        get('/api/projects/no-such-project/remix', headers:)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    describe '#create' do
+      it 'returns success response' do
         post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
 
-        expect(response.body).to eq({ error: 'Something went wrong' }.to_json)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns 404 response if invalid project' do
+        project_params[:identifier] = 'no-such-project'
+        post('/api/projects/no-such-project/remix', params: { project: project_params }, headers:)
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      context 'when project cannot be saved' do
+        before do
+          stub_fetch_oauth_user_id(user_id)
+          error_response = OperationResponse.new
+          error_response[:error] = 'Something went wrong'
+          allow(Project::CreateRemix).to receive(:call).and_return(error_response)
+        end
+
+        it 'returns 400' do
+          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+
+          expect(response).to have_http_status(:bad_request)
+        end
+
+        it 'returns error message' do
+          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+
+          expect(response.body).to eq({ error: 'Something went wrong' }.to_json)
+        end
       end
     end
   end
 
   context 'when auth is invalid' do
-    it 'returns unauthorized' do
-      post "/api/projects/#{original_project.identifier}/remix"
+    describe '#show' do
+      it 'returns unauthorized' do
+        get "/api/projects/#{original_project.identifier}/remix"
 
-      expect(response).to have_http_status(:unauthorized)
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    describe '#create' do
+      it 'returns unauthorized' do
+        post "/api/projects/#{original_project.identifier}/remix"
+
+        expect(response).to have_http_status(:unauthorized)
+      end
     end
   end
 end

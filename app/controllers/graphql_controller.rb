@@ -22,7 +22,7 @@ class GraphqlController < ApiController
   end
 
   def context
-    @context ||= { current_user_id:, current_ability: Ability.new(current_user_id) }
+    @context ||= { current_user_id:, current_ability: Ability.new(current_user_id), remix_origin: request.origin }
   end
 
   # Handle variables in form data, JSON body, or a blank value
