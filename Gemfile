@@ -6,6 +6,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 ruby '~> 3.2.0'
 
 gem 'administrate', '~> 0.16.0'
+gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
@@ -15,6 +16,7 @@ gem 'globalid'
 gem 'good_job', '~> 3.12'
 gem 'graphql'
 gem 'graphql-client'
+gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
@@ -23,6 +25,7 @@ gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.6'
 gem 'rack-cors'
 gem 'rails', '~> 7.0.0'
+gem 'rpi_auth', git: 'https://github.com/RaspberryPiFoundation/rpi-auth.git', tag: 'v3.5.0'
 gem 'scout_apm'
 gem 'sentry-rails', '~> 5.5.0'
 

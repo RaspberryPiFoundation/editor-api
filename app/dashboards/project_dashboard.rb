@@ -11,13 +11,19 @@ class ProjectDashboard < Administrate::BaseDashboard
     id: Field::String,
     components: Field::HasMany,
     identifier: Field::String,
+    images: Field::ActiveStorage.with_options(
+      direct_upload: true,
+      destroy_url: proc do |namespace, resource, attachment|
+        [:images_admin_project, { image_id: attachment.id }]
+      end
+    ),
     is_live: Field::Boolean,
     is_public: Field::Boolean,
     locale: Field::String,
     name: Field::String,
     parent: Field::BelongsTo,
     project_type: Field::String,
-    project_url: Field::String,
+    # project_url: Field::String,
     remixed_from_id: Field::String,
     remixes: Field::HasMany,
     user_id: Field::String,
@@ -49,7 +55,7 @@ class ProjectDashboard < Administrate::BaseDashboard
     name
     parent
     project_type
-    project_url
+    images
     is_live
     is_public
     remixed_from_id
@@ -63,16 +69,14 @@ class ProjectDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
   FORM_ATTRIBUTES = %i[
-    components
     identifier
     locale
     name
     is_live
-    parent
     project_type
     remixed_from_id
-    remixes
     user_id
+    images
   ].freeze
 
   # COLLECTION_FILTERS
@@ -93,4 +97,8 @@ class ProjectDashboard < Administrate::BaseDashboard
   def display_resource(project)
     "Project ##{project.name}"
   end
+
+  # def permitted_attributes
+  #   super + [:images => []]
+  # end
 end

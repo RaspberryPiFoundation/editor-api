@@ -1,3 +1,13 @@
+GIT
+  remote: https://github.com/RaspberryPiFoundation/rpi-auth.git
+  revision: 1da2cf4709cb60e7223b1bcb20cfdcaa4a0def23
+  tag: v3.5.0
+  specs:
+    rpi_auth (3.5.0)
+      omniauth-rails_csrf_protection (~> 1.0.0)
+      omniauth_openid_connect (~> 0.7.1)
+      rails (>= 6.1.4)
+
 GEM
   remote: https://rubygems.org/
   specs:
@@ -78,7 +88,12 @@ GEM
       momentjs-rails (~> 2.8)
       sassc-rails (~> 2.1)
       selectize-rails (~> 0.6)
+    administrate-field-active_storage (1.0.1)
+      administrate (>= 0.2.2)
+      rails (>= 7.0)
+    aes_key_wrap (1.1.0)
     ast (2.4.2)
+    attr_required (1.0.2)
     aws-eventstream (1.2.0)
     aws-partitions (1.718.0)
     aws-sdk-core (3.170.0)
@@ -95,6 +110,8 @@ GEM
       aws-sigv4 (~> 1.4)
     aws-sigv4 (1.5.2)
       aws-eventstream (~> 1, >= 1.0.2)
+    base64 (0.2.0)
+    bindata (2.4.15)
     bootsnap (1.16.0)
       msgpack (~> 1.2)
     builder (3.2.4)
@@ -118,6 +135,8 @@ GEM
     dotenv-rails (2.8.1)
       dotenv (= 2.8.1)
       railties (>= 3.2)
+    email_validator (2.2.4)
+      activemodel
     erubi (1.12.0)
     et-orbi (1.2.7)
       tzinfo
@@ -131,6 +150,8 @@ GEM
     faraday (2.7.4)
       faraday-net_http (>= 2.0, < 3.1)
       ruby2_keywords (>= 0.0.4)
+    faraday-follow_redirects (0.3.0)
+      faraday (>= 1, < 3)
     faraday-net_http (3.0.2)
     ffi (1.16.3)
     fugit (1.8.1)
@@ -158,8 +179,12 @@ GEM
       activesupport (>= 3.0)
       graphql
     hashdiff (1.0.1)
+    hashie (5.0.0)
     i18n (1.12.0)
       concurrent-ruby (~> 1.0)
+    image_processing (1.12.2)
+      mini_magick (>= 4.9.5, < 5)
+      ruby-vips (>= 2.0.17, < 3)
     importmap-rails (1.1.5)
       actionpack (>= 6.0.0)
       railties (>= 6.0.0)
@@ -172,6 +197,13 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.6.3)
+    json-jwt (1.16.5)
+      activesupport (>= 4.2)
+      aes_key_wrap
+      base64
+      bindata
+      faraday (~> 2.0)
+      faraday-follow_redirects
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
       kaminari-actionview (= 1.2.2)
@@ -194,6 +226,7 @@ GEM
       net-smtp
     marcel (1.0.2)
     method_source (1.0.0)
+    mini_magick (4.12.0)
     mini_mime (1.1.2)
     minitest (5.17.0)
     momentjs-rails (2.29.4.1)
@@ -213,10 +246,33 @@ GEM
       racc (~> 1.4)
     nokogiri (1.14.2-x86_64-linux)
       racc (~> 1.4)
+    omniauth (2.1.2)
+      hashie (>= 3.4.6)
+      rack (>= 2.2.3)
+      rack-protection
+    omniauth-rails_csrf_protection (1.0.1)
+      actionpack (>= 4.2)
+      omniauth (~> 2.0)
+    omniauth_openid_connect (0.7.1)
+      omniauth (>= 1.9, < 3)
+      openid_connect (~> 2.2)
     open-uri (0.3.0)
       stringio
       time
       uri
+    openid_connect (2.3.0)
+      activemodel
+      attr_required (>= 1.0.0)
+      email_validator
+      faraday (~> 2.0)
+      faraday-follow_redirects
+      json-jwt (>= 1.16)
+      mail
+      rack-oauth2 (~> 2.2)
+      swd (~> 2.0)
+      tzinfo
+      validate_url
+      webfinger (~> 2.0)
     parallel (1.22.1)
     parser (3.2.1.0)
       ast (~> 2.4.1)
@@ -235,6 +291,16 @@ GEM
     rack (2.2.6.2)
     rack-cors (2.0.0)
       rack (>= 2.0.0)
+    rack-oauth2 (2.2.1)
+      activesupport
+      attr_required
+      faraday (~> 2.0)
+      faraday-follow_redirects
+      json-jwt (>= 1.11.0)
+      rack (>= 2.1.0)
+    rack-protection (3.2.0)
+      base64 (>= 0.1.0)
+      rack (~> 2.2, >= 2.2.4)
     rack-test (2.0.2)
       rack (>= 1.3)
     rails (7.0.4.2)
@@ -314,6 +380,8 @@ GEM
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
     ruby-progressbar (1.11.0)
+    ruby-vips (2.2.0)
+      ffi (~> 1.12)
     ruby2_keywords (0.0.5)
     sassc (2.4.0)
       ffi (~> 1.9)
@@ -347,6 +415,11 @@ GEM
       activesupport (>= 5.2)
       sprockets (>= 3.0.0)
     stringio (3.0.5)
+    swd (2.0.3)
+      activesupport (>= 3)
+      attr_required (>= 0.0.5)
+      faraday (~> 2.0)
+      faraday-follow_redirects
     thor (1.2.1)
     tilt (2.3.0)
     time (0.2.1)
@@ -357,6 +430,13 @@ GEM
     unicode-display_width (2.4.2)
     uniform_notifier (1.16.0)
     uri (0.12.0)
+    validate_url (1.0.15)
+      activemodel (>= 3.0.0)
+      public_suffix
+    webfinger (2.1.3)
+      activesupport
+      faraday (~> 2.0)
+      faraday-follow_redirects
     webmock (3.18.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
@@ -373,6 +453,7 @@ PLATFORMS
 
 DEPENDENCIES
   administrate (~> 0.16.0)
+  administrate-field-active_storage
   aws-sdk-s3
   bootsnap
   bullet
@@ -388,6 +469,7 @@ DEPENDENCIES
   graphiql-rails
   graphql
   graphql-client
+  image_processing
   importmap-rails
   jbuilder
   kaminari
@@ -397,6 +479,7 @@ DEPENDENCIES
   puma (~> 5.6)
   rack-cors
   rails (~> 7.0.0)
+  rpi_auth!
   rspec
   rspec-rails
   rspec_junit_formatter

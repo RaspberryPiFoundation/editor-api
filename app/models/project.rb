@@ -18,9 +18,9 @@ class Project < ApplicationRecord
   scope :internal_projects, -> { where(user_id: nil) }
   scope :pending_projects, -> { where.not(user_id: nil, is_live: true) }
 
-  def project_url
-    "#{ENV.fetch('EDITOR_UI_URL')}/#{self.locale || 'en'}/projects/#{self.identifier}"
-  end
+  # def project_url
+  #   "#{ENV.fetch('EDITOR_UI_URL')}/#{self.locale || 'en'}/projects/#{self.identifier}"
+  # end
 
   def is_public
     if self.user_id.nil?
@@ -41,5 +41,9 @@ class Project < ApplicationRecord
     return if Project.where(identifier: self.identifier).where.not(user_id:).empty?
 
     errors.add(:identifier, "can't be taken by another user")
+  end
+
+  def permitted_attributes
+    super + [:images => []]
   end
 end
