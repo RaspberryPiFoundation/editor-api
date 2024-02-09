@@ -15,19 +15,21 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   }
   '
   end
-  let(:project) { create(:project, :with_default_component, user_id: SecureRandom.uuid) }
+  let(:current_user) { stubbed_user }
+  let(:project) { create(:project, :with_default_component, user_id: stubbed_user_id) }
   let(:project_id) { project.to_gid_param }
   let(:variables) { { id: project_id } }
   let(:remix_origin) { 'editor.com' }
 
   before do
     project
+    stub_fetch_oauth_user
   end
 
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'when unauthenticated' do
-    let(:current_user_id) { nil }
+    let(:current_user) { nil }
 
     it 'does not create a project' do
       expect { result }.not_to change(Project, :count)
@@ -40,7 +42,6 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   context 'when original project not found' do
     let(:project_id) { SecureRandom.uuid }
-    let(:current_user_id) { SecureRandom.uuid }
 
     it 'returns "not found" error' do
       expect(result.dig('errors', 0, 'message')).to match(/not found/)
@@ -52,7 +53,9 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   end
 
   context 'when user cannot view original project' do
-    let(:current_user_id) { SecureRandom.uuid }
+    before do
+      stub_fetch_oauth_user(user_index: 1)
+    end
 
     it 'returns "not permitted to read" error' do
       expect(result.dig('errors', 0, 'message')).to match(/not permitted to read/)
@@ -64,7 +67,6 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   end
 
   context 'when authenticated and project exists', :sample_words do
-    let(:current_user_id) { project.user_id }
     let(:returned_gid) { result.dig('data', 'remixProject', 'project', 'id') }
     let(:remixed_project) { GlobalID.find(returned_gid) }
 

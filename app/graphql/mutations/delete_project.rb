@@ -23,7 +23,7 @@ module Mutations
     end
 
     def ready?(...)
-      return true if context[:current_ability]&.can?(:destroy, Project, user_id: context[:current_user_id])
+      return true if context[:current_ability]&.can?(:destroy, Project, user_id: context[:current_user]&.id)
 
       raise GraphQL::ExecutionError, 'You are not permitted to delete projects'
     end

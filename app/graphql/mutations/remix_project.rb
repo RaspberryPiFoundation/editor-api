@@ -7,6 +7,7 @@ module Mutations
 
     field :project, Types::ProjectType, description: 'The project that has been created'
 
+    # rubocop:disable Metrics/AbcSize
     def resolve(**input)
       original_project = GlobalID.find(input[:id])
       raise GraphQL::ExecutionError, 'Project not found' unless original_project
@@ -18,12 +19,18 @@ module Mutations
         components: remix_components(input, original_project)
       }
 
-      response = Project::CreateRemix.call(params:, remix_origin:, user_id: context[:current_user_id],
-                                           original_project:)
+      response = Project::CreateRemix.call(
+        params:,
+        remix_origin:,
+        user_id: context[:current_user]&.id,
+        original_project:
+      )
+
       raise GraphQL::ExecutionError, response[:error] unless response.success?
 
       { project: response[:project] }
     end
+    # rubocop:enable Metrics/AbcSize
 
     def ready?(**_args)
       return true if can_create_project?
@@ -32,7 +39,7 @@ module Mutations
     end
 
     def can_create_project?
-      context[:current_ability]&.can?(:create, Project, user_id: context[:current_user_id])
+      context[:current_ability]&.can?(:create, Project, user_id: context[:current_user]&.id)
     end
 
     def can_read?(original_project)

@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'open-uri'
-require 'project_importer'
 require 'github_api'
 
 class UploadJob < ApplicationJob

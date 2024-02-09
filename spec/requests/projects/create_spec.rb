@@ -3,15 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe 'Create project requests' do
-  let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let(:project) { create(:project, user_id:) }
+  let(:project) { create(:project, user_id: stubbed_user_id) }
 
   context 'when auth is correct' do
     let(:headers) { { Authorization: 'dummy-token' } }
 
     context 'when creating project is successful' do
       before do
-        stub_fetch_oauth_user_id(user_id)
+        stub_fetch_oauth_user
 
         response = OperationResponse.new
         response[:project] = project
@@ -27,7 +26,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project fails' do
       before do
-        stub_fetch_oauth_user_id(user_id)
+        stub_fetch_oauth_user
 
         response = OperationResponse.new
         response[:error] = 'Error creating project'

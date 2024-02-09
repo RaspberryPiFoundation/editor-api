@@ -4,11 +4,9 @@ require 'rails_helper'
 
 RSpec.describe 'Project update requests' do
   let(:headers) { { Authorization: 'dummy-token' } }
-  let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let(:project) { create(:project, user_id:, locale: nil) }
 
   context 'when authed user is project creator' do
-    let(:project) { create(:project, :with_default_component, locale: nil) }
+    let(:project) { create(:project, :with_default_component, user_id: stubbed_user_id, locale: nil) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(
@@ -28,7 +26,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      stub_fetch_oauth_user_id(project.user_id)
+      stub_fetch_oauth_user
     end
 
     it 'returns success response' do
@@ -83,7 +81,7 @@ RSpec.describe 'Project update requests' do
     let(:params) { { project: { components: [] } } }
 
     before do
-      stub_fetch_oauth_user_id(SecureRandom.uuid)
+      stub_fetch_oauth_user
     end
 
     it 'returns forbidden response' do
@@ -96,7 +94,7 @@ RSpec.describe 'Project update requests' do
     let(:project) { create(:project) }
 
     before do
-      allow(HydraAdminApi).to receive(:fetch_oauth_user_id).and_return(nil)
+      stub_fetch_oauth_user(user_index: nil)
     end
 
     it 'returns unauthorized' do

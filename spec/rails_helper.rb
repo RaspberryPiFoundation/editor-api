@@ -83,7 +83,7 @@ RSpec.configure do |config|
   config.include GraphqlQueryHelpers, type: :graphql_query
 
   config.include PhraseIdentifierMock
-  config.include HydraAdminApiMock, type: :request
+  config.include HydraPublicApiMock
 
   if Bullet.enable?
     config.before { Bullet.start_request }
