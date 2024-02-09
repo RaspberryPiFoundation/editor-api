@@ -48,26 +48,10 @@ RSpec.describe User do
   end
 
   describe '#from_omniauth' do
-    subject(:user) { described_class.from_omniauth(token: 'my-access-token') }
-
-    let(:stubbed_response) do
-      json = File.read('spec/fixtures/users.json')
-      first = JSON.parse(json)['users'][0]
-
-      first['sub'] = first.delete('id')
-      first.to_json
-    end
-
-    let(:hydra_public_url) { HydraPublicApiClient::API_URL }
+    subject(:user) { described_class.from_omniauth(token: 'access-token') }
 
     before do
-      stub_request(:get, "#{hydra_public_url}/userinfo")
-        .with(headers: { Authorization: 'Bearer my-access-token' })
-        .to_return(
-          status: 200,
-          headers: { content_type: 'application/json' },
-          body: stubbed_response
-        )
+      stub_hydra_public_api
     end
 
     it 'returns an instance of the described class' do
@@ -99,7 +83,7 @@ RSpec.describe User do
 
       it 'does not call the API' do
         user
-        expect(WebMock).not_to have_requested(:get, "#{hydra_public_url}/userinfo")
+        expect(WebMock).not_to have_requested(:get, /.*/)
       end
 
       it 'returns a stubbed user' do
@@ -129,19 +113,8 @@ RSpec.describe User do
   describe '#where' do
     subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
 
-    let(:stubbed_response) { File.read('spec/fixtures/users.json') }
-
-    let(:userinfo_api_url) { UserinfoApiClient::API_URL }
-    let(:userinfo_api_key) { UserinfoApiClient::API_KEY }
-
     before do
-      stub_request(:get, "#{userinfo_api_url}/users")
-        .with(headers: { Authorization: "Bearer #{userinfo_api_key}" })
-        .to_return(
-          status: 200,
-          headers: { content_type: 'application/json' },
-          body: stubbed_response
-        )
+      stub_userinfo_api
     end
 
     it 'returns an instance of the described class' do
@@ -169,7 +142,7 @@ RSpec.describe User do
 
       it 'does not call the API' do
         user
-        expect(WebMock).not_to have_requested(:get, "#{userinfo_api_url}/users")
+        expect(WebMock).not_to have_requested(:get, /.*/)
       end
 
       it 'returns a stubbed user' do
