@@ -22,6 +22,7 @@ module Api
     def school_params
       params.require(:school).permit(
         :name,
+        :reference,
         :organisation_id,
         :address_line_1, # rubocop:disable Naming/VariableNumber
         :address_line_2, # rubocop:disable Naming/VariableNumber

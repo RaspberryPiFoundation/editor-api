@@ -68,6 +68,22 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'does not require a reference' do
+      create(:school, reference: nil)
+      create(:school, reference: nil)
+
+      school.reference = nil
+      expect(school).to be_valid
+    end
+
+    it 'requires references to be unique if provided' do
+      school.reference = 'URN-123'
+      school.save!
+
+      duplicate_school = build(:school, reference: 'urn-123')
+      expect(duplicate_school).to be_invalid
+    end
+
     it 'requires an address_line_1' do
       school.address_line_1 = ' '
       expect(school).to be_invalid
