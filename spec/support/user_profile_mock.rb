@@ -9,8 +9,8 @@ module UserProfileMock
     stub_request(:get, "#{UserinfoApiClient::API_URL}/users")
       .with(headers: { Authorization: "Bearer #{UserinfoApiClient::API_KEY}" })
       .to_return do |request|
-        user_ids = JSON.parse(request.body).fetch('userIds', [])
-        indexes = user_ids.map { |user_id| stubbed_user_index(user_id:) }.compact
+        uuids = JSON.parse(request.body).fetch('userIds', [])
+        indexes = uuids.map { |uuid| user_index_by_uuid(uuid) }.compact
         users = indexes.map { |user_index| stubbed_user_attributes(user_index:) }
 
         { body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } }
@@ -36,11 +36,15 @@ module UserProfileMock
     stubbed_user_attributes(user_index:)&.fetch('id')
   end
 
-  def stubbed_user_index(user_id: '00000000-0000-0000-0000-000000000000')
-    JSON.parse(USERS)['users'].find_index { |attributes| attributes['id'] == user_id }
-  end
-
   def stubbed_user
     User.from_omniauth(token: TOKEN)
+  end
+
+  def user_index_by_uuid(uuid)
+    JSON.parse(USERS)['users'].find_index { |attr| attr['id'] == uuid }
+  end
+
+  def user_index_by_role(name)
+    JSON.parse(USERS)['users'].find_index { |attr| attr['roles'].include?(name) }
   end
 end

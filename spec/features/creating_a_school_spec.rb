@@ -55,4 +55,11 @@ RSpec.describe 'Creating a school', type: :request do
     post '/api/schools'
     expect(response).to have_http_status(:unauthorized)
   end
+
+  it 'responds 403 Forbidden when the user is not a school-owner' do
+    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+
+    post('/api/schools', headers:, params:)
+    expect(response).to have_http_status(:forbidden)
+  end
 end

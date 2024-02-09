@@ -3,6 +3,7 @@
 module Api
   class SchoolsController < ApiController
     before_action :authorize_user, only: %i[create]
+    load_and_authorize_resource
 
     def create
       school_hash = school_params.merge(owner_id: current_user.id)

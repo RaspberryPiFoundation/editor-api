@@ -11,5 +11,7 @@ class Ability
 
     can %i[read create update destroy], Project, user_id: user.id
     can %i[read create update destroy], Component, project: { user_id: user.id }
+
+    can %i[create], School if user.school_owner?
   end
 end
