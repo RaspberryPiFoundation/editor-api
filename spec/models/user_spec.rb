@@ -75,19 +75,19 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq 'b6301f34-b970-4d4f-8314-f877bad8b150'
+      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
     end
 
     it 'returns a user with the correct name' do
-      expect(user.name).to eq 'Jane Doe'
+      expect(user.name).to eq 'School Owner'
     end
 
     it 'returns a user with the correct email' do
-      expect(user.email).to eq 'jane.doe@example.com'
+      expect(user.email).to eq 'school-owner@example.com'
     end
 
     it 'returns a user with the correct roles' do
-      expect(user.roles).to eq 'school-teacher'
+      expect(user.roles).to eq 'school-owner'
     end
 
     context 'when BYPASS_AUTH is true' do
@@ -103,7 +103,7 @@ RSpec.describe User do
       end
 
       it 'returns a stubbed user' do
-        expect(user.name).to eq('Jane Doe')
+        expect(user.name).to eq('School Owner')
       end
     end
   end
@@ -127,7 +127,7 @@ RSpec.describe User do
   end
 
   describe '#where' do
-    subject(:user) { described_class.where(id: 'b6301f34-b970-4d4f-8314-f877bad8b150').first }
+    subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
 
     let(:stubbed_response) { File.read('spec/fixtures/users.json') }
 
@@ -149,15 +149,15 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq 'b6301f34-b970-4d4f-8314-f877bad8b150'
+      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
     end
 
     it 'returns a user with the correct name' do
-      expect(user.name).to eq 'Jane Doe'
+      expect(user.name).to eq 'School Owner'
     end
 
     it 'returns a user with the correct email' do
-      expect(user.email).to eq 'jane.doe@example.com'
+      expect(user.email).to eq 'school-owner@example.com'
     end
 
     context 'when BYPASS_AUTH is true' do
@@ -173,7 +173,7 @@ RSpec.describe User do
       end
 
       it 'returns a stubbed user' do
-        expect(user.name).to eq('Jane Doe')
+        expect(user.name).to eq('School Owner')
       end
     end
   end
