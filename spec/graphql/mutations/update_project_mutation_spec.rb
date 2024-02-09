@@ -26,7 +26,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     before do
       # Instantiate project
       project
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     context 'when unauthenticated' do
@@ -68,7 +68,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
 
       context 'with another users project' do
         before do
-          stub_fetch_oauth_user(user_index: 1)
+          stub_hydra_public_api(user_index: 1)
         end
 
         it 'returns an error' do

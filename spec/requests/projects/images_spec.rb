@@ -19,10 +19,10 @@ RSpec.describe 'Images requests' do
 
   describe 'create' do
     context 'when auth is correct' do
-      let(:headers) { { Authorization: 'dummy-token' } }
+      let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        stub_fetch_oauth_user
+        stub_hydra_public_api
       end
 
       it 'attaches file to project' do
@@ -49,10 +49,10 @@ RSpec.describe 'Images requests' do
     end
 
     context 'when authed user is not creator' do
-      let(:headers) { { Authorization: 'dummy-token' } }
+      let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        stub_fetch_oauth_user(user_index: 1)
+        stub_hydra_public_api(user_index: 1)
       end
 
       it 'returns forbidden response' do

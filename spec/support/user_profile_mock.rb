@@ -2,6 +2,7 @@
 
 module UserProfileMock
   USERS = File.read('spec/fixtures/users.json')
+  TOKEN = 'fake-user-access-token'
 
   # Stubs that API that returns user profile data for a given list of UUIDs.
   def stub_userinfo_api
@@ -17,7 +18,7 @@ module UserProfileMock
   end
 
   # Stubs the API that returns user profile data for the logged in user.
-  def stub_hydra_public_api(user_index: 0, token: 'access-token')
+  def stub_hydra_public_api(user_index: 0, token: TOKEN)
     stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo")
       .with(headers: { Authorization: "Bearer #{token}" })
       .to_return(
@@ -25,12 +26,6 @@ module UserProfileMock
         headers: { content_type: 'application/json' },
         body: stubbed_user_attributes(user_index:).to_json
       )
-  end
-
-  # Stubs the API *client* that returns user profile data for the logged in user.
-  def stub_fetch_oauth_user(user_index: 0)
-    attributes = stubbed_user_attributes(user_index:)
-    allow(HydraPublicApiClient).to receive(:fetch_oauth_user).and_return(attributes)
   end
 
   def stubbed_user_attributes(user_index: 0)
@@ -46,6 +41,6 @@ module UserProfileMock
   end
 
   def stubbed_user
-    User.from_omniauth(token: 'ignored')
+    User.from_omniauth(token: TOKEN)
   end
 end

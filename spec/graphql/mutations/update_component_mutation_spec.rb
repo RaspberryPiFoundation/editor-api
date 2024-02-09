@@ -29,7 +29,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     before do
       # Instantiate component
       component
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     context 'when unauthenticated' do
@@ -79,7 +79,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
       context 'with another users component' do
         before do
-          stub_fetch_oauth_user(user_index: 1)
+          stub_hydra_public_api(user_index: 1)
         end
 
         it 'returns an error' do

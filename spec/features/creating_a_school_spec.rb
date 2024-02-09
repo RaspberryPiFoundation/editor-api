@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
   let(:user_id) { stubbed_user_id }
-  let(:headers) { { Authorization: 'dummy-token' } }
+  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   let(:params) do
     {
@@ -19,7 +19,7 @@ RSpec.describe 'Creating a school', type: :request do
   end
 
   before do
-    stub_fetch_oauth_user
+    stub_hydra_public_api
   end
 
   it 'responds 200 OK' do

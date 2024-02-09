@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Project index requests' do
   include PaginationLinksMock
 
-  let(:headers) { { Authorization: 'dummy-token' } }
+  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
   before do
@@ -16,7 +16,7 @@ RSpec.describe 'Project index requests' do
     before do
       # create non user projects
       create_list(:project, 2)
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     it 'returns success response' do
@@ -45,7 +45,7 @@ RSpec.describe 'Project index requests' do
 
   context 'when the projects index has pagination' do
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
       create_list(:project, 10, user_id: stubbed_user_id)
     end
 

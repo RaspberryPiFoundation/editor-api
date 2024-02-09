@@ -48,7 +48,7 @@ RSpec.describe User do
   end
 
   describe '#from_omniauth' do
-    subject(:user) { described_class.from_omniauth(token: 'access-token') }
+    subject(:user) { described_class.from_omniauth(token: UserProfileMock::TOKEN) }
 
     before do
       stub_hydra_public_api

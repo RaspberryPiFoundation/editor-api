@@ -5,10 +5,10 @@ require 'rails_helper'
 RSpec.describe 'Project delete requests' do
   context 'when user is logged in' do
     let!(:project) { create(:project, user_id: stubbed_user_id, locale: nil) }
-    let(:headers) { { Authorization: 'dummy-token' } }
+    let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     context 'when deleting a project the user owns' do

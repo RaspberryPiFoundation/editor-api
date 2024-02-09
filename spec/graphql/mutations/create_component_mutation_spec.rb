@@ -47,7 +47,7 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     let(:project) { create(:project, user_id: stubbed_user_id) }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     it 'returns the component ID' do

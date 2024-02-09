@@ -23,7 +23,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   before do
     project
-    stub_fetch_oauth_user
+    stub_hydra_public_api
   end
 
   it { expect(mutation).to be_a_valid_graphql_query }
@@ -54,7 +54,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   context 'when user cannot view original project' do
     before do
-      stub_fetch_oauth_user(user_index: 1)
+      stub_hydra_public_api(user_index: 1)
     end
 
     it 'returns "not permitted to read" error' do

@@ -18,10 +18,10 @@ RSpec.describe 'Project show requests' do
   let(:headers) { {} }
 
   context 'when user is logged in' do
-    let(:headers) { { Authorization: 'dummy-token' } }
+    let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     context 'when loading own project' do

@@ -37,7 +37,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       let(:current_user) { stubbed_user }
 
       before do
-        stub_fetch_oauth_user
+        stub_hydra_public_api
       end
 
       it 'deletes the project' do
@@ -55,7 +55,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
       context 'with another users project' do
         before do
-          stub_fetch_oauth_user(user_index: 1)
+          stub_hydra_public_api(user_index: 1)
         end
 
         it 'returns an error' do
