@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
-  let(:user_id) { '11111111-11111111-11111111-11111111' }
+  let(:user_id) { stubbed_user_id }
   let(:headers) { { Authorization: 'dummy-token' } }
 
   let(:params) do
@@ -19,7 +19,7 @@ RSpec.describe 'Creating a school', type: :request do
   end
 
   before do
-    stub_fetch_oauth_user_id(user_id)
+    stub_fetch_oauth_user
   end
 
   it 'responds 200 OK' do

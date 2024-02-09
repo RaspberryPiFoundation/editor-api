@@ -5,7 +5,7 @@ module Api
     before_action :authorize_user, only: %i[create]
 
     def create
-      school_hash = school_params.merge(owner_id: current_user)
+      school_hash = school_params.merge(owner_id: current_user.id)
       result = School::Create.call(school_hash:)
 
       if result.success?
