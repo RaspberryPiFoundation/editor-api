@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module HydraPublicApiMock
+module UserProfileMock
   USERS = File.read('spec/fixtures/users.json')
 
   # Stubs that API that returns user profile data for a given list of UUIDs.
