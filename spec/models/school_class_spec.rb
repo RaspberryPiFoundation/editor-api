@@ -8,6 +8,11 @@ RSpec.describe SchoolClass do
   end
 
   describe 'associations' do
+    it 'belongs to a school' do
+      school_class = create(:school_class)
+      expect(school_class.school).to be_a(School)
+    end
+
     it 'has many members' do
       school_class = create(:school_class, members: [build(:class_member), build(:class_member)])
       expect(school_class.members.size).to eq(2)

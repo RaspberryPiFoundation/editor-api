@@ -7,6 +7,18 @@ RSpec.describe ClassMember do
     stub_user_info_api
   end
 
+  describe 'associations' do
+    it 'belongs to a school_class' do
+      class_member = create(:class_member)
+      expect(class_member.school_class).to be_a(SchoolClass)
+    end
+
+    it 'belongs to a school (via school_class)' do
+      class_member = create(:class_member)
+      expect(class_member.school).to be_a(School)
+    end
+  end
+
   describe 'validations' do
     subject(:class_member) { build(:class_member) }
 
