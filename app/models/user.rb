@@ -15,6 +15,7 @@ class User
     picture
     postcode
     profile
+    token
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -74,7 +75,9 @@ class User
 
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)
+
     args['id'] ||= auth['sub']
+    args['token'] = token
 
     # TODO: remove once the HydraPublicApi returns the 'organisations' key.
     temporarily_add_organisations_until_the_profile_app_is_updated(args)
