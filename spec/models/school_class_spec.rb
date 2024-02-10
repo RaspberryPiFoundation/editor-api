@@ -48,6 +48,11 @@ RSpec.describe SchoolClass do
       expect(school_class).to be_invalid
     end
 
+    it 'requires a teacher that has the school-teacher role for the school' do
+      school_class.teacher_id = '22222222-2222-2222-2222-222222222222' # school-student
+      expect(school_class).to be_invalid
+    end
+
     it 'requires a name' do
       school_class.name = ' '
       expect(school_class).to be_invalid

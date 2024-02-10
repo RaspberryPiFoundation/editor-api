@@ -6,6 +6,7 @@ class SchoolClass < ApplicationRecord
 
   validates :teacher_id, presence: true
   validates :name, presence: true
+  validate :teacher_has_the_school_teacher_role_for_the_school
 
   def teacher
     User.from_userinfo(ids: teacher_id).first
@@ -13,5 +14,19 @@ class SchoolClass < ApplicationRecord
 
   def students
     User.from_userinfo(ids: members.pluck(:student_id))
+  end
+
+  private
+
+  def teacher_has_the_school_teacher_role_for_the_school
+    return unless teacher_id_changed? && errors.blank?
+
+    user = teacher
+    organisation_id = school.organisation_id
+
+    return unless user && !user.school_teacher?(organisation_id:)
+
+    msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{organisation_id}'"
+    errors.add(:teacher, msg)
   end
 end
