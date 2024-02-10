@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UserinfoApiClient
+class UserInfoApiClient
   API_URL = ENV.fetch('USERINFO_API_URL', 'http://localhost:6000')
   API_KEY = ENV.fetch('USERINFO_API_KEY', '1234')
 

@@ -55,11 +55,11 @@ class User
   def self.from_userinfo(ids:)
     user_ids = Array(ids)
 
-    UserinfoApiClient.fetch_by_ids(user_ids).map do |info|
+    UserInfoApiClient.fetch_by_ids(user_ids).map do |info|
       info = info.stringify_keys
       args = info.slice(*ATTRIBUTES)
 
-      # TODO: remove once the UserinfoApi returns the 'organisations' key.
+      # TODO: remove once the UserInfoApi returns the 'organisations' key.
       temporarily_add_organisations_until_the_profile_app_is_updated(args)
 
       new(args)

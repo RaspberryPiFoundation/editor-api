@@ -6,8 +6,8 @@ module UserProfileMock
 
   # Stubs that API that returns user profile data for a given list of UUIDs.
   def stub_userinfo_api
-    stub_request(:get, "#{UserinfoApiClient::API_URL}/users")
-      .with(headers: { Authorization: "Bearer #{UserinfoApiClient::API_KEY}" })
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
       .to_return do |request|
         uuids = JSON.parse(request.body).fetch('userIds', [])
         indexes = uuids.map { |uuid| user_index_by_uuid(uuid) }.compact
