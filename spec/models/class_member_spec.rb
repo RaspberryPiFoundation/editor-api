@@ -45,6 +45,11 @@ RSpec.describe ClassMember do
       expect(class_member).to be_invalid
     end
 
+    it 'requires a student that has the school-student role for the school' do
+      class_member.student_id = '11111111-1111-1111-1111-111111111111' # school-teacher
+      expect(class_member).to be_invalid
+    end
+
     it 'requires a unique student_id within the school_class' do
       class_member.save!
       duplicate = build(:class_member, student_id: class_member.student_id, school_class: class_member.school_class)

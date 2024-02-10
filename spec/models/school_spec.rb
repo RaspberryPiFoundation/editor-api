@@ -116,7 +116,7 @@ RSpec.describe School do
     end
   end
 
-  describe '#school' do
+  describe '#owner' do
     it 'returns a User instance for the owner_id of the school' do
       school = create(:school)
       expect(school.owner.name).to eq('School Owner')
