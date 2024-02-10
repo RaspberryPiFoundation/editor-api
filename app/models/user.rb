@@ -11,10 +11,10 @@ class User
     id
     name
     nickname
+    organisations
     picture
     postcode
     profile
-    roles
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -23,22 +23,25 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
-  def role?(role:)
-    return false if roles.nil?
-
-    roles.to_s.split(',').map(&:strip).include? role.to_s
+  def organisation_ids
+    organisations.keys
   end
 
-  def school_owner?
-    role?(role: 'school-owner')
+  def role?(organisation_id:, role:)
+    roles = organisations[organisation_id.to_s]
+    roles.to_s.split(',').map(&:strip).include?(role.to_s) if roles
   end
 
-  def school_teacher?
-    role?(role: 'school-teacher')
+  def school_owner?(organisation_id:)
+    role?(organisation_id:, role: 'school-owner')
   end
 
-  def school_student?
-    role?(role: 'school-student')
+  def school_teacher?(organisation_id:)
+    role?(organisation_id:, role: 'school-teacher')
+  end
+
+  def school_student?(organisation_id:)
+    role?(organisation_id:, role: 'school-student')
   end
 
   def ==(other)
@@ -56,6 +59,9 @@ class User
       info = info.stringify_keys
       args = info.slice(*ATTRIBUTES)
 
+      # TODO: remove once the UserinfoApi returns the 'organisations' key.
+      temporarily_add_organisations_until_the_profile_app_is_updated(args)
+
       new(args)
     end
   end
@@ -70,6 +76,16 @@ class User
     args = auth.slice(*ATTRIBUTES)
     args['id'] ||= auth['sub']
 
+    # TODO: remove once the HydraPublicApi returns the 'organisations' key.
+    temporarily_add_organisations_until_the_profile_app_is_updated(args)
+
     new(args)
+  end
+
+  def self.temporarily_add_organisations_until_the_profile_app_is_updated(hash)
+    return hash if hash.key?('organisations')
+
+    # Use the same organisation ID as the one from users.json for now.
+    hash.merge('organisations', { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
   end
 end

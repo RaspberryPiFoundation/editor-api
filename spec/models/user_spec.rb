@@ -5,42 +5,45 @@ require 'rails_helper'
 RSpec.describe User do
   subject { build(:user) }
 
+  let(:organisation_id) { '12345678-1234-1234-1234-123456789abc' }
+
   it { is_expected.to respond_to(:id) }
   it { is_expected.to respond_to(:name) }
   it { is_expected.to respond_to(:email) }
-  it { is_expected.to respond_to(:roles) }
+  it { is_expected.to respond_to(:organisations) }
+  it { is_expected.to respond_to(:organisation_ids) }
 
   shared_examples 'role_check' do |role|
-    let(:roles) { nil }
-    let(:user) { build(:user, roles:) }
+    let(:organisations) { {} }
+    let(:user) { build(:user, organisations:) }
 
     it { is_expected.to be_falsey }
 
     context 'with a blank roles entry' do
-      let(:roles) { ' ' }
+      let(:organisations) { { organisation_id => ' ' } }
 
       it { is_expected.to be_falsey }
     end
 
     context 'with an unrelated role given' do
-      let(:roles) { 'foo' }
+      let(:organisations) { { organisation_id => 'foo' } }
 
       it { is_expected.to be_falsey }
     end
 
     context "with a #{role} role given" do
-      let(:roles) { role }
+      let(:organisations) { { organisation_id => role } }
 
       it { is_expected.to be_truthy }
 
       context 'with unrelated roles too' do
-        let(:roles) { "foo,bar,#{role},quux" }
+        let(:organisations) { { organisation_id => "foo,bar,#{role},quux" } }
 
         it { is_expected.to be_truthy }
       end
 
       context 'with weird extra whitespace in role' do
-        let(:roles) { " #{role} " }
+        let(:organisations) { { organisation_id => " #{role} " } }
 
         it { is_expected.to be_truthy }
       end
@@ -70,8 +73,8 @@ RSpec.describe User do
       expect(user.email).to eq 'school-owner@example.com'
     end
 
-    it 'returns a user with the correct roles' do
-      expect(user.roles).to eq 'school-owner'
+    it 'returns a user with the correct organisations' do
+      expect(user.organisations).to eq(organisation_id => 'school-owner')
     end
 
     context 'when BYPASS_AUTH is true' do
@@ -93,19 +96,19 @@ RSpec.describe User do
   end
 
   describe '#school_owner?' do
-    subject { user.school_owner? }
+    subject { user.school_owner?(organisation_id:) }
 
     include_examples 'role_check', 'school-owner'
   end
 
   describe '#school_teacher?' do
-    subject { user.school_teacher? }
+    subject { user.school_teacher?(organisation_id:) }
 
     include_examples 'role_check', 'school-teacher'
   end
 
   describe '#school_student?' do
-    subject { user.school_student? }
+    subject { user.school_student?(organisation_id:) }
 
     include_examples 'role_check', 'school-student'
   end

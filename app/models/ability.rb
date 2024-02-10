@@ -12,6 +12,8 @@ class Ability
     can %i[read create update destroy], Project, user_id: user.id
     can %i[read create update destroy], Component, project: { user_id: user.id }
 
-    can %i[create], School if user.school_owner?
+    user.organisation_ids.each do |organisation_id|
+      can(%i[create], School, organisation_id:) if user.school_owner?(organisation_id:)
+    end
   end
 end

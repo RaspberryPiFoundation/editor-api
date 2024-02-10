@@ -10,7 +10,7 @@ RSpec.describe 'Creating a school', type: :request do
     {
       school: {
         name: 'Test School',
-        organisation_id: '00000000-00000000-00000000-00000000',
+        organisation_id: '12345678-1234-1234-1234-123456789abc',
         address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
         municipality: 'Greater London',
         country_code: 'GB'
@@ -60,6 +60,13 @@ RSpec.describe 'Creating a school', type: :request do
     stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
 
     post('/api/schools', headers:, params:)
+    expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'requires 403 Forbidden when the user is a school-owner for a different school' do
+    new_params = { school: params[:school].merge(organisation_id: '00000000-00000000-00000000-00000000') }
+
+    post('/api/schools', headers:, params: new_params)
     expect(response).to have_http_status(:forbidden)
   end
 end
