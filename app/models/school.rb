@@ -10,4 +10,8 @@ class School < ApplicationRecord
   validates :address_line_1, presence: true # rubocop:disable Naming/VariableNumber
   validates :municipality, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
+
+  def owner
+    User.from_userinfo(ids: owner_id).first
+  end
 end

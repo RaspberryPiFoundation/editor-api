@@ -104,4 +104,20 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
   end
+
+  describe '#school' do
+    before do
+      stub_userinfo_api
+    end
+
+    it 'returns a User instance for the owner_id of the school' do
+      school = create(:school, owner_id: '00000000-0000-0000-0000-000000000000')
+      expect(school.owner.name).to eq('School Owner')
+    end
+
+    it 'returns nil if no profile account exists' do
+      school = create(:school, owner_id: '99999999-9999-9999-9999-999999999999')
+      expect(school.owner).to be_nil
+    end
+  end
 end
