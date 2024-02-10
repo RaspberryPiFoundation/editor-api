@@ -117,7 +117,7 @@ RSpec.describe User do
     subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
 
     before do
-      stub_userinfo_api
+      stub_user_info_api
     end
 
     it 'returns an instance of the described class' do

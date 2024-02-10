@@ -5,7 +5,7 @@ module UserProfileMock
   TOKEN = 'fake-user-access-token'
 
   # Stubs that API that returns user profile data for a given list of UUIDs.
-  def stub_userinfo_api
+  def stub_user_info_api
     stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
       .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
       .to_return do |request|

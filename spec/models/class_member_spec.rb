@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe ClassMember do
+  before do
+    stub_user_info_api
+  end
+
   describe 'validations' do
     subject(:class_member) { build(:class_member) }
 

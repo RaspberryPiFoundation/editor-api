@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe School do
+  before do
+    stub_user_info_api
+  end
+
   describe 'associations' do
     it 'has many classes' do
       school = create(:school, classes: [build(:school_class), build(:school_class)])
@@ -10,7 +14,7 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member)]) }
+      let!(:school_class) { build(:school_class, members: [build(:class_member)]) }
       let!(:school) { create(:school, classes: [school_class]) }
 
       it 'also destroys school classes to avoid making them invalid' do
@@ -54,6 +58,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'requires an owner that has the school-owner role for the school' do
+      school.owner_id = '11111111-1111-1111-1111-111111111111' # school-teacher
+      expect(school).to be_invalid
+    end
+
     it 'requires a unique organisation_id' do
       school.save!
 
@@ -70,7 +79,9 @@ RSpec.describe School do
 
     it 'does not require a reference' do
       create(:school, reference: nil)
-      create(:school, reference: nil)
+
+      school.organisation_id = '99999999-9999-9999-9999-999999999999' # Satisfy the uniqueness validation.
+      school.owner_id = '99999999-9999-9999-9999-999999999999' # Satisfy the school-owner validation.
 
       school.reference = nil
       expect(school).to be_valid
@@ -106,12 +117,8 @@ RSpec.describe School do
   end
 
   describe '#school' do
-    before do
-      stub_userinfo_api
-    end
-
     it 'returns a User instance for the owner_id of the school' do
-      school = create(:school, owner_id: '00000000-0000-0000-0000-000000000000')
+      school = create(:school)
       expect(school.owner.name).to eq('School Owner')
     end
 

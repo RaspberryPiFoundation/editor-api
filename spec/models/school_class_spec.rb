@@ -3,6 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe SchoolClass do
+  before do
+    stub_user_info_api
+  end
+
   describe 'associations' do
     it 'has many members' do
       school_class = create(:school_class, members: [build(:class_member), build(:class_member)])
@@ -51,10 +55,6 @@ RSpec.describe SchoolClass do
   end
 
   describe '#teacher' do
-    before do
-      stub_userinfo_api
-    end
-
     it 'returns a User instance for the teacher_id of the class' do
       school_class = create(:school_class, teacher_id: '11111111-1111-1111-1111-111111111111')
       expect(school_class.teacher.name).to eq('School Teacher')
@@ -67,10 +67,6 @@ RSpec.describe SchoolClass do
   end
 
   describe '#students' do
-    before do
-      stub_userinfo_api
-    end
-
     it 'returns User instances for members of the class' do
       member = build(:class_member, student_id: '22222222-2222-2222-2222-222222222222')
       school_class = create(:school_class, members: [member])

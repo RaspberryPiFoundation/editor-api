@@ -6,7 +6,6 @@ RSpec.describe School::Create, type: :unit do
   let(:school_params) do
     {
       name: 'Test School',
-      owner_id: '11111111-11111111-11111111-11111111',
       address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
       municipality: 'Greater London',
       country_code: 'GB'
@@ -16,6 +15,7 @@ RSpec.describe School::Create, type: :unit do
   let(:current_user) { build(:user) }
 
   before do
+    stub_user_info_api
     stub_profile_api_create_organisation
   end
 

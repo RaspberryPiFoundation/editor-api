@@ -36,7 +36,7 @@ class UserInfoApiClient
     end
 
     def transform_result(result)
-      { result: }.deep_transform_keys { |k| k.to_s.underscore.to_sym }.fetch(:result)
+      { result: }.transform_keys { |k| k.to_s.underscore.to_sym }.fetch(:result)
     end
 
     def conn
