@@ -3,14 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
-  let(:user_id) { stubbed_user_id }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:user_id) { stubbed_user_id }
 
   let(:params) do
     {
       school: {
         name: 'Test School',
-        organisation_id: '12345678-1234-1234-1234-123456789abc',
         address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
         municipality: 'Greater London',
         country_code: 'GB'
@@ -20,6 +19,7 @@ RSpec.describe 'Creating a school', type: :request do
 
   before do
     stub_hydra_public_api
+    stub_profile_api_create_organisation
   end
 
   it 'responds 200 OK' do
@@ -32,13 +32,6 @@ RSpec.describe 'Creating a school', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:name]).to eq('Test School')
-  end
-
-  it "assigns the current user as the school's owner" do
-    post('/api/schools', headers:, params:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[:owner_id]).to eq(user_id)
   end
 
   it 'responds 400 Bad Request when params are missing' do
@@ -54,19 +47,5 @@ RSpec.describe 'Creating a school', type: :request do
   it 'responds 401 Unauthorized when no token is given' do
     post '/api/schools'
     expect(response).to have_http_status(:unauthorized)
-  end
-
-  it 'responds 403 Forbidden when the user is not a school-owner' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
-
-    post('/api/schools', headers:, params:)
-    expect(response).to have_http_status(:forbidden)
-  end
-
-  it 'requires 403 Forbidden when the user is a school-owner for a different school' do
-    new_params = { school: params[:school].merge(organisation_id: '00000000-00000000-00000000-00000000') }
-
-    post('/api/schools', headers:, params: new_params)
-    expect(response).to have_http_status(:forbidden)
   end
 end

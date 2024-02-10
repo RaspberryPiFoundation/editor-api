@@ -3,9 +3,9 @@
 class School
   class Create
     class << self
-      def call(school_hash:)
+      def call(school_params:, current_user:)
         response = OperationResponse.new
-        response[:school] = build_school(school_hash)
+        response[:school] = build_school(school_params, current_user)
         response[:school].save!
         response
       rescue StandardError => e
@@ -17,8 +17,19 @@ class School
 
       private
 
-      def build_school(school_hash)
-        School.new(school_hash)
+      def build_school(school_params, current_user)
+        school = School.new(school_params)
+        school.owner_id = current_user&.id
+
+        # Assign a temporary UUID to check the validity of other fields.
+        school.organisation_id = SecureRandom.uuid
+
+        if school.valid?
+          response = ProfileApiClient.create_organisation(token: current_user&.token)
+          school.organisation_id = response&.fetch(:id)
+        end
+
+        school
       end
     end
   end

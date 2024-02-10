@@ -83,6 +83,7 @@ RSpec.configure do |config|
   config.include GraphqlQueryHelpers, type: :graphql_query
 
   config.include PhraseIdentifierMock
+  config.include ProfileApiMock
   config.include UserProfileMock
 
   if Bullet.enable?

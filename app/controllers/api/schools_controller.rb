@@ -6,8 +6,7 @@ module Api
     load_and_authorize_resource
 
     def create
-      school_hash = school_params.merge(owner_id: current_user.id)
-      result = School::Create.call(school_hash:)
+      result = School::Create.call(school_params:, current_user:)
 
       if result.success?
         @school = result[:school]
@@ -23,7 +22,6 @@ module Api
       params.require(:school).permit(
         :name,
         :reference,
-        :organisation_id,
         :address_line_1, # rubocop:disable Naming/VariableNumber
         :address_line_2, # rubocop:disable Naming/VariableNumber
         :municipality,
