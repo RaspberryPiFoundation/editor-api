@@ -6,4 +6,12 @@ class SchoolClass < ApplicationRecord
 
   validates :teacher_id, presence: true
   validates :name, presence: true
+
+  def teacher
+    User.from_userinfo(ids: teacher_id).first
+  end
+
+  def students
+    User.from_userinfo(ids: members.pluck(:student_id))
+  end
 end

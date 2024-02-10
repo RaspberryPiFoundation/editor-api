@@ -49,4 +49,42 @@ RSpec.describe SchoolClass do
       expect(school_class).to be_invalid
     end
   end
+
+  describe '#teacher' do
+    before do
+      stub_userinfo_api
+    end
+
+    it 'returns a User instance for the teacher_id of the class' do
+      school_class = create(:school_class, teacher_id: '11111111-1111-1111-1111-111111111111')
+      expect(school_class.teacher.name).to eq('School Teacher')
+    end
+
+    it 'returns nil if no profile account exists' do
+      school_class = create(:school_class, teacher_id: '99999999-9999-9999-9999-999999999999')
+      expect(school_class.teacher).to be_nil
+    end
+  end
+
+  describe '#students' do
+    before do
+      stub_userinfo_api
+    end
+
+    it 'returns User instances for members of the class' do
+      member = build(:class_member, student_id: '22222222-2222-2222-2222-222222222222')
+      school_class = create(:school_class, members: [member])
+
+      student = school_class.students.first
+      expect(student.name).to eq('School Student')
+    end
+
+    it 'ignores members where no profile account exists' do
+      member = build(:class_member, student_id: '99999999-9999-9999-9999-999999999999')
+      school_class = create(:school_class, members: [member])
+
+      student = school_class.students.first
+      expect(student).to be_nil
+    end
+  end
 end
