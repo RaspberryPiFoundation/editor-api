@@ -27,6 +27,6 @@ class SchoolClass < ApplicationRecord
     return unless user && !user.school_teacher?(organisation_id:)
 
     msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{organisation_id}'"
-    errors.add(:teacher, msg)
+    errors.add(:user, msg)
   end
 end

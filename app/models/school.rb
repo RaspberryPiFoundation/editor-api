@@ -29,6 +29,6 @@ class School < ApplicationRecord
     user = owner
     return unless user && !user.school_owner?(organisation_id:)
 
-    errors.add(:owner, "'#{owner_id}' does not have the 'school-owner' role for organisation '#{organisation_id}'")
+    errors.add(:user, "'#{owner_id}' does not have the 'school-owner' role for organisation '#{organisation_id}'")
   end
 end
