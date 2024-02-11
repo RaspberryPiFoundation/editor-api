@@ -5,6 +5,11 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource
 
+    def index
+      @schools = School.where(organisation_id: current_user.organisation_ids)
+      render :index, formats: [:json], status: :ok
+    end
+
     def show
       @school = School.find(params[:id])
       render :show, formats: [:json], status: :ok

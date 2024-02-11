@@ -15,7 +15,7 @@ class Ability
     can %i[create], School
 
     user.organisation_ids.each do |organisation_id|
-      can(%i[show], School, organisation_id:)
+      can(%i[read], School, organisation_id:)
       can(%i[update], School, organisation_id:) if user.school_owner?(organisation_id:)
     end
   end
