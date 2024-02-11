@@ -4,12 +4,15 @@ json.call(
   @school,
   :organisation_id,
   :owner_id,
+  :name,
+  :reference,
   :address_line_1, # rubocop:disable Naming/VariableNumber
   :address_line_2, # rubocop:disable Naming/VariableNumber
   :municipality,
   :administrative_area,
   :postal_code,
   :country_code,
-  :name,
-  :verified_at
+  :verified_at,
+  :created_at,
+  :updated_at
 )
