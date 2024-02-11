@@ -26,8 +26,8 @@ RSpec.describe 'Listing schools that the current user belongs to', type: :reques
   end
 
   it 'only includes schools the user belongs to' do
-    create(:school, organisation_id: '00000000-0000-0000-0000-000000000000')
-    create(:school, organisation_id: '11111111-1111-1111-1111-111111111111')
+    create(:school, organisation_id: '00000000-0000-0000-0000-000000000000', owner_id: '99999999-9999-9999-9999-999999999999')
+    create(:school, organisation_id: '11111111-1111-1111-1111-111111111111', owner_id: '99999999-9999-9999-9999-999999999999')
 
     get('/api/schools', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
