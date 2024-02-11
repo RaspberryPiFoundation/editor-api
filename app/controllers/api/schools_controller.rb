@@ -6,7 +6,7 @@ module Api
     load_and_authorize_resource
 
     def index
-      @schools = School.where(organisation_id: current_user.organisation_ids)
+      @schools = School.accessible_by(current_ability)
       render :index, formats: [:json], status: :ok
     end
 
