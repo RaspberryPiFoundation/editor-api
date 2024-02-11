@@ -23,9 +23,9 @@ RSpec.describe 'Creating a school', type: :request do
     stub_profile_api_create_organisation
   end
 
-  it 'responds 200 OK' do
+  it 'responds 201 Created' do
     post('/api/schools', headers:, params:)
-    expect(response).to have_http_status(:ok)
+    expect(response).to have_http_status(:created)
   end
 
   it 'responds with the school JSON' do

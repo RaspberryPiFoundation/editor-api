@@ -10,7 +10,7 @@ module Api
 
       if result.success?
         @school = result[:school]
-        render :show, formats: [:json]
+        render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
