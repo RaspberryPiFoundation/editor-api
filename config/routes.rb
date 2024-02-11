@@ -17,7 +17,7 @@ Rails.application.routes.draw do
 
     resource :project_errors, only: %i[create]
 
-    resources :schools, only: %i[create]
+    resources :schools, only: %i[create update]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

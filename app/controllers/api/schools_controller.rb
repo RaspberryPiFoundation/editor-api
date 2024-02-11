@@ -2,7 +2,7 @@
 
 module Api
   class SchoolsController < ApiController
-    before_action :authorize_user, only: %i[create]
+    before_action :authorize_user
     load_and_authorize_resource
 
     def create
@@ -11,6 +11,18 @@ module Api
       if result.success?
         @school = result[:school]
         render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def update
+      school = School.find(params[:id])
+      result = School::Update.call(school:, school_params:)
+
+      if result.success?
+        @school = result[:school]
+        render :show, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end

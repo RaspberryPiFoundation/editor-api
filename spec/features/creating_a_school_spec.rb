@@ -3,6 +3,12 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
+  before do
+    stub_hydra_public_api
+    stub_user_info_api
+    stub_profile_api_create_organisation
+  end
+
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:user_id) { stubbed_user_id }
 
@@ -15,12 +21,6 @@ RSpec.describe 'Creating a school', type: :request do
         country_code: 'GB'
       }
     }
-  end
-
-  before do
-    stub_hydra_public_api
-    stub_user_info_api
-    stub_profile_api_create_organisation
   end
 
   it 'responds 201 Created' do
