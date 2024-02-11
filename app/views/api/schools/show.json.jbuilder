@@ -2,6 +2,7 @@
 
 json.call(
   @school,
+  :id,
   :organisation_id,
   :owner_id,
   :name,

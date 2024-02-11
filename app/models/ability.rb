@@ -12,11 +12,13 @@ class Ability
     can %i[read create update destroy], Project, user_id: user.id
     can %i[read create update destroy], Component, project: { user_id: user.id }
 
-    can %i[create], School
+    can %i[create], School # The user agrees to become a school-owner by creating a school.
 
     user.organisation_ids.each do |organisation_id|
       can(%i[read], School, organisation_id:)
       can(%i[update], School, organisation_id:) if user.school_owner?(organisation_id:)
+
+      can(%i[create], SchoolClass, school: { organisation_id: }) if user.school_owner_or_teacher?(organisation_id:)
     end
   end
 end

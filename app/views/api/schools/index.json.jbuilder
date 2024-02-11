@@ -3,6 +3,7 @@
 json.array!(@schools) do |school|
   json.call(
     school,
+    :id,
     :organisation_id,
     :owner_id,
     :name,
