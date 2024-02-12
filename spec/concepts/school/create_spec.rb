@@ -40,7 +40,7 @@ RSpec.describe School::Create, type: :unit do
 
   it 'assigns the organisation_id' do
     response = described_class.call(school_params:, current_user:)
-    expect(response[:school].organisation_id).to eq(ProfileApiMock::ORGANISATION_ID)
+    expect(response[:school].id).to eq(ProfileApiMock::ORGANISATION_ID)
   end
 
   context 'when creation fails' do

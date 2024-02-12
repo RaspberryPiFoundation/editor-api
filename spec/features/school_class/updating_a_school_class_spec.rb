@@ -57,7 +57,8 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school.update!(organisation_id: '00000000-00000000-00000000-00000000')
+    school = create(:school, id: SecureRandom.uuid, owner_id: SecureRandom.uuid)
+    school_class.update!(school_id: school.id)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)
@@ -65,7 +66,7 @@ RSpec.describe 'Updating a school class', type: :request do
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
     stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
-    school_class.update!(teacher_id: '99999999-99999999-99999999-99999999')
+    school_class.update!(teacher_id: SecureRandom.uuid)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)

@@ -29,7 +29,7 @@ RSpec.describe 'Listing school classes', type: :request do
 
   it "does not include school classes that the school-teacher doesn't teach" do
     stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
-    create(:school_class, school:, teacher_id: '99999999-9999-9999-9999-999999999999')
+    create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
@@ -39,7 +39,7 @@ RSpec.describe 'Listing school classes', type: :request do
 
   it "does not include school classes that the school-student isn't a member of" do
     stub_hydra_public_api(user_index: user_index_by_role('school-student'))
-    create(:school_class, school:, teacher_id: '99999999-9999-9999-9999-999999999999')
+    create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)

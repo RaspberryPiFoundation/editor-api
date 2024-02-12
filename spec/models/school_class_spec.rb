@@ -71,7 +71,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns nil if no profile account exists' do
-      school_class = create(:school_class, teacher_id: '99999999-9999-9999-9999-999999999999')
+      school_class = create(:school_class, teacher_id: SecureRandom.uuid)
       expect(school_class.teacher).to be_nil
     end
   end
@@ -86,7 +86,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'ignores members where no profile account exists' do
-      member = build(:class_member, student_id: '99999999-9999-9999-9999-999999999999')
+      member = build(:class_member, student_id: SecureRandom.uuid)
       school_class = create(:school_class, members: [member])
 
       student = school_class.students.first

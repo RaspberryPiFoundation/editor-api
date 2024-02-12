@@ -38,13 +38,20 @@ RSpec.describe School do
       expect { school.save! }.not_to raise_error
     end
 
-    it 'requires an organisation_id' do
-      school.organisation_id = ' '
+    # The school's ID must be set before create from the profile app's organisation ID.
+    # This avoids having two different IDs for a school which would be confusing.
+    it 'requires an id' do
+      school.id = ' '
       expect(school).to be_invalid
     end
 
-    it 'requires a UUID organisation_id' do
-      school.organisation_id = 'invalid'
+    it 'requires a UUID id' do
+      school.id = 'invalid'
+      expect(school).to be_invalid
+    end
+
+    it 'requires a unique id' do
+      create(:school)
       expect(school).to be_invalid
     end
 
@@ -63,15 +70,6 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
-    it 'requires a unique organisation_id' do
-      school.save!
-
-      duplicate_id = school.organisation_id.upcase
-      duplicate_school = build(:school, organisation_id: duplicate_id)
-
-      expect(duplicate_school).to be_invalid
-    end
-
     it 'requires a name' do
       school.name = ' '
       expect(school).to be_invalid
@@ -80,8 +78,8 @@ RSpec.describe School do
     it 'does not require a reference' do
       create(:school, reference: nil)
 
-      school.organisation_id = '99999999-9999-9999-9999-999999999999' # Satisfy the uniqueness validation.
-      school.owner_id = '99999999-9999-9999-9999-999999999999' # Satisfy the school-owner validation.
+      school.id = SecureRandom.uuid # Satisfy the uniqueness validation.
+      school.owner_id = SecureRandom.uuid # Satisfy the school-owner validation.
 
       school.reference = nil
       expect(school).to be_valid
@@ -123,7 +121,7 @@ RSpec.describe School do
     end
 
     it 'returns nil if no profile account exists' do
-      school = create(:school, owner_id: '99999999-9999-9999-9999-999999999999')
+      school = create(:school, owner_id: SecureRandom.uuid)
       expect(school.owner).to be_nil
     end
   end

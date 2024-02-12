@@ -35,7 +35,7 @@ RSpec.describe 'Showing a school', type: :request do
   end
 
   it 'responds 403 Forbidden when the user belongs to a different school' do
-    school.update!(organisation_id: '00000000-00000000-00000000-00000000')
+    school.update!(id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}", headers:)
     expect(response).to have_http_status(:forbidden)

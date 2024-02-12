@@ -21,9 +21,9 @@ class School
         school = School.new(school_params)
         school.owner_id = current_user&.id
 
-        if school.valid_except_for_organisation?
+        if school.valid_except_for_id?
           response = ProfileApiClient.create_organisation(token: current_user&.token)
-          school.organisation_id = response&.fetch(:id)
+          school.id = response&.fetch(:id)
         end
 
         school

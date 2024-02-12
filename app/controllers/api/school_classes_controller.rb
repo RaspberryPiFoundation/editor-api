@@ -51,7 +51,7 @@ module Api
     end
 
     def school_owner?
-      current_user.school_owner?(organisation_id: @school.organisation_id)
+      current_user.school_owner?(organisation_id: @school.id)
     end
   end
 end

@@ -160,7 +160,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   end
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "organisation_id", null: false
     t.uuid "owner_id", null: false
     t.string "name", null: false
     t.string "reference"
@@ -173,7 +172,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
     t.datetime "verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["organisation_id"], name: "index_schools_on_organisation_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true
   end
 
