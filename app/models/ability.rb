@@ -21,11 +21,13 @@ class Ability
       if user.school_owner?(organisation_id:)
         can(%i[update], School, id: organisation_id)
         can(%i[read create update], SchoolClass, school: { id: organisation_id })
+        can(%i[create], ClassMember, school_class: { school: { id: organisation_id } })
       end
 
       if user.school_teacher?(organisation_id:)
         can(%i[create], SchoolClass, school: { id: organisation_id })
         can(%i[read update], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
+        can(%i[create], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
       end
 
       if user.school_student?(organisation_id:)
