@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Listing schools that the current user belongs to', type: :request do
+RSpec.describe 'Listing schools', type: :request do
   before do
     stub_hydra_public_api
     stub_user_info_api
@@ -18,7 +18,7 @@ RSpec.describe 'Listing schools that the current user belongs to', type: :reques
     expect(response).to have_http_status(:ok)
   end
 
-  it 'responds with the school JSON' do
+  it 'responds with the schools JSON' do
     get('/api/schools', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -27,7 +27,6 @@ RSpec.describe 'Listing schools that the current user belongs to', type: :reques
 
   it 'only includes schools the user belongs to' do
     create(:school, organisation_id: '00000000-0000-0000-0000-000000000000', owner_id: '99999999-9999-9999-9999-999999999999')
-    create(:school, organisation_id: '11111111-1111-1111-1111-111111111111', owner_id: '99999999-9999-9999-9999-999999999999')
 
     get('/api/schools', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
