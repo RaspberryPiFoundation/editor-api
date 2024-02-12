@@ -10,12 +10,7 @@ json.array!(@class_members_with_students) do |class_member, student|
     :updated_at
   )
 
-  if student
-    json.call(
-      student,
-      :name,
-      :nickname,
-      :picture
-    )
-  end
+  json.student_name(student&.name)
+  json.student_nickname(student&.nickname)
+  json.student_picture(student&.picture)
 end

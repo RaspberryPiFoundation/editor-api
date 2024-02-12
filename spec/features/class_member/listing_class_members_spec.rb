@@ -31,16 +31,16 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.first[:name]).to eq('School Student')
+    expect(data.first[:student_name]).to eq('School Student')
   end
 
-  it "does not include student attributes in the JSON if the user profile doesn't exist" do
+  it "responds with nil attributes for students if the user profile doesn't exist" do
     class_member.update!(student_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.first).not_to have_key(:name)
+    expect(data.first[:student_name]).to be(nil)
   end
 
   it 'does not include class members that belong to a different class' do
