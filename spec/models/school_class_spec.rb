@@ -64,15 +64,69 @@ RSpec.describe SchoolClass do
     end
   end
 
-  describe '#teacher' do
-    it 'returns a User instance for the teacher_id of the class' do
-      school_class = create(:school_class, teacher_id: '11111111-1111-1111-1111-111111111111')
-      expect(school_class.teacher.name).to eq('School Teacher')
+  describe '.teachers' do
+    it 'returns User instances for the current scope' do
+      create(:school_class)
+
+      teacher = described_class.all.teachers.first
+      expect(teacher.name).to eq('School Teacher')
     end
 
-    it 'returns nil if no profile account exists' do
+    it 'ignores members where no profile account exists' do
+      create(:school_class, teacher_id: SecureRandom.uuid)
+
+      teacher = described_class.all.teachers.first
+      expect(teacher).to be_nil
+    end
+
+    it 'ignores members not included in the current scope' do
+      create(:school_class)
+
+      teacher = described_class.none.teachers.first
+      expect(teacher).to be_nil
+    end
+  end
+
+  describe '.with_teachers' do
+    it 'returns an array of class members paired with their User instance' do
+      school_class = create(:school_class)
+
+      pair = described_class.all.with_teachers.first
+      teacher = described_class.all.teachers.first
+
+      expect(pair).to eq([school_class, teacher])
+    end
+
+    it 'returns nil values for members where no profile account exists' do
       school_class = create(:school_class, teacher_id: SecureRandom.uuid)
-      expect(school_class.teacher).to be_nil
+
+      pair = described_class.all.with_teachers.first
+      expect(pair).to eq([school_class, nil])
+    end
+
+    it 'ignores members not included in the current scope' do
+      create(:school_class)
+
+      pair = described_class.none.with_teachers.first
+      expect(pair).to be_nil
+    end
+  end
+
+  describe '#with_teacher' do
+    it 'returns the class member paired with their User instance' do
+      school_class = create(:school_class)
+
+      pair = school_class.with_teacher
+      teacher = described_class.all.teachers.first
+
+      expect(pair).to eq([school_class, teacher])
+    end
+
+    it 'returns a nil value if the member has no profile account' do
+      school_class = create(:school_class, teacher_id: SecureRandom.uuid)
+
+      pair = school_class.with_teacher
+      expect(pair).to eq([school_class, nil])
     end
   end
 end

@@ -8,8 +8,17 @@ class SchoolClass < ApplicationRecord
   validates :name, presence: true
   validate :teacher_has_the_school_teacher_role_for_the_school
 
-  def teacher
-    User.from_userinfo(ids: teacher_id).first
+  def self.teachers
+    User.from_userinfo(ids: pluck(:teacher_id))
+  end
+
+  def self.with_teachers
+    users = teachers.index_by(&:id)
+    all.map { |instance| [instance, users[instance.teacher_id]] }
+  end
+
+  def with_teacher
+    [self, User.from_userinfo(ids: teacher_id).first]
   end
 
   private
@@ -17,7 +26,7 @@ class SchoolClass < ApplicationRecord
   def teacher_has_the_school_teacher_role_for_the_school
     return unless teacher_id_changed? && errors.blank?
 
-    user = teacher
+    _, user = with_teacher
     return unless user && !user.school_teacher?(organisation_id: school.id)
 
     msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{school.id}'"
