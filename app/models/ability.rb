@@ -3,6 +3,7 @@
 class Ability
   include CanCan::Ability
 
+  # rubocop:disable Metrics/AbcSize
   def initialize(user)
     can :show, Project, user_id: nil
     can :show, Component, project: { user_id: nil }
@@ -16,11 +17,17 @@ class Ability
 
     user.organisation_ids.each do |organisation_id|
       can(%i[read], School, organisation_id:)
-      can(%i[update], School, organisation_id:) if user.school_owner?(organisation_id:)
 
-      if user.school_owner_or_teacher?(organisation_id:)
-        can(%i[create update], SchoolClass, school: { organisation_id: })
+      if user.school_owner?(organisation_id:)
+        can(%i[update], School, organisation_id:)
+        can(%i[read create update], SchoolClass, school: { organisation_id: })
+      end
+
+      if user.school_teacher?(organisation_id:)
+        can(%i[create], SchoolClass, school: { organisation_id: })
+        can(%i[update], SchoolClass, school: { organisation_id: }, teacher_id: user.id)
       end
     end
   end
+  # rubocop:enable Metrics/AbcSize
 end

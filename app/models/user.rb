@@ -45,10 +45,6 @@ class User
     role?(organisation_id:, role: 'school-student')
   end
 
-  def school_owner_or_teacher?(organisation_id:)
-    school_owner?(organisation_id:) || school_teacher?(organisation_id:)
-  end
-
   def ==(other)
     id == other.id
   end

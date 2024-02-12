@@ -19,8 +19,6 @@ module Api
 
     def update
       school_class = @school.classes.find(params[:id])
-      raise CanCan::AccessDenied unless can_update?(school_class)
-
       result = SchoolClass::Update.call(school_class:, school_class_params:)
 
       if result.success?
@@ -45,10 +43,6 @@ module Api
 
     def school_owner?
       current_user.school_owner?(organisation_id: @school.organisation_id)
-    end
-
-    def can_update?(school_class)
-      school_owner? || school_class.teacher_id == current_user.id
     end
   end
 end
