@@ -18,7 +18,9 @@ class Ability
       can(%i[read], School, organisation_id:)
       can(%i[update], School, organisation_id:) if user.school_owner?(organisation_id:)
 
-      can(%i[create], SchoolClass, school: { organisation_id: }) if user.school_owner_or_teacher?(organisation_id:)
+      if user.school_owner_or_teacher?(organisation_id:)
+        can(%i[create update], SchoolClass, school: { organisation_id: })
+      end
     end
   end
 end
