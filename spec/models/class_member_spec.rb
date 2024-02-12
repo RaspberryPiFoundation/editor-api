@@ -56,4 +56,27 @@ RSpec.describe ClassMember do
       expect(duplicate).to be_invalid
     end
   end
+
+  describe '.students' do
+    it 'returns User instances for the current scope' do
+      class_member = create(:class_member)
+
+      student = ClassMember.all.students.first
+      expect(student.name).to eq('School Student')
+    end
+
+    it 'ignores members where no profile account exists' do
+      class_member = create(:class_member, student_id: SecureRandom.uuid)
+
+      student = ClassMember.all.students.first
+      expect(student).to be_nil
+    end
+
+    it 'ignores members not included in the current scope' do
+      class_member = create(:class_member)
+
+      student = ClassMember.none.students.first
+      expect(student).to be_nil
+    end
+  end
 end

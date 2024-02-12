@@ -12,10 +12,6 @@ class SchoolClass < ApplicationRecord
     User.from_userinfo(ids: teacher_id).first
   end
 
-  def students
-    User.from_userinfo(ids: members.pluck(:student_id))
-  end
-
   private
 
   def teacher_has_the_school_teacher_role_for_the_school

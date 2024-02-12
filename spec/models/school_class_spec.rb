@@ -75,22 +75,4 @@ RSpec.describe SchoolClass do
       expect(school_class.teacher).to be_nil
     end
   end
-
-  describe '#students' do
-    it 'returns User instances for members of the class' do
-      member = build(:class_member, student_id: '22222222-2222-2222-2222-222222222222')
-      school_class = create(:school_class, members: [member])
-
-      student = school_class.students.first
-      expect(student.name).to eq('School Student')
-    end
-
-    it 'ignores members where no profile account exists' do
-      member = build(:class_member, student_id: SecureRandom.uuid)
-      school_class = create(:school_class, members: [member])
-
-      student = school_class.students.first
-      expect(student).to be_nil
-    end
-  end
 end
