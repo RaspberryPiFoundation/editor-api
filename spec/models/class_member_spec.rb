@@ -59,23 +59,23 @@ RSpec.describe ClassMember do
 
   describe '.students' do
     it 'returns User instances for the current scope' do
-      class_member = create(:class_member)
+      create(:class_member)
 
-      student = ClassMember.all.students.first
+      student = described_class.all.students.first
       expect(student.name).to eq('School Student')
     end
 
     it 'ignores members where no profile account exists' do
-      class_member = create(:class_member, student_id: SecureRandom.uuid)
+      create(:class_member, student_id: SecureRandom.uuid)
 
-      student = ClassMember.all.students.first
+      student = described_class.all.students.first
       expect(student).to be_nil
     end
 
     it 'ignores members not included in the current scope' do
-      class_member = create(:class_member)
+      create(:class_member)
 
-      student = ClassMember.none.students.first
+      student = described_class.none.students.first
       expect(student).to be_nil
     end
   end
@@ -84,8 +84,8 @@ RSpec.describe ClassMember do
     it 'returns an array of class members paired with their User instance' do
       class_member = create(:class_member)
 
-      pair = ClassMember.all.with_students.first
-      student = ClassMember.all.students.first
+      pair = described_class.all.with_students.first
+      student = described_class.all.students.first
 
       expect(pair).to eq([class_member, student])
     end
@@ -93,15 +93,33 @@ RSpec.describe ClassMember do
     it 'returns nil values for members where no profile account exists' do
       class_member = create(:class_member, student_id: SecureRandom.uuid)
 
-      pair = ClassMember.all.with_students.first
+      pair = described_class.all.with_students.first
       expect(pair).to eq([class_member, nil])
     end
 
     it 'ignores members not included in the current scope' do
+      create(:class_member)
+
+      pair = described_class.none.with_students.first
+      expect(pair).to be_nil
+    end
+  end
+
+  describe '#with_student' do
+    it 'returns the class member paired with their User instance' do
       class_member = create(:class_member)
 
-      pair = ClassMember.none.with_students.first
-      expect(pair).to eq(nil)
+      pair = class_member.with_student
+      student = described_class.all.students.first
+
+      expect(pair).to eq([class_member, student])
+    end
+
+    it 'returns a nil value if the member has no profile account' do
+      class_member = create(:class_member, student_id: SecureRandom.uuid)
+
+      pair = class_member.with_student
+      expect(pair).to eq([class_member, nil])
     end
   end
 end

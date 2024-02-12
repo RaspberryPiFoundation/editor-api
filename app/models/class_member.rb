@@ -16,8 +16,12 @@ class ClassMember < ApplicationRecord
   end
 
   def self.with_students
-    users = students.map { |user| [user.id, user] }.to_h
+    users = students.index_by(&:id)
     all.map { |member| [member, users[member.student_id]] }
+  end
+
+  def with_student
+    [self, User.from_userinfo(ids: student_id).first]
   end
 
   private
@@ -25,7 +29,7 @@ class ClassMember < ApplicationRecord
   def student_has_the_school_student_role_for_the_school
     return unless student_id_changed? && errors.blank?
 
-    user = User.from_userinfo(ids: student_id).first
+    _, user = with_student
     return unless user && !user.school_student?(organisation_id: school.id)
 
     msg = "'#{student_id}' does not have the 'school-student' role for organisation '#{school.id}'"
