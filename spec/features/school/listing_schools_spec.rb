@@ -11,7 +11,6 @@ RSpec.describe 'Listing schools', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:user_id) { stubbed_user_id }
 
   it 'responds 200 OK' do
     get('/api/schools', headers:)

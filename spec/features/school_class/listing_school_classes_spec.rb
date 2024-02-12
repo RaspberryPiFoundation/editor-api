@@ -13,7 +13,6 @@ RSpec.describe 'Listing school classes', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
   let(:school) { school_class.school }
-  let(:user_id) { stubbed_user_id }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)
