@@ -11,7 +11,7 @@ module UserProfileMock
       .to_return do |request|
         uuids = JSON.parse(request.body).fetch('userIds', [])
         indexes = uuids.map { |uuid| user_index_by_uuid(uuid) }.compact
-        users = indexes.map { |user_index| stubbed_user_attributes(user_index:) }
+        users = indexes.map { |user_index| user_attributes_by_index(user_index) }
 
         { body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } }
       end
@@ -24,20 +24,20 @@ module UserProfileMock
       .to_return(
         status: 200,
         headers: { content_type: 'application/json' },
-        body: stubbed_user_attributes(user_index:).to_json
+        body: user_attributes_by_index(user_index).to_json
       )
-  end
-
-  def stubbed_user_attributes(user_index: 0)
-    JSON.parse(USERS)['users'][user_index] if user_index
-  end
-
-  def stubbed_user_id(user_index: 0)
-    stubbed_user_attributes(user_index:)&.fetch('id')
   end
 
   def stubbed_user
     User.from_omniauth(token: TOKEN)
+  end
+
+  def user_attributes_by_index(user_index = 0)
+    JSON.parse(USERS)['users'][user_index] if user_index
+  end
+
+  def user_id_by_index(user_index)
+    user_attributes_by_index(user_index)&.fetch('id')
   end
 
   def user_index_by_uuid(uuid)

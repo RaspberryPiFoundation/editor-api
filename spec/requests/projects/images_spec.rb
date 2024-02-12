@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Images requests' do
-  let(:project) { create(:project, user_id: stubbed_user_id) }
+  let(:project) { create(:project, user_id: user_id_by_index(0)) }
   let(:image_filename) { 'test_image_1.png' }
   let(:params) { { images: [fixture_file_upload(image_filename, 'image/png')] } }
   let(:expected_json) do

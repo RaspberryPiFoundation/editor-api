@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolClass::Create, type: :unit do
   let(:school) { create(:school) }
   let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { stubbed_user_id(user_index: teacher_index) }
+  let(:teacher_id) { user_id_by_index(teacher_index) }
 
   let(:school_class_params) do
     { name: 'Test School Class', teacher_id: }

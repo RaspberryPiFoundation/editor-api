@@ -46,7 +46,7 @@ RSpec.describe 'projects { }' do
   context 'when fetching project when logged in' do
     let(:query) { 'query { projects { edges { node { id } } } }' }
     let(:current_user) { stubbed_user }
-    let(:project) { create(:project, user_id: stubbed_user_id) }
+    let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
       stub_hydra_public_api
@@ -83,8 +83,8 @@ RSpec.describe 'projects { }' do
   context 'when fetching projects by user ID when logged in' do
     let(:query) { 'query ($userId: String) { projects(userId: $userId) { edges { node { id } } } }' }
     let(:current_user) { stubbed_user }
-    let(:variables) { { userId: stubbed_user_id } }
-    let(:project) { create(:project, user_id: stubbed_user_id) }
+    let(:variables) { { userId: stubbed_user.id } }
+    let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
       stub_hydra_public_api

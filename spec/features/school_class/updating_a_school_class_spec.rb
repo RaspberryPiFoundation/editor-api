@@ -12,7 +12,7 @@ RSpec.describe 'Updating a school class', type: :request do
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
   let(:school) { school_class.school }
   let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { stubbed_user_id(user_index: teacher_index) }
+  let(:teacher_id) { user_id_by_index(teacher_index) }
 
   let(:params) do
     {

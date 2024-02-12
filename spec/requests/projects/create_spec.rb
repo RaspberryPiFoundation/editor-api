@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Create project requests' do
-  let(:project) { create(:project, user_id: stubbed_user_id) }
+  let(:project) { create(:project, user_id: stubbed_user.id) }
 
   context 'when auth is correct' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }

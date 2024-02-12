@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Project delete requests' do
   context 'when user is logged in' do
-    let!(:project) { create(:project, user_id: stubbed_user_id, locale: nil) }
+    let!(:project) { create(:project, user_id: user_id_by_index(0), locale: nil) }
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do

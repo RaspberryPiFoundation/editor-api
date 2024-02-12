@@ -9,7 +9,7 @@ RSpec.describe 'Project index requests' do
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
   before do
-    create_list(:project, 2, user_id: stubbed_user_id)
+    create_list(:project, 2, user_id: user_id_by_index(0))
   end
 
   context 'when user is logged in' do
@@ -33,7 +33,7 @@ RSpec.describe 'Project index requests' do
     it 'returns users projects' do
       get('/api/projects', headers:)
       returned = response.parsed_body
-      expect(returned.all? { |proj| proj['user_id'] == stubbed_user_id }).to be(true)
+      expect(returned.all? { |proj| proj['user_id'] == stubbed_user.id }).to be(true)
     end
 
     it 'returns all keys in response' do
@@ -46,7 +46,7 @@ RSpec.describe 'Project index requests' do
   context 'when the projects index has pagination' do
     before do
       stub_hydra_public_api
-      create_list(:project, 10, user_id: stubbed_user_id)
+      create_list(:project, 10, user_id: stubbed_user.id)
     end
 
     it 'returns the default number of projects on the first page' do
