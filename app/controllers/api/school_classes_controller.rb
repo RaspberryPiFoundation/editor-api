@@ -7,7 +7,7 @@ module Api
     load_and_authorize_resource :school_class, through: :school, through_association: :classes
 
     def index
-      @school_classes = SchoolClass.accessible_by(current_ability)
+      @school_classes = @school.classes.accessible_by(current_ability)
       render :index, formats: [:json], status: :ok
     end
 

@@ -41,6 +41,22 @@ RSpec.describe 'Creating a class member', type: :request do
     expect(data[:student_id]).to eq(student_id)
   end
 
+  it 'responds with the student JSON' do
+    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:name]).to eq('School Student')
+  end
+
+  it "doesn't include student attributes in the JSON if the user profile doesn't exist" do
+    student_id = SecureRandom.uuid
+
+    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: { class_member: { student_id: } })
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data).not_to have_key(:name)
+  end
+
   it 'responds 400 Bad Request when params are missing' do
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     expect(response).to have_http_status(:bad_request)
