@@ -15,6 +15,11 @@ class ClassMember < ApplicationRecord
     User.from_userinfo(ids: pluck(:student_id))
   end
 
+  def self.with_students
+    users = students.map { |user| [user.id, user] }.to_h
+    all.map { |member| [member, users[member.student_id]] }
+  end
+
   private
 
   def student_has_the_school_student_role_for_the_school

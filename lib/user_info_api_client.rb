@@ -17,7 +17,7 @@ class UserInfoApiClient
     end
 
     def fetch_by_ids(user_ids)
-      return if user_ids.blank?
+      return [] if user_ids.blank?
       return stubbed_by_ids(user_ids) if bypass_auth?
 
       response = conn.get do |r|
