@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+school_class, teacher = @school_class_with_teacher
+
 json.call(
-  @school_class,
+  school_class,
   :id,
   :school_id,
   :teacher_id,
@@ -9,3 +11,7 @@ json.call(
   :created_at,
   :updated_at
 )
+
+json.teacher_name(teacher&.name)
+json.teacher_nickname(teacher&.nickname)
+json.teacher_picture(teacher&.picture)

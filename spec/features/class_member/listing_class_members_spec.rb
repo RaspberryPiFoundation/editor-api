@@ -40,7 +40,7 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.first[:student_name]).to be(nil)
+    expect(data.first[:student_name]).to be_nil
   end
 
   it 'does not include class members that belong to a different class' do

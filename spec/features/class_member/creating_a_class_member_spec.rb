@@ -54,7 +54,7 @@ RSpec.describe 'Creating a class member', type: :request do
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: { class_member: { student_id: } })
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:student_name]).to be(nil)
+    expect(data[:student_name]).to be_nil
   end
 
   it 'responds 400 Bad Request when params are missing' do

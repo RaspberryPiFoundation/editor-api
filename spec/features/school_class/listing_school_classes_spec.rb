@@ -26,6 +26,22 @@ RSpec.describe 'Listing school classes', type: :request do
     expect(data.first[:name]).to eq('Test School Class')
   end
 
+  it 'responds with the teachers JSON' do
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.first[:teacher_name]).to eq('School Teacher')
+  end
+
+  it "responds with nil attributes for teachers if the user profile doesn't exist" do
+    school_class.update!(teacher_id: SecureRandom.uuid)
+
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.first[:teacher_name]).to be_nil
+  end
+
   it "does not include school classes that the school-teacher doesn't teach" do
     stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
     create(:school_class, school:, teacher_id: SecureRandom.uuid)

@@ -39,6 +39,22 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(data[:name]).to eq('Test School Class')
   end
 
+  it 'responds with the teacher JSON' do
+    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:teacher_name]).to eq('School Teacher')
+  end
+
+  it "responds with nil attributes for the teacher if their user profile doesn't exist" do
+    school_class.update!(teacher_id: SecureRandom.uuid)
+
+    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:teacher_name]).to be_nil
+  end
+
   it 'responds 404 Not Found when no school exists' do
     get("/api/schools/not-a-real-id/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:not_found)

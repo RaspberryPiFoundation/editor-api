@@ -41,6 +41,22 @@ RSpec.describe 'Creating a school class', type: :request do
     expect(data[:name]).to eq('Test School Class')
   end
 
+  it 'responds with the teacher JSON' do
+    post("/api/schools/#{school.id}/classes", headers:, params:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:teacher_name]).to eq('School Teacher')
+  end
+
+  it "responds with nil attributes for the teacher if their user profile doesn't exist" do
+    teacher_id = SecureRandom.uuid
+
+    post("/api/schools/#{school.id}/classes", headers:, params: { school_class: { teacher_id: } })
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:teacher_name]).to be_nil
+  end
+
   it 'sets the class teacher to the specified user for school-owner users' do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)

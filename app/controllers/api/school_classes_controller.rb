@@ -7,11 +7,12 @@ module Api
     load_and_authorize_resource :school_class, through: :school, through_association: :classes
 
     def index
-      @school_classes = @school.classes.accessible_by(current_ability)
+      @school_classes_with_teachers = @school.classes.accessible_by(current_ability).with_teachers
       render :index, formats: [:json], status: :ok
     end
 
     def show
+      @school_class_with_teacher = @school_class.with_teacher
       render :show, formats: [:json], status: :ok
     end
 
@@ -19,7 +20,7 @@ module Api
       result = SchoolClass::Create.call(school: @school, school_class_params:)
 
       if result.success?
-        @school_class = result[:school_class]
+        @school_class_with_teacher = result[:school_class].with_teacher
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -31,7 +32,7 @@ module Api
       result = SchoolClass::Update.call(school_class:, school_class_params:)
 
       if result.success?
-        @school_class = result[:school_class]
+        @school_class_with_teacher = result[:school_class].with_teacher
         render :show, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
