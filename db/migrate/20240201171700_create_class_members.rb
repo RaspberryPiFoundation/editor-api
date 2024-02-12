@@ -1,7 +1,7 @@
 class CreateClassMembers < ActiveRecord::Migration[7.0]
   def change
     create_table :class_members, id: :uuid do |t|
-      t.belongs_to :school_class, null: false
+      t.references :school_class, type: :uuid, foreign_key: true, index: true, null: false
       t.uuid :student_id, null: false
       t.timestamps
     end

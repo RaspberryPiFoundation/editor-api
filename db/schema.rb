@@ -45,7 +45,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   end
 
   create_table "class_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.bigint "school_class_id", null: false
+    t.uuid "school_class_id", null: false
     t.uuid "student_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -150,7 +150,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   end
 
   create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.bigint "school_id", null: false
+    t.uuid "school_id", null: false
     t.uuid "teacher_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -184,6 +184,8 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "class_members", "school_classes"
   add_foreign_key "components", "projects"
   add_foreign_key "project_errors", "projects"
+  add_foreign_key "school_classes", "schools"
 end
