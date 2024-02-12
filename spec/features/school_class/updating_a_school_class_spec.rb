@@ -27,6 +27,13 @@ RSpec.describe 'Updating a school class', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
+  it 'responds 200 OK when the user is the school-teacher for the class' do
+    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+
+    put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
+    expect(response).to have_http_status(:ok)
+  end
+
   it 'responds with the school class JSON' do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
@@ -49,8 +56,8 @@ RSpec.describe 'Updating a school class', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 403 Forbidden when the user is not a school-owner or school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+  it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+    school.update!(organisation_id: '00000000-00000000-00000000-00000000')
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)
@@ -64,8 +71,8 @@ RSpec.describe 'Updating a school class', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
-  it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school.update!(organisation_id: '00000000-00000000-00000000-00000000')
+  it 'responds 403 Forbidden when the user is a school-student' do
+    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)

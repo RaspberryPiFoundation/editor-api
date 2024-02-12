@@ -11,7 +11,6 @@ module Api
     end
 
     def show
-      @school = School.find(params[:id])
       render :show, formats: [:json], status: :ok
     end
 

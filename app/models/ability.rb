@@ -25,7 +25,11 @@ class Ability
 
       if user.school_teacher?(organisation_id:)
         can(%i[create], SchoolClass, school: { organisation_id: })
-        can(%i[update], SchoolClass, school: { organisation_id: }, teacher_id: user.id)
+        can(%i[read update], SchoolClass, school: { organisation_id: }, teacher_id: user.id)
+      end
+
+      if user.school_student?(organisation_id:)
+        can(%i[read], SchoolClass, school: { organisation_id: }, members: { student_id: user.id })
       end
     end
   end

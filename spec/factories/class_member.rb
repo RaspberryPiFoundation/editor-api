@@ -3,6 +3,6 @@
 FactoryBot.define do
   factory :class_member do
     school_class
-    student_id { SecureRandom.uuid }
+    student_id { '22222222-2222-2222-2222-222222222222' } # Matches users.json.
   end
 end

@@ -6,6 +6,10 @@ module Api
     load_and_authorize_resource :school
     load_and_authorize_resource :school_class, through: :school, through_association: :classes
 
+    def show
+      render :show, formats: [:json], status: :ok
+    end
+
     def create
       result = SchoolClass::Create.call(school: @school, school_class_params:)
 

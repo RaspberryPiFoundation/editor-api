@@ -27,6 +27,13 @@ RSpec.describe 'Creating a school class', type: :request do
     expect(response).to have_http_status(:created)
   end
 
+  it 'responds 201 Created when the user is a school-teacher' do
+    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+
+    post("/api/schools/#{school.id}/classes", headers:, params:)
+    expect(response).to have_http_status(:created)
+  end
+
   it 'responds with the school class JSON' do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
@@ -64,5 +71,19 @@ RSpec.describe 'Creating a school class', type: :request do
   it 'responds 401 Unauthorized when no token is given' do
     post "/api/schools/#{school.id}/classes"
     expect(response).to have_http_status(:unauthorized)
+  end
+
+  it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+    school.update!(organisation_id: '00000000-00000000-00000000-00000000')
+
+    post("/api/schools/#{school.id}/classes", headers:, params:)
+    expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'responds 403 Forbidden when the user is a school-student' do
+    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+
+    post("/api/schools/#{school.id}/classes", headers:, params:)
+    expect(response).to have_http_status(:forbidden)
   end
 end

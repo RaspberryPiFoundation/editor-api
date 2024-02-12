@@ -14,8 +14,8 @@ RSpec.describe SchoolClass do
     end
 
     it 'has many members' do
-      school_class = create(:school_class, members: [build(:class_member), build(:class_member)])
-      expect(school_class.members.size).to eq(2)
+      school_class = create(:school_class, members: [build(:class_member)])
+      expect(school_class.members.size).to eq(1)
     end
 
     context 'when a school_class is destroyed' do
