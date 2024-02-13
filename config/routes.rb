@@ -21,6 +21,8 @@ Rails.application.routes.draw do
       resources :classes, only: %i[index show create update], controller: 'school_classes' do
         resources :members, only: %i[index create], controller: 'class_members'
       end
+
+      resources :owners, only: %i[create], controller: 'school_owners'
     end
   end
 
