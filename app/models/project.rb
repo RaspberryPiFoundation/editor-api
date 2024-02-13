@@ -42,8 +42,4 @@ class Project < ApplicationRecord
 
     errors.add(:identifier, "can't be taken by another user")
   end
-
-  def permitted_attributes
-    super + [:images => []]
-  end
 end
