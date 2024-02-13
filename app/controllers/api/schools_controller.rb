@@ -15,7 +15,7 @@ module Api
     end
 
     def create
-      result = School::Create.call(school_params:, current_user:)
+      result = School::Create.call(school_params:, token: current_user&.token)
 
       if result.success?
         @school = result[:school]

@@ -160,7 +160,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   end
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "owner_id", null: false
     t.string "name", null: false
     t.string "reference"
     t.string "address_line_1", null: false

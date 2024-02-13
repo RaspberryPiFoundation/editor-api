@@ -25,7 +25,7 @@ RSpec.describe 'Listing schools', type: :request do
   end
 
   it 'only includes schools the user belongs to' do
-    create(:school, id: SecureRandom.uuid, owner_id: SecureRandom.uuid)
+    create(:school, id: SecureRandom.uuid)
 
     get('/api/schools', headers:)
     data = JSON.parse(response.body, symbolize_names: true)

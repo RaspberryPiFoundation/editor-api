@@ -55,31 +55,13 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
-    it 'requires an owner_id' do
-      school.owner_id = ' '
-      expect(school).to be_invalid
-    end
-
-    it 'requires a UUID owner_id' do
-      school.owner_id = 'invalid'
-      expect(school).to be_invalid
-    end
-
-    it 'requires an owner that has the school-owner role for the school' do
-      school.owner_id = '11111111-1111-1111-1111-111111111111' # school-teacher
-      expect(school).to be_invalid
-    end
-
     it 'requires a name' do
       school.name = ' '
       expect(school).to be_invalid
     end
 
     it 'does not require a reference' do
-      create(:school, reference: nil)
-
-      school.id = SecureRandom.uuid # Satisfy the uniqueness validation.
-      school.owner_id = SecureRandom.uuid # Satisfy the school-owner validation.
+      create(:school, id: SecureRandom.uuid, reference: nil)
 
       school.reference = nil
       expect(school).to be_valid
@@ -111,18 +93,6 @@ RSpec.describe School do
     it "requires an 'ISO 3166-1 alpha-2' country_code" do
       school.country_code = 'GBR'
       expect(school).to be_invalid
-    end
-  end
-
-  describe '#owner' do
-    it 'returns a User instance for the owner_id of the school' do
-      school = create(:school)
-      expect(school.owner.name).to eq('School Owner')
-    end
-
-    it 'returns nil if no profile account exists' do
-      school = create(:school, owner_id: SecureRandom.uuid)
-      expect(school.owner).to be_nil
     end
   end
 end

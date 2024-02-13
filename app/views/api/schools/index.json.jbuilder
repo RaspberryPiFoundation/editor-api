@@ -4,7 +4,6 @@ json.array!(@schools) do |school|
   json.call(
     school,
     :id,
-    :owner_id,
     :name,
     :reference,
     :address_line_1, # rubocop:disable Naming/VariableNumber

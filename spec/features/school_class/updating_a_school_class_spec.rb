@@ -73,7 +73,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school = create(:school, id: SecureRandom.uuid, owner_id: SecureRandom.uuid)
+    school = create(:school, id: SecureRandom.uuid)
     school_class.update!(school_id: school.id)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
