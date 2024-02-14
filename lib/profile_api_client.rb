@@ -14,6 +14,8 @@ class ProfileApiClient
     def create_organisation(token:)
       return nil if token.blank?
 
+      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
+      # code so that School::Create propagates the error in the response.
       response = { 'id' => '12345678-1234-1234-1234-123456789abc' }
       response.deep_symbolize_keys
     end
@@ -112,6 +114,26 @@ class ProfileApiClient
       return nil if token.blank?
 
       _ = teacher_id
+      _ = organisation_id
+
+      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
+      # code so that SchoolOwner::Remove propagates the error in the response.
+      response = {}
+      response.deep_symbolize_keys
+    end
+
+    # The API should enforce these constraints:
+    # - The token has the school-owner role for the given organisation ID
+    # - The token user should not be under 13
+    # - The email must be verified
+    #
+    # The API should respond:
+    # - 404 Not Found if the user doesn't exist
+    # - 422 Unprocessable if the constraints are not met
+    def delete_school_student(token:, student_id:, organisation_id:)
+      return nil if token.blank?
+
+      _ = student_id
       _ = organisation_id
 
       # TODO: We should make Faraday raise a Ruby error for a non-2xx status
