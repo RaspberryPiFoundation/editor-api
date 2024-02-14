@@ -41,8 +41,6 @@ RSpec.describe 'Inviting an owner', type: :request do
   end
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
-    pending 'TODO: validate email address'
-
     post("/api/schools/#{school.id}/owners", headers:, params: { school_owner: { email_address: 'invalid' } })
     expect(response).to have_http_status(:unprocessable_entity)
   end

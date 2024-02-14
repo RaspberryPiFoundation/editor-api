@@ -31,7 +31,9 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
   end
 
   context 'when creation fails' do
-    let(:school_owner_params) { {} }
+    let(:school_owner_params) do
+      { email_address: 'invalid' }
+    end
 
     before do
       allow(Sentry).to receive(:capture_exception)
@@ -49,7 +51,7 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_owner_params:, token:)
-      expect(response[:error]).to match(/key not found: :email_address/)
+      expect(response[:error]).to match(/email address 'invalid' is invalid/)
     end
 
     it 'sent the exception to Sentry' do

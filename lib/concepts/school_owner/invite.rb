@@ -16,8 +16,10 @@ module SchoolOwner
       private
 
       def invite_owner(school, school_owner_params, token)
-        email_address = school_owner_params.fetch(:email_address)
         organisation_id = school.id
+        email_address = school_owner_params.fetch(:email_address)
+
+        raise ArgumentError, "email address '#{email_address}' is invalid" unless EmailValidator.valid?(email_address)
 
         response = ProfileApiClient.invite_school_owner(token:, email_address:, organisation_id:)
         user_id = response.fetch(:id)
