@@ -16,6 +16,16 @@ module Api
       end
     end
 
+    def destroy
+      result = SchoolTeacher::Remove.call(school: @school, teacher_id: params[:id], token: current_user.token)
+
+      if result.success?
+        head :no_content
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def school_teacher_params

@@ -10,11 +10,11 @@ module ProfileApiMock
   end
 
   def stub_profile_api_invite_school_owner
-    allow(ProfileApiClient).to receive(:invite_school_owner).and_return({})
+    allow(ProfileApiClient).to receive(:invite_school_owner)
   end
 
   def stub_profile_api_invite_school_teacher
-    allow(ProfileApiClient).to receive(:invite_school_teacher).and_return({})
+    allow(ProfileApiClient).to receive(:invite_school_teacher)
   end
 
   def stub_profile_api_create_school_student(user_id:)
@@ -22,6 +22,10 @@ module ProfileApiMock
   end
 
   def stub_profile_api_remove_school_owner
-    allow(ProfileApiClient).to receive(:remove_school_owner).and_return({})
+    allow(ProfileApiClient).to receive(:remove_school_owner)
+  end
+
+  def stub_profile_api_remove_school_teacher
+    allow(ProfileApiClient).to receive(:remove_school_teacher)
   end
 end
