@@ -4,7 +4,5 @@ json.call(
   @school_student,
   :id,
   :username,
-  :name,
-  :nickname,
-  :picture
+  :name
 )

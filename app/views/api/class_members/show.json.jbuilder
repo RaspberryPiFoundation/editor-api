@@ -12,5 +12,3 @@ json.call(
 )
 
 json.student_name(student&.name)
-json.student_nickname(student&.nickname)
-json.student_picture(student&.picture)

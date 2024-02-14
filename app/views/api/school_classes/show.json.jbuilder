@@ -13,5 +13,3 @@ json.call(
 )
 
 json.teacher_name(teacher&.name)
-json.teacher_nickname(teacher&.nickname)
-json.teacher_picture(teacher&.picture)
