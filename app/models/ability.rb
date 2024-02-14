@@ -4,8 +4,9 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    can :show, Project, user_id: nil
-    can :show, Component, project: { user_id: nil }
+    can :show, Project, user_id: nil, is_live: true
+    can :show, Component, project: { user_id: nil, is_live: true }
+
 
     return unless user
 

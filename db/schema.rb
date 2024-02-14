@@ -134,6 +134,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_06_151705) do
     t.uuid "remixed_from_id"
     t.string "locale"
     t.string "remix_origin"
+    t.boolean "is_live"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"

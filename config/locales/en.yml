@@ -8,3 +8,6 @@ en:
       remixing:
         invalid_params: 'Invalid parameters'
         cannot_save: 'Cannot create project remix'
+      sharing:
+        invalid_params: 'Invalid parameters'
+        cannot_save: 'Cannot create project share'

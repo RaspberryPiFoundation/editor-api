@@ -1,11 +1,12 @@
 # frozen_string_literal: true
 
 class ProjectLoader
-  attr_reader :identifier, :locale
+  attr_reader :identifier, :locale, :is_live
 
   def initialize(identifier, locales)
     @identifier = identifier
     @locales = [*locales, 'en', nil]
+    # @is_live = true
   end
 
   def load
