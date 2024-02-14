@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Inviting a teacher', type: :request do
+RSpec.describe 'Inviting a school teacher', type: :request do
   before do
     stub_hydra_public_api
     stub_profile_api_invite_school_teacher(user_id: teacher_id)

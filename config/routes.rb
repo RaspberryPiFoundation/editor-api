@@ -24,6 +24,7 @@ Rails.application.routes.draw do
 
       resources :owners, only: %i[create], controller: 'school_owners'
       resources :teachers, only: %i[create], controller: 'school_teachers'
+      resources :students, only: %i[create], controller: 'school_students'
     end
   end
 

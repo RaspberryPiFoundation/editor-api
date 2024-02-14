@@ -16,6 +16,7 @@ class User
     postcode
     profile
     token
+    username
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
