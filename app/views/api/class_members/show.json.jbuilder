@@ -11,4 +11,5 @@ json.call(
   :updated_at
 )
 
+json.student_username(student&.username)
 json.student_name(student&.name)

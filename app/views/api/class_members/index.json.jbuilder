@@ -10,5 +10,6 @@ json.array!(@class_members_with_students) do |class_member, student|
     :updated_at
   )
 
+  json.student_username(student&.username)
   json.student_name(student&.name)
 end
