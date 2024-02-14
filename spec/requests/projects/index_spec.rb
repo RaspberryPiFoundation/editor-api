@@ -6,18 +6,17 @@ RSpec.describe 'Project index requests' do
   include PaginationLinksMock
 
   let(:headers) { { Authorization: 'dummy-token' } }
-  let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
   before do
-    create_list(:project, 2, user_id:)
+    create_list(:project, 2, user_id: stubbed_user_id)
   end
 
   context 'when user is logged in' do
     before do
       # create non user projects
       create_list(:project, 2)
-      stub_fetch_oauth_user_id(user_id)
+      stub_fetch_oauth_user
     end
 
     it 'returns success response' do
@@ -34,7 +33,7 @@ RSpec.describe 'Project index requests' do
     it 'returns users projects' do
       get('/api/projects', headers:)
       returned = response.parsed_body
-      expect(returned.all? { |proj| proj['user_id'] == user_id }).to be(true)
+      expect(returned.all? { |proj| proj['user_id'] == stubbed_user_id }).to be(true)
     end
 
     it 'returns all keys in response' do
@@ -46,8 +45,8 @@ RSpec.describe 'Project index requests' do
 
   context 'when the projects index has pagination' do
     before do
-      create_list(:project, 10, user_id:)
-      stub_fetch_oauth_user_id(user_id)
+      stub_fetch_oauth_user
+      create_list(:project, 10, user_id: stubbed_user_id)
     end
 
     it 'returns the default number of projects on the first page' do

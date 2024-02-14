@@ -6,7 +6,7 @@ RSpec.describe 'projects { }' do
   # NB: This is mostly tested via the `project_query_spec.rb`
   subject(:result) { execute_query(query:, variables:) }
 
-  let(:current_user_id) { nil }
+  let(:current_user) { nil }
   let(:variables) { {} }
 
   context 'when introspecting projects' do
@@ -45,8 +45,12 @@ RSpec.describe 'projects { }' do
 
   context 'when fetching project when logged in' do
     let(:query) { 'query { projects { edges { node { id } } } }' }
-    let(:current_user_id) { SecureRandom.uuid }
-    let(:project) { create(:project, user_id: current_user_id) }
+    let(:current_user) { stubbed_user }
+    let(:project) { create(:project, user_id: stubbed_user_id) }
+
+    before do
+      stub_fetch_oauth_user
+    end
 
     it { expect(query).to be_a_valid_graphql_query }
 
@@ -78,9 +82,13 @@ RSpec.describe 'projects { }' do
 
   context 'when fetching projects by user ID when logged in' do
     let(:query) { 'query ($userId: String) { projects(userId: $userId) { edges { node { id } } } }' }
-    let(:current_user_id) { SecureRandom.uuid }
-    let(:variables) { { userId: current_user_id } }
-    let(:project) { create(:project, user_id: current_user_id) }
+    let(:current_user) { stubbed_user }
+    let(:variables) { { userId: stubbed_user_id } }
+    let(:project) { create(:project, user_id: stubbed_user_id) }
+
+    before do
+      stub_fetch_oauth_user
+    end
 
     it { expect(query).to be_a_valid_graphql_query }
 

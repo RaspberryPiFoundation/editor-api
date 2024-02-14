@@ -8,8 +8,10 @@ module Mutations
     field :project, Types::ProjectType, description: 'The project that has been created'
 
     def resolve(**input)
-      project_hash = input.merge(user_id: context[:current_user_id],
-                                 components: input[:components]&.map(&:to_h))
+      project_hash = input.merge(
+        user_id: context[:current_user]&.id,
+        components: input[:components]&.map(&:to_h)
+      )
 
       response = Project::Create.call(project_hash:)
       raise GraphQL::ExecutionError, response[:error] unless response.success?
@@ -18,7 +20,7 @@ module Mutations
     end
 
     def ready?(**_args)
-      return true if context[:current_ability]&.can?(:create, Project, user_id: context[:current_user_id])
+      return true if context[:current_ability]&.can?(:create, Project, user_id: context[:current_user]&.id)
 
       raise GraphQL::ExecutionError, 'You are not permitted to create a project'
     end

@@ -6,14 +6,14 @@ module Api
       before_action :authorize_user
 
       def show
-        @project = Project.find_by!(remixed_from_id: project.id, user_id: current_user)
+        @project = Project.find_by!(remixed_from_id: project.id, user_id: current_user&.id)
 
         render '/api/projects/show', formats: [:json]
       end
 
       def create
         result = Project::CreateRemix.call(params: remix_params,
-                                           user_id: current_user,
+                                           user_id: current_user&.id,
                                            original_project: project,
                                            remix_origin: request.origin)
 

@@ -88,8 +88,12 @@ RSpec.describe 'query { project { ... } }' do
     end
 
     context 'when logged in' do
-      let(:current_user_id) { SecureRandom.uuid }
-      let(:project) { create(:project, user_id: current_user_id) }
+      let(:current_user) { stubbed_user }
+      let(:project) { create(:project, user_id: stubbed_user_id) }
+
+      before do
+        stub_fetch_oauth_user
+      end
 
       it 'returns the project global id' do
         expect(result.dig('data', 'project', 'id')).to eq project.to_gid_param

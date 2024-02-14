@@ -6,7 +6,8 @@ require 'rails_helper'
 RSpec.describe Ability do
   subject { described_class.new(user) }
 
-  let(:project) { build(:project) }
+  let(:user_id) { SecureRandom.uuid }
+  let(:project) { build(:project, user_id:) }
   let(:starter_project) { build(:project, user_id: nil) }
 
   describe 'Project' do
@@ -31,7 +32,7 @@ RSpec.describe Ability do
     end
 
     context 'when user present' do
-      let(:user) { project.user_id }
+      let(:user) { build(:user, id: user_id) }
       let(:another_project) { build(:project) }
 
       context 'with a starter project' do
@@ -83,7 +84,7 @@ RSpec.describe Ability do
     end
 
     context 'when user present' do
-      let(:user) { project.user_id }
+      let(:user) { build(:user, id: user_id) }
 
       context 'with a component from a starter project' do
         it { is_expected.not_to be_able_to(:index, starter_project_component) }

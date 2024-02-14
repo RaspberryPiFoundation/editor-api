@@ -22,12 +22,14 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing component' do
-    let(:component) { create(:component, name: 'bob', extension: 'html', content: 'new', default: true) }
+    let(:project) { create(:project, user_id: stubbed_user_id) }
+    let(:component) { create(:component, project:, name: 'bob', extension: 'html', content: 'new', default: true) }
     let(:component_id) { component.to_gid_param }
 
     before do
       # Instantiate component
       component
+      stub_fetch_oauth_user
     end
 
     context 'when unauthenticated' do
@@ -49,7 +51,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user_id) { component.project.user_id }
+      let(:current_user) { stubbed_user }
 
       it 'updates the component name' do
         expect { result }.to change { component.reload.name }.from(component.name).to(variables.dig(:component, :name))
@@ -76,7 +78,9 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
       end
 
       context 'with another users component' do
-        let(:current_user_id) { SecureRandom.uuid }
+        before do
+          stub_fetch_oauth_user(user_index: 1)
+        end
 
         it 'returns an error' do
           expect(result.dig('errors', 0, 'message')).to match(/not permitted/)

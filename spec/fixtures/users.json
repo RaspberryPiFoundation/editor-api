@@ -1,0 +1,40 @@
+{
+  "users": [
+    {
+      "id": "b6301f34-b970-4d4f-8314-f877bad8b150",
+      "email": "jane.doe@example.com",
+      "username": null,
+      "parentalEmail": null,
+      "name": "Jane Doe",
+      "nickname": "Jane",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "postcode": null,
+      "dateOfBirth": null,
+      "verifiedAt": "2023-08-14T11:02:27.038Z",
+      "createdAt": "2023-08-14T11:02:27.038Z",
+      "updatedAt": "2023-08-14T13:41:46.874Z",
+      "discardedAt": null,
+      "lastLoggedInAt": "2023-08-14T13:41:46.863Z",
+      "roles": "school-teacher"
+    },
+    {
+      "id": "bbb9b8fd-f357-4238-983d-6f87b99bdbb2",
+      "email": "john.doe@example.com",
+      "username": null,
+      "parentalEmail": null,
+      "name": "John Doe",
+      "nickname": "John",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "postcode": null,
+      "dateOfBirth": null,
+      "verifiedAt": "2023-08-14T11:02:27.038Z",
+      "createdAt": "2023-08-14T11:02:27.038Z",
+      "updatedAt": "2023-09-18T06:53:02.312Z",
+      "discardedAt": null,
+      "lastLoggedInAt": "2023-09-18T06:53:02.277Z",
+      "roles": "school-student"
+    }
+  ]
+}

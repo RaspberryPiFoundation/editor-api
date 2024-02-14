@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe 'Remix requests' do
   let!(:original_project) { create(:project) }
-  let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
   let(:project_params) do
     {
       name: original_project.name,
@@ -21,12 +20,12 @@ RSpec.describe 'Remix requests' do
     let(:headers) { { Authorization: 'dummy-token', Origin: 'editor.com' } }
 
     before do
-      stub_fetch_oauth_user_id(user_id)
+      stub_fetch_oauth_user
     end
 
     describe '#show' do
       before do
-        create(:project, remixed_from_id: original_project.id, user_id:)
+        create(:project, remixed_from_id: original_project.id, user_id: stubbed_user_id)
       end
 
       it 'returns success response' do
@@ -58,7 +57,7 @@ RSpec.describe 'Remix requests' do
 
       context 'when project cannot be saved' do
         before do
-          stub_fetch_oauth_user_id(user_id)
+          stub_fetch_oauth_user
           error_response = OperationResponse.new
           error_response[:error] = 'Something went wrong'
           allow(Project::CreateRemix).to receive(:call).and_return(error_response)

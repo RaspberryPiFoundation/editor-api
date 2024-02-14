@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'project_importer'
 
 RSpec.describe ProjectImporter do
   let(:importer) do

@@ -8,9 +8,9 @@ class Ability
     can :show, Component, project: { user_id: nil, is_live: true }
 
 
-    return if user.blank?
+    return unless user
 
-    can %i[show read create update destroy], Project, user_id: user
-    can %i[show read create update destroy], Component, project: { user_id: user }
+    can %i[read create update destroy], Project, user_id: user.id
+    can %i[read create update destroy], Component, project: { user_id: user.id }
   end
 end
