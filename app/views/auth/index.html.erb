@@ -1,9 +1,9 @@
 <% if current_user %>
-    <form action="<%= rpi_auth_logout_path %>">
+    <form action="<%= logout_path %>">
         <input type="submit" value="Logout">
     </form>
 <% else %>
-    <%= button_to "Log in", rpi_auth_login_path, params: { returnTo: '/admin' } %>
+    <%= button_to "Log in", login_path %>
 <% end %>
 <% flash.each do |type, msg| %>
   <div>

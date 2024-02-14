@@ -6,10 +6,17 @@
 # you're free to overwrite the RESTful controller actions.
 module Admin
   class ApplicationController < Administrate::ApplicationController
+    # include RpiAuth::Controllers::CurrentUser
+    include AuthenticationHelper
+    # include Identifiable
+
     before_action :authenticate_admin
 
+    helper_method :current_user
+
     def authenticate_admin
-      # TODO Add authentication logic here.
+      puts current_user.inspect
+      redirect_to '/', alert: 'Not authorized.' unless current_user&.admin?
     end
 
     # Override this value to specify the number of elements to display at a time

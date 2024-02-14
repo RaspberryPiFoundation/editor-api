@@ -25,7 +25,10 @@ gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.6'
 gem 'rack-cors'
 gem 'rails', '~> 7.0.0'
-gem 'rpi_auth', git: 'https://github.com/RaspberryPiFoundation/rpi-auth.git', tag: 'v3.5.0'
+gem 'omniauth-rails_csrf_protection', '~> 1.0.1'
+gem 'omniauth-rpi',
+    github: 'RaspberryPiFoundation/omniauth-rpi',
+    tag: 'v1.3.1'
 gem 'scout_apm'
 gem 'sentry-rails', '~> 5.5.0'
 

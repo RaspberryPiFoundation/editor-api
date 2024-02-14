@@ -32,7 +32,7 @@ Rails.application.routes.draw do
 
   root to: 'auth#index'
 
-  # post '/auth/rpi', as: 'login'
-  # get '/auth/callback', to: 'auth#callback', as: 'callback'
-  # get '/logout', to: 'auth#destroy', as: 'logout'
+  post '/auth/rpi', as: 'login'
+  get '/auth/callback', to: 'auth#callback', as: 'callback'
+  get '/logout', to: 'auth#destroy', as: 'logout'
 end

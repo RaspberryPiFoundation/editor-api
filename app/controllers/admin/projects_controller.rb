@@ -1,7 +1,5 @@
 module Admin
   class ProjectsController < Admin::ApplicationController
-    include RpiAuth::Models::Authenticatable
-
     before_action :set_host_for_local_storage
 
     def scoped_resource
