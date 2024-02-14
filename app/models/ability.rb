@@ -16,10 +16,8 @@ class Ability
     can %i[create], School # The user agrees to become a school-owner by creating a school.
 
     user.organisation_ids.each do |organisation_id|
-      can(%i[read], School, id: organisation_id)
-
       if user.school_owner?(organisation_id:)
-        can(%i[update], School, id: organisation_id)
+        can(%i[read update], School, id: organisation_id)
         can(%i[read create update], SchoolClass, school: { id: organisation_id })
         can(%i[read create], ClassMember, school_class: { school: { id: organisation_id } })
         can(%i[create destroy], :school_owner)
@@ -28,6 +26,7 @@ class Ability
       end
 
       if user.school_teacher?(organisation_id:)
+        can(%i[read], School, id: organisation_id)
         can(%i[create], SchoolClass, school: { id: organisation_id })
         can(%i[read update], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
         can(%i[read create], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
@@ -35,6 +34,7 @@ class Ability
       end
 
       if user.school_student?(organisation_id:)
+        can(%i[read], School, id: organisation_id)
         can(%i[read], SchoolClass, school: { id: organisation_id }, members: { student_id: user.id })
       end
     end
