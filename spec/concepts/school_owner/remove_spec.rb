@@ -9,7 +9,7 @@ RSpec.describe SchoolOwner::Remove, type: :unit do
   let(:owner_id) { user_id_by_index(owner_index) }
 
   before do
-    stub_profile_api_remove_school_owner(user_id: owner_id)
+    stub_profile_api_remove_school_owner
   end
 
   it 'makes a profile API call' do

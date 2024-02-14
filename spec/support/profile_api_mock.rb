@@ -9,19 +9,19 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:create_organisation).and_return(id: organisation_id)
   end
 
-  def stub_profile_api_invite_school_owner(user_id:)
-    allow(ProfileApiClient).to receive(:invite_school_owner).and_return(id: user_id)
+  def stub_profile_api_invite_school_owner
+    allow(ProfileApiClient).to receive(:invite_school_owner).and_return({})
   end
 
-  def stub_profile_api_invite_school_teacher(user_id:)
-    allow(ProfileApiClient).to receive(:invite_school_teacher).and_return(id: user_id)
+  def stub_profile_api_invite_school_teacher
+    allow(ProfileApiClient).to receive(:invite_school_teacher).and_return({})
   end
 
   def stub_profile_api_create_school_student(user_id:)
     allow(ProfileApiClient).to receive(:create_school_student).and_return(id: user_id)
   end
 
-  def stub_profile_api_remove_school_owner(user_id:)
+  def stub_profile_api_remove_school_owner
     allow(ProfileApiClient).to receive(:remove_school_owner).and_return({})
   end
 end

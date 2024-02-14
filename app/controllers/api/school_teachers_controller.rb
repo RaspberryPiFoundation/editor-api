@@ -10,8 +10,7 @@ module Api
       result = SchoolTeacher::Invite.call(school: @school, school_teacher_params:, token: current_user.token)
 
       if result.success?
-        @school_teacher = result[:school_teacher]
-        render :show, formats: [:json], status: :created
+        head :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end

@@ -10,8 +10,7 @@ module Api
       result = SchoolOwner::Invite.call(school: @school, school_owner_params:, token: current_user.token)
 
       if result.success?
-        @school_owner = result[:school_owner]
-        render :show, formats: [:json], status: :created
+        head :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
@@ -20,7 +19,9 @@ module Api
     def destroy
       result = SchoolOwner::Remove.call(school: @school, owner_id: params[:id], token: current_user.token)
 
-      unless result.success?
+      if result.success?
+        head :no_content
+      else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end

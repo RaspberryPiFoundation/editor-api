@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Inviting a school owner', type: :request do
   before do
     stub_hydra_public_api
-    stub_profile_api_invite_school_owner(user_id: owner_id)
+    stub_profile_api_invite_school_owner
     stub_user_info_api
   end
 
@@ -25,13 +25,6 @@ RSpec.describe 'Inviting a school owner', type: :request do
   it 'responds 201 Created' do
     post("/api/schools/#{school.id}/owners", headers:, params:)
     expect(response).to have_http_status(:created)
-  end
-
-  it 'responds with the invited owner JSON' do
-    post("/api/schools/#{school.id}/owners", headers:, params:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[:name]).to eq('School Owner')
   end
 
   it 'responds 400 Bad Request when params are missing' do

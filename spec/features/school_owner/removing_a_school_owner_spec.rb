@@ -6,7 +6,7 @@ RSpec.describe 'Removing a school owner', type: :request do
   before do
     stub_hydra_public_api
     stub_user_info_api
-    stub_profile_api_remove_school_owner(user_id: owner_id)
+    stub_profile_api_remove_school_owner
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

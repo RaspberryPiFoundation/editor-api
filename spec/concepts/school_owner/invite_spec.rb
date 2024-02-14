@@ -13,8 +13,7 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
   end
 
   before do
-    stub_profile_api_invite_school_owner(user_id: owner_id)
-    stub_user_info_api
+    stub_profile_api_invite_school_owner
   end
 
   it 'makes a profile API call' do
@@ -23,11 +22,6 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:invite_school_owner)
       .with(token:, email_address: 'owner-to-invite@example.com', organisation_id: school.id)
-  end
-
-  it 'returns the school owner in the operation response' do
-    response = described_class.call(school:, school_owner_params:, token:)
-    expect(response[:school_owner]).to be_a(User)
   end
 
   context 'when creation fails' do
