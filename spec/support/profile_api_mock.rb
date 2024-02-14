@@ -32,4 +32,8 @@ module ProfileApiMock
   def stub_profile_api_delete_school_student
     allow(ProfileApiClient).to receive(:delete_school_student)
   end
+
+  def stub_profile_api_update_school_student
+    allow(ProfileApiClient).to receive(:update_school_student)
+  end
 end

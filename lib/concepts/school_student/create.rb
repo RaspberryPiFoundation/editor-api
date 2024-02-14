@@ -21,14 +21,18 @@ module SchoolStudent
         password = school_student_params.fetch(:password)
         name = school_student_params.fetch(:name)
 
-        raise ArgumentError, "username '#{username}' is invalid" if username.blank?
-        raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
-        raise ArgumentError, "name '#{name}' is invalid" if name.blank?
+        validate(username:, password:, name:)
 
         response = ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id:)
         user_id = response.fetch(:id)
 
         User.from_userinfo(ids: user_id).first
+      end
+
+      def validate(username:, password:, name:)
+        raise ArgumentError, "username '#{username}' is invalid" if username.blank?
+        raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
+        raise ArgumentError, "name '#{name}' is invalid" if name.blank?
       end
     end
   end
