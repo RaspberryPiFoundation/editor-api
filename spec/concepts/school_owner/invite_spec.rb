@@ -5,15 +5,15 @@ require 'rails_helper'
 RSpec.describe SchoolOwner::Invite, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { user_id_by_index(teacher_index) }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
 
   let(:school_owner_params) do
-    { email_address: 'school-teacher@example.com' }
+    { email_address: 'owner-to-invite@example.com' }
   end
 
   before do
-    stub_profile_api_invite_school_owner(user_id: teacher_id)
+    stub_profile_api_invite_school_owner(user_id: owner_id)
     stub_user_info_api
   end
 
@@ -22,7 +22,7 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:invite_school_owner)
-      .with(token:, email_address: 'school-teacher@example.com', organisation_id: school.id)
+      .with(token:, email_address: 'owner-to-invite@example.com', organisation_id: school.id)
   end
 
   it 'returns the school owner in the operation response' do

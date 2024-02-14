@@ -23,6 +23,7 @@ Rails.application.routes.draw do
       end
 
       resources :owners, only: %i[create], controller: 'school_owners'
+      resources :teachers, only: %i[create], controller: 'school_teachers'
     end
   end
 

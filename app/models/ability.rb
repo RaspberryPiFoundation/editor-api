@@ -23,6 +23,7 @@ class Ability
         can(%i[read create update], SchoolClass, school: { id: organisation_id })
         can(%i[read create], ClassMember, school_class: { school: { id: organisation_id } })
         can(%i[create], :school_owner)
+        can(%i[create], :school_teacher)
       end
 
       if user.school_teacher?(organisation_id:)
