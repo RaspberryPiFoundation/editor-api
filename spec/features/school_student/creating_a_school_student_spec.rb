@@ -6,7 +6,6 @@ RSpec.describe 'Creating a school student', type: :request do
   before do
     stub_hydra_public_api
     stub_profile_api_create_school_student(user_id: student_id)
-    stub_user_info_api
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -24,23 +23,16 @@ RSpec.describe 'Creating a school student', type: :request do
     }
   end
 
-  it 'responds 201 Created' do
+  it 'responds 204 No Content' do
     post("/api/schools/#{school.id}/students", headers:, params:)
-    expect(response).to have_http_status(:created)
+    expect(response).to have_http_status(:no_content)
   end
 
-  it 'responds 201 Created when the user is a school-teacher' do
+  it 'responds 204 No Content when the user is a school-teacher' do
     stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
 
     post("/api/schools/#{school.id}/students", headers:, params:)
-    expect(response).to have_http_status(:created)
-  end
-
-  it 'responds with the created student JSON' do
-    post("/api/schools/#{school.id}/students", headers:, params:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[:name]).to eq('School Student')
+    expect(response).to have_http_status(:no_content)
   end
 
   it 'responds 400 Bad Request when params are missing' do

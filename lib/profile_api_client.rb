@@ -78,7 +78,7 @@ class ProfileApiClient
 
       # TODO: We should make Faraday raise a Ruby error for a non-2xx status
       # code so that SchoolStudent::Create propagates the error in the response.
-      response = { 'id' => '99999999-9999-9999-9999-999999999999' }
+      response = {}
       response.deep_symbolize_keys
     end
 

@@ -18,7 +18,6 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
   before do
     stub_profile_api_create_school_student(user_id: student_id)
-    stub_user_info_api
   end
 
   it 'makes a profile API call' do
@@ -27,11 +26,6 @@ RSpec.describe SchoolStudent::Create, type: :unit do
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:create_school_student)
       .with(token:, username: 'student-to-create', password: 'at-least-8-characters', name: 'School Student', organisation_id: school.id)
-  end
-
-  it 'returns the school student in the operation response' do
-    response = described_class.call(school:, school_student_params:, token:)
-    expect(response[:school_student]).to be_a(User)
   end
 
   context 'when creation fails' do

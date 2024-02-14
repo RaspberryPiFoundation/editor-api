@@ -10,8 +10,7 @@ module Api
       result = SchoolStudent::Create.call(school: @school, school_student_params:, token: current_user.token)
 
       if result.success?
-        @school_student = result[:school_student]
-        render :show, formats: [:json], status: :created
+        head :no_content
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end

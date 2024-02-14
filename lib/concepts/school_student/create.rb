@@ -5,7 +5,7 @@ module SchoolStudent
     class << self
       def call(school:, school_student_params:, token:)
         response = OperationResponse.new
-        response[:school_student] = create_student(school, school_student_params, token)
+        create_student(school, school_student_params, token)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -23,10 +23,7 @@ module SchoolStudent
 
         validate(username:, password:, name:)
 
-        response = ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id:)
-        user_id = response.fetch(:id)
-
-        User.from_userinfo(ids: user_id).first
+        ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id:)
       end
 
       def validate(username:, password:, name:)
