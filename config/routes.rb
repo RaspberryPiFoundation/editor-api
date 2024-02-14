@@ -22,7 +22,7 @@ Rails.application.routes.draw do
         resources :members, only: %i[index create], controller: 'class_members'
       end
 
-      resources :owners, only: %i[create], controller: 'school_owners'
+      resources :owners, only: %i[create destroy], controller: 'school_owners'
       resources :teachers, only: %i[create], controller: 'school_teachers'
       resources :students, only: %i[create], controller: 'school_students'
     end

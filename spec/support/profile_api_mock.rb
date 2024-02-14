@@ -20,4 +20,8 @@ module ProfileApiMock
   def stub_profile_api_create_school_student(user_id:)
     allow(ProfileApiClient).to receive(:create_school_student).and_return(id: user_id)
   end
+
+  def stub_profile_api_remove_school_owner(user_id:)
+    allow(ProfileApiClient).to receive(:remove_school_owner).and_return({})
+  end
 end
