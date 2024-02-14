@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Creating a school', type: :request do
   before do
     stub_hydra_public_api
-    stub_user_info_api
     stub_profile_api_create_organisation
   end
 

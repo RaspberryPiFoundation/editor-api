@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Listing schools', type: :request do
   before do
     stub_hydra_public_api
-    stub_user_info_api
 
     create(:school, name: 'Test School')
   end
