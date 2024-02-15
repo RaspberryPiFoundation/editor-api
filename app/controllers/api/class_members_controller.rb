@@ -23,6 +23,16 @@ module Api
       end
     end
 
+    def destroy
+      result = ClassMember::Delete.call(school_class: @school_class, class_member_id: params[:id])
+
+      if result.success?
+        head :no_content
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def class_member_params

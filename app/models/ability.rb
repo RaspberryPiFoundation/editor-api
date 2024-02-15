@@ -3,7 +3,7 @@
 class Ability
   include CanCan::Ability
 
-  # rubocop:disable Metrics/AbcSize
+  # rubocop:disable Metrics/AbcSize, Layout/LineLength
   def initialize(user)
     can :show, Project, user_id: nil
     can :show, Component, project: { user_id: nil }
@@ -19,7 +19,7 @@ class Ability
       if user.school_owner?(organisation_id:)
         can(%i[read update], School, id: organisation_id)
         can(%i[read create update], SchoolClass, school: { id: organisation_id })
-        can(%i[read create], ClassMember, school_class: { school: { id: organisation_id } })
+        can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id } })
         can(%i[read create destroy], :school_owner)
         can(%i[read create destroy], :school_teacher)
         can(%i[read create update destroy], :school_student)
@@ -29,7 +29,7 @@ class Ability
         can(%i[read], School, id: organisation_id)
         can(%i[create], SchoolClass, school: { id: organisation_id })
         can(%i[read update], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
-        can(%i[read create], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
+        can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
         can(%i[read], :school_owner)
         can(%i[read], :school_teacher)
         can(%i[read create update], :school_student)
@@ -41,5 +41,5 @@ class Ability
       end
     end
   end
-  # rubocop:enable Metrics/AbcSize
+  # rubocop:enable Metrics/AbcSize, Layout/LineLength
 end
