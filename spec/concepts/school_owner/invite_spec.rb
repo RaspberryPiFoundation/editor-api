@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolOwner::Invite, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, verified_at: Time.zone.now) }
   let(:owner_index) { user_index_by_role('school-owner') }
   let(:owner_id) { user_id_by_index(owner_index) }
 
@@ -51,6 +51,15 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
     it 'sent the exception to Sentry' do
       described_class.call(school:, school_owner_params:, token:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+    end
+  end
+
+  context 'when the school is not verified' do
+    let(:school) { create(:school) }
+
+    it 'returns the error message in the operation response' do
+      response = described_class.call(school:, school_owner_params:, token:)
+      expect(response[:error]).to match(/school is not verified/)
     end
   end
 end

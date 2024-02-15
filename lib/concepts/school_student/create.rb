@@ -21,12 +21,13 @@ module SchoolStudent
         password = school_student_params.fetch(:password)
         name = school_student_params.fetch(:name)
 
-        validate(username:, password:, name:)
+        validate(school:, username:, password:, name:)
 
         ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id:)
       end
 
-      def validate(username:, password:, name:)
+      def validate(school:, username:, password:, name:)
+        raise ArgumentError, 'school is not verified' unless school.verified_at
         raise ArgumentError, "username '#{username}' is invalid" if username.blank?
         raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
         raise ArgumentError, "name '#{name}' is invalid" if name.blank?
