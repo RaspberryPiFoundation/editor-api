@@ -17,7 +17,7 @@ Rails.application.routes.draw do
 
     resource :project_errors, only: %i[create]
 
-    resources :schools, only: %i[index show create update] do
+    resources :schools, only: %i[index show create update destroy] do
       resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do
         resources :members, only: %i[index create destroy], controller: 'class_members'
       end
