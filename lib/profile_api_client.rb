@@ -42,6 +42,26 @@ class ProfileApiClient
 
     # The API should enforce these constraints:
     # - The token has the school-owner role for the given organisation ID
+    # - The token user should not be under 13
+    # - The email must be verified
+    #
+    # The API should respond:
+    # - 404 Not Found if the user doesn't exist
+    # - 422 Unprocessable if the constraints are not met
+    def remove_school_owner(token:, owner_id:, organisation_id:)
+      return nil if token.blank?
+
+      _ = owner_id
+      _ = organisation_id
+
+      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
+      # code so that SchoolOwner::Remove propagates the error in the response.
+      response = {}
+      response.deep_symbolize_keys
+    end
+
+    # The API should enforce these constraints:
+    # - The token has the school-owner role for the given organisation ID
     # - The token user or given user should not be under 13
     # - The email must be verified
     #
@@ -56,6 +76,26 @@ class ProfileApiClient
 
       # TODO: We should make Faraday raise a Ruby error for a non-2xx status
       # code so that SchoolTeacher::Invite propagates the error in the response.
+      response = {}
+      response.deep_symbolize_keys
+    end
+
+    # The API should enforce these constraints:
+    # - The token has the school-owner role for the given organisation ID
+    # - The token user should not be under 13
+    # - The email must be verified
+    #
+    # The API should respond:
+    # - 404 Not Found if the user doesn't exist
+    # - 422 Unprocessable if the constraints are not met
+    def remove_school_teacher(token:, teacher_id:, organisation_id:)
+      return nil if token.blank?
+
+      _ = teacher_id
+      _ = organisation_id
+
+      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
+      # code so that SchoolOwner::Remove propagates the error in the response.
       response = {}
       response.deep_symbolize_keys
     end
@@ -83,37 +123,18 @@ class ProfileApiClient
     end
 
     # The API should enforce these constraints:
-    # - The token has the school-owner role for the given organisation ID
+    # - The token has the school-owner or school-teacher role for the given organisation ID
     # - The token user should not be under 13
     # - The email must be verified
+    # - The student_id must be a school-student for the given organisation ID
     #
     # The API should respond:
     # - 404 Not Found if the user doesn't exist
     # - 422 Unprocessable if the constraints are not met
-    def remove_school_owner(token:, owner_id:, organisation_id:)
+    def update_school_student(token:, attributes_to_update:, organisation_id:)
       return nil if token.blank?
 
-      _ = owner_id
-      _ = organisation_id
-
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolOwner::Remove propagates the error in the response.
-      response = {}
-      response.deep_symbolize_keys
-    end
-
-    # The API should enforce these constraints:
-    # - The token has the school-owner role for the given organisation ID
-    # - The token user should not be under 13
-    # - The email must be verified
-    #
-    # The API should respond:
-    # - 404 Not Found if the user doesn't exist
-    # - 422 Unprocessable if the constraints are not met
-    def remove_school_teacher(token:, teacher_id:, organisation_id:)
-      return nil if token.blank?
-
-      _ = teacher_id
+      _ = attributes_to_update
       _ = organisation_id
 
       # TODO: We should make Faraday raise a Ruby error for a non-2xx status
@@ -135,27 +156,6 @@ class ProfileApiClient
       return nil if token.blank?
 
       _ = student_id
-      _ = organisation_id
-
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolOwner::Remove propagates the error in the response.
-      response = {}
-      response.deep_symbolize_keys
-    end
-
-    # The API should enforce these constraints:
-    # - The token has the school-owner or school-teacher role for the given organisation ID
-    # - The token user should not be under 13
-    # - The email must be verified
-    # - The student_id must be a school-student for the given organisation ID
-    #
-    # The API should respond:
-    # - 404 Not Found if the user doesn't exist
-    # - 422 Unprocessable if the constraints are not met
-    def update_school_student(token:, attributes_to_update:, organisation_id:)
-      return nil if token.blank?
-
-      _ = attributes_to_update
       _ = organisation_id
 
       # TODO: We should make Faraday raise a Ruby error for a non-2xx status
