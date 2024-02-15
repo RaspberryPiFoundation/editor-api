@@ -6,6 +6,17 @@ module Api
     load_and_authorize_resource :school
     authorize_resource :school_student, class: false
 
+    def index
+      result = SchoolStudent::List.call(school: @school, token: current_user.token)
+
+      if result.success?
+        @school_students = result[:school_students]
+        render :index, formats: [:json], status: :ok
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     def create
       result = SchoolStudent::Create.call(school: @school, school_student_params:, token: current_user.token)
 

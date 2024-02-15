@@ -24,7 +24,7 @@ Rails.application.routes.draw do
 
       resources :owners, only: %i[index create destroy], controller: 'school_owners'
       resources :teachers, only: %i[index create destroy], controller: 'school_teachers'
-      resources :students, only: %i[create update destroy], controller: 'school_students'
+      resources :students, only: %i[index create update destroy], controller: 'school_students'
     end
   end
 
