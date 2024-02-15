@@ -18,7 +18,7 @@ class Ability
     user.organisation_ids.each do |organisation_id|
       if user.school_owner?(organisation_id:)
         can(%i[read update], School, id: organisation_id)
-        can(%i[read create update], SchoolClass, school: { id: organisation_id })
+        can(%i[read create update destroy], SchoolClass, school: { id: organisation_id })
         can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id } })
         can(%i[read create destroy], :school_owner)
         can(%i[read create destroy], :school_teacher)
@@ -28,7 +28,7 @@ class Ability
       if user.school_teacher?(organisation_id:)
         can(%i[read], School, id: organisation_id)
         can(%i[create], SchoolClass, school: { id: organisation_id })
-        can(%i[read update], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
+        can(%i[read update destroy], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
         can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
         can(%i[read], :school_owner)
         can(%i[read], :school_teacher)
