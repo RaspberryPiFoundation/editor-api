@@ -20,7 +20,7 @@ class Ability
         can(%i[read update], School, id: organisation_id)
         can(%i[read create update], SchoolClass, school: { id: organisation_id })
         can(%i[read create], ClassMember, school_class: { school: { id: organisation_id } })
-        can(%i[create destroy], :school_owner)
+        can(%i[read create destroy], :school_owner)
         can(%i[create destroy], :school_teacher)
         can(%i[create update destroy], :school_student)
       end
@@ -30,6 +30,7 @@ class Ability
         can(%i[create], SchoolClass, school: { id: organisation_id })
         can(%i[read update], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
         can(%i[read create], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
+        can(%i[read], :school_owner)
         can(%i[create update], :school_student)
       end
 
