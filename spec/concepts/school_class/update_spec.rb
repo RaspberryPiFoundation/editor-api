@@ -10,6 +10,11 @@ RSpec.describe SchoolClass::Update, type: :unit do
     stub_user_info_api
   end
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school_class:, school_class_params:)
+    expect(response.success?).to be(true)
+  end
+
   it 'updates the school class' do
     response = described_class.call(school_class:, school_class_params:)
     expect(response[:school_class].name).to eq('New Name')

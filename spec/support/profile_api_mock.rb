@@ -37,8 +37,8 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:list_school_students).and_return(ids: [user_id])
   end
 
-  def stub_profile_api_create_school_student(user_id:)
-    allow(ProfileApiClient).to receive(:create_school_student).and_return(id: user_id)
+  def stub_profile_api_create_school_student
+    allow(ProfileApiClient).to receive(:create_school_student)
   end
 
   def stub_profile_api_update_school_student

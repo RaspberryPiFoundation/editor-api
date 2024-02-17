@@ -12,6 +12,11 @@ RSpec.describe ClassMember::Delete, type: :unit do
   let(:school_class) { class_member.school_class }
   let(:school) { school_class.school }
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school_class:, class_member_id:)
+    expect(response.success?).to be(true)
+  end
+
   it 'deletes a class member' do
     expect { described_class.call(school_class:, class_member_id:) }.to change(ClassMember, :count).by(-1)
   end

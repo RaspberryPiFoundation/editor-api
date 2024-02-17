@@ -27,6 +27,16 @@ module Api
       end
     end
 
+    def create_batch
+      result = SchoolStudent::CreateBatch.call(school: @school, uploaded_file: params[:file], token: current_user.token)
+
+      if result.success?
+        head :no_content
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     def update
       result = SchoolStudent::Update.call(school: @school, school_student_params:, token: current_user.token)
 

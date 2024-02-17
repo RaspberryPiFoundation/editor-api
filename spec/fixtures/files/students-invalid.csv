@@ -1,0 +1,9 @@
+Student Name,Username,Password
+Jane Doe,jane123,secret123
+John Doe,john123,secret456
+,,
+Jack Doe,jack123,invalid
+,,
+ ,jade123,secret789
+Jacob Doe,  ,secret012
+Julia Doe,julia123,   

@@ -5,8 +5,6 @@ require 'rails_helper'
 RSpec.describe SchoolStudent::Create, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
 
   let(:school_student_params) do
     {
@@ -17,7 +15,12 @@ RSpec.describe SchoolStudent::Create, type: :unit do
   end
 
   before do
-    stub_profile_api_create_school_student(user_id: student_id)
+    stub_profile_api_create_school_student
+  end
+
+  it 'returns a successful operation response' do
+    response = described_class.call(school:, school_student_params:, token:)
+    expect(response.success?).to be(true)
   end
 
   it 'makes a profile API call' do

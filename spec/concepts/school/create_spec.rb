@@ -19,6 +19,11 @@ RSpec.describe School::Create, type: :unit do
     stub_profile_api_create_organisation
   end
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school_params:, token:)
+    expect(response.success?).to be(true)
+  end
+
   it 'creates a school' do
     expect { described_class.call(school_params:, token:) }.to change(School, :count).by(1)
   end

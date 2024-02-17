@@ -20,6 +20,11 @@ RSpec.describe SchoolStudent::Update, type: :unit do
     stub_profile_api_update_school_student
   end
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school:, school_student_params:, token:)
+    expect(response.success?).to be(true)
+  end
+
   it 'makes a profile API call' do
     described_class.call(school:, school_student_params:, token:)
 

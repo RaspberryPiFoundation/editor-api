@@ -16,6 +16,11 @@ RSpec.describe ClassMember::Create, type: :unit do
     { student_id: }
   end
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school_class:, class_member_params:)
+    expect(response.success?).to be(true)
+  end
+
   it 'creates a school class' do
     expect { described_class.call(school_class:, class_member_params:) }.to change(ClassMember, :count).by(1)
   end

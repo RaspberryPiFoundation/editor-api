@@ -12,6 +12,11 @@ RSpec.describe SchoolTeacher::Remove, type: :unit do
     stub_profile_api_remove_school_teacher
   end
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school:, teacher_id:, token:)
+    expect(response.success?).to be(true)
+  end
+
   it 'makes a profile API call' do
     described_class.call(school:, teacher_id:, token:)
 

@@ -24,7 +24,9 @@ Rails.application.routes.draw do
 
       resources :owners, only: %i[index create destroy], controller: 'school_owners'
       resources :teachers, only: %i[index create destroy], controller: 'school_teachers'
-      resources :students, only: %i[index create update destroy], controller: 'school_students'
+      resources :students, only: %i[index create update destroy], controller: 'school_students' do
+        post :batch, on: :collection, to: 'school_students#create_batch'
+      end
     end
   end
 

@@ -16,6 +16,11 @@ RSpec.describe SchoolOwner::Invite, type: :unit do
     stub_profile_api_invite_school_owner
   end
 
+  it 'returns a successful operation response' do
+    response = described_class.call(school:, school_owner_params:, token:)
+    expect(response.success?).to be(true)
+  end
+
   it 'makes a profile API call' do
     described_class.call(school:, school_owner_params:, token:)
 
