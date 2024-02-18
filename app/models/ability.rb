@@ -14,6 +14,7 @@ class Ability
     can %i[read create update destroy], Component, project: { user_id: user.id }
 
     can %i[create], School # The user agrees to become a school-owner by creating a school.
+    can %i[create], Lesson # Public lessons can be created.
 
     user.organisation_ids.each do |organisation_id|
       if user.school_owner?(organisation_id:)

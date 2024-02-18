@@ -28,6 +28,8 @@ Rails.application.routes.draw do
         post :batch, on: :collection, to: 'school_students#create_batch'
       end
     end
+
+    resources :lessons, only: %i[create]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
