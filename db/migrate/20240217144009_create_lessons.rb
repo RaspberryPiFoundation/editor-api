@@ -1,6 +1,7 @@
 class CreateLessons < ActiveRecord::Migration[7.0]
   def change
     create_table :lessons, id: :uuid do |t|
+      t.references :school, type: :uuid, foreign_key: true, index: true
       t.references :school_class, type: :uuid, foreign_key: true, index: true
       t.uuid :user_id, null: false
 

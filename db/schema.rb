@@ -125,6 +125,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_17_144009) do
   end
 
   create_table "lessons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id"
     t.uuid "school_class_id"
     t.uuid "user_id", null: false
     t.string "name", null: false
@@ -135,6 +136,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_17_144009) do
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_lessons_on_name"
     t.index ["school_class_id"], name: "index_lessons_on_school_class_id"
+    t.index ["school_id"], name: "index_lessons_on_school_id"
     t.index ["user_id"], name: "index_lessons_on_user_id"
     t.index ["visibility"], name: "index_lessons_on_visibility"
   end
@@ -199,6 +201,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_17_144009) do
   add_foreign_key "class_members", "school_classes"
   add_foreign_key "components", "projects"
   add_foreign_key "lessons", "school_classes"
+  add_foreign_key "lessons", "schools"
   add_foreign_key "project_errors", "projects"
   add_foreign_key "school_classes", "schools"
 end
