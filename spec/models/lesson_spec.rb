@@ -8,8 +8,15 @@ RSpec.describe Lesson do
   end
 
   describe 'associations' do
+    it 'optionally belongs to a school (library)' do
+      lesson = create(:lesson, school: build(:school))
+      expect(lesson.school).to be_a(School)
+    end
+
     it 'optionally belongs to a school class' do
-      lesson = create(:lesson, school_class: build(:school_class))
+      school_class = create(:school_class)
+
+      lesson = create(:lesson, school_class:, school: school_class.school)
       expect(lesson.school_class).to be_a(SchoolClass)
     end
   end
@@ -48,6 +55,18 @@ RSpec.describe Lesson do
     it "requires a visibility that is either 'private', 'school' or 'public'" do
       lesson.visibility = 'invalid'
       expect(lesson).to be_invalid
+    end
+  end
+
+  describe '#school' do
+    it 'is set from the school_class' do
+      lesson = create(:lesson, school_class: build(:school_class))
+      expect(lesson.school).to eq(lesson.school_class.school)
+    end
+
+    it 'is not nullified when there is no school_class' do
+      lesson = create(:lesson, school: build(:school))
+      expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end
 end
