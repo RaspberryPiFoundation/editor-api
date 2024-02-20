@@ -3,6 +3,7 @@
 module Api
   class LessonsController < ApiController
     before_action :authorize_user
+    before_action :verify_school_class_belongs_to_school
     load_and_authorize_resource :lesson
 
     def create
@@ -23,8 +24,33 @@ module Api
 
     private
 
+    def verify_school_class_belongs_to_school
+      return if base_params[:school_class_id].blank?
+      return if school&.classes&.pluck(:id)&.include?(base_params[:school_class_id])
+
+      raise ParameterError, 'school_class_id does not correspond to school_id'
+    end
+
     def lesson_params
-      params.require(:lesson).permit(:school_id, :school_class_id, :name).merge(user_id: current_user.id)
+      if school_owner?
+        # A school owner must specify who the lesson user is.
+        base_params
+      else
+        # A school teacher may only create classes they own.
+        base_params.merge(user_id: current_user.id)
+      end
+    end
+
+    def base_params
+      params.require(:lesson).permit(:school_id, :school_class_id, :user_id, :name)
+    end
+
+    def school_owner?
+      school && current_user.school_owner?(organisation_id: school.id)
+    end
+
+    def school
+      @school ||= School.find_by(id: base_params[:school_id])
     end
   end
 end

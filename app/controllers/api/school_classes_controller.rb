@@ -53,7 +53,7 @@ module Api
 
     def school_class_params
       if school_owner?
-        # The school owner must specify who the class teacher is.
+        # A school owner must specify who the class teacher is.
         params.require(:school_class).permit(:teacher_id, :name)
       else
         # A school teacher may only create classes they own.

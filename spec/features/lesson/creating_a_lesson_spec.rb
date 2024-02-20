@@ -54,12 +54,15 @@ RSpec.describe 'Creating a public lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
+    let(:teacher_index) { user_index_by_role('school-teacher') }
+    let(:teacher_id) { user_id_by_index(teacher_index) }
 
     let(:params) do
       {
         lesson: {
           name: 'Test Lesson',
-          school_id: school.id
+          school_id: school.id,
+          user_id: teacher_id
         }
       }
     end
@@ -74,6 +77,23 @@ RSpec.describe 'Creating a public lesson', type: :request do
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
+    end
+
+    it 'sets the lesson user to the specified user for school-owner users' do
+      post('/api/lessons', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:user_id]).to eq(teacher_id)
+    end
+
+    it 'sets the lesson user to the current user for school-teacher users' do
+      stub_hydra_public_api(user_index: teacher_index)
+      new_params = { lesson: params[:lesson].merge(user_id: 'ignored') }
+
+      post('/api/lessons', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:user_id]).to eq(teacher_id)
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
@@ -94,13 +114,16 @@ RSpec.describe 'Creating a public lesson', type: :request do
   context 'when the lesson is associated with a school class' do
     let(:school_class) { create(:school_class) }
     let(:school) { school_class.school }
+    let(:teacher_index) { user_index_by_role('school-teacher') }
+    let(:teacher_id) { user_id_by_index(teacher_index) }
 
     let(:params) do
       {
         lesson: {
           name: 'Test Lesson',
           school_id: school.id,
-          school_class_id: school_class.id
+          school_class_id: school_class.id,
+          user_id: teacher_id
         }
       }
     end
@@ -118,6 +141,20 @@ RSpec.describe 'Creating a public lesson', type: :request do
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
+    end
+
+    it 'responds 422 Unprocessable if school_id is missing' do
+      new_params = { lesson: params[:lesson].without(:school_id) }
+
+      post('/api/lessons', headers:, params: new_params)
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'responds 422 Unprocessable if school_id does not correspond to school_class_id' do
+      new_params = { lesson: params[:lesson].merge(school_id: SecureRandom.uuid) }
+
+      post('/api/lessons', headers:, params: new_params)
+      expect(response).to have_http_status(:unprocessable_entity)
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
