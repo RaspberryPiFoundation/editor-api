@@ -1,0 +1,12 @@
+<% if current_user %>
+    <form action="<%= logout_path %>">
+        <input type="submit" value="Logout">
+    </form>
+<% else %>
+    <%= button_to "Log in", login_path %>
+<% end %>
+<% flash.each do |type, msg| %>
+  <div>
+    <%= msg %>
+  </div>
+<% end %>

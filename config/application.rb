@@ -48,6 +48,10 @@ module App
 
     config.active_job.queue_adapter = :good_job
 
+    config.to_prepare do
+      Administrate::ApplicationController.helper App::Application.helpers
+    end
+
     config.api_only = false
   end
 end

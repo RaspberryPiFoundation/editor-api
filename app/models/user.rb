@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class User
+  include ActiveModel::Serialization
   include ActiveModel::Model
 
   ATTRIBUTES = %w[
@@ -41,6 +42,10 @@ class User
     role?(role: 'school-student')
   end
 
+  def admin?
+    role?(role: 'editor-admin')
+  end
+
   def ==(other)
     id == other.id
   end
@@ -60,15 +65,11 @@ class User
     end
   end
 
-  def self.from_omniauth(token:)
-    return nil if token.blank?
-
-    auth = HydraPublicApiClient.fetch_oauth_user(token:)
+  def self.from_omniauth(auth)
     return nil unless auth
 
-    auth = auth.stringify_keys
-    args = auth.slice(*ATTRIBUTES)
-    args['id'] = auth['sub']
+    args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
+    args['id'] = auth.uid
 
     new(args)
   end
