@@ -1,8 +1,7 @@
 default: &default
   adapter: postgresql
   encoding: unicode
-  host: <%= ENV.fetch('POSTGRES_HOST', 'postgres') %>
-  port: <%= ENV.fetch('POSTGRES_PORT', '5432') %>
+  host: <%= ENV.fetch('POSTGRES_HOST', 'db') %>
   username: <%= ENV.fetch('POSTGRES_USER', 'no_pg_user_set') %>
   password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
   pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
