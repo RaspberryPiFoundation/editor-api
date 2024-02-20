@@ -84,6 +84,7 @@ class User
     return nil if token.blank?
 
     auth = HydraPublicApiClient.fetch_oauth_user(token:)
+    return nil unless auth
 
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)

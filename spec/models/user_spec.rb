@@ -108,6 +108,51 @@ RSpec.describe User do
     end
   end
 
+  describe '#from_omniauth' do
+    subject(:auth_subject) { described_class.from_omniauth(auth) }
+
+    let(:user) { build(:user) }
+    let(:info) { user.serializable_hash(except: :id) }
+
+    let(:auth) do
+      OmniAuth::AuthHash.new(
+        {
+          provider: 'rpi',
+          uid: user.id,
+          extra: {
+            raw_info: info
+          }
+        }
+      )
+    end
+
+    it 'returns a User object' do
+      expect(auth_subject).to be_a described_class
+    end
+
+    it 'sets the user attributes correctly' do
+      expect(auth_subject.serializable_hash).to eq user.serializable_hash
+    end
+
+    context 'with unusual keys in info' do
+      let(:info) { { foo: :bar, flibble: :woo } }
+
+      it { is_expected.to be_a described_class }
+    end
+
+    context 'with no info' do
+      let(:info) { nil }
+
+      it { is_expected.to be_a described_class }
+    end
+
+    context 'with no auth set' do
+      let(:auth) { nil }
+
+      it { is_expected.to be_nil }
+    end
+  end
+
   describe '#school_owner?' do
     subject { user.school_owner? }
 
