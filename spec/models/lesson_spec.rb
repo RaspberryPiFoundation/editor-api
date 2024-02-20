@@ -52,7 +52,7 @@ RSpec.describe Lesson do
       expect(lesson).to be_invalid
     end
 
-    it "requires a visibility that is either 'private', 'school' or 'public'" do
+    it "requires a visibility that is either 'private', 'teachers', 'students' or 'public'" do
       lesson.visibility = 'invalid'
       expect(lesson).to be_invalid
     end

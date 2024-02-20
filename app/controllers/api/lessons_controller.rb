@@ -2,9 +2,14 @@
 
 module Api
   class LessonsController < ApiController
-    before_action :authorize_user
-    before_action :verify_school_class_belongs_to_school
+    before_action :authorize_user, except: %i[show]
+    before_action :verify_school_class_belongs_to_school, except: %i[show]
     load_and_authorize_resource :lesson
+
+    def show
+      @lesson_with_user = @lesson.with_user
+      render :show, formats: [:json], status: :ok
+    end
 
     def create
       result = Lesson::Create.call(lesson_params:)
@@ -15,11 +20,6 @@ module Api
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
-    end
-
-    def show
-      @lesson_with_user = @lesson.with_user
-      render :show, formats: [:json], status: :ok
     end
 
     private
