@@ -65,11 +65,29 @@ class User
     end
   end
 
-  def self.from_omniauth(auth)
+  def self.from_omniauth(auth = nil)
+    return nil unless auth
+
+    from_auth(auth)
+  end
+
+  def self.from_auth(auth)
     return nil unless auth
 
     args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
     args['id'] = auth.uid
+
+    new(args)
+  end
+
+  def self.from_token(token:)
+    return nil if token.blank?
+
+    auth = HydraPublicApiClient.fetch_oauth_user(token:)
+
+    auth = auth.stringify_keys
+    args = auth.slice(*ATTRIBUTES)
+    args['id'] = auth['sub']
 
     new(args)
   end

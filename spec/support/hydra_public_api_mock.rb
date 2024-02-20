@@ -21,6 +21,6 @@ module HydraPublicApiMock
   end
 
   def stubbed_user
-    User.from_omniauth(token: 'ignored')
+    User.from_token(token: 'ignored')
   end
 end

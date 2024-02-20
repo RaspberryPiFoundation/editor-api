@@ -85,6 +85,9 @@ RSpec.configure do |config|
   config.include PhraseIdentifierMock
   config.include HydraPublicApiMock
 
+  config.include SignInStubs, type: :request
+  config.include SignInStubs, type: :system
+
   if Bullet.enable?
     config.before { Bullet.start_request }
     config.after  { Bullet.end_request }

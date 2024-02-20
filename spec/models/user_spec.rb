@@ -47,8 +47,8 @@ RSpec.describe User do
     end
   end
 
-  describe '#from_omniauth' do
-    subject(:user) { described_class.from_omniauth(token: 'my-access-token') }
+  describe '#from_token' do
+    subject(:user) { described_class.from_token(token: 'my-access-token') }
 
     let(:stubbed_response) do
       json = File.read('spec/fixtures/users.json')
