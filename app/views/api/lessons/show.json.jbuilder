@@ -1,7 +1,9 @@
 # frozen_string_literal: true
 
+lesson, user = @lesson_with_user
+
 json.call(
-  @lesson,
+  lesson,
   :id,
   :school_id,
   :school_class_id,
@@ -12,3 +14,5 @@ json.call(
   :created_at,
   :updated_at
 )
+
+json.user_name(user&.name)

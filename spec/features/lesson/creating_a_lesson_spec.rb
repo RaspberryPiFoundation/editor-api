@@ -30,6 +30,13 @@ RSpec.describe 'Creating a public lesson', type: :request do
     expect(data[:name]).to eq('Test Lesson')
   end
 
+  it 'responds with the user JSON which is set from the current user' do
+    post('/api/lessons', headers:, params:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:user_name]).to eq('School Owner')
+  end
+
   it 'responds 400 Bad Request when params are missing' do
     post('/api/lessons', headers:)
     expect(response).to have_http_status(:bad_request)
