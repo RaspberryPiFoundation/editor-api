@@ -7,7 +7,7 @@ Rails.application.routes.draw do
       delete :images, on: :member, action: :destroy_image
     end
 
-    root to: "projects#index"
+    root to: 'projects#index'
   end
 
   post '/graphql', to: 'graphql#execute'

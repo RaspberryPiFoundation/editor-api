@@ -1,4 +1,6 @@
-require "administrate/base_dashboard"
+# frozen_string_literal: true
+
+require 'administrate/base_dashboard'
 
 class ProjectDashboard < Administrate::BaseDashboard
   # ATTRIBUTE_TYPES
@@ -13,18 +15,17 @@ class ProjectDashboard < Administrate::BaseDashboard
     identifier: Field::String,
     images: Field::ActiveStorage.with_options(
       direct_upload: true,
-      destroy_url: proc do |namespace, resource, attachment|
+      destroy_url: proc do |_namespace, _resource, attachment|
         [:images_admin_project, { image_id: attachment.id }]
       end
     ),
-    is_public: Field::Boolean,
     locale: Field::String,
     name: Field::String,
     project_type: Field::String,
     remixed_from_id: Field::String,
     user_id: Field::String,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -82,6 +83,6 @@ class ProjectDashboard < Administrate::BaseDashboard
   end
 
   def permitted_attributes
-    super + [:images => []]
+    super + [images: []]
   end
 end

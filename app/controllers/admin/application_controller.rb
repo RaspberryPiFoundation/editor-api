@@ -9,8 +9,7 @@ module Admin
     helper_method :current_user
 
     def authenticate_admin
-      puts current_user.inspect
-      redirect_to '/', alert: 'Not authorized.' unless current_user&.admin?
+      redirect_to '/', alert: I18n.t('errors.admin.unauthorized') unless current_user&.admin?
     end
   end
 end

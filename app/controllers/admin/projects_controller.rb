@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Admin
   class ProjectsController < Admin::ApplicationController
     before_action :set_host_for_local_storage
@@ -13,8 +15,9 @@ module Admin
     end
 
     private
-     def set_host_for_local_storage
-        ActiveStorage::Current.host = request.base_url if Rails.application.config.active_storage.service == :local
+
+    def set_host_for_local_storage
+      ActiveStorage::Current.host = request.base_url if Rails.application.config.active_storage.service == :local
     end
   end
 end

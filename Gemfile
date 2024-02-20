@@ -20,15 +20,15 @@ gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
+gem 'omniauth-rails_csrf_protection', '~> 1.0.1'
+gem 'omniauth-rpi',
+    github: 'RaspberryPiFoundation/omniauth-rpi',
+    tag: 'v1.3.1'
 gem 'open-uri'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.6'
 gem 'rack-cors'
 gem 'rails', '~> 7.0.0'
-gem 'omniauth-rails_csrf_protection', '~> 1.0.1'
-gem 'omniauth-rpi',
-    github: 'RaspberryPiFoundation/omniauth-rpi',
-    tag: 'v1.3.1'
 gem 'scout_apm'
 gem 'sentry-rails', '~> 5.5.0'
 

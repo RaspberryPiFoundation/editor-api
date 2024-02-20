@@ -6,19 +6,19 @@ if ENV['BYPASS_OAUTH'].present?
   using RpiAuthBypass
 
   extra = RpiAuthBypass::DEFAULT_EXTRA.deep_merge(raw_info: { roles: 'editor-admin' })
-  OmniAuth.config.add_rpi_mock(extra: extra)
+  OmniAuth.config.add_rpi_mock(extra:)
   OmniAuth.config.enable_rpi_auth_bypass
 end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider(
-    OmniAuth::Strategies::Rpi, ENV['AUTH_CLIENT_ID'], ENV['AUTH_CLIENT_SECRET'],
-    scope: "openid email profile roles force-consent",
+    OmniAuth::Strategies::Rpi, ENV.fetch('AUTH_CLIENT_ID', nil), ENV.fetch('AUTH_CLIENT_SECRET', nil),
+    scope: 'openid email profile roles force-consent',
     callback_path: '/auth/callback',
     client_options: {
-      site: ENV['AUTH_URL'],
-      authorize_url: "#{ENV['AUTH_URL']}/oauth2/auth",
-      token_url: "#{ENV.fetch('AUTH_TOKEN_URL', ENV['AUTH_URL'])}/oauth2/token",
+      site: ENV.fetch('AUTH_URL', nil),
+      authorize_url: "#{ENV.fetch('AUTH_URL', nil)}/oauth2/auth",
+      token_url: "#{ENV.fetch('AUTH_TOKEN_URL', ENV.fetch('AUTH_URL', nil))}/oauth2/token",
       auth_scheme: :basic_auth
     },
     authorize_params: {},

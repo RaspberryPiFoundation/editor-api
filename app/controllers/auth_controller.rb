@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AuthController < ApplicationController
-
   # def index
 
   # end
@@ -28,7 +27,8 @@ class AuthController < ApplicationController
       return
     end
 
-    redirect_to "#{ENV['IDENTITY_URL']}/logout?returnTo=#{ENV['HOST_URL']}", allow_other_host: true
+    redirect_to "#{ENV.fetch('IDENTITY_URL', nil)}/logout?returnTo=#{ENV.fetch('HOST_URL', nil)}",
+                allow_other_host: true
   end
 
   def failure

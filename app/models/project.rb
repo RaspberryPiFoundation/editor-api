@@ -14,14 +14,6 @@ class Project < ApplicationRecord
 
   scope :internal_projects, -> { where(user_id: nil) }
 
-  def is_public
-    if self.user_id.nil?
-      true
-    else
-      false
-    end
-  end
-
   private
 
   def check_unique_not_null
