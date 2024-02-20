@@ -9,11 +9,16 @@ module Api
       result = Lesson::Create.call(lesson_params:)
 
       if result.success?
-        @lesson = result[:lesson]
+        @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
+    end
+
+    def show
+      @lesson_with_user = @lesson.with_user
+      render :show, formats: [:json], status: :ok
     end
 
     private
