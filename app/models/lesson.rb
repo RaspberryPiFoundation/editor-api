@@ -6,7 +6,7 @@ class Lesson < ApplicationRecord
 
   validates :user_id, presence: true
   validates :name, presence: true
-  validates :visibility, presence: true, inclusion: { in: %w[private school public] }
+  validates :visibility, presence: true, inclusion: { in: %w[private teachers students public] }
 
   before_save :assign_school_from_school_class
 

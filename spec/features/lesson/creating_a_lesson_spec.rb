@@ -90,7 +90,7 @@ RSpec.describe 'Creating a public lesson', type: :request do
       stub_hydra_public_api(user_index: teacher_index)
       new_params = { lesson: params[:lesson].merge(user_id: 'ignored') }
 
-      post('/api/lessons', headers:, params:)
+      post('/api/lessons', headers:, params: new_params)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:user_id]).to eq(teacher_id)
