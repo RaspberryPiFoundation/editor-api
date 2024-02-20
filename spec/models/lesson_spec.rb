@@ -69,4 +69,70 @@ RSpec.describe Lesson do
       expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end
+
+  describe '.users' do
+    it 'returns User instances for the current scope' do
+      create(:lesson)
+
+      user = described_class.all.users.first
+      expect(user.name).to eq('School Teacher')
+    end
+
+    it 'ignores members where no profile account exists' do
+      create(:lesson, user_id: SecureRandom.uuid)
+
+      user = described_class.all.users.first
+      expect(user).to be_nil
+    end
+
+    it 'ignores members not included in the current scope' do
+      create(:lesson)
+
+      user = described_class.none.users.first
+      expect(user).to be_nil
+    end
+  end
+
+  describe '.with_users' do
+    it 'returns an array of class members paired with their User instance' do
+      lesson = create(:lesson)
+
+      pair = described_class.all.with_users.first
+      user = described_class.all.users.first
+
+      expect(pair).to eq([lesson, user])
+    end
+
+    it 'returns nil values for members where no profile account exists' do
+      lesson = create(:lesson, user_id: SecureRandom.uuid)
+
+      pair = described_class.all.with_users.first
+      expect(pair).to eq([lesson, nil])
+    end
+
+    it 'ignores members not included in the current scope' do
+      create(:lesson)
+
+      pair = described_class.none.with_users.first
+      expect(pair).to be_nil
+    end
+  end
+
+  describe '#with_user' do
+    it 'returns the class member paired with their User instance' do
+      lesson = create(:lesson)
+
+      pair = lesson.with_user
+      user = described_class.all.users.first
+
+      expect(pair).to eq([lesson, user])
+    end
+
+    it 'returns a nil value if the member has no profile account' do
+      lesson = create(:lesson, user_id: SecureRandom.uuid)
+
+      pair = lesson.with_user
+      expect(pair).to eq([lesson, nil])
+    end
+  end
 end

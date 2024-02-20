@@ -16,8 +16,8 @@ class ClassMember < ApplicationRecord
   end
 
   def self.with_students
-    users = students.index_by(&:id)
-    all.map { |instance| [instance, users[instance.student_id]] }
+    by_id = students.index_by(&:id)
+    all.map { |instance| [instance, by_id[instance.student_id]] }
   end
 
   def with_student

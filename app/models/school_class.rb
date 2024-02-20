@@ -14,8 +14,8 @@ class SchoolClass < ApplicationRecord
   end
 
   def self.with_teachers
-    users = teachers.index_by(&:id)
-    all.map { |instance| [instance, users[instance.teacher_id]] }
+    by_id = teachers.index_by(&:id)
+    all.map { |instance| [instance, by_id[instance.teacher_id]] }
   end
 
   def with_teacher
