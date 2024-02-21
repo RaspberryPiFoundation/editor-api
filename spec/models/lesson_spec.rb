@@ -87,6 +87,32 @@ RSpec.describe Lesson do
     end
   end
 
+  describe '.archived' do
+    let!(:archived_lesson) { create(:lesson, archived_at: Time.now.utc) }
+    let!(:unarchived_lesson) { create(:lesson) }
+
+    it 'includes archived lessons' do
+      expect(described_class.archived).to include(archived_lesson)
+    end
+
+    it 'excludes unarchived lessons' do
+      expect(described_class.archived).not_to include(unarchived_lesson)
+    end
+  end
+
+  describe '.unarchived' do
+    let!(:archived_lesson) { create(:lesson, archived_at: Time.now.utc) }
+    let!(:unarchived_lesson) { create(:lesson) }
+
+    it 'includes unarchived lessons' do
+      expect(described_class.unarchived).to include(unarchived_lesson)
+    end
+
+    it 'excludes archived lessons' do
+      expect(described_class.unarchived).not_to include(archived_lesson)
+    end
+  end
+
   describe '#school' do
     it 'is set from the school_class' do
       lesson = create(:lesson, school_class: build(:school_class))

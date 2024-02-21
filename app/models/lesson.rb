@@ -5,6 +5,7 @@ class Lesson < ApplicationRecord
   belongs_to :school_class, optional: true
 
   before_validation :assign_school_from_school_class
+  before_destroy -> { throw :abort }
 
   validates :user_id, presence: true
   validates :name, presence: true
@@ -13,7 +14,8 @@ class Lesson < ApplicationRecord
   validate :user_has_the_school_owner_or_school_teacher_role_for_the_school
   validate :user_is_the_school_teacher_for_the_school_class
 
-  before_destroy -> { throw :abort }
+  scope :archived, -> { where.not(archived_at: nil) }
+  scope :unarchived, -> { where(archived_at: nil) }
 
   def self.users
     User.from_userinfo(ids: pluck(:user_id))
