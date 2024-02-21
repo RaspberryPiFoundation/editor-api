@@ -12,13 +12,13 @@ end
 
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider(
-    OmniAuth::Strategies::Rpi, ENV.fetch('AUTH_CLIENT_ID', nil), ENV.fetch('AUTH_CLIENT_SECRET', nil),
+    OmniAuth::Strategies::Rpi, ENV.fetch('HYDRA_CLIENT_ID', nil), ENV.fetch('HYDRA_CLIENT_SECRET', nil),
     scope: 'openid email profile roles force-consent',
     callback_path: '/auth/callback',
     client_options: {
-      site: ENV.fetch('AUTH_URL', nil),
-      authorize_url: "#{ENV.fetch('AUTH_URL', nil)}/oauth2/auth",
-      token_url: "#{ENV.fetch('AUTH_TOKEN_URL', ENV.fetch('AUTH_URL', nil))}/oauth2/token",
+      site: ENV.fetch('HYDRA_PUBLIC_URL', nil),
+      authorize_url: "#{ENV.fetch('HYDRA_PUBLIC_URL', nil)}/oauth2/auth",
+      token_url: "#{ENV.fetch('HYDRA_PUBLIC_TOKEN_URL', ENV.fetch('HYDRA_PUBLIC_URL', nil))}/oauth2/token",
       auth_scheme: :basic_auth
     },
     authorize_params: {},
