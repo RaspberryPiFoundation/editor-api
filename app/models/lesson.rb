@@ -13,6 +13,8 @@ class Lesson < ApplicationRecord
   validate :user_has_the_school_owner_or_school_teacher_role_for_the_school
   validate :user_is_the_school_teacher_for_the_school_class
 
+  before_destroy -> { throw :abort }
+
   def self.users
     User.from_userinfo(ids: pluck(:user_id))
   end

@@ -21,6 +21,13 @@ RSpec.describe Lesson do
     end
   end
 
+  describe 'callbacks' do
+    it 'cannot be destroyed and should be archived instead' do
+      lesson = create(:lesson)
+      expect { lesson.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
+    end
+  end
+
   describe 'validations' do
     subject(:lesson) { build(:lesson) }
 
