@@ -7,7 +7,8 @@ module Api
     load_and_authorize_resource :lesson
 
     def index
-      @lessons_with_users = Lesson.accessible_by(current_ability).with_users
+      scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
+      @lessons_with_users = scope.accessible_by(current_ability).with_users
       render :index, formats: [:json], status: :ok
     end
 
