@@ -165,12 +165,19 @@ RSpec.describe 'Creating a public lesson', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
-    it 'responds 403 Forbidden when the user is a school-teacher for a different class' do
+    it 'responds 403 Forbidden when the current user is a school-teacher for a different class' do
       stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
       school_class.update!(teacher_id: SecureRandom.uuid)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 422 Unprocessable Entity when the user_id is a school-teacher for a different class' do
+      new_params = { lesson: params[:lesson].merge(user_id: SecureRandom.uuid) }
+
+      post('/api/lessons', headers:, params: new_params)
+      expect(response).to have_http_status(:unprocessable_entity)
     end
   end
 end

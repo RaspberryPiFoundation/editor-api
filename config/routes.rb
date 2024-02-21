@@ -29,7 +29,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :lessons, only: %i[index create show]
+    resources :lessons, only: %i[index create show update]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
