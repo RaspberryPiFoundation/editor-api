@@ -104,11 +104,12 @@ RSpec.describe 'Showing a lesson', type: :request do
   context "when the lesson's visibility is 'students'" do
     let(:school_class) { create(:school_class) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
-    let(:owner_index) { user_index_by_role('school-owner') }
-    let(:owner_id) { user_id_by_index(owner_index) }
+    let(:teacher_index) { user_index_by_role('school-teacher') }
+    let(:teacher_id) { user_id_by_index(teacher_index) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      lesson.update!(user_id: owner_id)
+      stub_hydra_public_api(user_index: teacher_index)
+      lesson.update!(user_id: teacher_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)
