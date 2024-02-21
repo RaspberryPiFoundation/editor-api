@@ -132,8 +132,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_17_144009) do
     t.string "description"
     t.string "visibility", default: "private", null: false
     t.datetime "due_date"
+    t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["archived_at"], name: "index_lessons_on_archived_at"
     t.index ["name"], name: "index_lessons_on_name"
     t.index ["school_class_id"], name: "index_lessons_on_school_class_id"
     t.index ["school_id"], name: "index_lessons_on_school_id"
