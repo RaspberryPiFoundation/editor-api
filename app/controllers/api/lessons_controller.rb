@@ -38,6 +38,17 @@ module Api
       end
     end
 
+    def destroy
+      operation = params[:undo] == 'true' ? Lesson::Unarchive : Lesson::Archive
+      result = operation.call(lesson: @lesson)
+
+      if result.success?
+        head :no_content
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def verify_school_class_belongs_to_school
