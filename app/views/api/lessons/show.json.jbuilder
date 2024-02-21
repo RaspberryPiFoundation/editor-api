@@ -12,6 +12,7 @@ json.call(
   :visibility,
   :due_date,
   :created_at,
+  :archived_at,
   :updated_at
 )
 
