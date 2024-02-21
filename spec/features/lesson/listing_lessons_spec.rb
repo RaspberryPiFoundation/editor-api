@@ -44,6 +44,24 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.first[:user_name]).to be_nil
   end
 
+  it 'does not include archived lessons' do
+    lesson.archive!
+
+    get('/api/lessons', headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.size).to eq(0)
+  end
+
+  it 'includes archived lessons if ?include_archived=true is set' do
+    lesson.archive!
+
+    get('/api/lessons?include_archived=true', headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.size).to eq(1)
+  end
+
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
     let(:owner_index) { user_index_by_role('school-owner') }
