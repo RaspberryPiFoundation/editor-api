@@ -2,9 +2,14 @@
 
 module Api
   class LessonsController < ApiController
-    before_action :authorize_user, except: %i[show]
-    before_action :verify_school_class_belongs_to_school, except: %i[show]
+    before_action :authorize_user, except: %i[index show]
+    before_action :verify_school_class_belongs_to_school, except: %i[index show]
     load_and_authorize_resource :lesson
+
+    def index
+      @lessons_with_users = Lesson.accessible_by(current_ability).with_users
+      render :index, formats: [:json], status: :ok
+    end
 
     def show
       @lesson_with_user = @lesson.with_user

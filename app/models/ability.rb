@@ -7,7 +7,7 @@ class Ability
   def initialize(user)
     can :show, Project, user_id: nil
     can :show, Component, project: { user_id: nil }
-    can :show, Lesson, visibility: 'public'
+    can :read, Lesson, visibility: 'public'
 
     return unless user
 
