@@ -16,7 +16,7 @@ class Ability
 
     can :create, School # The user agrees to become a school-owner by creating a school.
     can :create, Lesson, school_id: nil, school_class_id: nil
-    can :read, Lesson, user_id: user.id
+    can %i[read update], Lesson, user_id: user.id
 
     user.organisation_ids.each do |organisation_id|
       define_school_owner_abilities(organisation_id:) if user.school_owner?(organisation_id:)
@@ -36,7 +36,8 @@ class Ability
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
     can(%i[create], Lesson, school_id: organisation_id)
-    can(%i[read], Lesson, school_id: organisation_id, visibility: 'teachers')
+    can(%i[read update], Lesson, school_id: organisation_id, visibility: %w[teachers students])
+    can(%i[update], Lesson, school_id: organisation_id, visibility: 'public')
   end
 
   def define_school_teacher_abilities(user:, organisation_id:)
@@ -48,7 +49,7 @@ class Ability
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
     can(%i[create], Lesson) { |lesson| school_teacher_can_create_lesson?(user:, organisation_id:, lesson:) }
-    can(%i[read], Lesson, school_id: organisation_id, visibility: 'teachers')
+    can(%i[read], Lesson, school_id: organisation_id, visibility: %w[teachers students])
   end
 
   # rubocop:disable Layout/LineLength

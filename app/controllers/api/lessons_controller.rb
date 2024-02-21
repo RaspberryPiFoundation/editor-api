@@ -3,7 +3,7 @@
 module Api
   class LessonsController < ApiController
     before_action :authorize_user, except: %i[index show]
-    before_action :verify_school_class_belongs_to_school, except: %i[index show]
+    before_action :verify_school_class_belongs_to_school, only: :create
     load_and_authorize_resource :lesson
 
     def index
@@ -22,6 +22,17 @@ module Api
       if result.success?
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def update
+      result = Lesson::Update.call(lesson: @lesson, lesson_params:)
+
+      if result.success?
+        @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
@@ -55,7 +66,7 @@ module Api
     end
 
     def school
-      @school ||= School.find_by(id: base_params[:school_id])
+      @school ||= @lesson&.school || School.find_by(id: base_params[:school_id])
     end
   end
 end
