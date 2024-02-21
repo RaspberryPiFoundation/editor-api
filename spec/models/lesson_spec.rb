@@ -42,6 +42,17 @@ RSpec.describe Lesson do
       expect(lesson).to be_invalid
     end
 
+    context 'when the lesson has a school' do
+      before do
+        lesson.update!(school_class: create(:school_class))
+      end
+
+      it 'requires a user that has the school-owner or school-teacher role for the school' do
+        lesson.user_id = '22222222-2222-2222-2222-222222222222' # school-student
+        expect(lesson).to be_invalid
+      end
+    end
+
     it 'requires a name' do
       lesson.name = ' '
       expect(lesson).to be_invalid
