@@ -28,6 +28,24 @@ class Lesson < ApplicationRecord
     [self, User.from_userinfo(ids: user_id).first]
   end
 
+  def archived?
+    archived_at.present?
+  end
+
+  def archive!
+    return if archived?
+
+    self.archived_at = Time.now.utc
+    save!(validate: false)
+  end
+
+  def unarchive!
+    return unless archived?
+
+    self.archived_at = nil
+    save!(validate: false)
+  end
+
   private
 
   def assign_school_from_school_class

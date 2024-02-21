@@ -164,4 +164,67 @@ RSpec.describe Lesson do
       expect(pair).to eq([lesson, nil])
     end
   end
+
+  describe '#archive!' do
+    let(:lesson) { build(:lesson) }
+
+    it 'archives the lesson' do
+      lesson.archive!
+      expect(lesson.archived?).to be(true)
+    end
+
+    it 'sets archived_at' do
+      lesson.archive!
+      expect(lesson.archived_at).to be_present
+    end
+
+    it 'does not set archived_at if it was already set' do
+      lesson.update!(archived_at: 1.day.ago)
+
+      lesson.archive!
+      expect(lesson.archived_at).to be < 23.hours.ago
+    end
+
+    it 'saves the record' do
+      lesson.archive!
+      expect(lesson).to be_persisted
+    end
+
+    it 'is infallible to other validation errors' do
+      lesson.save!
+      lesson.name = ' '
+      lesson.save!(validate: false)
+
+      lesson.archive!
+      expect(lesson.archived?).to be(true)
+    end
+  end
+
+  describe '#unarchive!' do
+    let(:lesson) { build(:lesson, archived_at: Time.now.utc) }
+
+    it 'unarchives the lesson' do
+      lesson.unarchive!
+      expect(lesson.archived?).to be(false)
+    end
+
+    it 'clears archived_at' do
+      lesson.unarchive!
+      expect(lesson.archived_at).to be_nil
+    end
+
+    it 'saves the record' do
+      lesson.unarchive!
+      expect(lesson).to be_persisted
+    end
+
+    it 'is infallible to other validation errors' do
+      lesson.archive!
+      lesson.name = ' '
+      lesson.save!(validate: false)
+
+      lesson.unarchive!
+      expect(lesson.archived?).to be(false)
+    end
+  end
 end
