@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
   post '/graphql', to: 'graphql#execute'
   mount GraphiQL::Rails::Engine, at: '/', graphql_path: '/graphql#execute' unless Rails.env.production?
@@ -29,8 +30,11 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :lessons, only: %i[index create show update destroy]
+    resources :lessons, only: %i[index create show update destroy] do
+      post :copy, on: :member, to: 'lessons#create_copy'
+    end
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
 end
+# rubocop:enable Metrics/BlockLength

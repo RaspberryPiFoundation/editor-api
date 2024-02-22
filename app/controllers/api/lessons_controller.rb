@@ -28,6 +28,17 @@ module Api
       end
     end
 
+    def create_copy
+      result = Lesson::CreateCopy.call(lesson: @lesson, lesson_params:)
+
+      if result.success?
+        @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     def update
       result = Lesson::Update.call(lesson: @lesson, lesson_params:)
 
@@ -70,7 +81,15 @@ module Api
     end
 
     def base_params
-      params.require(:lesson).permit(:school_id, :school_class_id, :user_id, :name)
+      params.fetch(:lesson, {}).permit(
+        :school_id,
+        :school_class_id,
+        :user_id,
+        :name,
+        :description,
+        :visibility,
+        :due_date
+      )
     end
 
     def school_owner?
