@@ -3,8 +3,8 @@ class CreateLessons < ActiveRecord::Migration[7.0]
     create_table :lessons, id: :uuid do |t|
       t.references :school, type: :uuid, foreign_key: true, index: true
       t.references :school_class, type: :uuid, foreign_key: true, index: true
+      t.references :copied_from, type: :uuid, foreign_key: { to_table: :lessons }, index: true
 
-      t.uuid :copied_from
       t.uuid :user_id, null: false
       t.string :name, null: false
       t.string :description
@@ -15,9 +15,6 @@ class CreateLessons < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_foreign_key :lessons, :lessons, column: :copied_from
-
-    add_index :lessons, :copied_from
     add_index :lessons, :user_id
     add_index :lessons, :name
     add_index :lessons, :visibility
