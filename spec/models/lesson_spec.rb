@@ -19,6 +19,16 @@ RSpec.describe Lesson do
       lesson = create(:lesson, school_class:, school: school_class.school)
       expect(lesson.school_class).to be_a(SchoolClass)
     end
+
+    it 'optionally belongs to a parent' do
+      lesson = create(:lesson, parent: build(:lesson))
+      expect(lesson.parent).to be_a(described_class)
+    end
+
+    it 'has many copies' do
+      lesson = create(:lesson, copies: [build(:lesson), build(:lesson)])
+      expect(lesson.copies.size).to eq(2)
+    end
   end
 
   describe 'callbacks' do
