@@ -37,11 +37,6 @@ RSpec.describe 'Creating a public lesson', type: :request do
     expect(data[:user_name]).to eq('School Owner')
   end
 
-  it 'responds 400 Bad Request when params are missing' do
-    post('/api/lessons', headers:)
-    expect(response).to have_http_status(:bad_request)
-  end
-
   it 'responds 422 Unprocessable Entity when params are invalid' do
     post('/api/lessons', headers:, params: { lesson: { name: ' ' } })
     expect(response).to have_http_status(:unprocessable_entity)

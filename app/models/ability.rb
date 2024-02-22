@@ -15,8 +15,9 @@ class Ability
     can %i[read create update destroy], Component, project: { user_id: user.id }
 
     can :create, School # The user agrees to become a school-owner by creating a school.
-    can :create, Lesson, school_id: nil, school_class_id: nil
-    can %i[read update destroy], Lesson, user_id: user.id
+    can :create, Lesson, school_id: nil, school_class_id: nil # Users can create shared lessons.
+    can :create_copy, Lesson, visibility: 'public' # Users can create a copy of any public lesson.
+    can %i[read create_copy update destroy], Lesson, user_id: user.id # Users can manage their own lessons.
 
     user.organisation_ids.each do |organisation_id|
       define_school_owner_abilities(organisation_id:) if user.school_owner?(organisation_id:)
@@ -35,7 +36,7 @@ class Ability
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
-    can(%i[create], Lesson, school_id: organisation_id)
+    can(%i[create create_copy], Lesson, school_id: organisation_id)
     can(%i[read update destroy], Lesson, school_id: organisation_id, visibility: %w[teachers students public])
   end
 
@@ -48,7 +49,7 @@ class Ability
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
     can(%i[create destroy], Lesson) { |lesson| school_teacher_can_manage_lesson?(user:, organisation_id:, lesson:) }
-    can(%i[read], Lesson, school_id: organisation_id, visibility: %w[teachers students])
+    can(%i[read create_copy], Lesson, school_id: organisation_id, visibility: %w[teachers students])
   end
 
   # rubocop:disable Layout/LineLength
