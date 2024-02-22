@@ -117,6 +117,15 @@ GEM
       uniform_notifier (~> 1.11)
     byebug (11.1.3)
     cancancan (3.4.0)
+    capybara (3.40.0)
+      addressable
+      matrix
+      mini_mime (>= 0.1.3)
+      nokogiri (~> 1.11)
+      rack (>= 1.6.0)
+      rack-test (>= 0.6.3)
+      regexp_parser (>= 1.5, < 3.0)
+      xpath (~> 3.2)
     climate_control (1.2.0)
     coderay (1.1.3)
     concurrent-ruby (1.2.2)
@@ -212,6 +221,7 @@ GEM
       net-pop
       net-smtp
     marcel (1.0.2)
+    matrix (0.4.2)
     method_source (1.0.0)
     mini_magick (4.12.0)
     mini_mime (1.1.2)
@@ -360,6 +370,7 @@ GEM
     ruby-vips (2.2.0)
       ffi (~> 1.12)
     ruby2_keywords (0.0.5)
+    rubyzip (2.3.2)
     sassc (2.4.0)
       ffi (~> 1.9)
     sassc-rails (2.1.2)
@@ -371,6 +382,11 @@ GEM
     scout_apm (5.3.5)
       parser
     selectize-rails (0.12.6)
+    selenium-webdriver (4.18.1)
+      base64 (~> 0.2)
+      rexml (~> 3.2, >= 3.2.5)
+      rubyzip (>= 1.2.2, < 3.0)
+      websocket (~> 1.0)
     sentry-rails (5.5.0)
       railties (>= 5.0)
       sentry-ruby (~> 5.5.0)
@@ -406,14 +422,21 @@ GEM
     uniform_notifier (1.16.0)
     uri (0.12.0)
     version_gem (1.1.3)
+    webdrivers (5.2.0)
+      nokogiri (~> 1.6)
+      rubyzip (>= 1.3.0)
+      selenium-webdriver (~> 4.0)
     webmock (3.18.1)
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
     webrick (1.8.1)
+    websocket (1.2.10)
     websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
+    xpath (3.2.0)
+      nokogiri (~> 1.8)
     zeitwerk (2.6.7)
 
 PLATFORMS
@@ -428,6 +451,7 @@ DEPENDENCIES
   bootsnap
   bullet
   cancancan (~> 3.3)
+  capybara (~> 3.36)
   climate_control
   dotenv-rails
   factory_bot_rails
@@ -459,9 +483,11 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   scout_apm
+  selenium-webdriver (~> 4.1)
   sentry-rails (~> 5.5.0)
   shoulda-matchers (~> 5.0)
   simplecov
+  webdrivers (~> 5.0)
   webmock
 
 RUBY VERSION

@@ -50,7 +50,10 @@ group :development, :test do
 end
 
 group :test do
+  gem 'capybara'
   gem 'climate_control'
+  gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 5.0'
+  gem 'webdrivers'
   gem 'webmock'
 end

@@ -96,6 +96,25 @@ RSpec.configure do |config|
   config.before do |example|
     create_list(:word, 10) if example.metadata[:sample_words]
   end
+
+  config.before(:each, type: :system) do
+    driven_by :rack_test
+  end
+
+  config.before(:each, type: :system, js: true) do
+    # We need to allow net connect at this stage to allow WebDrivers to update
+    # or Capybara to talk to selenium etc.
+    WebMock.allow_net_connect!
+
+    # Ensure we update the driver here, while we can connect to the network
+    Webdrivers::Geckodriver.update
+    driven_by :selenium_headless, using: :firefox
+
+    # Need to set the hostname, otherwise it defaults to www.example.com.
+    default_url_options[:host] = Capybara.server_host
+
+    WebMock.disable_net_connect!(allow_localhost: true, allow: Capybara.server_host)
+  end
 end
 
 Shoulda::Matchers.configure do |config|
