@@ -25,6 +25,14 @@ RSpec.describe Project do
     let(:project) { create(:project) }
     let(:identifier) { project.identifier }
 
+    it 'has a valid default factory' do
+      expect(build(:project)).to be_valid
+    end
+
+    it 'can save the default factory' do
+      expect { build(:project).save! }.not_to raise_error
+    end
+
     it 'is invalid if no user or locale' do
       invalid_project = build(:project, locale: nil, user_id: nil)
       expect(invalid_project).to be_invalid
@@ -60,6 +68,17 @@ RSpec.describe Project do
       it 'is invalid if identifier in use in another locale by another user' do
         new_project = build(:project, identifier:, user_id:, locale: 'another_locale')
         expect(new_project).to be_invalid
+      end
+    end
+
+    context 'when the project has a school' do
+      before do
+        project.update!(school: create(:school))
+      end
+
+      it 'requires a user that has a role within the school' do
+        project.user_id = SecureRandom.uuid
+        expect(project).to be_invalid
       end
     end
   end

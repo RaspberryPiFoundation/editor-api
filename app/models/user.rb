@@ -27,12 +27,6 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
-  def role?(role:)
-    return false if roles.nil?
-
-    roles.to_s.split(',').map(&:strip).include? role.to_s
-  end
-
   def organisation_ids
     organisations&.keys || []
   end
@@ -58,7 +52,7 @@ class User
   end
 
   def admin?
-    role?(role: 'editor-admin')
+    organisation_ids.any? { |organisation_id| org_role?(organisation_id:, role: 'editor-admin') }
   end
 
   def ==(other)
