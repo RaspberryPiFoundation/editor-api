@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_23_113155) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_23_150228) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -166,8 +166,10 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_23_113155) do
     t.string "locale"
     t.string "remix_origin"
     t.uuid "school_id"
+    t.uuid "lesson_id"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
+    t.index ["lesson_id"], name: "index_projects_on_lesson_id"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
     t.index ["school_id"], name: "index_projects_on_school_id"
   end
@@ -210,6 +212,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_23_113155) do
   add_foreign_key "lessons", "school_classes"
   add_foreign_key "lessons", "schools"
   add_foreign_key "project_errors", "projects"
+  add_foreign_key "projects", "lessons"
   add_foreign_key "projects", "schools"
   add_foreign_key "school_classes", "schools"
 end
