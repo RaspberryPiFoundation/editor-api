@@ -16,6 +16,7 @@ class Project < ApplicationRecord
   validates :identifier, presence: true, uniqueness: { scope: :locale }
   validate :identifier_cannot_be_taken_by_another_user
   validates :locale, presence: true, unless: :user_id
+  validate :user_has_a_role_within_the_school
 
   def self.users
     User.from_userinfo(ids: pluck(:user_id))
@@ -46,5 +47,17 @@ class Project < ApplicationRecord
     return if Project.where(identifier: self.identifier).where.not(user_id:).empty?
 
     errors.add(:identifier, "can't be taken by another user")
+  end
+
+  def user_has_a_role_within_the_school
+    return unless user_id_changed? && errors.blank? && school
+
+    _, user = with_user
+
+    return if user.blank?
+    return if user.roles(organisation_id: school.id).any?
+
+    msg = "'#{user_id}' does not have any roles for for organisation '#{school.id}'"
+    errors.add(:user, msg)
   end
 end

@@ -29,9 +29,12 @@ class User
     organisations.keys
   end
 
+  def roles(organisation_id:)
+    organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
+  end
+
   def role?(organisation_id:, role:)
-    roles = organisations[organisation_id.to_s]
-    roles.to_s.split(',').map(&:strip).include?(role.to_s) if roles
+    roles(organisation_id:).include?(role.to_s)
   end
 
   def school_owner?(organisation_id:)
