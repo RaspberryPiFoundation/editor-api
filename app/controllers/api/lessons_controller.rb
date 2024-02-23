@@ -75,7 +75,7 @@ module Api
         # A school owner must specify who the lesson user is.
         base_params
       else
-        # A school teacher may only create classes they own.
+        # A school teacher may only create lessons they own.
         base_params.merge(user_id: current_user.id)
       end
     end

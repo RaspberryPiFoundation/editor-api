@@ -20,7 +20,7 @@ RSpec.describe 'Create project requests' do
       it 'returns success' do
         post('/api/projects', headers:)
 
-        expect(response).to have_http_status(:ok)
+        expect(response).to have_http_status(:created)
       end
     end
 
@@ -36,7 +36,7 @@ RSpec.describe 'Create project requests' do
       it 'returns error' do
         post('/api/projects', headers:)
 
-        expect(response).to have_http_status(:internal_server_error)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

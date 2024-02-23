@@ -123,7 +123,7 @@ RSpec.describe 'Showing a lesson', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it "responds 403 Forbidden when the user is not a school-student within the lesson's class" do
+    it "responds 403 Forbidden when the user is a school-student but isn't within the lesson's class" do
       stub_hydra_public_api(user_index: user_index_by_role('school-student'))
 
       get("/api/lessons/#{lesson.id}", headers:)

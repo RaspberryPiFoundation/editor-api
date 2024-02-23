@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Creating a public lesson', type: :request do
+RSpec.describe 'Creating a lesson', type: :request do
   before do
     stub_hydra_public_api
     stub_user_info_api
