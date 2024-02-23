@@ -19,6 +19,19 @@ class Project < ApplicationRecord
 
   scope :internal_projects, -> { where(user_id: nil) }
 
+  def self.users
+    User.from_userinfo(ids: pluck(:user_id))
+  end
+
+  def self.with_users
+    by_id = users.index_by(&:id)
+    all.map { |instance| [instance, by_id[instance.user_id]] }
+  end
+
+  def with_user
+    [self, User.from_userinfo(ids: user_id).first]
+  end
+
   # Work around a CanCanCan issue with accepts_nested_attributes_for.
   # https://github.com/CanCanCommunity/cancancan/issues/774
   def components=(array)
