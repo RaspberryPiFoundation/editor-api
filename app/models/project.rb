@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class Project < ApplicationRecord
+  belongs_to :school, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
   has_many :remixes, dependent: :nullify, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :parent
   has_many :components, -> { order(default: :desc, name: :asc) }, dependent: :destroy, inverse_of: :project

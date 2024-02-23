@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Project do
   describe 'associations', :sample_words do
+    it { is_expected.to belong_to(:school).optional(true) }
     it { is_expected.to belong_to(:parent).optional(true) }
     it { is_expected.to have_many(:remixes).dependent(:nullify) }
     it { is_expected.to have_many(:components) }
