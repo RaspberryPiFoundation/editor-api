@@ -16,6 +16,12 @@ class Project < ApplicationRecord
   validate :identifier_cannot_be_taken_by_another_user
   validates :locale, presence: true, unless: :user_id
 
+  # Work around a CanCanCan issue with accepts_nested_attributes_for.
+  # https://github.com/CanCanCommunity/cancancan/issues/774
+  def components=(array)
+    super(array.map { |o| o.is_a?(Hash) ? Component.new(o) : o })
+  end
+
   private
 
   def check_unique_not_null
