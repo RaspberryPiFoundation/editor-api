@@ -29,6 +29,11 @@ RSpec.describe Lesson do
       lesson = create(:lesson, copies: [build(:lesson), build(:lesson)])
       expect(lesson.copies.size).to eq(2)
     end
+
+    it 'has many projects' do
+      lesson = create(:lesson, projects: [build(:project), build(:project)])
+      expect(lesson.projects.size).to eq(2)
+    end
   end
 
   describe 'callbacks' do
