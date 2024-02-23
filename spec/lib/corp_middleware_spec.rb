@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 describe CORPMiddleware do
-  let(:app) { double('App') } # rubocop:disable RSpec/VerifiedDoubles  let(:middleware) { described_class.new(app) }
+  let(:app) { double('App') } # rubocop:disable RSpec/VerifiedDoubles
+  let(:middleware) { described_class.new(app) }
   let(:env) { { 'HTTP_HOST' => 'test.com', 'PATH_INFO' => '/rails/active_storage' } }
 
   before do
