@@ -66,7 +66,7 @@ class Ability
     can(%i[read create create_batch update], :school_student)
     can(%i[create destroy], Lesson) { |lesson| school_teacher_can_manage_lesson?(user:, organisation_id:, lesson:) }
     can(%i[read create_copy], Lesson, school_id: organisation_id, visibility: %w[teachers students])
-    can(%i[create], Project, school_id: organisation_id, user_id: user.id)
+    can(%i[create], Project) { |project| school_teacher_can_manage_project?(user:, organisation_id:, project:) }
   end
 
   # rubocop:disable Layout/LineLength
@@ -74,6 +74,7 @@ class Ability
     can(%i[read], School, id: organisation_id)
     can(%i[read], SchoolClass, school: { id: organisation_id }, members: { student_id: user.id })
     can(%i[read], Lesson, school_id: organisation_id, visibility: 'students', school_class: { members: { student_id: user.id } })
+    can(%i[create], Project, school_id: organisation_id, user_id: user.id, lesson_id: nil)
   end
   # rubocop:enable Layout/LineLength
 
@@ -82,5 +83,12 @@ class Ability
     is_my_class = lesson.school_class && lesson.school_class.teacher_id == user.id
 
     is_my_lesson && (is_my_class || !lesson.school_class)
+  end
+
+  def school_teacher_can_manage_project?(user:, organisation_id:, project:)
+    is_my_project = project.school_id == organisation_id && project.user_id == user.id
+    is_my_lesson = project.lesson && project.lesson.user_id == user.id
+
+    is_my_project && (is_my_lesson || !project.lesson)
   end
 end

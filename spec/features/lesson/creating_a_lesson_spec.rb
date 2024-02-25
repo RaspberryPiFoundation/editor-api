@@ -145,7 +145,7 @@ RSpec.describe 'Creating a lesson', type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
     end
 
-    it 'responds 422 Unprocessable if school_id does not correspond to school_class_id' do
+    it 'responds 422 Unprocessable if school_class_id does not correspond to school_id' do
       new_params = { lesson: params[:lesson].merge(school_id: SecureRandom.uuid) }
 
       post('/api/lessons', headers:, params: new_params)
