@@ -7,8 +7,9 @@ module Api
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
-    after_action :pagination_link_header, only: %i[index]
     load_and_authorize_resource
+    before_action :verify_lesson_belongs_to_school, only: :create
+    after_action :pagination_link_header, only: %i[index]
 
     def index
       @paginated_projects = @projects.page(params[:page])
@@ -47,6 +48,13 @@ module Api
 
     private
 
+    def verify_lesson_belongs_to_school
+      return if base_params[:lesson_id].blank?
+      return if school&.lessons&.pluck(:id)&.include?(base_params[:lesson_id])
+
+      raise ParameterError, 'lesson_id does not correspond to school_id'
+    end
+
     def load_project
       project_loader = ProjectLoader.new(params[:id], [params[:locale]])
       @project = project_loader.load
@@ -69,6 +77,7 @@ module Api
     def base_params
       params.fetch(:project, {}).permit(
         :school_id,
+        :lesson_id,
         :user_id,
         :identifier,
         :name,

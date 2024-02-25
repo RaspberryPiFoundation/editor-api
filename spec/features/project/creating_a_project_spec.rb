@@ -79,6 +79,13 @@ RSpec.describe 'Creating a project', type: :request do
       expect(response).to have_http_status(:created)
     end
 
+    it 'responds 201 Created when the user is a school-student for the school' do
+      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:created)
+    end
+
     it 'sets the lesson user to the specified user for school-owner users' do
       post('/api/projects', headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
@@ -98,6 +105,81 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
       school.update!(id: SecureRandom.uuid)
+
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  context 'when the project is associated with a lesson' do
+    let(:school) { create(:school) }
+    let(:lesson) { create(:lesson, school:) }
+    let(:teacher_index) { user_index_by_role('school-teacher') }
+    let(:teacher_id) { user_id_by_index(teacher_index) }
+
+    let(:params) do
+      {
+        project: {
+          name: 'Test Project',
+          components: [],
+          school_id: school.id,
+          lesson_id: lesson.id,
+          user_id: teacher_id
+        }
+      }
+    end
+
+    it 'responds 201 Created' do
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'responds 201 Created when the current user is the owner of the lesson' do
+      stub_hydra_public_api(user_index: teacher_index)
+      lesson.update!(user_id: user_id_by_index(teacher_index))
+
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'responds 422 Unprocessable when when the user_id is not the owner of the lesson' do
+      new_params = { project: params[:project].merge(user_id: SecureRandom.uuid) }
+
+      post('/api/projects', headers:, params: new_params)
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'responds 422 Unprocessable when lesson_id is provided but school_id is missing' do
+      new_params = { project: params[:project].without(:school_id) }
+
+      post('/api/projects', headers:, params: new_params)
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'responds 422 Unprocessable when lesson_id does not correspond to school_id' do
+      new_params = { project: params[:project].merge(lesson_id: SecureRandom.uuid) }
+
+      post('/api/projects', headers:, params: new_params)
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+      new_params = { project: params[:project].without(:lesson_id).merge(school_id: SecureRandom.uuid) }
+
+      post('/api/projects', headers:, params: new_params)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
+      stub_hydra_public_api(user_index: teacher_index)
+      lesson.update!(user_id: SecureRandom.uuid)
+
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the user is a school-student' do
+      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
