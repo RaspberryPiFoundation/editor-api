@@ -31,8 +31,9 @@ RSpec.describe Lesson do
     end
 
     it 'has many projects' do
-      lesson = create(:lesson, projects: [build(:project), build(:project)])
-      expect(lesson.projects.size).to eq(2)
+      user_id = SecureRandom.uuid
+      lesson = create(:lesson, user_id:, projects: [build(:project, user_id:)])
+      expect(lesson.projects.size).to eq(1)
     end
   end
 
