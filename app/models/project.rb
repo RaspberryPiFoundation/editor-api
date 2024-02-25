@@ -17,6 +17,7 @@ class Project < ApplicationRecord
   validate :identifier_cannot_be_taken_by_another_user
   validates :locale, presence: true, unless: :user_id
   validate :user_has_a_role_within_the_school
+  validate :user_is_the_owner_of_the_lesson
 
   def self.users
     User.from_userinfo(ids: pluck(:user_id))
@@ -55,9 +56,15 @@ class Project < ApplicationRecord
     _, user = with_user
 
     return if user.blank?
-    return if user.roles(organisation_id: school.id).any?
+    return if user.roles(organisation_id: school_id).any?
 
-    msg = "'#{user_id}' does not have any roles for for organisation '#{school.id}'"
+    msg = "'#{user_id}' does not have any roles for for organisation '#{school_id}'"
     errors.add(:user, msg)
+  end
+
+  def user_is_the_owner_of_the_lesson
+    return if !lesson || user_id == lesson.user_id
+
+    errors.add(:user, "'#{user_id}' is not the owner for lesson '#{lesson_id}'")
   end
 end

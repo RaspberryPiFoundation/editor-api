@@ -76,7 +76,19 @@ RSpec.describe Project do
         project.update!(school: create(:school))
       end
 
-      it 'requires a user that has a role within the school' do
+      it 'requires that the user that has a role within the school' do
+        project.user_id = SecureRandom.uuid
+        expect(project).to be_invalid
+      end
+    end
+
+    context 'when the project has a lesson' do
+      before do
+        lesson = create(:lesson)
+        project.update!(lesson:, user_id: lesson.user_id, identifier: 'something')
+      end
+
+      it 'requires that the user be the owner of the lesson' do
         project.user_id = SecureRandom.uuid
         expect(project).to be_invalid
       end
