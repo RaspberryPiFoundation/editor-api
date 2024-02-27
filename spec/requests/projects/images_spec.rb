@@ -6,12 +6,18 @@ RSpec.describe 'Images requests' do
   let(:project) { create(:project, user_id: stubbed_user_id) }
   let(:image_filename) { 'test_image_1.png' }
   let(:params) { { images: [fixture_file_upload(image_filename, 'image/png')] } }
+  let(:file_blob) do
+    fixture_file_path = Rails.root.join('spec', 'fixtures', 'files', image_filename)
+    Base64.strict_encode64(File.binread(fixture_file_path))
+  end
   let(:expected_json) do
     {
       image_list: [
         {
           filename: image_filename,
-          url: rails_blob_url(project.images[0])
+          url: rails_blob_url(project.images[0]),
+          blob_data: file_blob,
+          content_type: 'image/png'
         }
       ]
     }.to_json
@@ -31,7 +37,6 @@ RSpec.describe 'Images requests' do
 
       it 'returns file list' do
         post("/api/projects/#{project.identifier}/images", params:, headers:)
-
         expect(response.body).to eq(expected_json)
       end
 
