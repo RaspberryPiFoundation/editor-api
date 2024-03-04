@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Project update requests' do
-  let(:headers) { { Authorization: 'dummy-token' } }
+  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   context 'when authed user is project creator' do
-    let(:project) { create(:project, :with_default_component, user_id: stubbed_user_id, locale: nil) }
+    let(:project) { create(:project, :with_default_component, user_id: user_id_by_index(0), locale: nil) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(
@@ -26,7 +26,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     it 'returns success response' do
@@ -81,7 +81,7 @@ RSpec.describe 'Project update requests' do
     let(:params) { { project: { components: [] } } }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     it 'returns forbidden response' do
@@ -94,7 +94,7 @@ RSpec.describe 'Project update requests' do
     let(:project) { create(:project) }
 
     before do
-      stub_fetch_oauth_user(user_index: nil)
+      stub_hydra_public_api(user_index: nil)
     end
 
     it 'returns unauthorized' do

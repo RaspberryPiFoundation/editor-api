@@ -17,15 +17,20 @@ RSpec.describe 'Remix requests' do
   end
 
   context 'when auth is correct' do
-    let(:headers) { { Authorization: 'dummy-token', Origin: 'editor.com' } }
+    let(:headers) do
+      {
+        Authorization: UserProfileMock::TOKEN,
+        Origin: 'editor.com'
+      }
+    end
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     describe '#show' do
       before do
-        create(:project, remixed_from_id: original_project.id, user_id: stubbed_user_id)
+        create(:project, remixed_from_id: original_project.id, user_id: stubbed_user.id)
       end
 
       it 'returns success response' do
@@ -57,7 +62,7 @@ RSpec.describe 'Remix requests' do
 
       context 'when project cannot be saved' do
         before do
-          stub_fetch_oauth_user
+          stub_hydra_public_api
           error_response = OperationResponse.new
           error_response[:error] = 'Something went wrong'
           allow(Project::CreateRemix).to receive(:call).and_return(error_response)

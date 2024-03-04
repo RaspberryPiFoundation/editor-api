@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Project show requests' do
-  let!(:project) { create(:project, user_id: stubbed_user_id, locale: nil) }
+  let!(:project) { create(:project, user_id: user_id_by_index(0), locale: nil) }
   let(:project_json) do
     {
       identifier: project.identifier,
@@ -18,10 +18,10 @@ RSpec.describe 'Project show requests' do
   let(:headers) { {} }
 
   context 'when user is logged in' do
-    let(:headers) { { Authorization: 'dummy-token' } }
+    let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     context 'when loading own project' do
@@ -43,7 +43,7 @@ RSpec.describe 'Project show requests' do
     end
 
     context 'when loading another user\'s project' do
-      let!(:another_project) { create(:project, user_id: stubbed_user_id(user_index: 1), locale: nil) }
+      let!(:another_project) { create(:project, user_id: user_id_by_index(1), locale: nil) }
       let(:another_project_json) do
         {
           identifier: another_project.identifier,

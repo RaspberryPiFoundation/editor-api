@@ -4,8 +4,8 @@ FactoryBot.define do
   factory :user do
     id { SecureRandom.uuid }
     name { Faker::Name.name }
-    roles { nil }
     email { Faker::Internet.email }
+    organisations { {} }
 
     skip_create
   end

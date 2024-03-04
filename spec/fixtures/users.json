@@ -1,40 +1,67 @@
 {
   "users": [
     {
-      "id": "b6301f34-b970-4d4f-8314-f877bad8b150",
-      "email": "jane.doe@example.com",
+      "id": "00000000-0000-0000-0000-000000000000",
+      "email": "school-owner@example.com",
       "username": null,
       "parentalEmail": null,
-      "name": "Jane Doe",
-      "nickname": "Jane",
+      "name": "School Owner",
+      "nickname": "Owner",
       "country": "United Kingdom",
       "country_code": "GB",
       "postcode": null,
       "dateOfBirth": null,
-      "verifiedAt": "2023-08-14T11:02:27.038Z",
-      "createdAt": "2023-08-14T11:02:27.038Z",
-      "updatedAt": "2023-08-14T13:41:46.874Z",
+      "verifiedAt": "2024-01-01T12:00:00.000Z",
+      "createdAt": "2024-01-01T12:00:00.000Z",
+      "updatedAt": "2024-01-01T12:00:00.000Z",
       "discardedAt": null,
-      "lastLoggedInAt": "2023-08-14T13:41:46.863Z",
-      "roles": "school-teacher"
+      "lastLoggedInAt": "2024-01-01T12:00:00.000Z",
+      "roles": "school-owner",
+      "organisations": {
+        "12345678-1234-1234-1234-123456789abc": "school-owner"
+      }
     },
     {
-      "id": "bbb9b8fd-f357-4238-983d-6f87b99bdbb2",
-      "email": "john.doe@example.com",
+      "id": "11111111-1111-1111-1111-111111111111",
+      "email": "school-teacher@example.com",
       "username": null,
       "parentalEmail": null,
-      "name": "John Doe",
-      "nickname": "John",
+      "name": "School Teacher",
+      "nickname": "Teacher",
       "country": "United Kingdom",
       "country_code": "GB",
       "postcode": null,
       "dateOfBirth": null,
-      "verifiedAt": "2023-08-14T11:02:27.038Z",
-      "createdAt": "2023-08-14T11:02:27.038Z",
-      "updatedAt": "2023-09-18T06:53:02.312Z",
+      "verifiedAt": "2024-01-01T12:00:00.000Z",
+      "createdAt": "2024-01-01T12:00:00.000Z",
+      "updatedAt": "2024-01-01T12:00:00.000Z",
       "discardedAt": null,
-      "lastLoggedInAt": "2023-09-18T06:53:02.277Z",
-      "roles": "school-student"
+      "lastLoggedInAt": "2024-01-01T12:00:00.000Z",
+      "roles": "school-teacher",
+      "organisations": {
+        "12345678-1234-1234-1234-123456789abc": "school-teacher"
+      }
+    },
+    {
+      "id": "22222222-2222-2222-2222-222222222222",
+      "email": null,
+      "username": "student123",
+      "parentalEmail": null,
+      "name": "School Student",
+      "nickname": "Student",
+      "country": "United Kingdom",
+      "country_code": "GB",
+      "postcode": null,
+      "dateOfBirth": null,
+      "verifiedAt": "2024-01-01T12:00:00.000Z",
+      "createdAt": "2024-01-01T12:00:00.000Z",
+      "updatedAt": "2024-01-01T12:00:00.000Z",
+      "discardedAt": null,
+      "lastLoggedInAt": "2024-01-01T12:00:00.000Z",
+      "roles": "school-student",
+      "organisations": {
+        "12345678-1234-1234-1234-123456789abc": "school-student"
+      }
     }
   ]
 }

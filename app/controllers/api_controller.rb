@@ -4,7 +4,8 @@ class ApiController < ActionController::API
   include Identifiable
 
   unless Rails.application.config.consider_all_requests_local
-    rescue_from ActiveRecord::RecordNotFound, with: -> { notfound }
+    rescue_from ActionController::ParameterMissing, with: -> { bad_request }
+    rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
     rescue_from CanCan::AccessDenied, with: -> { denied }
   end
 
@@ -14,7 +15,11 @@ class ApiController < ActionController::API
     head :unauthorized unless current_user
   end
 
-  def notfound
+  def bad_request
+    head :bad_request
+  end
+
+  def not_found
     head :not_found
   end
 

@@ -5,6 +5,10 @@ require 'rails_helper'
 RSpec.describe 'mutation DeleteProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
+  before do
+    stub_hydra_public_api
+  end
+
   let(:mutation) { 'mutation DeleteProject($project: DeleteProjectInput!) { deleteProject(input: $project) { id } }' }
   let(:project_id) { 'dummy-id' }
   let(:variables) { { project: { id: project_id } } }
@@ -12,7 +16,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let!(:project) { create(:project, user_id: stubbed_user_id) }
+    let!(:project) { create(:project, user_id: stubbed_user.id) }
     let(:project_id) { project.to_gid_param }
 
     context 'when unauthenticated' do
@@ -37,7 +41,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       let(:current_user) { stubbed_user }
 
       before do
-        stub_fetch_oauth_user
+        stub_hydra_public_api
       end
 
       it 'deletes the project' do
@@ -55,7 +59,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
       context 'with another users project' do
         before do
-          stub_fetch_oauth_user(user_index: 1)
+          stub_hydra_public_api(user_index: 1)
         end
 
         it 'returns an error' do

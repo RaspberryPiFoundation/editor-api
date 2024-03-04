@@ -16,14 +16,14 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   '
   end
   let(:current_user) { stubbed_user }
-  let(:project) { create(:project, :with_default_component, user_id: stubbed_user_id) }
+  let(:project) { create(:project, :with_default_component, user_id: stubbed_user.id) }
   let(:project_id) { project.to_gid_param }
   let(:variables) { { id: project_id } }
   let(:remix_origin) { 'editor.com' }
 
   before do
+    stub_hydra_public_api
     project
-    stub_fetch_oauth_user
   end
 
   it { expect(mutation).to be_a_valid_graphql_query }
@@ -54,7 +54,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   context 'when user cannot view original project' do
     before do
-      stub_fetch_oauth_user(user_index: 1)
+      stub_hydra_public_api(user_index: 1)
     end
 
     it 'returns "not permitted to read" error' do

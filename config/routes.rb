@@ -16,6 +16,18 @@ Rails.application.routes.draw do
     end
 
     resource :project_errors, only: %i[create]
+
+    resources :schools, only: %i[index show create update destroy] do
+      resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do
+        resources :members, only: %i[index create destroy], controller: 'class_members'
+      end
+
+      resources :owners, only: %i[index create destroy], controller: 'school_owners'
+      resources :teachers, only: %i[index create destroy], controller: 'school_teachers'
+      resources :students, only: %i[index create update destroy], controller: 'school_students' do
+        post :batch, on: :collection, to: 'school_students#create_batch'
+      end
+    end
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

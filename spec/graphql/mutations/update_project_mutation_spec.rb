@@ -5,6 +5,10 @@ require 'rails_helper'
 RSpec.describe 'mutation UpdateProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
+  before do
+    stub_hydra_public_api
+  end
+
   let(:mutation) { 'mutation UpdateProject($project: UpdateProjectInput!) { updateProject(input: $project) { project { id } } }' }
   let(:project_id) { 'dummy-id' }
   let(:variables) do
@@ -20,13 +24,13 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let(:project) { create(:project, user_id: stubbed_user_id, project_type: :python) }
+    let(:project) { create(:project, user_id: stubbed_user.id, project_type: :python) }
     let(:project_id) { project.to_gid_param }
 
     before do
       # Instantiate project
       project
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     context 'when unauthenticated' do
@@ -68,7 +72,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
 
       context 'with another users project' do
         before do
-          stub_fetch_oauth_user(user_index: 1)
+          stub_hydra_public_api(user_index: 1)
         end
 
         it 'returns an error' do
