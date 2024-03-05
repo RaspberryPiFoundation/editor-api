@@ -71,7 +71,7 @@ RSpec.describe 'Project update requests' do
 
       it 'returns error response' do
         put("/api/projects/#{project.identifier}", params:, headers:)
-        expect(response).to have_http_status(:bad_request)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
   end

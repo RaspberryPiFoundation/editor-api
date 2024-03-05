@@ -2,6 +2,8 @@
 
 class School < ApplicationRecord
   has_many :classes, class_name: :SchoolClass, inverse_of: :school, dependent: :destroy
+  has_many :lessons, dependent: :nullify
+  has_many :projects, dependent: :nullify
 
   validates :id, presence: true, uniqueness: { case_sensitive: false }
   validates :name, presence: true
