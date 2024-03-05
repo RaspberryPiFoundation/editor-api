@@ -91,5 +91,4 @@ class Ability
 
     is_my_project && (is_my_lesson || !project.lesson)
   end
-  # rubocop:enable Metrics/AbcSize, Layout/LineLength
 end
