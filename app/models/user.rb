@@ -26,7 +26,7 @@ class User
   end
 
   def organisation_ids
-    organisations.keys
+    organisations&.keys || []
   end
 
   def role?(organisation_id:, role:)
