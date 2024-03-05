@@ -1,0 +1,68 @@
+name: test
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - '**'
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    container:
+      image: ruby:3.2-slim-bullseye
+
+    services:
+      postgres:
+        image: postgres:15.0-alpine
+        env:
+          POSTGRES_DB: editor_api_test
+          POSTGRES_PASSWORD: password
+          POSTGRES_USER: user
+        ports:
+          - "5432:5432"
+      redis:
+        image: redis:6.2-alpine
+
+    env:
+      BUNDLE_JOBS: '3'
+      BUNDLE_RETRY: '3'
+      PAGER: ''
+      POSTGRES_DB: editor_api_test
+      POSTGRES_PASSWORD: password
+      POSTGRES_USER: user
+      POSTGRES_HOST: postgres
+      RAILS_ENV: test
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3.3.0
+
+    - name: Setup bundler cache
+      uses: actions/cache@v3
+      with:
+        path: vendor/bundle
+        key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-gems-
+
+    - name: Install packages needed for build
+      run: |
+        apt-get update
+        apt-get install --yes --no-install-recommends build-essential libpq-dev libxml2-dev libxslt1-dev git
+
+    - name: Bundle install
+      run: |
+        bundle config path vendor/bundle
+        bundle install --jobs 4 --retry 3
+
+    - name: Database setup
+      run: bin/rails db:setup --trace
+
+    - run: bundle exec rspec spec --profile 10 --format RspecJunitFormatter --out /tmp/test-results/rspec/results.xml --format progress
+
+    - uses: actions/upload-artifact@v3.1.1
+      with:
+        path: coverage
+
