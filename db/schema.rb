@@ -199,6 +199,31 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_23_150228) do
     t.index ["reference"], name: "index_schools_on_reference", unique: true
   end
 
+  create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id", null: false
+    t.uuid "teacher_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
+    t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "reference"
+    t.string "address_line_1", null: false
+    t.string "address_line_2"
+    t.string "municipality", null: false
+    t.string "administrative_area"
+    t.string "postal_code"
+    t.string "country_code", null: false
+    t.datetime "verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reference"], name: "index_schools_on_reference", unique: true
+  end
+
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "word"
     t.index ["word"], name: "index_words_on_word"
