@@ -2,6 +2,7 @@
 
 Rails.application.routes.draw do
   namespace :admin do
+    mount GoodJob::Engine => 'good_job'
     resources :components
     resources :projects do
       delete :images, on: :member, action: :destroy_image
