@@ -38,13 +38,12 @@ module App
     # config.eager_load_paths << Rails.root.join("extras")
     # config.autoload_paths += %W["#{config.root}/lib"]
 
-    # Don't generate system test files.
-    config.generators.system_tests = nil
-
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
       g.test_framework :rspec
     end
+
+    config.assets.css_compressor = nil
 
     config.active_job.queue_adapter = :good_job
 
