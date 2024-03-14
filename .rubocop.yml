@@ -1,5 +1,7 @@
 ---
-require: rubocop-graphql
+require:
+  - rubocop-graphql
+  - rubocop-capybara
 inherit_from:
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-base.yml
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rails.yml
@@ -27,3 +29,7 @@ RSpec/DescribeClass:
 
 RSpec/MultipleMemoizedHelpers:
   Max: 8
+
+Metrics/BlockLength:
+  Exclude:
+    - "config/routes.rb"

@@ -101,7 +101,7 @@ RSpec.configure do |config|
     driven_by :rack_test
   end
 
-  config.before(:each, type: :system, js: true) do
+  config.before(:each, js: true, type: :system) do
     # We need to allow net connect at this stage to allow WebDrivers to update
     # or Capybara to talk to selenium etc.
     WebMock.allow_net_connect!
