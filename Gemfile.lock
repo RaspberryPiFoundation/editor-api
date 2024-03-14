@@ -451,7 +451,7 @@ DEPENDENCIES
   bootsnap
   bullet
   cancancan (~> 3.3)
-  capybara (~> 3.36)
+  capybara
   climate_control
   dotenv-rails
   factory_bot_rails
@@ -483,11 +483,11 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   scout_apm
-  selenium-webdriver (~> 4.1)
+  selenium-webdriver
   sentry-rails (~> 5.5.0)
   shoulda-matchers (~> 5.0)
   simplecov
-  webdrivers (~> 5.0)
+  webdrivers
   webmock
 
 RUBY VERSION
