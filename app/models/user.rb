@@ -18,6 +18,7 @@ class User
     profile
     token
     username
+    roles
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -26,28 +27,34 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
+  def role?(role:)
+    return false if roles.nil?
+
+    roles.to_s.split(',').map(&:strip).include? role.to_s
+  end
+
   def organisation_ids
     organisations&.keys || []
   end
 
-  def roles(organisation_id:)
+  def org_roles(organisation_id:)
     organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
   end
 
-  def role?(organisation_id:, role:)
-    roles(organisation_id:).include?(role.to_s)
+  def org_role?(organisation_id:, role:)
+    org_roles(organisation_id:).include?(role.to_s)
   end
 
   def school_owner?(organisation_id:)
-    role?(organisation_id:, role: 'school-owner')
+    org_role?(organisation_id:, role: 'school-owner')
   end
 
   def school_teacher?(organisation_id:)
-    role?(organisation_id:, role: 'school-teacher')
+    org_role?(organisation_id:, role: 'school-teacher')
   end
 
   def school_student?(organisation_id:)
-    role?(organisation_id:, role: 'school-student')
+    org_role?(organisation_id:, role: 'school-student')
   end
 
   def admin?
