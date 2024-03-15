@@ -53,16 +53,6 @@ RSpec.describe User do
   describe '#from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
-    let(:stubbed_response) do
-      json = File.read('spec/fixtures/users.json')
-      first = JSON.parse(json)['users'][0]
-
-      first['sub'] = first.delete('id')
-      first.to_json
-    end
-
-    let(:hydra_public_url) { HydraPublicApiClient::API_URL }
-
     before do
       stub_hydra_public_api
     end
