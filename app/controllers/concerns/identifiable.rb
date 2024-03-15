@@ -5,7 +5,7 @@ module Identifiable
 
   def identify_user
     token = request.headers['Authorization']
-    User.from_omniauth(token:) if token
+    User.from_token(token:) if token
   end
 
   def current_user

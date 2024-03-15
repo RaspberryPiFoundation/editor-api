@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class User
+  include ActiveModel::Serialization
   include ActiveModel::Model
 
   ATTRIBUTES = %w[
@@ -17,6 +18,7 @@ class User
     profile
     token
     username
+    roles
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -25,25 +27,38 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
+  def role?(role:)
+    return false if roles.nil?
+
+    roles.to_s.split(',').map(&:strip).include? role.to_s
+  end
+
   def organisation_ids
     organisations&.keys || []
   end
 
-  def role?(organisation_id:, role:)
-    roles = organisations[organisation_id.to_s]
-    roles.to_s.split(',').map(&:strip).include?(role.to_s) if roles
+  def org_roles(organisation_id:)
+    organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
+  end
+
+  def org_role?(organisation_id:, role:)
+    org_roles(organisation_id:).include?(role.to_s)
   end
 
   def school_owner?(organisation_id:)
-    role?(organisation_id:, role: 'school-owner')
+    org_role?(organisation_id:, role: 'school-owner')
   end
 
   def school_teacher?(organisation_id:)
-    role?(organisation_id:, role: 'school-teacher')
+    org_role?(organisation_id:, role: 'school-teacher')
   end
 
   def school_student?(organisation_id:)
-    role?(organisation_id:, role: 'school-student')
+    org_role?(organisation_id:, role: 'school-student')
+  end
+
+  def admin?
+    role?(role: 'editor-admin')
   end
 
   def ==(other)
@@ -68,7 +83,22 @@ class User
     end
   end
 
-  def self.from_omniauth(token:)
+  def self.from_omniauth(auth = nil)
+    return nil unless auth
+
+    from_auth(auth)
+  end
+
+  def self.from_auth(auth)
+    return nil unless auth
+
+    args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
+    args['id'] = auth.uid
+
+    new(args)
+  end
+
+  def self.from_token(token:)
     return nil if token.blank?
 
     auth = HydraPublicApiClient.fetch_oauth_user(token:)

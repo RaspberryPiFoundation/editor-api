@@ -31,6 +31,10 @@ Rails.application.configure do
   # config.action_dispatch.x_sendfile_header = "X-Accel-Redirect" # for NGINX
 
   config.active_storage.service = :amazon
+  Rails.application.routes.default_url_options = {
+    host: ENV.fetch('HOST_URL',
+                    "https://#{ENV.fetch('HEROKU_APP_NAME', '')}.herokuapp.com")
+  }
 
   # Mount Action Cable outside main process or domain.
   # config.action_cable.mount_path = nil
