@@ -22,15 +22,13 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing component' do
-    let(:project) { create(:project, user_id: stubbed_user_id) }
-    let(:component) { create(:component, project:, name: 'bob', extension: 'html', content: 'new', default: true) }
-    let(:component_id) { component.to_gid_param }
-
     before do
-      # Instantiate component
-      component
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
+
+    let(:project) { create(:project, user_id: stubbed_user.id) }
+    let!(:component) { create(:component, project:, name: 'bob', extension: 'html', content: 'new', default: true) }
+    let(:component_id) { component.to_gid_param }
 
     context 'when unauthenticated' do
       it 'does not update a component' do
@@ -79,7 +77,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
       context 'with another users component' do
         before do
-          stub_fetch_oauth_user(user_index: 1)
+          stub_hydra_public_api(user_index: 1)
         end
 
         it 'returns an error' do

@@ -10,6 +10,8 @@ gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
+gem 'countries'
+gem 'email_validator'
 gem 'faraday'
 gem 'github_webhook', '~> 1.4'
 gem 'globalid'
@@ -29,6 +31,7 @@ gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.6'
 gem 'rack-cors'
 gem 'rails', '~> 7.0.0'
+gem 'roo'
 gem 'scout_apm'
 gem 'sentry-rails', '~> 5.5.0'
 

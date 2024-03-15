@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_11_06_151705) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -42,6 +42,16 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_06_151705) do
     t.uuid "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "class_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_class_id", null: false
+    t.uuid "student_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_class_id", "student_id"], name: "index_class_members_on_school_class_id_and_student_id", unique: true
+    t.index ["school_class_id"], name: "index_class_members_on_school_class_id"
+    t.index ["student_id"], name: "index_class_members_on_student_id"
   end
 
   create_table "components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -139,6 +149,31 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_06_151705) do
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
   end
 
+  create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id", null: false
+    t.uuid "teacher_id", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
+    t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "name", null: false
+    t.string "reference"
+    t.string "address_line_1", null: false
+    t.string "address_line_2"
+    t.string "municipality", null: false
+    t.string "administrative_area"
+    t.string "postal_code"
+    t.string "country_code", null: false
+    t.datetime "verified_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["reference"], name: "index_schools_on_reference", unique: true
+  end
+
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "word"
     t.index ["word"], name: "index_words_on_word"
@@ -146,6 +181,8 @@ ActiveRecord::Schema[7.0].define(version: 2023_11_06_151705) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "class_members", "school_classes"
   add_foreign_key "components", "projects"
   add_foreign_key "project_errors", "projects"
+  add_foreign_key "school_classes", "schools"
 end

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Images requests' do
-  let(:project) { create(:project, user_id: stubbed_user_id) }
+  let(:project) { create(:project, user_id: user_id_by_index(0)) }
   let(:image_filename) { 'test_image_1.png' }
   let(:params) { { images: [fixture_file_upload(image_filename, 'image/png')] } }
   let(:expected_json) do
@@ -19,10 +19,10 @@ RSpec.describe 'Images requests' do
 
   describe 'create' do
     context 'when auth is correct' do
-      let(:headers) { { Authorization: 'dummy-token' } }
+      let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        stub_fetch_oauth_user
+        stub_hydra_public_api
       end
 
       it 'attaches file to project' do
@@ -49,10 +49,10 @@ RSpec.describe 'Images requests' do
     end
 
     context 'when authed user is not creator' do
-      let(:headers) { { Authorization: 'dummy-token' } }
+      let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        stub_fetch_oauth_user(user_index: 1)
+        stub_hydra_public_api(user_index: 1)
       end
 
       it 'returns forbidden response' do

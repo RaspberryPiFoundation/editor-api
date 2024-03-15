@@ -44,10 +44,10 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
 
   context 'when authenticated' do
     let(:current_user) { stubbed_user }
-    let(:project) { create(:project, user_id: stubbed_user_id) }
+    let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
     end
 
     it 'returns the component ID' do

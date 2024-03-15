@@ -15,6 +15,7 @@ require 'action_text/engine'
 require 'action_view/railtie'
 require 'action_cable/engine'
 # require "rails/test_unit/railtie"
+require_relative '../lib/corp_middleware'
 
 # Require the gems listed in Gemfile, including any gems
 # you've limited to :test, :development, or :production.
@@ -52,5 +53,7 @@ module App
     end
 
     config.api_only = false
+
+    config.middleware.insert_before 0, CORPMiddleware
   end
 end

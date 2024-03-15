@@ -12,10 +12,12 @@ class User
     id
     name
     nickname
+    organisations
     picture
     postcode
     profile
-    roles
+    token
+    username
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -24,22 +26,28 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
-  def role?(role:)
-    return false if roles.nil?
-
-    roles.to_s.split(',').map(&:strip).include? role.to_s
+  def organisation_ids
+    organisations&.keys || []
   end
 
-  def school_owner?
-    role?(role: 'school-owner')
+  def roles(organisation_id:)
+    organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
   end
 
-  def school_teacher?
-    role?(role: 'school-teacher')
+  def role?(organisation_id:, role:)
+    roles(organisation_id:).include?(role.to_s)
   end
 
-  def school_student?
-    role?(role: 'school-student')
+  def school_owner?(organisation_id:)
+    role?(organisation_id:, role: 'school-owner')
+  end
+
+  def school_teacher?(organisation_id:)
+    role?(organisation_id:, role: 'school-teacher')
+  end
+
+  def school_student?(organisation_id:)
+    role?(organisation_id:, role: 'school-student')
   end
 
   def admin?
@@ -57,9 +65,12 @@ class User
   def self.from_userinfo(ids:)
     user_ids = Array(ids)
 
-    UserinfoApiClient.fetch_by_ids(user_ids).map do |info|
+    UserInfoApiClient.fetch_by_ids(user_ids).map do |info|
       info = info.stringify_keys
       args = info.slice(*ATTRIBUTES)
+
+      # TODO: remove once the UserInfoApi returns the 'organisations' key.
+      temporarily_add_organisations_until_the_profile_app_is_updated(args)
 
       new(args)
     end
@@ -84,12 +95,24 @@ class User
     return nil if token.blank?
 
     auth = HydraPublicApiClient.fetch_oauth_user(token:)
-    return nil unless auth
+    return nil if auth.blank?
 
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)
-    args['id'] = auth['sub']
+
+    args['id'] ||= auth['sub']
+    args['token'] = token
+
+    # TODO: remove once the HydraPublicApi returns the 'organisations' key.
+    temporarily_add_organisations_until_the_profile_app_is_updated(args)
 
     new(args)
+  end
+
+  def self.temporarily_add_organisations_until_the_profile_app_is_updated(hash)
+    return hash if hash.key?('organisations')
+
+    # Use the same organisation ID as the one from users.json for now.
+    hash.merge('organisations' => { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
   end
 end

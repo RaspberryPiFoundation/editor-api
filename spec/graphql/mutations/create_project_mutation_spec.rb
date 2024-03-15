@@ -45,7 +45,7 @@ RSpec.describe 'mutation CreateProject() { ... }' do
     let(:current_user) { stubbed_user }
 
     before do
-      stub_fetch_oauth_user
+      stub_hydra_public_api
       mock_phrase_generation
     end
 

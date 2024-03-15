@@ -83,7 +83,8 @@ RSpec.configure do |config|
   config.include GraphqlQueryHelpers, type: :graphql_query
 
   config.include PhraseIdentifierMock
-  config.include HydraPublicApiMock
+  config.include ProfileApiMock
+  config.include UserProfileMock
 
   config.include SignInStubs, type: :request
   config.include SignInStubs, type: :system

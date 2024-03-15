@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class UserinfoApiClient
+class UserInfoApiClient
   API_URL = ENV.fetch('USERINFO_API_URL', 'http://localhost:6000')
   API_KEY = ENV.fetch('USERINFO_API_KEY', '1234')
 
@@ -17,7 +17,7 @@ class UserinfoApiClient
     end
 
     def fetch_by_ids(user_ids)
-      return if user_ids.blank?
+      return [] if user_ids.blank?
       return stubbed_by_ids(user_ids) if bypass_auth?
 
       response = conn.get do |r|
@@ -36,7 +36,7 @@ class UserinfoApiClient
     end
 
     def transform_result(result)
-      { result: }.deep_transform_keys { |k| k.to_s.underscore.to_sym }.fetch(:result)
+      { result: }.transform_keys { |k| k.to_s.underscore.to_sym }.fetch(:result)
     end
 
     def conn

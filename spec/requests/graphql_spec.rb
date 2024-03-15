@@ -64,11 +64,11 @@ RSpec.describe 'POST /graphql' do
     it_behaves_like 'an unidentified request'
 
     context 'with a token' do
-      let(:token) { 'valid-token' }
+      let(:token) { UserProfileMock::TOKEN }
 
       context 'when the token is invalid' do
         before do
-          stub_fetch_oauth_user(user_index: nil)
+          stub_hydra_public_api(user_index: nil)
         end
 
         it_behaves_like 'an unidentified request'
@@ -76,7 +76,7 @@ RSpec.describe 'POST /graphql' do
 
       context 'when the token is valid' do
         before do
-          stub_fetch_oauth_user
+          stub_hydra_public_api
         end
 
         it 'sets the current_user in the context' do

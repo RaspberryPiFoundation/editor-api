@@ -3,14 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe 'Create project requests' do
-  let(:project) { create(:project, user_id: stubbed_user_id) }
+  let(:project) { create(:project, user_id: stubbed_user.id) }
 
   context 'when auth is correct' do
-    let(:headers) { { Authorization: 'dummy-token' } }
+    let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     context 'when creating project is successful' do
       before do
-        stub_fetch_oauth_user
+        stub_hydra_public_api
 
         response = OperationResponse.new
         response[:project] = project
@@ -26,7 +26,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project fails' do
       before do
-        stub_fetch_oauth_user
+        stub_hydra_public_api
 
         response = OperationResponse.new
         response[:error] = 'Error creating project'
