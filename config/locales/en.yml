@@ -1,5 +1,7 @@
 en:
   errors:
+    admin:
+      unauthorized: 'Not authorized.'
     project:
       editing:
         delete_default_component: 'Cannot delete default file'

@@ -7,6 +7,10 @@ FactoryBot.define do
     email { Faker::Internet.email }
     organisations { {} }
 
+    factory :admin_user do
+      roles { 'editor-admin' }
+    end
+
     skip_create
   end
 end

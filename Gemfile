@@ -5,6 +5,8 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '~> 3.2.0'
 
+gem 'administrate', '~> 0.16.0'
+gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
@@ -16,9 +18,14 @@ gem 'globalid'
 gem 'good_job', '~> 3.12'
 gem 'graphql'
 gem 'graphql-client'
+gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
+gem 'omniauth-rails_csrf_protection', '~> 1.0.1'
+gem 'omniauth-rpi',
+    github: 'RaspberryPiFoundation/omniauth-rpi',
+    tag: 'v1.3.1'
 gem 'open-uri'
 gem 'pg', '~> 1.1'
 gem 'puma', '~> 5.6'
@@ -46,7 +53,10 @@ group :development, :test do
 end
 
 group :test do
+  gem 'capybara'
   gem 'climate_control'
+  gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 5.0'
+  gem 'webdrivers'
   gem 'webmock'
 end

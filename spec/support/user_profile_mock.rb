@@ -29,7 +29,7 @@ module UserProfileMock
   end
 
   def stubbed_user
-    User.from_omniauth(token: TOKEN)
+    User.from_token(token: TOKEN)
   end
 
   def user_attributes_by_index(user_index = 0)
