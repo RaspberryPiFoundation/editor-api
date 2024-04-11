@@ -211,6 +211,12 @@ RSpec.describe User do
     include_examples 'role_check', 'school-student'
   end
 
+  describe '#admin?' do
+    subject { user.admin? }
+
+    include_examples 'role_check', 'editor-admin'
+  end
+
   describe '.where' do
     subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
 
