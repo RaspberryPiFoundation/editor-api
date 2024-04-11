@@ -50,7 +50,7 @@ RSpec.describe User do
     end
   end
 
-  describe '#from_token' do
+  describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
     before do
@@ -95,7 +95,7 @@ RSpec.describe User do
     end
   end
 
-  describe '#from_omniauth' do
+  describe '.from_omniauth' do
     subject(:auth_subject) { described_class.from_omniauth(auth) }
 
     let(:user) { build(:user) }
@@ -158,7 +158,7 @@ RSpec.describe User do
     include_examples 'role_check', 'school-student'
   end
 
-  describe '#where' do
+  describe '.where' do
     subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
 
     before do
