@@ -114,6 +114,6 @@ class User
     return hash if hash.key?('organisations')
 
     # Use the same organisation ID as the one from users.json for now.
-    hash.merge('organisations' => { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
+    hash.merge!('organisations' => { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
   end
 end

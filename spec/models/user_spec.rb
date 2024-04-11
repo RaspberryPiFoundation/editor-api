@@ -50,11 +50,56 @@ RSpec.describe User do
     end
   end
 
+  describe '.from_userinfo' do
+    subject(:users) { described_class.from_userinfo(ids:) }
+
+    let(:ids) { ['00000000-0000-0000-0000-000000000000'] }
+    let(:user) { users.first }
+
+    before do
+      stub_user_info_api
+    end
+
+    it 'returns an Array' do
+      expect(users).to be_an Array
+    end
+
+    it 'returns an array of instances of the described class' do
+      expect(user).to be_a described_class
+    end
+
+    it 'returns a user with the correct ID' do
+      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+    end
+
+    it 'returns a user with the correct name' do
+      expect(user.name).to eq 'School Owner'
+    end
+
+    it 'returns a user with the correct email' do
+      expect(user.email).to eq 'school-owner@example.com'
+    end
+
+    it 'returns a user with the correct organisations' do
+      expect(user.organisations).to eq(organisation_id => 'school-owner')
+    end
+
+    context 'when no organisations are returned' do
+      let(:ids) { ['33333333-3333-3333-3333-333333333333'] } # student without organisations
+
+      it 'returns a user with the correct organisations' do
+        expect(user.organisations).to eq(organisation_id => 'school-student')
+      end
+    end
+  end
+
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
+    let(:user_index) { 0 }
+
     before do
-      stub_hydra_public_api
+      stub_hydra_public_api(user_index:)
     end
 
     it 'returns an instance of the described class' do
@@ -75,6 +120,14 @@ RSpec.describe User do
 
     it 'returns a user with the correct organisations' do
       expect(user.organisations).to eq(organisation_id => 'school-owner')
+    end
+
+    context 'when no organisations are returned' do
+      let(:user_index) { 3 } # student without organisations
+
+      it 'returns a user with the correct organisations' do
+        expect(user.organisations).to eq(organisation_id => 'school-student')
+      end
     end
 
     context 'when BYPASS_AUTH is true' do
