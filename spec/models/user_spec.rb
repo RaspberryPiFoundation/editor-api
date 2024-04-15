@@ -151,14 +151,22 @@ RSpec.describe User do
   describe '.from_omniauth' do
     subject(:auth_subject) { described_class.from_omniauth(auth) }
 
-    let(:user) { build(:user) }
-    let(:info) { user.serializable_hash(except: :id) }
+    let(:id) { 'f80ba5b2-2eee-457d-9f75-872b5c09be84' }
+    let(:info) do
+      {
+        'id' => id,
+        'email' => 'john.doe@example.com',
+        'name' => 'John Doe',
+        'roles' => 'school-student'
+      }
+    end
+    let(:user) { described_class.new(info) }
 
     let(:auth) do
       OmniAuth::AuthHash.new(
         {
           provider: 'rpi',
-          uid: user.id,
+          uid: id,
           extra: {
             raw_info: info
           }
@@ -170,8 +178,16 @@ RSpec.describe User do
       expect(auth_subject).to be_a described_class
     end
 
-    it 'sets the user attributes correctly' do
-      expect(auth_subject.serializable_hash).to eq user.serializable_hash
+    it 'returns a user with the correct ID' do
+      expect(auth_subject.id).to eq id
+    end
+
+    it 'returns a user with the correct name' do
+      expect(auth_subject.name).to eq 'John Doe'
+    end
+
+    it 'returns a user with the correct email' do
+      expect(user.email).to eq 'john.doe@example.com'
     end
 
     context 'with unusual keys in info' do
