@@ -89,6 +89,9 @@ class User
     args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
     args['id'] = auth.uid
 
+    # TODO: remove once the OmniAuth info returns the 'organisations' key.
+    temporarily_add_organisations_until_the_profile_app_is_updated(args)
+
     new(args)
   end
 

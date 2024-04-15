@@ -152,7 +152,7 @@ RSpec.describe User do
     subject(:auth_subject) { described_class.from_omniauth(auth) }
 
     let(:id) { 'f80ba5b2-2eee-457d-9f75-872b5c09be84' }
-    let(:info) do
+    let(:info_without_organisations) do
       {
         'id' => id,
         'email' => 'john.doe@example.com',
@@ -160,6 +160,7 @@ RSpec.describe User do
         'roles' => 'school-student'
       }
     end
+    let(:info) { info_without_organisations }
     let(:user) { described_class.new(info) }
 
     let(:auth) do
@@ -188,6 +189,18 @@ RSpec.describe User do
 
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'john.doe@example.com'
+    end
+
+    it 'returns a user with the correct organisations' do
+      expect(auth_subject.organisations).to eq(organisation_id => 'school-student')
+    end
+
+    context 'when info includes organisations' do
+      let(:info) { info_without_organisations.merge!('organisations' => { 'c78ab987-5fa8-482e-a9cf-a5e93513349b' => 'school-student' }) }
+
+      it 'returns a user with the supplied organisations' do
+        expect(auth_subject.organisations).to eq('c78ab987-5fa8-482e-a9cf-a5e93513349b' => 'school-student')
+      end
     end
 
     context 'with unusual keys in info' do
