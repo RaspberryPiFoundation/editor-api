@@ -27,7 +27,6 @@ RSpec.describe Project::Create, type: :unit do
             content: 'print("hello world")',
             default: true
           }],
-          image_list: [],
           user_id:
         }
       end
