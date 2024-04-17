@@ -6,7 +6,7 @@ RSpec.describe School::Create, type: :unit do
   let(:school_params) do
     {
       name: 'Test School',
-      address_line_1: 'Address Line 1', # rubocop:disable Naming/VariableNumber
+      address_line_1: 'Address Line 1',
       municipality: 'Greater London',
       country_code: 'GB'
     }
