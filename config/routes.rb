@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
   namespace :admin do
     mount GoodJob::Engine => 'good_job'
@@ -38,6 +39,10 @@ Rails.application.routes.draw do
         post :batch, on: :collection, to: 'school_students#create_batch'
       end
     end
+
+    resources :lessons, only: %i[index create show update destroy] do
+      post :copy, on: :member, to: 'lessons#create_copy'
+    end
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
@@ -48,3 +53,4 @@ Rails.application.routes.draw do
   get '/auth/callback', to: 'auth#callback', as: 'callback'
   get '/logout', to: 'auth#destroy', as: 'logout'
 end
+# rubocop:enable Metrics/BlockLength

@@ -18,13 +18,8 @@ class Project
 
       def build_project(project_hash)
         identifier = PhraseIdentifier.generate
-        new_project = Project.new(project_hash.except(:components, :image_list).merge(identifier:))
+        new_project = Project.new(project_hash.except(:components).merge(identifier:))
         new_project.components.build(project_hash[:components])
-
-        (project_hash[:image_list] || []).each do |image|
-          new_project.images.attach(image.blob)
-        end
-
         new_project
       end
     end

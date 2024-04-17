@@ -13,9 +13,23 @@ RSpec.describe School do
       expect(school.classes.size).to eq(2)
     end
 
+    it 'has many lessons' do
+      school = create(:school, lessons: [build(:lesson), build(:lesson)])
+      expect(school.lessons.size).to eq(2)
+    end
+
+    it 'has many projects' do
+      school = create(:school, projects: [build(:project), build(:project)])
+      expect(school.projects.size).to eq(2)
+    end
+
     context 'when a school is destroyed' do
-      let!(:school_class) { build(:school_class, members: [build(:class_member)]) }
-      let!(:school) { create(:school, classes: [school_class]) }
+      let(:lesson1) { build(:lesson) }
+      let(:lesson2) { build(:lesson) }
+      let(:project) { build(:project) }
+
+      let!(:school_class) { build(:school_class, members: [build(:class_member)], lessons: [lesson1]) }
+      let!(:school) { create(:school, classes: [school_class], lessons: [lesson2], projects: [project]) }
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
@@ -23,6 +37,28 @@ RSpec.describe School do
 
       it 'also destroys class members to avoid making them invalid' do
         expect { school.destroy! }.to change(ClassMember, :count).by(-1)
+      end
+
+      it 'does not destroy lessons' do
+        expect { school.destroy! }.not_to change(Lesson, :count)
+      end
+
+      it 'nullifies school_id and school_class_id fields on lessons' do
+        school.destroy!
+
+        lessons = [lesson1, lesson2].map(&:reload)
+        values = lessons.flat_map { |l| [l.school_id, l.school_class_id] }
+
+        expect(values).to eq [nil, nil, nil, nil]
+      end
+
+      it 'does not destroy projects' do
+        expect { school.destroy! }.not_to change(Project, :count)
+      end
+
+      it 'nullifies the school_id field on projects' do
+        school.destroy!
+        expect(project.reload.school_id).to be_nil
       end
     end
   end

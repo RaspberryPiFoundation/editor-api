@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
+ActiveRecord::Schema[7.0].define(version: 2024_02_23_150228) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -124,6 +124,27 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
+  create_table "lessons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id"
+    t.uuid "school_class_id"
+    t.uuid "copied_from_id"
+    t.uuid "user_id", null: false
+    t.string "name", null: false
+    t.string "description"
+    t.string "visibility", default: "private", null: false
+    t.datetime "due_date"
+    t.datetime "archived_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["archived_at"], name: "index_lessons_on_archived_at"
+    t.index ["copied_from_id"], name: "index_lessons_on_copied_from_id"
+    t.index ["name"], name: "index_lessons_on_name"
+    t.index ["school_class_id"], name: "index_lessons_on_school_class_id"
+    t.index ["school_id"], name: "index_lessons_on_school_id"
+    t.index ["user_id"], name: "index_lessons_on_user_id"
+    t.index ["visibility"], name: "index_lessons_on_visibility"
+  end
+
   create_table "project_errors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "project_id"
     t.string "error", null: false
@@ -144,9 +165,13 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
     t.uuid "remixed_from_id"
     t.string "locale"
     t.string "remix_origin"
+    t.uuid "school_id"
+    t.uuid "lesson_id"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
+    t.index ["lesson_id"], name: "index_projects_on_lesson_id"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
+    t.index ["school_id"], name: "index_projects_on_school_id"
   end
 
   create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -183,6 +208,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_01_171700) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "class_members", "school_classes"
   add_foreign_key "components", "projects"
+  add_foreign_key "lessons", "lessons", column: "copied_from_id"
+  add_foreign_key "lessons", "school_classes"
+  add_foreign_key "lessons", "schools"
   add_foreign_key "project_errors", "projects"
+  add_foreign_key "projects", "lessons"
+  add_foreign_key "projects", "schools"
   add_foreign_key "school_classes", "schools"
 end

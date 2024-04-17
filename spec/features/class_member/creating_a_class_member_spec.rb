@@ -50,8 +50,9 @@ RSpec.describe 'Creating a class member', type: :request do
 
   it "responds with nil attributes for the student if their user profile doesn't exist" do
     student_id = SecureRandom.uuid
+    new_params = { class_member: params[:class_member].merge(student_id:) }
 
-    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: { class_member: { student_id: } })
+    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: new_params)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:student_name]).to be_nil

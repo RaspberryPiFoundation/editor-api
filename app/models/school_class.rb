@@ -3,6 +3,7 @@
 class SchoolClass < ApplicationRecord
   belongs_to :school
   has_many :members, class_name: :ClassMember, inverse_of: :school_class, dependent: :destroy
+  has_many :lessons, dependent: :nullify
 
   validates :teacher_id, presence: true
   validates :name, presence: true
@@ -13,8 +14,8 @@ class SchoolClass < ApplicationRecord
   end
 
   def self.with_teachers
-    users = teachers.index_by(&:id)
-    all.map { |instance| [instance, users[instance.teacher_id]] }
+    by_id = teachers.index_by(&:id)
+    all.map { |instance| [instance, by_id[instance.teacher_id]] }
   end
 
   def with_teacher

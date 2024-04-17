@@ -7,9 +7,9 @@ module Api
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
-    after_action :pagination_link_header, only: [:index]
     load_and_authorize_resource
-    skip_load_resource only: :create
+    before_action :verify_lesson_belongs_to_school, only: :create
+    after_action :pagination_link_header, only: %i[index]
 
     def index
       @paginated_projects = @projects.page(params[:page])
@@ -21,25 +21,23 @@ module Api
     end
 
     def create
-      project_hash = project_params.merge(user_id: current_user&.id)
-      result = Project::Create.call(project_hash:)
+      result = Project::Create.call(project_hash: project_params)
 
       if result.success?
         @project = result[:project]
-        render :show, formats: [:json]
+        render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :internal_server_error
+        render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
 
     def update
-      update_hash = project_params.merge(user_id: current_user&.id)
-      result = Project::Update.call(project: @project, update_hash:)
+      result = Project::Update.call(project: @project, update_hash: project_params)
 
       if result.success?
         render :show, formats: [:json]
       else
-        render json: { error: result[:error] }, status: :bad_request
+        render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
 
@@ -49,6 +47,13 @@ module Api
     end
 
     private
+
+    def verify_lesson_belongs_to_school
+      return if base_params[:lesson_id].blank?
+      return if school&.lessons&.pluck(:id)&.include?(base_params[:lesson_id])
+
+      raise ParameterError, 'lesson_id does not correspond to school_id'
+    end
 
     def load_project
       project_loader = ProjectLoader.new(params[:id], [params[:locale]])
@@ -60,16 +65,36 @@ module Api
     end
 
     def project_params
+      if school_owner?
+        # A school owner must specify who the project user is.
+        base_params
+      else
+        # A school teacher may only create projects they own.
+        base_params.merge(user_id: current_user&.id)
+      end
+    end
+
+    def base_params
       params.fetch(:project, {}).permit(
+        :school_id,
+        :lesson_id,
+        :user_id,
         :identifier,
         :name,
         :project_type,
         :locale,
         {
-          image_list: [],
           components: %i[id name extension content index default]
         }
       )
+    end
+
+    def school_owner?
+      school && current_user.school_owner?(organisation_id: school.id)
+    end
+
+    def school
+      @school ||= @project&.school || School.find_by(id: base_params[:school_id])
     end
 
     def pagination_link_header

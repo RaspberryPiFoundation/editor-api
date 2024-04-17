@@ -27,12 +27,6 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
-  def role?(role:)
-    return false if roles.nil?
-
-    roles.to_s.split(',').map(&:strip).include? role.to_s
-  end
-
   def organisation_ids
     organisations&.keys || []
   end
@@ -58,7 +52,7 @@ class User
   end
 
   def admin?
-    role?(role: 'editor-admin')
+    organisation_ids.any? { |organisation_id| org_role?(organisation_id:, role: 'editor-admin') }
   end
 
   def ==(other)
@@ -95,6 +89,9 @@ class User
     args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
     args['id'] = auth.uid
 
+    # TODO: remove once the OmniAuth info returns the 'organisations' key.
+    temporarily_add_organisations_until_the_profile_app_is_updated(args)
+
     new(args)
   end
 
@@ -120,6 +117,6 @@ class User
     return hash if hash.key?('organisations')
 
     # Use the same organisation ID as the one from users.json for now.
-    hash.merge('organisations' => { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
+    hash.merge!('organisations' => { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
   end
 end
