@@ -4,13 +4,14 @@ require 'yaml'
 
 CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
 IMAGE_FORMATS = ['.png', '.jpg', '.jpeg', '.webp'].freeze
+PROJECTS_ROOT = Rails.root.join('lib/tasks/project_components')
 
 namespace :projects do
   desc 'Import starter projects'
   task create_starter: :environment do
-    Dir.each_child("#{File.dirname(__FILE__)}/project_components") do |dir|
-      proj_config = YAML.safe_load(File.read("#{File.dirname(__FILE__)}/project_components/#{dir}/project_config.yml"))
-      files = Dir.children("#{File.dirname(__FILE__)}/project_components/#{dir}")
+    PROJECTS_ROOT.each_child do |dir|
+      proj_config = YAML.safe_load_file(dir.join('project_config.yml').to_s)
+      files = dir.children
       code_files = files.filter { |file| CODE_FORMATS.include? File.extname(file) }
       image_files = files.filter { |file| IMAGE_FORMATS.include? File.extname(file) }
 
@@ -37,13 +38,13 @@ private
 def component(file, dir)
   name = File.basename(file, '.*')
   extension = File.extname(file).delete('.')
-  code = File.read(File.dirname(__FILE__) + "/project_components/#{dir}/#{File.basename(file)}")
+  code = File.read(dir.join(File.basename(file)).to_s)
   default = (File.basename(file) == 'main.py')
   component = { name:, extension:, content: code, default: }
 end
 
 def image(file, dir)
   filename = File.basename(file)
-  io = File.open(File.dirname(__FILE__) + "/project_components/#{dir}/#{filename}")
+  io = File.open(dir.join(filename).to_s)
   image = { filename:, io: }
 end
