@@ -36,12 +36,12 @@ class FilesystemProject
     extension = File.extname(file).delete('.')
     code = File.read(dir.join(File.basename(file)).to_s)
     default = (File.basename(file) == 'main.py')
-    component = { name:, extension:, content: code, default: }
+    { name:, extension:, content: code, default: }
   end
 
   def self.image(file, dir)
     filename = File.basename(file)
     io = File.open(dir.join(filename).to_s)
-    image = { filename:, io: }
+    { filename:, io: }
   end
 end

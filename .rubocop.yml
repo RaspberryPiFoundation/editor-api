@@ -33,3 +33,7 @@ RSpec/MultipleMemoizedHelpers:
 Metrics/BlockLength:
   Exclude:
     - "config/routes.rb"
+
+Naming/VariableNumber:
+  EnforcedStyle: snake_case
+  AllowedIdentifiers: sha256, X-Hub-Signature-256
