@@ -9,7 +9,7 @@ Please note that in this document, to avoid confusion, `project` refers to an en
 ## Creating the project directory
 Each version of a Projects site 'project' such as a starter or finished example needs its own directory in `/project_components` as they will form separate `project`s in the database. Although the naming of these directories is inconsequential, at the moment they are roughly named in the form `{project_name}_starter` and `{project_name}_example` for the sake of consistency.
 
-Each directory for a `project` should contain copies of the `python` files and any `text`, `csv` and image files that the `project` should contain. Any content reused across multiple `project`s should be duplicated in the relevant directory for each `project`. 
+Each directory for a `project` should contain copies of the `python` files and any `text`, `csv` and image files that the `project` should contain. Any content reused across multiple `project`s should be duplicated in the relevant directory for each `project`.
 
 ### Populating `project_config.yml`
 Every directory representing a `project` must contain a `project_config.yml`. This should include the following information:
