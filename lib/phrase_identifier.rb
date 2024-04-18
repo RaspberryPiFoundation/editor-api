@@ -4,6 +4,12 @@ class PhraseIdentifier
   class Error < RuntimeError
   end
 
+  def self.seed!
+    words = File.readlines('words.txt', chomp: true)
+    Word.delete_all
+    words.each { |word| Word.create!(word:) }
+  end
+
   def self.generate
     10.times do
       phrase = Word.order(Arel.sql('RANDOM()')).take(3).pluck(:word).join('-')

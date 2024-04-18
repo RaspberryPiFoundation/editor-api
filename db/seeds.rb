@@ -7,8 +7,4 @@
 #
 #   movies = Movie.create([{ name: "Star Wars" }, { name: "Lord of the Rings" }])
 #   Character.create(name: "Luke", movie: movies.first)
-words = File.readlines('words.txt').map { |w| w.delete!("\n") }
-
-words.each do |word|
-  Word.create(word: word)
-end
+PhraseIdentifier.seed!
