@@ -9,4 +9,4 @@
 # Offense count: 2
 Lint/UselessAssignment:
   Exclude:
-    - 'lib/tasks/projects.rake'
+    - 'app/models/filesystem_project.rb'

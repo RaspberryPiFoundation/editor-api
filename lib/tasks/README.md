@@ -9,7 +9,7 @@ Please note that in this document, to avoid confusion, `project` refers to an en
 ## Creating the project directory
 Each version of a Projects site 'project' such as a starter or finished example needs its own directory in `/project_components` as they will form separate `project`s in the database. Although the naming of these directories is inconsequential, at the moment they are roughly named in the form `{project_name}_starter` and `{project_name}_example` for the sake of consistency.
 
-Each directory for a `project` should contain copies of the `python` files and any `text`, `csv` and image files that the `project` should contain. Any content reused across multiple `project`s should be duplicated in the relevant directory for each `project`. 
+Each directory for a `project` should contain copies of the `python` files and any `text`, `csv` and image files that the `project` should contain. Any content reused across multiple `project`s should be duplicated in the relevant directory for each `project`.
 
 ### Populating `project_config.yml`
 Every directory representing a `project` must contain a `project_config.yml`. This should include the following information:
@@ -27,7 +27,7 @@ Every directory representing a `project` must contain a `project_config.yml`. Th
 An example `project_config.yml` with all of the above properties can be seen [here](https://github.com/RaspberryPiFoundation/editor-api/blob/main/lib/tasks/project_components/persuasive_data_presentation_iss_starter/project_config.yml).
 
 ## Getting the projects created in the database
-Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-ui/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
+Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-api/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
 
 ## Amending existing projects
 Existing `project`s can be ammended by updating the content in the directory corresponding to that `project`. Please create a pull request with the required changes as described above and we will ensure they are applied once the pull request has been merged.
