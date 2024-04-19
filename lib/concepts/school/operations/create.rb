@@ -3,7 +3,7 @@
 class School
   class Create
     class << self
-      def call(school_params:, token:)
+      def call(school_params:)
         response = OperationResponse.new
         response[:school] = build_school(school_params)
         response[:school].save!
