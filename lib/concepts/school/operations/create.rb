@@ -18,14 +18,7 @@ class School
       private
 
       def build_school(school_params, token)
-        school = School.new(school_params)
-
-        if school.valid_except_for_id?
-          response = ProfileApiClient.create_organisation(token:)
-          school.id = response&.fetch(:id)
-        end
-
-        school
+        School.new(school_params)
       end
     end
   end

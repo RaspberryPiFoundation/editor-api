@@ -11,9 +11,4 @@ class School < ApplicationRecord
   validates :municipality, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }
-
-  def valid_except_for_id?
-    validate
-    errors.attribute_names.all? { |name| name == :id }
-  end
 end

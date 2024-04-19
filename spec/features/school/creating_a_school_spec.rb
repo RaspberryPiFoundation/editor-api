@@ -14,6 +14,7 @@ RSpec.describe 'Creating a school', type: :request do
     {
       school: {
         name: 'Test School',
+        website: 'http://www.example.com',
         address_line_1: 'Address Line 1',
         municipality: 'Greater London',
         country_code: 'GB'

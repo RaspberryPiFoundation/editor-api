@@ -74,23 +74,6 @@ RSpec.describe School do
       expect { school.save! }.not_to raise_error
     end
 
-    # The school's ID must be set before create from the profile app's organisation ID.
-    # This avoids having two different IDs for a school which would be confusing.
-    it 'requires an id' do
-      school.id = ' '
-      expect(school).to be_invalid
-    end
-
-    it 'requires a UUID id' do
-      school.id = 'invalid'
-      expect(school).to be_invalid
-    end
-
-    it 'requires a unique id' do
-      create(:school)
-      expect(school).to be_invalid
-    end
-
     it 'requires a name' do
       school.name = ' '
       expect(school).to be_invalid
