@@ -20,27 +20,22 @@ RSpec.describe School::Create, type: :unit do
   end
 
   it 'returns a successful operation response' do
-    response = described_class.call(school_params:, token:)
+    response = described_class.call(school_params:)
     expect(response.success?).to be(true)
   end
 
   it 'creates a school' do
-    expect { described_class.call(school_params:, token:) }.to change(School, :count).by(1)
+    expect { described_class.call(school_params:) }.to change(School, :count).by(1)
   end
 
   it 'returns the school in the operation response' do
-    response = described_class.call(school_params:, token:)
+    response = described_class.call(school_params:)
     expect(response[:school]).to be_a(School)
   end
 
   it 'assigns the name' do
-    response = described_class.call(school_params:, token:)
+    response = described_class.call(school_params:)
     expect(response[:school].name).to eq('Test School')
-  end
-
-  it 'assigns the organisation_id' do
-    response = described_class.call(school_params:, token:)
-    expect(response[:school].id).to eq(ProfileApiMock::ORGANISATION_ID)
   end
 
   context 'when creation fails' do

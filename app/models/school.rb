@@ -10,5 +10,5 @@ class School < ApplicationRecord
   validates :address_line_1, presence: true
   validates :municipality, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
-  validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }
+  validates :reference
 end

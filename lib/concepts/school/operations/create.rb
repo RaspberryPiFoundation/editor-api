@@ -17,7 +17,7 @@ class School
 
       private
 
-      def build_school(school_params, token)
+      def build_school(school_params)
         School.new(school_params)
       end
     end
