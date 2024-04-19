@@ -5,7 +5,7 @@ class School
     class << self
       def call(school_params:, token:)
         response = OperationResponse.new
-        response[:school] = build_school(school_params, token)
+        response[:school] = build_school(school_params)
         response[:school].save!
         response
       rescue StandardError => e
@@ -18,7 +18,8 @@ class School
       private
 
       def build_school(school_params)
-        School.new(school_params)
+        school = School.new(school_params)
+        school
       end
     end
   end
