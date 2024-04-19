@@ -3,7 +3,7 @@
 class School
   class Create
     class << self
-      def call(school_params:)
+      def call(school_params:, token:) # rubocop:disable Lint/UnusedMethodArgument
         response = OperationResponse.new
         response[:school] = build_school(school_params)
         response[:school].save!
@@ -18,8 +18,7 @@ class School
       private
 
       def build_school(school_params)
-        school = School.new(school_params)
-        school
+        School.new(school_params)
       end
     end
   end
