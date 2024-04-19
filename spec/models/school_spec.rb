@@ -96,6 +96,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'requires a website' do
+      school.website = ' '
+      expect(school).to be_invalid
+    end
+
     it 'does not require a reference' do
       create(:school, id: SecureRandom.uuid, reference: nil)
 

@@ -195,11 +195,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_04_19_102922) do
     t.datetime "verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "reference"
     t.datetime "rejected_at"
     t.uuid "organisation_id"
     t.uuid "user_id"
     t.string "website", null: false
-    t.integer "urn"
   end
 
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
