@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_02_23_150228) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_19_102922) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -186,7 +186,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_23_150228) do
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
-    t.string "reference"
     t.string "address_line_1", null: false
     t.string "address_line_2"
     t.string "municipality", null: false
@@ -196,7 +195,11 @@ ActiveRecord::Schema[7.0].define(version: 2024_02_23_150228) do
     t.datetime "verified_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["reference"], name: "index_schools_on_reference", unique: true
+    t.datetime "rejected_at"
+    t.uuid "organisation_id"
+    t.uuid "user_id"
+    t.string "website", null: false
+    t.integer "urn"
   end
 
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
