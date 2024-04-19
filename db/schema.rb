@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_04_19_102922) do
+ActiveRecord::Schema[7.0].define(version: 2024_04_19_151721) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
@@ -200,6 +200,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_04_19_102922) do
     t.uuid "organisation_id"
     t.uuid "user_id"
     t.string "website", null: false
+    t.index ["reference"], name: "index_schools_on_reference", unique: true
   end
 
   create_table "words", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
