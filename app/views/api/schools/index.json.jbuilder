@@ -5,9 +5,10 @@ json.array!(@schools) do |school|
     school,
     :id,
     :name,
+    :website,
     :reference,
-    :address_line_1, # rubocop:disable Naming/VariableNumber
-    :address_line_2, # rubocop:disable Naming/VariableNumber
+    :address_line_1,
+    :address_line_2,
     :municipality,
     :administrative_area,
     :postal_code,

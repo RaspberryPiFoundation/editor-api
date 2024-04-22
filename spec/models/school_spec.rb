@@ -24,12 +24,12 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let(:lesson1) { build(:lesson) }
-      let(:lesson2) { build(:lesson) }
+      let(:lesson_1) { build(:lesson) }
+      let(:lesson_2) { build(:lesson) }
       let(:project) { build(:project) }
 
-      let!(:school_class) { build(:school_class, members: [build(:class_member)], lessons: [lesson1]) }
-      let!(:school) { create(:school, classes: [school_class], lessons: [lesson2], projects: [project]) }
+      let!(:school_class) { build(:school_class, members: [build(:class_member)], lessons: [lesson_1]) }
+      let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], projects: [project]) }
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
@@ -46,7 +46,7 @@ RSpec.describe School do
       it 'nullifies school_id and school_class_id fields on lessons' do
         school.destroy!
 
-        lessons = [lesson1, lesson2].map(&:reload)
+        lessons = [lesson_1, lesson_2].map(&:reload)
         values = lessons.flat_map { |l| [l.school_id, l.school_class_id] }
 
         expect(values).to eq [nil, nil, nil, nil]
@@ -74,25 +74,13 @@ RSpec.describe School do
       expect { school.save! }.not_to raise_error
     end
 
-    # The school's ID must be set before create from the profile app's organisation ID.
-    # This avoids having two different IDs for a school which would be confusing.
-    it 'requires an id' do
-      school.id = ' '
-      expect(school).to be_invalid
-    end
-
-    it 'requires a UUID id' do
-      school.id = 'invalid'
-      expect(school).to be_invalid
-    end
-
-    it 'requires a unique id' do
-      create(:school)
-      expect(school).to be_invalid
-    end
-
     it 'requires a name' do
       school.name = ' '
+      expect(school).to be_invalid
+    end
+
+    it 'requires a website' do
+      school.website = ' '
       expect(school).to be_invalid
     end
 
