@@ -4,6 +4,7 @@ json.call(
   @school,
   :id,
   :name,
+  :website,
   :reference,
   :address_line_1,
   :address_line_2,
