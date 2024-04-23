@@ -15,14 +15,13 @@ module Api
     end
 
     def create
-      @school = School.new(school_params)
+      result = School::Create.call(school_params:)
 
-      if @school.save
+      if result.success?
+        @school = result[:school]
         render :show, formats: [:json], status: :created
       else
-        render json: {
-          errors: @school.errors
-        }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
 
