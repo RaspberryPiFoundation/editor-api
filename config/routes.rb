@@ -5,9 +5,18 @@ Rails.application.routes.draw do
   namespace :admin do
     mount GoodJob::Engine => 'good_job'
     resources :components
+
     resources :projects do
       delete :images, on: :member, action: :destroy_image
     end
+
+    resources :schools do
+      post :verify_school, action: :verify_school
+      patch :reject_school, action: :reject_school
+    end
+
+    resources :school_classes, only: %i[show]
+    resources :lessons, only: %i[show]
 
     root to: 'projects#index'
   end

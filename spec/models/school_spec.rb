@@ -84,6 +84,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'rejects a badly formed url for website' do
+      school.website = 'http://.example.com'
+      expect(school).to be_invalid
+    end
+
     it 'does not require a reference' do
       create(:school, id: SecureRandom.uuid, reference: nil)
 

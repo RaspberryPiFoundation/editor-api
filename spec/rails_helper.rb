@@ -8,6 +8,7 @@ end
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
+ENV['BYPASS_AUTH'] = nil # Ensure we don't bypass auth in tests
 
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?

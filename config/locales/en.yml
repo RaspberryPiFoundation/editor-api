@@ -10,3 +10,6 @@ en:
       remixing:
         invalid_params: 'Invalid parameters'
         cannot_save: 'Cannot create project remix'
+  validations:
+    school:
+      website: 'must be a valid URL'
