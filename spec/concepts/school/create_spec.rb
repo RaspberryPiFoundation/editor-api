@@ -55,9 +55,14 @@ RSpec.describe School::Create, type: :unit do
       expect(response.failure?).to be(true)
     end
 
-    it 'returns the error message in the operation response' do
+    it 'returns the correct number of objects in the operation response' do
       response = described_class.call(school_params:)
-      expect(response[:error]).to match(/Error creating school/)
+      expect(response[:error].count).to eq(6)
+    end
+
+    it 'returns the correct type of object in the operation response' do
+      response = described_class.call(school_params:)
+      expect(response[:error].first).to be_a(ActiveModel::Error)
     end
 
     it 'sent the exception to Sentry' do
