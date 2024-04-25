@@ -11,7 +11,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     id: Field::String,
-    user: Field::BelongsTo.with_options(class_name: "User"),
+    user: Field::BelongsTo.with_options(class_name: 'User'),
     name: Field::String,
     website: Field::String,
     address_line_1: Field::String,
@@ -93,6 +93,6 @@ class SchoolDashboard < Administrate::BaseDashboard
   # across all pages of the admin dashboard.
   #
   def display_resource(school)
-    "#{school.name}"
+    school.name.to_s
   end
 end

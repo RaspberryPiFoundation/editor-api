@@ -62,7 +62,7 @@ RSpec.describe School::Create, type: :unit do
 
     it 'returns the correct number of objects in the operation response' do
       response = described_class.call(school_params:, user_id:)
-      expect(response[:error].count).to eq(6)
+      expect(response[:error].count).to eq(7)
     end
 
     it 'returns the correct type of object in the operation response' do

@@ -3,9 +3,10 @@
 module Admin
   class SchoolsController < Admin::ApplicationController
     def authorized_action?(resource, action)
-      if action == :verify_school
+      case action
+      when :verify_school
         resource&.rejected_at.present? || resource&.verified_at.nil?
-      elsif action == :reject_school
+      when :reject_school
         resource&.verified_at.present? || resource&.rejected_at.nil?
       else
         super

@@ -1,4 +1,6 @@
-require "administrate/base_dashboard"
+# frozen_string_literal: true
+
+require 'administrate/base_dashboard'
 
 class LessonDashboard < Administrate::BaseDashboard
   # ATTRIBUTE_TYPES
@@ -22,7 +24,7 @@ class LessonDashboard < Administrate::BaseDashboard
     due_date: Field::DateTime,
     archived_at: Field::DateTime,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime,
+    updated_at: Field::DateTime
   }.freeze
 
   # COLLECTION_ATTRIBUTES

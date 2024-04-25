@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SchoolVerificationService do
@@ -10,7 +12,7 @@ RSpec.describe SchoolVerificationService do
     allow(ProfileApiClient).to receive(:create_organisation).and_return({ id: organisation_id })
   end
 
-  context '#verify' do
+  describe '#verify' do
     before do
       service.verify
       school.reload
@@ -21,11 +23,11 @@ RSpec.describe SchoolVerificationService do
     end
 
     it 'sets verified_at to a date' do
-      expect(school.verified_at).to be_a_kind_of(ActiveSupport::TimeWithZone)
+      expect(school.verified_at).to be_a(ActiveSupport::TimeWithZone)
     end
   end
 
-  context '#reject' do
+  describe '#reject' do
     before do
       service.reject
       school.reload
@@ -40,11 +42,11 @@ RSpec.describe SchoolVerificationService do
     end
 
     it 'sets rejected_at to a date' do
-      expect(school.rejected_at).to be_a_kind_of(ActiveSupport::TimeWithZone)
+      expect(school.rejected_at).to be_a(ActiveSupport::TimeWithZone)
     end
   end
 
-  context 'when the school was previously verified' do
+  describe 'when the school was previously verified' do
     before do
       service.verify
       service.reject
@@ -60,7 +62,7 @@ RSpec.describe SchoolVerificationService do
     end
 
     it 'sets rejected_at to a date' do
-      expect(school.rejected_at).to be_a_kind_of(ActiveSupport::TimeWithZone)
+      expect(school.rejected_at).to be_a(ActiveSupport::TimeWithZone)
     end
   end
 end
