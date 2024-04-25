@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby '~> 3.2.0'
 
-gem 'administrate', '~> 0.16.0'
+gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
@@ -50,6 +50,11 @@ group :development, :test do
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
   gem 'simplecov', require: false
+end
+
+group :development do
+  gem 'ruby-lsp-rails'
+  gem 'ruby-lsp-rspec'
 end
 
 group :test do

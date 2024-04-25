@@ -78,14 +78,12 @@ GEM
       tzinfo (~> 2.0)
     addressable (2.8.1)
       public_suffix (>= 2.0.2, < 6.0)
-    administrate (0.16.0)
-      actionpack (>= 5.0)
-      actionview (>= 5.0)
-      activerecord (>= 5.0)
-      datetime_picker_rails (~> 0.0.7)
-      jquery-rails (>= 4.0)
-      kaminari (>= 1.0)
-      momentjs-rails (~> 2.8)
+    administrate (0.20.1)
+      actionpack (>= 6.0, < 8.0)
+      actionview (>= 6.0, < 8.0)
+      activerecord (>= 6.0, < 8.0)
+      jquery-rails (~> 4.6.0)
+      kaminari (~> 1.2.2)
       sassc-rails (~> 2.1)
       selectize-rails (~> 0.6)
     administrate-field-active_storage (1.0.1)
@@ -134,9 +132,7 @@ GEM
     crack (0.4.5)
       rexml
     crass (1.0.6)
-    date (3.3.3)
-    datetime_picker_rails (0.0.7)
-      momentjs-rails (>= 2.8.1)
+    date (3.3.4)
     diff-lcs (1.5.0)
     docile (1.4.0)
     dotenv (2.8.1)
@@ -216,6 +212,7 @@ GEM
       activerecord
       kaminari-core (= 1.2.2)
     kaminari-core (1.2.2)
+    language_server-protocol (3.17.0.3)
     loofah (2.19.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
@@ -230,8 +227,6 @@ GEM
     mini_magick (4.12.0)
     mini_mime (1.1.2)
     minitest (5.17.0)
-    momentjs-rails (2.29.4.1)
-      railties (>= 3.1)
     msgpack (1.6.0)
     multi_xml (0.6.0)
     net-imap (0.3.4)
@@ -275,6 +270,7 @@ GEM
     parser (3.2.1.0)
       ast (~> 2.4.1)
     pg (1.4.6)
+    prism (0.27.0)
     pry (0.14.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -373,6 +369,15 @@ GEM
     rubocop-rspec (2.18.1)
       rubocop (~> 1.33)
       rubocop-capybara (~> 2.17)
+    ruby-lsp (0.16.5)
+      language_server-protocol (~> 3.17.0)
+      prism (>= 0.23.0, < 0.28)
+      sorbet-runtime (>= 0.5.10782)
+    ruby-lsp-rails (0.3.5)
+      ruby-lsp (>= 0.16.0, < 0.17.0)
+      sorbet-runtime (>= 0.5.9897)
+    ruby-lsp-rspec (0.1.11)
+      ruby-lsp (~> 0.16.0)
     ruby-progressbar (1.11.0)
     ruby-vips (2.2.0)
       ffi (~> 1.12)
@@ -410,6 +415,7 @@ GEM
     snaky_hash (2.0.1)
       hashie
       version_gem (~> 1.1, >= 1.1.1)
+    sorbet-runtime (0.5.11357)
     sprockets (4.2.0)
       concurrent-ruby (~> 1.0)
       rack (>= 2.2.4, < 4)
@@ -420,7 +426,7 @@ GEM
     stringio (3.0.5)
     thor (1.2.1)
     tilt (2.3.0)
-    time (0.2.1)
+    time (0.3.0)
       date
     timeout (0.3.2)
     tzinfo (2.0.6)
@@ -453,7 +459,7 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
-  administrate (~> 0.16.0)
+  administrate (~> 0.20.1)
   administrate-field-active_storage
   aws-sdk-s3
   bootsnap
@@ -493,6 +499,8 @@ DEPENDENCIES
   rubocop-graphql
   rubocop-rails
   rubocop-rspec
+  ruby-lsp-rails
+  ruby-lsp-rspec
   scout_apm
   selenium-webdriver
   sentry-rails (~> 5.5.0)
