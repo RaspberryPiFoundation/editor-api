@@ -5,12 +5,10 @@ class ApiController < ActionController::API
 
   include Identifiable
 
-  unless Rails.application.config.consider_all_requests_local
-    rescue_from ActionController::ParameterMissing, with: -> { bad_request }
-    rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
-    rescue_from CanCan::AccessDenied, with: -> { denied }
-    rescue_from ParameterError, with: -> { unprocessable }
-  end
+  rescue_from ActionController::ParameterMissing, with: -> { bad_request }
+  rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
+  rescue_from CanCan::AccessDenied, with: -> { denied }
+  rescue_from ParameterError, with: -> { unprocessable }
 
   private
 
