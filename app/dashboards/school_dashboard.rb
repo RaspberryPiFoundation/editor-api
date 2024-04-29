@@ -22,7 +22,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     classes: Field::HasMany,
     lessons: Field::HasMany,
     projects: Field::HasMany,
-    reference: Field::Number,
+    reference: Field::String,
     verified_at: Field::DateTime,
     rejected_at: Field::DateTime,
     created_at: Field::DateTime,
