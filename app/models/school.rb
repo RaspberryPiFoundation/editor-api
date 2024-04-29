@@ -5,7 +5,7 @@ class School < ApplicationRecord
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
 
-  VALID_URL_REGEX = %r{\Ahttps?://[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,6}(/.*)?\z}ix
+  VALID_URL_REGEX = %r{\A(?:https?:\/\/)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,6}(\/.*)?\z}ix
 
   validates :name, presence: true
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
