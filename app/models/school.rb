@@ -14,6 +14,12 @@ class School < ApplicationRecord
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }
 
+  # TODO: To be removed once we move the an separate organisation_id
+  def valid_except_for_id?
+    validate
+    errors.attribute_names.all? { |name| name == :id }
+  end
+
   def user
     User.from_userinfo(ids: user_id).first
   end
