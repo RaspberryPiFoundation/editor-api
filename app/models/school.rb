@@ -5,7 +5,7 @@ class School < ApplicationRecord
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
 
-  VALID_URL_REGEX = %r{\A(?:https?:\/\/)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,6}(\/.*)?\z}ix
+  VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,6}(/.*)?\z}ix
 
   # TODO: To be removed once we move to a separate organisation_id
   validates :id, presence: true, uniqueness: { case_sensitive: false }
@@ -32,6 +32,6 @@ class School < ApplicationRecord
 
   # Ensure the reference is nil, not an empty string
   def normalize_reference
-    self.reference = nil if self.reference.blank?
+    self.reference = nil if reference.blank?
   end
 end
