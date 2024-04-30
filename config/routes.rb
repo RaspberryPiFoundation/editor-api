@@ -10,7 +10,7 @@ Rails.application.routes.draw do
       delete :images, on: :member, action: :destroy_image
     end
 
-    resources :schools do
+    resources :schools, only: %i[index show edit update] do
       post :verify_school, action: :verify_school
       patch :reject_school, action: :reject_school
     end
