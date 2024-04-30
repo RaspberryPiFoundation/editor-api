@@ -19,7 +19,7 @@ class School
       def build_school(school_params, token)
         school = School.new(school_params)
 
-        # TODO: To be removed once we move the an separate organisation_id
+        # TODO: To be removed once we move to a separate organisation_id
         if school.valid_except_for_id?
           response = ProfileApiClient.create_organisation(token:)
           school.id = response&.fetch(:id)
