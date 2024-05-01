@@ -103,6 +103,12 @@ RSpec.configure do |config|
     driven_by :rack_test
   end
 
+  config.before(:suite) do
+    db_config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
+    puts "Running tests in environment: #{Rails.env}"
+    puts "Running tests against the database: #{db_config.database}"
+  end
+
   config.before(:each, js: true, type: :system) do
     # We need to allow net connect at this stage to allow WebDrivers to update
     # or Capybara to talk to selenium etc.

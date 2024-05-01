@@ -10,8 +10,6 @@ RUN gem install bundler \
   && apt-get update \
   && apt-get install --yes --no-install-recommends postgresql-client-15 \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
-RUN apt-get update && apt-get install -y sudo curl wget vim git zsh docker.io
-RUN sh -c "$(wget https://raw.github.com/ohmyzsh/ohmyzsh/master/tools/install.sh -O -)"
 ENV TZ='Europe/London'
 ENV RUBYOPT='-W:no-deprecated -W:no-experimental'
 
@@ -26,6 +24,18 @@ RUN apt-get update \
 COPY Gemfile Gemfile.lock /app/
 RUN bundle install --jobs 4 \
   && bundle binstubs --all --path /usr/local/bundle/bin
+
+# Dev container image
+FROM builder AS dev-container
+RUN apt-get update \
+  && apt-get install --yes --no-install-recommends sudo git vim zsh ssh curl less
+RUN sh -c "$(curl -L https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" -- \
+    -t robbyrussell \
+    -p git -p docker-compose -p yarn \
+    -p https://github.com/zsh-users/zsh-autosuggestions \
+    # -p https://github.com/marlonrichert/zsh-autocomplete \
+    -p https://github.com/unixorn/fzf-zsh-plugin
+RUN chsh -s $(which zsh) ${USER}
 
 # Slim application image without development dependencies
 FROM base AS app
