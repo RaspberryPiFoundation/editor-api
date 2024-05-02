@@ -112,4 +112,14 @@ RSpec.describe Ability do
       end
     end
   end
+
+  describe 'School' do
+    let(:school) { build(:school, user_id:, verified_at: nil) }
+
+    context 'when user is not a school-owner but is the creator of the school' do
+      let(:user) { build(:user, id: user_id) }
+
+      it { is_expected.to be_able_to(:read, school) }
+    end
+  end
 end
