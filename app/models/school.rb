@@ -7,8 +7,6 @@ class School < ApplicationRecord
 
   VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,6}(/.*)?\z}ix
 
-  # TODO: To be removed once we move to a separate organisation_id
-  validates :id, presence: false, uniqueness: { case_sensitive: false }
   validates :name, presence: true
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
   validates :address_line_1, presence: true
