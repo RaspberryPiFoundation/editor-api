@@ -18,12 +18,6 @@ class School < ApplicationRecord
 
   before_validation :normalize_reference
 
-  # TODO: To be removed once we move to a separate organisation_id
-  def valid_except_for_id?
-    validate
-    errors.attribute_names.all? { |name| name == :id }
-  end
-
   def user
     User.from_userinfo(ids: user_id).first
   end
