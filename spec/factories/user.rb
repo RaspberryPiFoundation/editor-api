@@ -8,7 +8,7 @@ FactoryBot.define do
     organisations { {} }
 
     factory :admin_user do
-      organisations { { '12345678-1234-1234-1234-123456789abc' => 'editor-admin' } }
+      organisations { {} }
     end
 
     skip_create
