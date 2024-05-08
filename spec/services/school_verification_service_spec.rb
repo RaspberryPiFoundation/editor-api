@@ -8,10 +8,6 @@ RSpec.describe SchoolVerificationService do
   let(:service) { described_class.new(school.id, user) }
   let(:organisation_id) { SecureRandom.uuid }
 
-  before do
-    allow(ProfileApiClient).to receive(:create_organisation).and_return({ id: organisation_id })
-  end
-
   describe '#verify' do
     before do
       service.verify

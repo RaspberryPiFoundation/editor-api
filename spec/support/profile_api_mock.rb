@@ -5,10 +5,6 @@ module ProfileApiMock
 
   # TODO: Replace with WebMock HTTP stubs once the profile API has been built.
 
-  def stub_profile_api_create_organisation(organisation_id: ORGANISATION_ID)
-    allow(ProfileApiClient).to receive(:create_organisation).and_return(id: organisation_id)
-  end
-
   def stub_profile_api_list_school_owners(user_id:)
     allow(ProfileApiClient).to receive(:list_school_owners).and_return(ids: [user_id])
   end

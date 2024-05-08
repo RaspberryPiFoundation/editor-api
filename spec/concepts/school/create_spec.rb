@@ -18,7 +18,6 @@ RSpec.describe School::Create, type: :unit do
 
   before do
     stub_user_info_api
-    stub_profile_api_create_organisation
   end
 
   it 'returns a successful operation response' do

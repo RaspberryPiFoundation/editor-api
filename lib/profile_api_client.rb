@@ -5,22 +5,6 @@ class ProfileApiClient
     # TODO: Replace with HTTP requests once the profile API has been built.
 
     # The API should enforce these constraints:
-    # - The user should have an email address
-    # - The user should not be under 13
-    # - The user must have a verified email
-    #
-    # The API should respond:
-    # - 422 Unprocessable if the constraints are not met
-    def create_organisation(token:)
-      return nil if token.blank?
-
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that School::Create propagates the error in the response.
-      response = { 'id' => '12345678-1234-1234-1234-123456789abc' }
-      response.deep_symbolize_keys
-    end
-
-    # The API should enforce these constraints:
     # - The token has the school-owner or school-teacher role for the given organisation ID
     # - The token user or given user should not be under 13
     # - The email must be verified
