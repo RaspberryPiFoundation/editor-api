@@ -32,6 +32,8 @@ class User
   end
 
   def org_roles(organisation_id:)
+    return [] unless organisations
+
     organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
   end
 
