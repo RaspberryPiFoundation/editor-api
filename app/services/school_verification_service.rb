@@ -9,8 +9,7 @@ class SchoolVerificationService
   def verify
     School.transaction do
       school = School.find(@school_id)
-      result = ProfileApiClient.create_organisation(token: @current_user.token)
-      school.update(verified_at: Time.zone.now, rejected_at: nil, organisation_id: result&.fetch(:id))
+      school.update(verified_at: Time.zone.now, rejected_at: nil)
     end
   rescue StandardError => e
     Sentry.capture_exception(e)
@@ -22,6 +21,6 @@ class SchoolVerificationService
 
   def reject
     school = School.find(@school_id)
-    school.update(verified_at: nil, rejected_at: Time.zone.now, organisation_id: nil)
+    school.update(verified_at: nil, rejected_at: Time.zone.now)
   end
 end
