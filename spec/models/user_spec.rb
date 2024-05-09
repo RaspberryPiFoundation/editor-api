@@ -261,21 +261,21 @@ RSpec.describe User do
   end
 
   describe '#school_roles' do
-    subject(:user) { build(:user, roles:, organisations:) }
+    subject(:user) { build(:user) }
 
     let(:school) { create(:school) }
-    let(:organisations) { { '12345678-1234-1234-1234-123456789abc' => roles } }
 
     context 'when the user has no roles' do
-      let(:roles) { '' }
-
       it 'returns an empty array if the user has no role in this school' do
         expect(user.school_roles(school)).to be_empty
       end
     end
 
     context 'when the user has an organisation and roles' do
-      let(:roles) { 'owner,teacher' }
+      before do
+        create(:role, school:, user_id: user.id, role: 'owner')
+        create(:role, school:, user_id: user.id, role: 'teacher')
+      end
 
       it 'returns an array of the roles the user has at the school' do
         expect(user.school_roles(school)).to match_array(%w[owner teacher])

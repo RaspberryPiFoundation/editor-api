@@ -36,7 +36,7 @@ class User
   end
 
   def school_roles(school)
-    organisations[school.id.to_s]&.to_s&.split(',')&.map(&:strip) || []
+    Role.where(school:, user_id: id).map(&:role)
   end
 
   def org_role?(organisation_id:, role:)
