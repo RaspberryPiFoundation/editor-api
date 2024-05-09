@@ -4,15 +4,19 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school classes', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: owner_index)
     stub_user_info_api
 
     create(:class_member, school_class:)
+
+    create(:owner_role, school:, user_id: owner_id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
   let(:school) { school_class.school }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)

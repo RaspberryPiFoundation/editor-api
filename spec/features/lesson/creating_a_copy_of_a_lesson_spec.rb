@@ -84,6 +84,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
     let(:owner_index) { user_index_by_role('school-owner') }
     let(:owner_id) { user_id_by_index(owner_index) }
+    let!(:role) { create(:owner_role, school:, user_id: owner_id) }
 
     let(:params) do
       {
@@ -106,8 +107,8 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-      school = create(:school, id: SecureRandom.uuid)
-      lesson.update!(school_id: school.id)
+      different_school = create(:school, id: SecureRandom.uuid)
+      role.update!(school: different_school)
 
       post("/api/lessons/#{lesson.id}/copy", headers:, params:)
       expect(response).to have_http_status(:forbidden)

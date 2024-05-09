@@ -11,6 +11,9 @@ RSpec.describe 'Showing a school class', type: :request do
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
   let(:school) { school_class.school }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
+  let!(:role) { create(:owner_role, school:, user_id: owner_id) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -71,8 +74,8 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school = create(:school, id: SecureRandom.uuid)
-    school_class.update!(school_id: school.id)
+    different_school = create(:school, id: SecureRandom.uuid)
+    role.update!(school: different_school)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

@@ -1,0 +1,7 @@
+rspec ./spec/features/school_owner/listing_school_owners_spec.rb:29 # Listing school owners responds with the school owners JSON
+rspec ./spec/features/school_owner/listing_school_owners_spec.rb:17 # Listing school owners responds 200 OK
+rspec ./spec/features/school_class/showing_a_school_class_spec.rb:15 # Showing a school class responds 200 OK
+rspec ./spec/features/school_class/showing_a_school_class_spec.rb:63 # Showing a school class responds 404 Not Found when no school class exists
+rspec ./spec/features/school_class/showing_a_school_class_spec.rb:49 # Showing a school class responds with nil attributes for the teacher if their user profile doesn't exist
+rspec ./spec/features/school_class/showing_a_school_class_spec.rb:35 # Showing a school class responds with the school class JSON
+rspec ./spec/features/school_class/showing_a_school_class_spec.rb:42 # Showing a school class responds with the teacher JSON

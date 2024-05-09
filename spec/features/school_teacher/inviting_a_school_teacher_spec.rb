@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Inviting a school teacher', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: school_owner_index)
     stub_profile_api_invite_school_teacher
   end
 
@@ -12,6 +12,9 @@ RSpec.describe 'Inviting a school teacher', type: :request do
   let(:school) { create(:school, verified_at: Time.zone.now) }
   let(:teacher_index) { user_index_by_role('school-teacher') }
   let(:teacher_id) { user_id_by_index(teacher_index) }
+  let(:school_owner_index) { user_index_by_role('school-owner') }
+  let(:school_owner_id) { user_id_by_index(school_owner_index) }
+  let!(:role) { create(:owner_role, school:, user_id: school_owner_id) }
 
   let(:params) do
     {
@@ -42,7 +45,8 @@ RSpec.describe 'Inviting a school teacher', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school.update!(id: SecureRandom.uuid)
+    different_school = create(:school, id: SecureRandom.uuid)
+    role.update!(school: different_school)
 
     post("/api/schools/#{school.id}/teachers", headers:, params:)
     expect(response).to have_http_status(:forbidden)

@@ -4,12 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: owner_index)
     stub_user_info_api
     mock_phrase_generation
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
 
   let(:params) do
     {
@@ -55,6 +57,7 @@ RSpec.describe 'Creating a project', type: :request do
     let(:school) { create(:school) }
     let(:teacher_index) { user_index_by_role('school-teacher') }
     let(:teacher_id) { user_id_by_index(teacher_index) }
+    let!(:role) { create(:owner_role, school:, user_id: owner_id) }
 
     let(:params) do
       {
@@ -104,7 +107,8 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-      school.update!(id: SecureRandom.uuid)
+      different_school = create(:school, id: SecureRandom.uuid)
+      role.update!(school: different_school)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
@@ -127,6 +131,10 @@ RSpec.describe 'Creating a project', type: :request do
           user_id: teacher_id
         }
       }
+    end
+
+    before do
+      create(:owner_role, school:, user_id: owner_id)
     end
 
     it 'responds 201 Created' do

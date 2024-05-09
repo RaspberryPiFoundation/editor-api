@@ -4,12 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a school student', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: owner_index)
     stub_profile_api_delete_school_student
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
+  let!(:role) { create(:owner_role, school:, user_id: owner_id) }
   let(:student_index) { user_index_by_role('school-student') }
   let(:student_id) { user_id_by_index(student_index) }
 
@@ -24,7 +27,8 @@ RSpec.describe 'Deleting a school student', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school.update!(id: SecureRandom.uuid)
+    different_school = create(:school, id: SecureRandom.uuid)
+    role.update!(school: different_school)
 
     delete("/api/schools/#{school.id}/students/#{student_id}", headers:)
     expect(response).to have_http_status(:forbidden)

@@ -4,13 +4,17 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a school class', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: school_owner_index)
     stub_user_info_api
+
+    create(:owner_role, school:, user_id: school_owner_id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class) }
   let(:school) { school_class.school }
+  let(:school_owner_index) { user_index_by_role('school-owner') }
+  let(:school_owner_id) { user_id_by_index(school_owner_index) }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)

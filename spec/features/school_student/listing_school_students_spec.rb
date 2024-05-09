@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school students', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: owner_index)
     stub_profile_api_list_school_students(user_id: student_id)
     stub_user_info_api
   end
@@ -13,6 +13,9 @@ RSpec.describe 'Listing school students', type: :request do
   let(:school) { create(:school) }
   let(:student_index) { user_index_by_role('school-student') }
   let(:student_id) { user_id_by_index(student_index) }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
+  let!(:role) { create(:owner_role, school:, user_id: owner_id) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/students", headers:)
@@ -39,7 +42,8 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school.update!(id: SecureRandom.uuid)
+    different_school = create(:school, id: SecureRandom.uuid)
+    role.update!(school: different_school)
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:forbidden)

@@ -4,12 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Showing a lesson', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api # (user_index: owner_index)
     stub_user_info_api
   end
 
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  # let(:owner_index) { user_index_by_role('school-owner') }
+  # let(:owner_id) { user_id_by_index(owner_index) }
+  # let!(:role) { create(:owner_role, school:, user_id: owner_id) }
 
   it 'responds 200 OK' do
     get("/api/lessons/#{lesson.id}", headers:)
@@ -72,6 +75,10 @@ RSpec.describe 'Showing a lesson', type: :request do
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
     let(:owner_index) { user_index_by_role('school-owner') }
     let(:owner_id) { user_id_by_index(owner_index) }
+
+    before do
+      create(:owner_role, school:, user_id: owner_id)
+    end
 
     it 'responds 200 OK when the user owns the lesson' do
       lesson.update!(user_id: owner_id)

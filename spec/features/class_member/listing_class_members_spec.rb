@@ -2,9 +2,10 @@
 
 require 'rails_helper'
 
+# rubocop:disable RSpec/MultipleMemoizedHelpers
 RSpec.describe 'Listing class members', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: owner_index)
     stub_user_info_api
   end
 
@@ -14,6 +15,9 @@ RSpec.describe 'Listing class members', type: :request do
   let(:school) { school_class.school }
   let(:student_index) { user_index_by_role('school-student') }
   let(:student_id) { user_id_by_index(student_index) }
+  let(:owner_index) { user_index_by_role('school-owner') }
+  let(:owner_id) { user_id_by_index(owner_index) }
+  let!(:role) { create(:owner_role, school:, user_id: owner_id) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
@@ -59,8 +63,8 @@ RSpec.describe 'Listing class members', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school = create(:school, id: SecureRandom.uuid)
-    school_class.update!(school_id: school.id)
+    different_school = create(:school, id: SecureRandom.uuid)
+    role.update!(school: different_school)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     expect(response).to have_http_status(:forbidden)
@@ -81,3 +85,4 @@ RSpec.describe 'Listing class members', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Archiving a lesson', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: owner_index)
     stub_user_info_api
   end
 
@@ -12,6 +12,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
   let!(:lesson) { create(:lesson, user_id: owner_id) }
   let(:owner_index) { user_index_by_role('school-owner') }
   let(:owner_id) { user_id_by_index(owner_index) }
+  # let!(:role) { create(:owner_role, user_id: school_owner_id) }
 
   it 'responds 204 No Content' do
     delete("/api/lessons/#{lesson.id}", headers:)
@@ -54,11 +55,13 @@ RSpec.describe 'Archiving a lesson', type: :request do
     let!(:lesson) { create(:lesson, school:, visibility: 'teachers') }
 
     it 'responds 204 No Content when the user is a school-owner' do
+      create(:owner_role, school:, user_id: owner_id)
       delete("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:no_content)
     end
 
     it "responds 403 Forbidden when the user a school-owner but visibility is 'private'" do
+      create(:owner_role, school:, user_id: owner_id)
       lesson.update!(visibility: 'private')
 
       delete("/api/lessons/#{lesson.id}", headers:)

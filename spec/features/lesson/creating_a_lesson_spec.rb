@@ -2,12 +2,15 @@
 
 require 'rails_helper'
 
+# rubocop:disable RSpec/MultipleMemoizedHelpers
 RSpec.describe 'Creating a lesson', type: :request do
   before do
-    stub_hydra_public_api
+    stub_hydra_public_api(user_index: school_owner_index)
     stub_user_info_api
   end
 
+  let(:school_owner_index) { user_index_by_role('school-owner') }
+  let(:school_owner_id) { user_id_by_index(school_owner_index) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   let(:params) do
@@ -51,6 +54,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     let(:school) { create(:school) }
     let(:teacher_index) { user_index_by_role('school-teacher') }
     let(:teacher_id) { user_id_by_index(teacher_index) }
+    let!(:role) { create(:owner_role, school:, user_id: school_owner_id) }
 
     let(:params) do
       {
@@ -92,7 +96,8 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-      school.update!(id: SecureRandom.uuid)
+      different_school = create(:school, id: SecureRandom.uuid)
+      role.update!(school: different_school)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)
@@ -111,6 +116,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     let(:school) { school_class.school }
     let(:teacher_index) { user_index_by_role('school-teacher') }
     let(:teacher_id) { user_id_by_index(teacher_index) }
+    let!(:role) { create(:owner_role, school:, user_id: school_owner_id) }
 
     let(:params) do
       {
@@ -153,8 +159,8 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-      school = create(:school, id: SecureRandom.uuid)
-      school_class.update!(school_id: school.id)
+      different_school = create(:school, id: SecureRandom.uuid)
+      role.update!(school: different_school)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)
@@ -176,3 +182,4 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
   end
 end
+# rubocop:enable RSpec/MultipleMemoizedHelpers
