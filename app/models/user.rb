@@ -31,8 +31,8 @@ class User
     organisations&.keys || []
   end
 
-  def school_roles(organisation_id:)
-    organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
+  def school_roles(school)
+    organisations[school.id.to_s]&.to_s&.split(',')&.map(&:strip) || []
   end
 
   def school_owner?(organisation_id:)
