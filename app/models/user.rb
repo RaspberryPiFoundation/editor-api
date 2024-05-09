@@ -48,7 +48,7 @@ class User
   end
 
   def school_student?(organisation_id:)
-    org_role?(organisation_id:, role: 'school-student')
+    Role.student.find_by(school_id: organisation_id, user_id: id)
   end
 
   def admin?

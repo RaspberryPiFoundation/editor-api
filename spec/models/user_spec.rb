@@ -255,9 +255,19 @@ RSpec.describe User do
   end
 
   describe '#school_student?' do
-    subject { user.school_student?(organisation_id:) }
+    subject(:user) { create(:user) }
 
-    include_examples 'role_check', 'school-student'
+    let(:school) { create(:school) }
+
+    it 'returns true when the user has the student role for this school' do
+      create(:role, school:, user_id: user.id, role: 'student')
+      expect(user).to be_school_student(organisation_id: school.id)
+    end
+
+    it 'returns false when the user does not have the student role for this school' do
+      create(:role, school:, user_id: user.id, role: 'owner')
+      expect(user).not_to be_school_student(organisation_id: school.id)
+    end
   end
 
   describe '#admin?' do
