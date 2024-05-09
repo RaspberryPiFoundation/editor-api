@@ -52,7 +52,7 @@ class User
   end
 
   def admin?
-    organisation_ids.any? { |organisation_id| org_role?(organisation_id:, role: 'editor-admin') }
+    (roles&.to_s&.split(',')&.map(&:strip) || []).include?('editor-admin')
   end
 
   def ==(other)
