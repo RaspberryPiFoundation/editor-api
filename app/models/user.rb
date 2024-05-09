@@ -35,10 +35,6 @@ class User
     organisations[organisation_id.to_s]&.to_s&.split(',')&.map(&:strip) || []
   end
 
-  def org_role?(organisation_id:, role:)
-    org_roles(organisation_id:).include?(role.to_s)
-  end
-
   def school_owner?(organisation_id:)
     Role.owner.find_by(school_id: organisation_id, user_id: id)
   end
