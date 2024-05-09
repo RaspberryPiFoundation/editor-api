@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_07_162837) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_09_104834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -173,6 +173,17 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_07_162837) do
     t.index ["school_id"], name: "index_projects_on_school_id"
   end
 
+  create_table "roles", force: :cascade do |t|
+    t.uuid "user_id"
+    t.uuid "school_id"
+    t.integer "role"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_roles_on_school_id"
+    t.index ["user_id", "school_id", "role"], name: "index_roles_on_user_id_and_school_id_and_role", unique: true
+    t.index ["user_id"], name: "index_roles_on_user_id"
+  end
+
   create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_id", null: false
     t.uuid "teacher_id", null: false
@@ -216,5 +227,6 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_07_162837) do
   add_foreign_key "project_errors", "projects"
   add_foreign_key "projects", "lessons"
   add_foreign_key "projects", "schools"
+  add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
 end
