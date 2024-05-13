@@ -15,7 +15,7 @@ module Api
         result = Project::CreateRemix.call(params: remix_params,
                                            user_id: current_user&.id,
                                            original_project: project,
-                                           remix_origin: request.origin)
+                                           remix_origin:)
 
         if result.success?
           @project = result[:project]
@@ -37,6 +37,15 @@ module Api
                       :identifier,
                       :locale,
                       components: %i[id name extension content index])
+      end
+
+      def remix_origin
+        request.origin || referer
+      end
+
+      def referer
+        referer = request.headers['Referer']
+        referer && URI(referer).origin
       end
     end
   end

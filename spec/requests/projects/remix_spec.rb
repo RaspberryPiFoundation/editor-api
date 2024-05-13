@@ -53,6 +53,45 @@ RSpec.describe 'Remix requests' do
         expect(response).to have_http_status(:ok)
       end
 
+      it "sets project remix origin based on 'Origin' header on request" do
+        post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+
+        identifier = response.parsed_body['identifier']
+        project = Project.find_by(identifier:)
+        expect(project.remix_origin).to eq('editor.com')
+      end
+
+      context 'when Origin header is not set, but Referer header is set' do
+        let(:headers) do
+          {
+            Authorization: UserProfileMock::TOKEN,
+            Referer: 'https://referer.com/some-path'
+          }
+        end
+
+        it "sets project remix origin based on 'Referer' header on request" do
+          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+
+          identifier = response.parsed_body['identifier']
+          project = Project.find_by(identifier:)
+          expect(project.remix_origin).to eq('https://referer.com')
+        end
+      end
+
+      context 'when neither Origin nor Referer headers are set' do
+        let(:headers) do
+          {
+            Authorization: UserProfileMock::TOKEN
+          }
+        end
+
+        it 'returns 400' do
+          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+
+          expect(response).to have_http_status(:bad_request)
+        end
+      end
+
       it 'returns 404 response if invalid project' do
         project_params[:identifier] = 'no-such-project'
         post('/api/projects/no-such-project/remix', params: { project: project_params }, headers:)
