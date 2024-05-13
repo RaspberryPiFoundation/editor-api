@@ -9,14 +9,14 @@ RSpec.describe Lesson do
 
   describe 'associations' do
     it 'optionally belongs to a school (library)' do
-      lesson = create(:lesson, school: build(:school))
+      lesson = create(:lesson_with_school)
+
       expect(lesson.school).to be_a(School)
     end
 
     it 'optionally belongs to a school class' do
-      school_class = create(:school_class)
-
-      lesson = create(:lesson, school_class:, school: school_class.school)
+      lesson = described_class.new
+      lesson.build_school_class
       expect(lesson.school_class).to be_a(SchoolClass)
     end
 
@@ -66,9 +66,7 @@ RSpec.describe Lesson do
     end
 
     context 'when the lesson has a school' do
-      before do
-        lesson.update!(school: create(:school))
-      end
+      let(:lesson) { create(:lesson_with_school) }
 
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
         lesson.user_id = '22222222-2222-2222-2222-222222222222' # school-student
@@ -78,7 +76,8 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class))
+        school_class = create(:school_class, teacher_id: lesson.user_id)
+        lesson.update!(school_class:)
       end
 
       it 'requires that the user that is the school-teacher for the school_class' do
@@ -131,19 +130,24 @@ RSpec.describe Lesson do
 
   describe '#school' do
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class))
+      school_class = build(:school_class)
+      lesson = described_class.new
+      lesson.school_class = school_class
+
+      lesson.valid?
+
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 
     it 'is not nullified when there is no school_class' do
-      lesson = create(:lesson, school: build(:school))
+      lesson = create(:lesson_with_school)
       expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      create(:lesson)
+      create(:lesson, user_id: '11111111-1111-1111-1111-111111111111')
 
       user = described_class.all.users.first
       expect(user.name).to eq('School Teacher')

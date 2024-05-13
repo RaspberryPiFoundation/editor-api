@@ -19,7 +19,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'has many lessons' do
-      school_class = create(:school_class, lessons: [build(:lesson)])
+      school_class = create(:school_class)
+      create(:lesson, user_id: school_class.teacher_id, school_class:)
+
       expect(school_class.lessons.size).to eq(1)
     end
 

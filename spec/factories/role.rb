@@ -10,4 +10,8 @@ FactoryBot.define do
   factory :owner_role, parent: :role do
     role { 'owner' }
   end
+
+  factory :teacher_role, parent: :role do
+    role { 'teacher' }
+  end
 end
