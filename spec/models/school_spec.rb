@@ -24,12 +24,11 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let(:lesson_1) { build(:lesson) }
-      let(:lesson_2) { build(:lesson) }
+      let!(:school) { create(:school, classes: [school_class], projects: [project]) }
+      let!(:school_class) { build(:school_class, members: [build(:class_member)]) }
+      let!(:lesson_1) { create(:lesson, school_class:, user_id: school_class.teacher_id) }
+      let!(:lesson_2) { create(:lesson, school:) }
       let(:project) { build(:project) }
-
-      let!(:school_class) { build(:school_class, members: [build(:class_member)], lessons: [lesson_1]) }
-      let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], projects: [project]) }
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)

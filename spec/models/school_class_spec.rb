@@ -19,12 +19,18 @@ RSpec.describe SchoolClass do
     end
 
     it 'has many lessons' do
-      school_class = create(:school_class, lessons: [build(:lesson)])
+      school_class = create(:school_class)
+      create(:lesson, school_class:, user_id: school_class.teacher_id)
+
       expect(school_class.lessons.size).to eq(1)
     end
 
     context 'when a school_class is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member)], lessons: [build(:lesson)]) }
+      let!(:school_class) { create(:school_class, members: [build(:class_member)]) }
+
+      before do
+        create(:lesson, school_class:, user_id: school_class.teacher_id)
+      end
 
       it 'also destroys class members to avoid making them invalid' do
         expect { school_class.destroy! }.to change(ClassMember, :count).by(-1)
@@ -80,7 +86,9 @@ RSpec.describe SchoolClass do
 
   describe '.teachers' do
     it 'returns User instances for the current scope' do
-      create(:school_class)
+      school_class = create(:school_class)
+
+      stub_user_info_api_for_school_class(school_class)
 
       teacher = described_class.all.teachers.first
       expect(teacher.name).to eq('School Teacher')

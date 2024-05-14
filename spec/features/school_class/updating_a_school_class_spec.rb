@@ -28,7 +28,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the school-teacher for the class' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(teacher_id: school_class.teacher_id)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
@@ -42,6 +42,8 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds with the teacher JSON' do
+    stub_user_info_api_for_school_class(school_class)
+
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 

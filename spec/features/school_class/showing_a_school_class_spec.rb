@@ -18,7 +18,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the class teacher' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(teacher_id: school_class.teacher_id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)
@@ -40,6 +40,8 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds with the teacher JSON' do
+    stub_user_info_api_for_school_class(school_class)
+
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 

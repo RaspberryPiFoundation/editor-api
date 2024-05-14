@@ -28,7 +28,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(teacher_id: school_class.teacher_id)
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:created)

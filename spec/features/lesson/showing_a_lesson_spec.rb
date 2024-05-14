@@ -103,13 +103,13 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school_class) { create(:school_class) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
+    let!(:lesson) { create(:lesson, school_class:, user_id: school_class.teacher_id, name: 'Test Lesson', visibility: 'students') }
     let(:teacher_index) { user_index_by_role('school-teacher') }
     let(:teacher_id) { user_id_by_index(teacher_index) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      authenticate_as_school_teacher
-      lesson.update!(user_id: teacher_id)
+      authenticate_as_school_teacher # (teacher_id: school_class.teacher_id)
+      # lesson.update!(user_id: school_class.teacher_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)

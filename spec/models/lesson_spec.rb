@@ -16,7 +16,7 @@ RSpec.describe Lesson do
     it 'optionally belongs to a school class' do
       school_class = create(:school_class)
 
-      lesson = create(:lesson, school_class:, school: school_class.school)
+      lesson = create(:lesson, school_class:, school: school_class.school, user_id: school_class.teacher_id)
       expect(lesson.school_class).to be_a(SchoolClass)
     end
 
@@ -78,7 +78,8 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class))
+        school_class = create(:school_class)
+        lesson.update!(school_class:, user_id: school_class.teacher_id)
       end
 
       it 'requires that the user that is the school-teacher for the school_class' do
@@ -131,7 +132,8 @@ RSpec.describe Lesson do
 
   describe '#school' do
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class))
+      school_class = build(:school_class)
+      lesson = create(:lesson, school_class:, user_id: school_class.teacher_id)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 

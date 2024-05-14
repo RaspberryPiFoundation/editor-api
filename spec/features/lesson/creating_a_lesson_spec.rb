@@ -118,7 +118,7 @@ RSpec.describe 'Creating a lesson', type: :request do
           name: 'Test Lesson',
           school_id: school.id,
           school_class_id: school_class.id,
-          user_id: teacher_id
+          user_id: school_class.teacher_id
         }
       }
     end

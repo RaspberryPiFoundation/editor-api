@@ -26,6 +26,8 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   it 'responds with the teachers JSON' do
+    stub_user_info_api_for_school_class(school_class)
+
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -42,7 +44,7 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   it "does not include school classes that the school-teacher doesn't teach" do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(teacher_id: school_class.teacher_id)
     create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes", headers:)
