@@ -28,7 +28,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the school-teacher for the class' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
@@ -82,7 +82,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
     school_class.update!(teacher_id: SecureRandom.uuid)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)

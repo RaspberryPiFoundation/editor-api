@@ -20,7 +20,7 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 200 OK when the user is a school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:ok)

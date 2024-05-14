@@ -59,7 +59,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
       context 'with another users project' do
         before do
-          stub_hydra_public_api(user_index: 1)
+          authenticate_as_school_teacher
         end
 
         it 'returns an error' do

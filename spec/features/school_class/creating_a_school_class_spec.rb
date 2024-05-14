@@ -28,7 +28,7 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     post("/api/schools/#{school.id}/classes", headers:, params:)
     expect(response).to have_http_status(:created)
@@ -66,7 +66,8 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   it 'sets the class teacher to the current user for school-teacher users' do
-    stub_hydra_public_api(user_index: teacher_index)
+    authenticate_as_school_teacher
+
     new_params = { school_class: params[:school_class].merge(teacher_id: 'ignored') }
 
     post("/api/schools/#{school.id}/classes", headers:, params: new_params)

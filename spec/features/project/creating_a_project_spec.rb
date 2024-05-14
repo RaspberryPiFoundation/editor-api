@@ -73,7 +73,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-teacher for the school' do
-      stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+      authenticate_as_school_teacher
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -94,7 +94,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'sets the project user to the current user for school-teacher users' do
-      stub_hydra_public_api(user_index: teacher_index)
+      authenticate_as_school_teacher
       new_params = { project: params[:project].merge(user_id: 'ignored') }
 
       post('/api/projects', headers:, params: new_params)
@@ -135,7 +135,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the current user is the owner of the lesson' do
-      stub_hydra_public_api(user_index: teacher_index)
+      authenticate_as_school_teacher
       lesson.update!(user_id: user_id_by_index(teacher_index))
 
       post('/api/projects', headers:, params:)
@@ -171,7 +171,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
-      stub_hydra_public_api(user_index: teacher_index)
+      authenticate_as_school_teacher
       lesson.update!(user_id: SecureRandom.uuid)
 
       post('/api/projects', headers:, params:)

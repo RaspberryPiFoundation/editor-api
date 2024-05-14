@@ -83,7 +83,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
-      stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+      authenticate_as_school_teacher
       lesson.update!(user_id: SecureRandom.uuid)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)
