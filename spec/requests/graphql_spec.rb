@@ -76,7 +76,7 @@ RSpec.describe 'POST /graphql' do
 
       context 'when the token is valid' do
         before do
-          stub_hydra_public_api
+          authenticate_as_school_owner
         end
 
         it 'sets the current_user in the context' do

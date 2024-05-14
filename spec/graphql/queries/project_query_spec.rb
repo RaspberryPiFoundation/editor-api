@@ -92,7 +92,7 @@ RSpec.describe 'query { project { ... } }' do
       let(:project) { create(:project, user_id: stubbed_user.id) }
 
       before do
-        stub_hydra_public_api
+        authenticate_as_school_owner
       end
 
       it 'returns the project global id' do

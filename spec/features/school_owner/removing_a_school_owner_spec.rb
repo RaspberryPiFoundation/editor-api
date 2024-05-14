@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Removing a school owner', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     stub_profile_api_remove_school_owner
   end
 

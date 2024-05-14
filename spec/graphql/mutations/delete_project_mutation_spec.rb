@@ -6,7 +6,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
   end
 
   let(:mutation) { 'mutation DeleteProject($project: DeleteProjectInput!) { deleteProject(input: $project) { id } }' }
@@ -41,7 +41,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       let(:current_user) { stubbed_user }
 
       before do
-        stub_hydra_public_api
+        authenticate_as_school_owner
       end
 
       it 'deletes the project' do

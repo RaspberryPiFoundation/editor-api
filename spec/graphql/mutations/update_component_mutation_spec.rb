@@ -23,7 +23,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
   context 'with an existing component' do
     before do
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     let(:project) { create(:project, user_id: stubbed_user.id) }

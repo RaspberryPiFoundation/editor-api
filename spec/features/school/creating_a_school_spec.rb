@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

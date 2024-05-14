@@ -10,7 +10,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project is successful' do
       before do
-        stub_hydra_public_api
+        authenticate_as_school_owner
 
         response = OperationResponse.new
         response[:project] = project
@@ -26,7 +26,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project fails' do
       before do
-        stub_hydra_public_api
+        authenticate_as_school_owner
 
         response = OperationResponse.new
         response[:error] = 'Error creating project'

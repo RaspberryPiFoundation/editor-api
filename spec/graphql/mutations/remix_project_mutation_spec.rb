@@ -22,7 +22,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   let(:remix_origin) { 'editor.com' }
 
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     project
   end
 
