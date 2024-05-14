@@ -24,10 +24,12 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.first[:student_id]).to eq(student_id)
+    expect(data.first[:student_id]).to eq(class_member.student_id)
   end
 
   it 'responds with the students JSON' do
+    stub_user_info_api_for_class_member(class_member)
+
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 

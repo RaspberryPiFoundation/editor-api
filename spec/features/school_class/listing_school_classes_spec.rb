@@ -6,13 +6,12 @@ RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticate_as_school_owner
     stub_user_info_api
-
-    create(:class_member, school_class:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
   let(:school) { school_class.school }
+  let!(:member) { create(:class_member, school_class:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)
@@ -53,7 +52,8 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   it "does not include school classes that the school-student isn't a member of" do
-    authenticate_as_school_student
+    authenticate_as_school_student(member)
+
     create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes", headers:)
