@@ -25,7 +25,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is a student in the class' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
     create(:class_member, school_class:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -87,7 +87,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not a school-student for the class' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

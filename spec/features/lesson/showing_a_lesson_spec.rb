@@ -94,7 +94,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:forbidden)
@@ -116,7 +116,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     end
 
     it "responds 200 OK when the user is a school-student within the lesson's class" do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
       create(:class_member, school_class:)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -124,7 +124,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     end
 
     it "responds 403 Forbidden when the user is a school-student but isn't within the lesson's class" do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:forbidden)

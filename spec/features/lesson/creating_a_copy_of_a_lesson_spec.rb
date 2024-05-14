@@ -114,7 +114,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
 
       post("/api/lessons/#{lesson.id}/copy", headers:, params:)
       expect(response).to have_http_status(:forbidden)

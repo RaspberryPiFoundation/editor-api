@@ -117,7 +117,7 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it 'does not include the lesson when the user is a school-student' do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
@@ -143,7 +143,7 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it "includes the lesson when the user is a school-student within the lesson's class" do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
       create(:class_member, school_class:)
 
       get('/api/lessons', headers:)
@@ -153,7 +153,7 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
-      stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+      authenticate_as_school_student
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
