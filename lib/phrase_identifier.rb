@@ -4,15 +4,9 @@ class PhraseIdentifier
   class Error < RuntimeError
   end
 
-  def self.seed!
-    words = File.readlines('words.txt', chomp: true)
-    Word.delete_all
-    words.each { |word| Word.create!(word:) }
-  end
-
   def self.generate
     10.times do
-      phrase = Word.order(Arel.sql('RANDOM()')).take(3).pluck(:word).join('-')
+      phrase = words.shuffle.take(3).join('-')
 
       # Uh-oh, no words found?
       raise PhraseIdentifier::Error, 'Unable to generate a random phrase identifier' if phrase.blank?
@@ -26,5 +20,9 @@ class PhraseIdentifier
 
   def self.unique?(phrase)
     phrase.present? && Project.where(identifier: phrase).none?
+  end
+
+  def self.words
+    @words ||= File.readlines('words.txt', chomp: true)
   end
 end

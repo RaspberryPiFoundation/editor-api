@@ -12,18 +12,17 @@ RSpec.describe PhraseIdentifier do
       let(:phrase_regex) { /^[abc]-[abc]-[abc]$/ }
 
       before do
-        Word.delete_all
-        words.each { |word| Word.new(word:).save! }
+        allow(described_class).to receive(:words).and_return(words)
       end
 
       it { is_expected.to match phrase_regex }
     end
 
     context 'when there are no available combinations' do
-      let(:identifier) { create(:word).word }
+      let(:identifier) { Faker::Verb.base }
 
       before do
-        Word.delete_all
+        allow(described_class).to receive(:words).and_return([identifier])
         create(:project, identifier:)
       end
 
@@ -31,7 +30,9 @@ RSpec.describe PhraseIdentifier do
     end
 
     context 'when no words are in the database' do
-      before { Word.delete_all }
+      before do
+        allow(described_class).to receive(:words).and_return([])
+      end
 
       it { expect { generate }.to raise_exception(PhraseIdentifier::Error) }
     end
