@@ -106,7 +106,8 @@ RSpec.describe Project do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      create(:project)
+      project = create(:project)
+      stub_user_info_api_for_project(project)
 
       user = described_class.all.users.first
       expect(user.name).to eq('School Student')

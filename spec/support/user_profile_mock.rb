@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# rubocop:disable Metrics/ModuleLength
 module UserProfileMock
   USERS = File.read('spec/fixtures/users.json')
   TOKEN = 'fake-user-access-token'
@@ -21,6 +22,16 @@ module UserProfileMock
     index = user_index_by_role('school-student')
     attrs = user_attributes_by_index(index)
     attrs[:id] = class_member.student_id
+
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
+      .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
+
+  def stub_user_info_api_for_project(project)
+    index = user_index_by_role('school-student')
+    attrs = user_attributes_by_index(index)
+    attrs[:id] = project.user_id
 
     stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
       .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
@@ -125,3 +136,4 @@ module UserProfileMock
       )
   end
 end
+# rubocop:enable Metrics/ModuleLength
