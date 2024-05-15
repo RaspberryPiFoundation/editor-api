@@ -95,10 +95,6 @@ RSpec.configure do |config|
     config.after  { Bullet.end_request }
   end
 
-  config.before do |example|
-    create_list(:word, 10) if example.metadata[:sample_words]
-  end
-
   config.before(:each, type: :system) do
     driven_by :rack_test
   end

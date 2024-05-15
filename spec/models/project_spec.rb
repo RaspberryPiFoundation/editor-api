@@ -7,7 +7,7 @@ RSpec.describe Project do
     stub_user_info_api
   end
 
-  describe 'associations', :sample_words do
+  describe 'associations' do
     it { is_expected.to belong_to(:school).optional(true) }
     it { is_expected.to belong_to(:lesson).optional(true) }
     it { is_expected.to belong_to(:parent).optional(true) }
@@ -95,7 +95,7 @@ RSpec.describe Project do
     end
   end
 
-  describe 'check_unique_not_null', :sample_words do
+  describe 'check_unique_not_null' do
     let(:saved_project) { create(:project) }
 
     it 'generates an identifier if nil' do
