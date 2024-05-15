@@ -122,7 +122,7 @@ RSpec.describe User do
 
     context 'when no organisations are returned' do
       before do
-        stub_hydra_public_api(user_index: 3) # student without organisations
+        authenticate_as_school_student_without_organisations
       end
 
       it 'returns a user with the correct organisations' do
