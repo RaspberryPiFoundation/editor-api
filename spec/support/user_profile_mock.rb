@@ -9,7 +9,6 @@ module UserProfileMock
     stub_user_info_api_for_unknown_users
     stub_user_info_api_for_owner
     stub_user_info_api_for_teacher
-    stub_user_info_api_for_student
   end
 
   def stub_user_info_api_for_unknown_users

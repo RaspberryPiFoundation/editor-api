@@ -68,6 +68,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'requires a teacher that has the school-teacher role for the school' do
+      stub_user_info_api_for_student
       school_class.teacher_id = '22222222-2222-2222-2222-222222222222' # school-student
       expect(school_class).to be_invalid
     end

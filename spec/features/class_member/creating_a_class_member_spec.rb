@@ -42,6 +42,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds with the student JSON' do
+    stub_user_info_api_for_student
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
