@@ -145,7 +145,8 @@ RSpec.describe Lesson do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      create(:lesson)
+      lesson = create(:lesson)
+      stub_user_info_api_for_lesson(lesson)
 
       user = described_class.all.users.first
       expect(user.name).to eq('School Teacher')

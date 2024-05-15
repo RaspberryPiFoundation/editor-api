@@ -124,7 +124,7 @@ RSpec.describe 'Creating a project', type: :request do
           components: [],
           school_id: school.id,
           lesson_id: lesson.id,
-          user_id: teacher_id
+          user_id: lesson.user_id
         }
       }
     end

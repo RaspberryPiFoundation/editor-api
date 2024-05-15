@@ -37,6 +37,16 @@ module UserProfileMock
       .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
 
+  def stub_user_info_api_for_lesson(lesson)
+    index = user_index_by_role('school-teacher')
+    attrs = user_attributes_by_index(index)
+    attrs[:id] = lesson.user_id
+
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
+      .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
+
   def authenticate_as_school_owner
     stub_hydra_public_api(user_index: 0)
   end
