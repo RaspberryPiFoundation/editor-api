@@ -7,7 +7,6 @@ module UserProfileMock
   # Stubs that API that returns user profile data for a given list of UUIDs.
   def stub_user_info_api
     stub_user_info_api_for_unknown_users
-    stub_user_info_api_for_owner
   end
 
   def stub_user_info_api_for_unknown_users

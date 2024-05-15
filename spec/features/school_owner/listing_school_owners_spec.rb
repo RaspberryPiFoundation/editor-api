@@ -27,6 +27,7 @@ RSpec.describe 'Listing school owners', type: :request do
   end
 
   it 'responds with the school owners JSON' do
+    stub_user_info_api_for_owner
     get("/api/schools/#{school.id}/owners", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 

@@ -31,6 +31,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds with the user JSON which is set from the current user' do
+    stub_user_info_api_for_owner
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
