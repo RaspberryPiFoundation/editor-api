@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Listing class members', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -36,6 +37,7 @@ RSpec.describe 'Listing class members', type: :request do
   end
 
   it "responds with nil attributes for students if the user profile doesn't exist" do
+    stub_user_info_api_for_unknown_users
     class_member.update!(student_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
@@ -44,7 +46,9 @@ RSpec.describe 'Listing class members', type: :request do
     expect(data.first[:student_name]).to be_nil
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it 'does not include class members that belong to a different class' do
+    stub_user_info_api_for_unknown_users
     different_class = create(:school_class, school:)
     create(:class_member, school_class: different_class, student_id: SecureRandom.uuid)
 
@@ -53,6 +57,7 @@ RSpec.describe 'Listing class members', type: :request do
 
     expect(data.size).to eq(1)
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 401 Unauthorized when no token is given' do
     get "/api/schools/#{school.id}/classes/#{school_class.id}/members"
@@ -68,6 +73,7 @@ RSpec.describe 'Listing class members', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+    stub_user_info_api_for_unknown_users
     authenticate_as_school_teacher
     school_class.update!(teacher_id: SecureRandom.uuid)
 

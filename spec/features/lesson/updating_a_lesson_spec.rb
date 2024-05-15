@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Updating a lesson', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -22,11 +22,13 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds 200 OK' do
+    stub_user_info_api_for_owner
     put("/api/lessons/#{lesson.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
   end
 
   it 'responds with the lesson JSON' do
+    stub_user_info_api_for_owner
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -84,6 +86,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
+      stub_user_info_api_for_unknown_users
       authenticate_as_school_teacher
       lesson.update!(user_id: SecureRandom.uuid)
 
@@ -108,7 +111,9 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
+    # rubocop:disable RSpec/ExampleLength
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
+      stub_user_info_api_for_unknown_users
       school = create(:school, id: SecureRandom.uuid)
       school_class = create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
@@ -117,8 +122,10 @@ RSpec.describe 'Updating a lesson', type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
+      stub_user_info_api_for_owner
       new_params = { lesson: params[:lesson].merge(user_id: owner_id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 

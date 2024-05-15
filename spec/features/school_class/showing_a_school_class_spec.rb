@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Showing a school class', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
@@ -25,6 +25,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is a student in the class' do
+    stub_user_info_api_for_student
     authenticate_as_school_student
     create(:class_member, school_class:)
 
@@ -48,6 +49,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do
+    stub_user_info_api_for_unknown_users
     school_class.update!(teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -80,6 +82,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+    stub_user_info_api_for_unknown_users
     authenticate_as_school_teacher
     school_class.update!(teacher_id: SecureRandom.uuid)
 

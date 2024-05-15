@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Lesson do
   before do
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   describe 'associations' do
@@ -83,6 +83,7 @@ RSpec.describe Lesson do
       end
 
       it 'requires that the user that is the school-teacher for the school_class' do
+        stub_user_info_api_for_owner
         lesson.user_id = '00000000-0000-0000-0000-000000000000' # school-owner
         expect(lesson).to be_invalid
       end
@@ -152,6 +153,7 @@ RSpec.describe Lesson do
     end
 
     it 'ignores members where no profile account exists' do
+      stub_user_info_api_for_unknown_users
       create(:lesson, user_id: SecureRandom.uuid)
 
       user = described_class.all.users.first
@@ -177,6 +179,7 @@ RSpec.describe Lesson do
     end
 
     it 'returns nil values for members where no profile account exists' do
+      stub_user_info_api_for_unknown_users
       lesson = create(:lesson, user_id: SecureRandom.uuid)
 
       pair = described_class.all.with_users.first
@@ -202,6 +205,7 @@ RSpec.describe Lesson do
     end
 
     it 'returns a nil value if the member has no profile account' do
+      stub_user_info_api_for_unknown_users
       lesson = create(:lesson, user_id: SecureRandom.uuid)
 
       pair = lesson.with_user

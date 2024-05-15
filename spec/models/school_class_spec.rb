@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass do
   before do
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
   end
 
   describe 'associations' do
@@ -89,6 +90,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'ignores members where no profile account exists' do
+      stub_user_info_api_for_unknown_users
       create(:school_class, teacher_id: SecureRandom.uuid)
 
       teacher = described_class.all.teachers.first
@@ -114,6 +116,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns nil values for members where no profile account exists' do
+      stub_user_info_api_for_unknown_users
       school_class = create(:school_class, teacher_id: SecureRandom.uuid)
 
       pair = described_class.all.with_teachers.first
@@ -139,6 +142,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns a nil value if the member has no profile account' do
+      stub_user_info_api_for_unknown_users
       school_class = create(:school_class, teacher_id: SecureRandom.uuid)
 
       pair = school_class.with_teacher

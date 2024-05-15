@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Creating a project', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
     mock_phrase_generation
   end
 
@@ -80,6 +80,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-student for the school' do
+      stub_user_info_api_for_student
       authenticate_as_school_student
 
       post('/api/projects', headers:, params:)
@@ -143,6 +144,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 422 Unprocessable when when the user_id is not the owner of the lesson' do
+      stub_user_info_api_for_unknown_users
       new_params = { project: params[:project].merge(user_id: SecureRandom.uuid) }
 
       post('/api/projects', headers:, params: new_params)
@@ -172,6 +174,7 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
       authenticate_as_school_teacher
+      stub_user_info_api_for_unknown_users
       lesson.update!(user_id: SecureRandom.uuid)
 
       post('/api/projects', headers:, params:)

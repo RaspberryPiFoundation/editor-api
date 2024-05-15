@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Updating a school class', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -49,7 +49,9 @@ RSpec.describe 'Updating a school class', type: :request do
     expect(data[:teacher_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do
+    stub_user_info_api_for_unknown_users
     teacher_id = SecureRandom.uuid
     new_params = { school_class: params[:school_class].merge(teacher_id:) }
 
@@ -58,6 +60,7 @@ RSpec.describe 'Updating a school class', type: :request do
 
     expect(data[:teacher_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 400 Bad Request when params are missing' do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -83,6 +86,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+    stub_user_info_api_for_unknown_users
     authenticate_as_school_teacher
     school_class.update!(teacher_id: SecureRandom.uuid)
 

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Creating a lesson', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -19,11 +19,13 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds 201 Created' do
+    stub_user_info_api_for_owner
     post('/api/lessons', headers:, params:)
     expect(response).to have_http_status(:created)
   end
 
   it 'responds with the lesson JSON' do
+    stub_user_info_api_for_owner
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -162,6 +164,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the current user is a school-teacher for a different class' do
+      stub_user_info_api_for_unknown_users
       authenticate_as_school_teacher
       school_class.update!(teacher_id: SecureRandom.uuid)
 
@@ -170,6 +173,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 422 Unprocessable Entity when the user_id is a school-teacher for a different class' do
+      stub_user_info_api_for_unknown_users
       new_params = { lesson: params[:lesson].merge(user_id: SecureRandom.uuid) }
 
       post('/api/lessons', headers:, params: new_params)

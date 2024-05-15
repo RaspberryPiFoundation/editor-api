@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Showing a lesson', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
@@ -37,6 +37,7 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   it "responds with nil attributes for the user if their user profile doesn't exist" do
+    stub_user_info_api_for_unknown_users
     lesson.update!(user_id: SecureRandom.uuid)
 
     get("/api/lessons/#{lesson.id}", headers:)
@@ -56,6 +57,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner_id) { user_id_by_index(owner_index) }
 
     it 'responds 200 OK when the user owns the lesson' do
+      stub_user_info_api_for_owner
       lesson.update!(user_id: owner_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -75,6 +77,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner_id) { user_id_by_index(owner_index) }
 
     it 'responds 200 OK when the user owns the lesson' do
+      stub_user_info_api_for_owner
       lesson.update!(user_id: owner_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -118,6 +121,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       authenticate_as_school_student
+      stub_user_info_api_for_student
       create(:class_member, school_class:)
 
       get("/api/lessons/#{lesson.id}", headers:)

@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Deleting a class member', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -41,6 +42,7 @@ RSpec.describe 'Deleting a class member', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+    stub_user_info_api_for_unknown_users
     authenticate_as_school_teacher
     school_class.update!(teacher_id: SecureRandom.uuid)
 

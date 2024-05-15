@@ -114,6 +114,7 @@ RSpec.describe Project do
     end
 
     it 'ignores members where no profile account exists' do
+      stub_user_info_api_for_unknown_users
       create(:project, user_id: SecureRandom.uuid)
 
       user = described_class.all.users.first
@@ -130,6 +131,7 @@ RSpec.describe Project do
 
   describe '.with_users' do
     it 'returns an array of class members paired with their User instance' do
+      stub_user_info_api_for_student
       project = create(:project)
 
       pair = described_class.all.with_users.first
@@ -139,6 +141,7 @@ RSpec.describe Project do
     end
 
     it 'returns nil values for members where no profile account exists' do
+      stub_user_info_api_for_unknown_users
       project = create(:project, user_id: SecureRandom.uuid)
 
       pair = described_class.all.with_users.first
@@ -155,6 +158,7 @@ RSpec.describe Project do
 
   describe '#with_user' do
     it 'returns the class member paired with their User instance' do
+      stub_user_info_api_for_student
       project = create(:project)
 
       pair = project.with_user
@@ -164,6 +168,7 @@ RSpec.describe Project do
     end
 
     it 'returns a nil value if the member has no profile account' do
+      stub_user_info_api_for_unknown_users
       project = create(:project, user_id: SecureRandom.uuid)
 
       pair = project.with_user

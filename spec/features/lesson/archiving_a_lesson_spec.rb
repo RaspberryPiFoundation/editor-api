@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Archiving a lesson', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -66,6 +66,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
+      stub_user_info_api_for_unknown_users
       authenticate_as_school_teacher
       lesson.update!(user_id: SecureRandom.uuid)
 
