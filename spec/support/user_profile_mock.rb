@@ -60,7 +60,7 @@ module UserProfileMock
   private
 
   # Stubs the API that returns user profile data for the logged in user.
-  def stub_hydra_public_api(user_index: 0)
+  def stub_hydra_public_api(user_index:)
     stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo")
       .with(headers: { Authorization: "Bearer #{TOKEN}" })
       .to_return(
