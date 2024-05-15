@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school student', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     stub_profile_api_create_school_student
   end
 
@@ -27,7 +27,7 @@ RSpec.describe 'Creating a school student', type: :request do
   end
 
   it 'responds 204 No Content when the user is a school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     post("/api/schools/#{school.id}/students", headers:, params:)
     expect(response).to have_http_status(:no_content)
@@ -56,7 +56,7 @@ RSpec.describe 'Creating a school student', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
 
     post("/api/schools/#{school.id}/students", headers:, params:)
     expect(response).to have_http_status(:forbidden)

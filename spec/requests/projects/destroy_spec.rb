@@ -8,7 +8,7 @@ RSpec.describe 'Project delete requests' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     context 'when deleting a project the user owns' do

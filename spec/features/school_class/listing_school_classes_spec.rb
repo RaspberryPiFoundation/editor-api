@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school classes', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     stub_user_info_api
 
     create(:class_member, school_class:)
@@ -43,7 +43,7 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   it "does not include school classes that the school-teacher doesn't teach" do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
     create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes", headers:)
@@ -53,7 +53,7 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   it "does not include school classes that the school-student isn't a member of" do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
     create(:school_class, school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes", headers:)

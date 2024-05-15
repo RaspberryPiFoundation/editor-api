@@ -6,7 +6,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
   end
 
   let(:mutation) { 'mutation UpdateProject($project: UpdateProjectInput!) { updateProject(input: $project) { project { id } } }' }
@@ -30,7 +30,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     before do
       # Instantiate project
       project
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     context 'when unauthenticated' do
@@ -72,7 +72,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
 
       context 'with another users project' do
         before do
-          stub_hydra_public_api(user_index: 1)
+          authenticate_as_school_teacher
         end
 
         it 'returns an error' do

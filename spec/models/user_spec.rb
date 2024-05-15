@@ -96,10 +96,8 @@ RSpec.describe User do
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
-    let(:user_index) { 0 }
-
     before do
-      stub_hydra_public_api(user_index:)
+      authenticate_as_school_owner
     end
 
     it 'returns an instance of the described class' do
@@ -123,7 +121,9 @@ RSpec.describe User do
     end
 
     context 'when no organisations are returned' do
-      let(:user_index) { 3 } # student without organisations
+      before do
+        authenticate_as_school_student_without_organisations
+      end
 
       it 'returns a user with the correct organisations' do
         expect(user.organisations).to eq(organisation_id => 'school-student')

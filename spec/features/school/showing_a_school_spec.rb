@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Showing a school', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
   end
 
   let!(:school) { create(:school, name: 'Test School') }

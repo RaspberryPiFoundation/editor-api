@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school teachers', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     stub_profile_api_list_school_teachers(user_id: teacher_id)
     stub_user_info_api
   end
@@ -20,7 +20,7 @@ RSpec.describe 'Listing school teachers', type: :request do
   end
 
   it 'responds 200 OK when the user is a school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     get("/api/schools/#{school.id}/teachers", headers:)
     expect(response).to have_http_status(:ok)
@@ -46,7 +46,7 @@ RSpec.describe 'Listing school teachers', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
 
     get("/api/schools/#{school.id}/teachers", headers:)
     expect(response).to have_http_status(:forbidden)

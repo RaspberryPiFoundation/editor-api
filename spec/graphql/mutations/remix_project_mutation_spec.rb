@@ -22,7 +22,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   let(:remix_origin) { 'editor.com' }
 
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     project
   end
 
@@ -54,7 +54,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   context 'when user cannot view original project' do
     before do
-      stub_hydra_public_api(user_index: 1)
+      authenticate_as_school_teacher
     end
 
     it 'returns "not permitted to read" error' do

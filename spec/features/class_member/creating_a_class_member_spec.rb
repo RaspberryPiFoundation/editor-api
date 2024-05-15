@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a class member', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     stub_user_info_api
   end
 
@@ -28,7 +28,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:created)
@@ -82,7 +82,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
     school_class.update!(teacher_id: SecureRandom.uuid)
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
@@ -90,7 +90,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:forbidden)

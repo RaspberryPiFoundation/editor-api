@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Removing a school teacher', type: :request do
   before do
-    stub_hydra_public_api
+    authenticate_as_school_owner
     stub_profile_api_remove_school_teacher
   end
 
@@ -31,14 +31,14 @@ RSpec.describe 'Removing a school teacher', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-teacher' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-teacher'))
+    authenticate_as_school_teacher
 
     delete("/api/schools/#{school.id}/teachers/#{teacher_id}", headers:)
     expect(response).to have_http_status(:forbidden)
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    stub_hydra_public_api(user_index: user_index_by_role('school-student'))
+    authenticate_as_school_student
 
     delete("/api/schools/#{school.id}/teachers/#{teacher_id}", headers:)
     expect(response).to have_http_status(:forbidden)

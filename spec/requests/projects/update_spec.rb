@@ -26,7 +26,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     it 'returns success response' do
@@ -81,7 +81,7 @@ RSpec.describe 'Project update requests' do
     let(:params) { { project: { components: [] } } }
 
     before do
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     it 'returns forbidden response' do
@@ -94,7 +94,7 @@ RSpec.describe 'Project update requests' do
     let(:project) { create(:project) }
 
     before do
-      stub_hydra_public_api(user_index: nil)
+      unauthenticated_user
     end
 
     it 'returns unauthorized' do

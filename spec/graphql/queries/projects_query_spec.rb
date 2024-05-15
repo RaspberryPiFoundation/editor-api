@@ -49,7 +49,7 @@ RSpec.describe 'projects { }' do
     let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     it { expect(query).to be_a_valid_graphql_query }
@@ -87,7 +87,7 @@ RSpec.describe 'projects { }' do
     let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
-      stub_hydra_public_api
+      authenticate_as_school_owner
     end
 
     it { expect(query).to be_a_valid_graphql_query }
