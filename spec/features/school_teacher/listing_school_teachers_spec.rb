@@ -27,6 +27,7 @@ RSpec.describe 'Listing school teachers', type: :request do
   end
 
   it 'responds with the school teachers JSON' do
+    stub_user_info_api_for_teacher
     get("/api/schools/#{school.id}/teachers", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 

@@ -81,6 +81,7 @@ RSpec.describe SchoolClass do
 
   describe '.teachers' do
     it 'returns User instances for the current scope' do
+      stub_user_info_api_for_teacher
       create(:school_class)
 
       teacher = described_class.all.teachers.first

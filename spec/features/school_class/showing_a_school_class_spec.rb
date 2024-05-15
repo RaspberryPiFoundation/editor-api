@@ -40,6 +40,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds with the teacher JSON' do
+    stub_user_info_api_for_teacher
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
