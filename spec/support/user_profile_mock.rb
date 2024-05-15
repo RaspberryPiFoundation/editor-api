@@ -33,6 +33,10 @@ module UserProfileMock
     stub_hydra_public_api(user_index: 3)
   end
 
+  def unauthenticated_user
+    stub_hydra_public_api(user_index: nil)
+  end
+
   # Stubs the API that returns user profile data for the logged in user.
   def stub_hydra_public_api(user_index: 0, token: TOKEN)
     stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo")
