@@ -18,6 +18,38 @@ module UserProfileMock
       end
   end
 
+  def stub_user_info_api_for_student(student_id, organisation_id)
+    index = user_index_by_role('school-student')
+    attrs = user_attributes_by_index(index)
+    attrs[:id] = student_id
+    attrs[:organisations] = { organisation_id => 'school-student' }
+
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{student_id}/)
+      .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
+
+  def stub_user_info_api_for_teacher(teacher_id, organisation_id)
+    index = user_index_by_role('school-teacher')
+    attrs = user_attributes_by_index(index)
+    attrs[:id] = teacher_id
+    attrs[:organisations] = { organisation_id => 'school-teacher' }
+
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
+      .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
+
+  def stub_user_info_api_for_owner(organisation_id)
+    index = user_index_by_role('school-owner')
+    attrs = user_attributes_by_index(index)
+    attrs[:organisations] = { organisation_id => 'school-owner' }
+
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
+      .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
+
   def stub_user_info_api_for_class_member(class_member)
     index = user_index_by_role('school-student')
     attrs = user_attributes_by_index(index)
@@ -58,12 +90,16 @@ module UserProfileMock
       .to_return({ body: { users: [attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
 
-  def authenticate_as_school_owner
-    stub_hydra_public_api(user_index: 0)
+  def authenticate_as_school_owner(school: nil)
+    if school
+      stub_hydra_public_api_for_school(school)
+    else
+      stub_hydra_public_api(user_index: 0)
+    end
   end
 
-  def authenticate_as_school_teacher(teacher_id: nil)
-    stub_hydra_public_api(user_index: 1, user_id: teacher_id)
+  def authenticate_as_school_teacher(teacher_id: nil, school_id: nil)
+    stub_hydra_public_api(user_index: 1, user_id: teacher_id, school_id:)
   end
 
   def authenticate_as_school_student(member = nil)
@@ -98,6 +134,21 @@ module UserProfileMock
       )
   end
 
+  def stub_hydra_public_api_for_school(school, token: TOKEN)
+    index = user_index_by_role('school-owner')
+    attrs = user_attributes_by_index(index)
+    attrs[:organisations] = { school.id => 'school-owner' }
+    body = attrs.to_json
+
+    stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo")
+      .with(headers: { Authorization: "Bearer #{token}" })
+      .to_return(
+        status: 200,
+        headers: { content_type: 'application/json' },
+        body:
+      )
+  end
+
   def stubbed_user
     User.from_token(token: TOKEN)
   end
@@ -121,9 +172,10 @@ module UserProfileMock
   private
 
   # Stubs the API that returns user profile data for the logged in user.
-  def stub_hydra_public_api(user_index:, user_id: nil)
+  def stub_hydra_public_api(user_index:, user_id: nil, school_id: nil)
     attrs = user_attributes_by_index(user_index)
     attrs[:id] = user_id if user_id
+    attrs[:organisations] = { school_id => attrs['roles'] } if school_id
 
     body = attrs.to_json
 

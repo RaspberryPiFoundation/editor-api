@@ -4,8 +4,10 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a class member', type: :request do
   before do
-    authenticate_as_school_owner
     stub_user_info_api
+    stub_user_info_api_for_owner(school.id)
+    stub_user_info_api_for_student(student_id, school.id)
+    authenticate_as_school_owner(school:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -28,7 +30,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    authenticate_as_school_teacher(teacher_id: school_class.teacher_id)
+    authenticate_as_school_teacher(teacher_id: school_class.teacher_id, school_id: school.id)
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:created)
@@ -81,12 +83,18 @@ RSpec.describe 'Creating a class member', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
-  it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    authenticate_as_school_teacher
-    school_class.update!(teacher_id: SecureRandom.uuid)
+  context 'when the user is not the school-teacher for the class' do
+    before do
+      authenticate_as_school_teacher
+      other_teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_teacher(other_teacher_id, school.id)
+      school_class.update!(teacher_id: other_teacher_id)
+    end
 
-    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
-    expect(response).to have_http_status(:forbidden)
+    it 'responds 403 Forbidden' do
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
