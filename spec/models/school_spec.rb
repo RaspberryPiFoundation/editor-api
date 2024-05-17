@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe School do
   before do
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
   end
 
   describe 'associations' do

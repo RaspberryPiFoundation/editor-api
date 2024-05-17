@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Listing lessons', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -29,20 +29,25 @@ RSpec.describe 'Listing lessons', type: :request do
   end
 
   it 'responds with the user JSON' do
+    stub_user_info_api_for_teacher
     get('/api/lessons', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:user_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the user if their user profile doesn't exist" do
-    lesson.update!(user_id: SecureRandom.uuid)
+    user_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id:)
+    lesson.update!(user_id:)
 
     get('/api/lessons', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:user_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'does not include archived lessons' do
     lesson.archive!
@@ -68,6 +73,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner_id) { user_id_by_index(owner_index) }
 
     it 'includes the lesson when the user owns the lesson' do
+      stub_user_info_api_for_owner
       lesson.update!(user_id: owner_id)
 
       get('/api/lessons', headers:)
@@ -91,6 +97,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner_id) { user_id_by_index(owner_index) }
 
     it 'includes the lesson when the user owns the lesson' do
+      stub_user_info_api_for_owner
       lesson.update!(user_id: owner_id)
 
       get('/api/lessons', headers:)
@@ -142,7 +149,9 @@ RSpec.describe 'Listing lessons', type: :request do
       expect(data.size).to eq(1)
     end
 
+    # rubocop:disable RSpec/ExampleLength
     it "includes the lesson when the user is a school-student within the lesson's class" do
+      stub_user_info_api_for_student
       authenticate_as_school_student
       create(:class_member, school_class:)
 
@@ -151,6 +160,7 @@ RSpec.describe 'Listing lessons', type: :request do
 
       expect(data.size).to eq(1)
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
       authenticate_as_school_student

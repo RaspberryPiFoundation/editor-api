@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
 
     create(:class_member, school_class:)
   end
@@ -27,40 +28,53 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   it 'responds with the teachers JSON' do
+    stub_user_info_api_for_teacher
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:teacher_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for teachers if the user profile doesn't exist" do
-    school_class.update!(teacher_id: SecureRandom.uuid)
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
+    school_class.update!(teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:teacher_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
+  # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-teacher doesn't teach" do
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     authenticate_as_school_teacher
-    create(:school_class, school:, teacher_id: SecureRandom.uuid)
+    create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.size).to eq(1)
   end
+  # rubocop:enable RSpec/ExampleLength
 
+  # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-student isn't a member of" do
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     authenticate_as_school_student
-    create(:school_class, school:, teacher_id: SecureRandom.uuid)
+    create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.size).to eq(1)
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 401 Unauthorized when no token is given' do
     get "/api/schools/#{school.id}/classes"

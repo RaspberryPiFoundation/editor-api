@@ -3,10 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Project do
-  before do
-    stub_user_info_api
-  end
-
   describe 'associations' do
     it { is_expected.to belong_to(:school).optional(true) }
     it { is_expected.to belong_to(:lesson).optional(true) }
@@ -106,6 +102,7 @@ RSpec.describe Project do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
+      stub_user_info_api_for_student
       create(:project)
 
       user = described_class.all.users.first
@@ -113,7 +110,9 @@ RSpec.describe Project do
     end
 
     it 'ignores members where no profile account exists' do
-      create(:project, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      create(:project, user_id:)
 
       user = described_class.all.users.first
       expect(user).to be_nil
@@ -129,6 +128,7 @@ RSpec.describe Project do
 
   describe '.with_users' do
     it 'returns an array of class members paired with their User instance' do
+      stub_user_info_api_for_student
       project = create(:project)
 
       pair = described_class.all.with_users.first
@@ -138,7 +138,9 @@ RSpec.describe Project do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      project = create(:project, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      project = create(:project, user_id:)
 
       pair = described_class.all.with_users.first
       expect(pair).to eq([project, nil])
@@ -154,6 +156,7 @@ RSpec.describe Project do
 
   describe '#with_user' do
     it 'returns the class member paired with their User instance' do
+      stub_user_info_api_for_student
       project = create(:project)
 
       pair = project.with_user
@@ -163,7 +166,9 @@ RSpec.describe Project do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      project = create(:project, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      project = create(:project, user_id:)
 
       pair = project.with_user
       expect(pair).to eq([project, nil])

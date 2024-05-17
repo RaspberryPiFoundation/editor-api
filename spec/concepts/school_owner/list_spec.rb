@@ -10,7 +10,7 @@ RSpec.describe SchoolOwner::List, type: :unit do
 
   before do
     stub_profile_api_list_school_owners(user_id: owner_id)
-    stub_user_info_api
+    stub_user_info_api_for_owner
   end
 
   it 'returns a successful operation response' do
@@ -26,6 +26,7 @@ RSpec.describe SchoolOwner::List, type: :unit do
   end
 
   it 'returns the school owners in the operation response' do
+    stub_user_info_api_for_owner
     response = described_class.call(school:, token:)
     expect(response[:school_owners].first).to be_a(User)
   end

@@ -3,10 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Lesson::Archive, type: :unit do
-  before do
-    stub_user_info_api
-  end
-
   let(:lesson) { create(:lesson) }
 
   it 'returns a successful operation response' do

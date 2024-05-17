@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass do
   before do
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
   end
 
   describe 'associations' do
@@ -68,6 +69,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'requires a teacher that has the school-teacher role for the school' do
+      stub_user_info_api_for_student
       school_class.teacher_id = '22222222-2222-2222-2222-222222222222' # school-student
       expect(school_class).to be_invalid
     end
@@ -80,6 +82,7 @@ RSpec.describe SchoolClass do
 
   describe '.teachers' do
     it 'returns User instances for the current scope' do
+      stub_user_info_api_for_teacher
       create(:school_class)
 
       teacher = described_class.all.teachers.first
@@ -87,7 +90,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'ignores members where no profile account exists' do
-      create(:school_class, teacher_id: SecureRandom.uuid)
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
+      create(:school_class, teacher_id:)
 
       teacher = described_class.all.teachers.first
       expect(teacher).to be_nil
@@ -112,7 +117,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      school_class = create(:school_class, teacher_id: SecureRandom.uuid)
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
+      school_class = create(:school_class, teacher_id:)
 
       pair = described_class.all.with_teachers.first
       expect(pair).to eq([school_class, nil])
@@ -137,7 +144,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      school_class = create(:school_class, teacher_id: SecureRandom.uuid)
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
+      school_class = create(:school_class, teacher_id:)
 
       pair = school_class.with_teacher
       expect(pair).to eq([school_class, nil])

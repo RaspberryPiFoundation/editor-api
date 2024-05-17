@@ -10,7 +10,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
 
   before do
     stub_profile_api_list_school_students(user_id: student_id)
-    stub_user_info_api
+    stub_user_info_api_for_student
   end
 
   it 'returns a successful operation response' do
@@ -26,6 +26,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
   end
 
   it 'returns the school students in the operation response' do
+    stub_user_info_api_for_student
     response = described_class.call(school:, token:)
     expect(response[:school_students].first).to be_a(User)
   end

@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Creating a copy of a lesson', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_owner
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -25,6 +26,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   end
 
   it 'responds with the user JSON which is set from the current user' do
+    stub_user_info_api_for_owner
     post("/api/lessons/#{lesson.id}/copy", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Showing a lesson', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
@@ -29,20 +29,25 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
+    stub_user_info_api_for_teacher
     get("/api/lessons/#{lesson.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:user_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the user if their user profile doesn't exist" do
-    lesson.update!(user_id: SecureRandom.uuid)
+    user_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id:)
+    lesson.update!(user_id:)
 
     get("/api/lessons/#{lesson.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:user_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 404 Not Found when no lesson exists' do
     get('/api/lessons/not-a-real-id', headers:)
@@ -55,6 +60,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner_id) { user_id_by_index(owner_index) }
 
     it 'responds 200 OK when the user owns the lesson' do
+      stub_user_info_api_for_owner
       lesson.update!(user_id: owner_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -74,6 +80,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner_id) { user_id_by_index(owner_index) }
 
     it 'responds 200 OK when the user owns the lesson' do
+      stub_user_info_api_for_owner
       lesson.update!(user_id: owner_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -117,6 +124,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       authenticate_as_school_student
+      stub_user_info_api_for_student
       create(:class_member, school_class:)
 
       get("/api/lessons/#{lesson.id}", headers:)

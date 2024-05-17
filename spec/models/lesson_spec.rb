@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Lesson do
   before do
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   describe 'associations' do
@@ -71,6 +71,7 @@ RSpec.describe Lesson do
       end
 
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
+        stub_user_info_api_for_student
         lesson.user_id = '22222222-2222-2222-2222-222222222222' # school-student
         expect(lesson).to be_invalid
       end
@@ -82,6 +83,7 @@ RSpec.describe Lesson do
       end
 
       it 'requires that the user that is the school-teacher for the school_class' do
+        stub_user_info_api_for_owner
         lesson.user_id = '00000000-0000-0000-0000-000000000000' # school-owner
         expect(lesson).to be_invalid
       end
@@ -143,6 +145,7 @@ RSpec.describe Lesson do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
+      stub_user_info_api_for_teacher
       create(:lesson)
 
       user = described_class.all.users.first
@@ -150,7 +153,9 @@ RSpec.describe Lesson do
     end
 
     it 'ignores members where no profile account exists' do
-      create(:lesson, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      create(:lesson, user_id:)
 
       user = described_class.all.users.first
       expect(user).to be_nil
@@ -175,7 +180,9 @@ RSpec.describe Lesson do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      lesson = create(:lesson, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      lesson = create(:lesson, user_id:)
 
       pair = described_class.all.with_users.first
       expect(pair).to eq([lesson, nil])
@@ -200,7 +207,9 @@ RSpec.describe Lesson do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      lesson = create(:lesson, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      lesson = create(:lesson, user_id:)
 
       pair = lesson.with_user
       expect(pair).to eq([lesson, nil])

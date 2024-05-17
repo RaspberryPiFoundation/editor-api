@@ -57,7 +57,7 @@ RSpec.describe User do
     let(:user) { users.first }
 
     before do
-      stub_user_info_api
+      stub_user_info_api_for_owner
     end
 
     it 'returns an Array' do
@@ -88,6 +88,8 @@ RSpec.describe User do
       let(:ids) { ['33333333-3333-3333-3333-333333333333'] } # student without organisations
 
       it 'returns a user with the correct organisations' do
+        stub_user_info_api_for_student_without_organisations
+
         expect(user.organisations).to eq(organisation_id => 'school-student')
       end
     end
@@ -266,7 +268,7 @@ RSpec.describe User do
     subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
 
     before do
-      stub_user_info_api
+      stub_user_info_api_for_owner
     end
 
     it 'returns an instance of the described class' do

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Updating a school class', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
+    stub_user_info_api_for_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -42,14 +42,17 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds with the teacher JSON' do
+    stub_user_info_api_for_teacher
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:teacher_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do
     teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     new_params = { school_class: params[:school_class].merge(teacher_id:) }
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params: new_params)
@@ -57,6 +60,7 @@ RSpec.describe 'Updating a school class', type: :request do
 
     expect(data[:teacher_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 400 Bad Request when params are missing' do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -81,13 +85,17 @@ RSpec.describe 'Updating a school class', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     authenticate_as_school_teacher
-    school_class.update!(teacher_id: SecureRandom.uuid)
+    school_class.update!(teacher_id:)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is a school-student' do
     authenticate_as_school_student

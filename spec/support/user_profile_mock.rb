@@ -4,17 +4,29 @@ module UserProfileMock
   USERS = File.read('spec/fixtures/users.json')
   TOKEN = 'fake-user-access-token'
 
-  # Stubs that API that returns user profile data for a given list of UUIDs.
-  def stub_user_info_api
-    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
-      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
-      .to_return do |request|
-        uuids = JSON.parse(request.body).fetch('userIds', [])
-        indexes = uuids.map { |uuid| user_index_by_uuid(uuid) }.compact
-        users = indexes.map { |user_index| user_attributes_by_index(user_index) }
+  def stub_user_info_api_for_unknown_users(user_id:)
+    stub_user_info_api(user_id:, users: [])
+  end
 
-        { body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } }
-      end
+  def stub_user_info_api_for_owner
+    stub_user_info_api_for(user_index: 0)
+  end
+
+  def stub_user_info_api_for_teacher
+    stub_user_info_api_for(user_index: 1)
+  end
+
+  def stub_user_info_api_for_student
+    stub_user_info_api_for(user_index: 2)
+  end
+
+  def stub_user_info_api_for_student_without_organisations
+    stub_user_info_api_for(user_index: 3)
+  end
+
+  def stub_user_info_api_for(user_index:)
+    user_attrs = user_attributes_by_index(user_index)
+    stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 
   def authenticate_as_school_owner
@@ -68,5 +80,11 @@ module UserProfileMock
         headers: { content_type: 'application/json' },
         body: user_attributes_by_index(user_index).to_json
       )
+  end
+
+  def stub_user_info_api(user_id:, users:)
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
+      .to_return({ body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
 end

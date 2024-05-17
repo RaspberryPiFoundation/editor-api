@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe ClassMember do
   before do
-    stub_user_info_api
+    stub_user_info_api_for_teacher
+    stub_user_info_api_for_student
   end
 
   describe 'associations' do
@@ -46,6 +47,7 @@ RSpec.describe ClassMember do
     end
 
     it 'requires a student that has the school-student role for the school' do
+      stub_user_info_api_for_teacher
       class_member.student_id = '11111111-1111-1111-1111-111111111111' # school-teacher
       expect(class_member).to be_invalid
     end
@@ -59,6 +61,7 @@ RSpec.describe ClassMember do
 
   describe '.students' do
     it 'returns User instances for the current scope' do
+      stub_user_info_api_for_student
       create(:class_member)
 
       student = described_class.all.students.first
@@ -66,7 +69,9 @@ RSpec.describe ClassMember do
     end
 
     it 'ignores members where no profile account exists' do
-      create(:class_member, student_id: SecureRandom.uuid)
+      student_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: student_id)
+      create(:class_member, student_id:)
 
       student = described_class.all.students.first
       expect(student).to be_nil
@@ -91,7 +96,9 @@ RSpec.describe ClassMember do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      class_member = create(:class_member, student_id: SecureRandom.uuid)
+      student_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: student_id)
+      class_member = create(:class_member, student_id:)
 
       pair = described_class.all.with_students.first
       expect(pair).to eq([class_member, nil])
@@ -116,7 +123,9 @@ RSpec.describe ClassMember do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      class_member = create(:class_member, student_id: SecureRandom.uuid)
+      student_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: student_id)
+      class_member = create(:class_member, student_id:)
 
       pair = class_member.with_student
       expect(pair).to eq([class_member, nil])
