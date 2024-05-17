@@ -36,15 +36,18 @@ RSpec.describe 'Showing a lesson', type: :request do
     expect(data[:user_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the user if their user profile doesn't exist" do
-    stub_user_info_api_for_unknown_users
-    lesson.update!(user_id: SecureRandom.uuid)
+    user_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id:)
+    lesson.update!(user_id:)
 
     get("/api/lessons/#{lesson.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:user_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 404 Not Found when no lesson exists' do
     get('/api/lessons/not-a-real-id', headers:)

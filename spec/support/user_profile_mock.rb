@@ -4,9 +4,9 @@ module UserProfileMock
   USERS = File.read('spec/fixtures/users.json')
   TOKEN = 'fake-user-access-token'
 
-  def stub_user_info_api_for_unknown_users
+  def stub_user_info_api_for_unknown_users(user_id:)
     stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
-      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
       .to_return({ body: { users: [] }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
 

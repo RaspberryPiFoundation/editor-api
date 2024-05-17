@@ -85,14 +85,17 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
+    # rubocop:disable RSpec/ExampleLength
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
-      stub_user_info_api_for_unknown_users
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
       authenticate_as_school_teacher
-      lesson.update!(user_id: SecureRandom.uuid)
+      lesson.update!(user_id:)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)
       expect(response).to have_http_status(:forbidden)
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it 'responds 403 Forbidden when the user is a school-student' do
       authenticate_as_school_student
@@ -113,9 +116,10 @@ RSpec.describe 'Updating a lesson', type: :request do
 
     # rubocop:disable RSpec/ExampleLength
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
-      stub_user_info_api_for_unknown_users
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
       school = create(:school, id: SecureRandom.uuid)
-      school_class = create(:school_class, school:, teacher_id: SecureRandom.uuid)
+      school_class = create(:school_class, school:, teacher_id:)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)

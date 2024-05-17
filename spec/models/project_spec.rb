@@ -110,8 +110,9 @@ RSpec.describe Project do
     end
 
     it 'ignores members where no profile account exists' do
-      stub_user_info_api_for_unknown_users
-      create(:project, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      create(:project, user_id:)
 
       user = described_class.all.users.first
       expect(user).to be_nil
@@ -137,8 +138,9 @@ RSpec.describe Project do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      stub_user_info_api_for_unknown_users
-      project = create(:project, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      project = create(:project, user_id:)
 
       pair = described_class.all.with_users.first
       expect(pair).to eq([project, nil])
@@ -164,8 +166,9 @@ RSpec.describe Project do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      stub_user_info_api_for_unknown_users
-      project = create(:project, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      project = create(:project, user_id:)
 
       pair = project.with_user
       expect(pair).to eq([project, nil])

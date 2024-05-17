@@ -144,8 +144,9 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 422 Unprocessable when when the user_id is not the owner of the lesson' do
-      stub_user_info_api_for_unknown_users
-      new_params = { project: params[:project].merge(user_id: SecureRandom.uuid) }
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      new_params = { project: params[:project].merge(user_id:) }
 
       post('/api/projects', headers:, params: new_params)
       expect(response).to have_http_status(:unprocessable_entity)
@@ -172,14 +173,17 @@ RSpec.describe 'Creating a project', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
+    # rubocop:disable RSpec/ExampleLength
     it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
+      user_id = SecureRandom.uuid
       authenticate_as_school_teacher
-      stub_user_info_api_for_unknown_users
-      lesson.update!(user_id: SecureRandom.uuid)
+      stub_user_info_api_for_unknown_users(user_id:)
+      lesson.update!(user_id:)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it 'responds 403 Forbidden when the user is a school-student' do
       authenticate_as_school_student

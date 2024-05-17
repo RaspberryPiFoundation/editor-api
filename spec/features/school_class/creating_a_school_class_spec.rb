@@ -51,8 +51,8 @@ RSpec.describe 'Creating a school class', type: :request do
 
   # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do
-    stub_user_info_api_for_unknown_users
     teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     new_params = { school_class: params[:school_class].merge(teacher_id:) }
 
     post("/api/schools/#{school.id}/classes", headers:, params: new_params)

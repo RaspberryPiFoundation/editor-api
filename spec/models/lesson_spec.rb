@@ -153,8 +153,9 @@ RSpec.describe Lesson do
     end
 
     it 'ignores members where no profile account exists' do
-      stub_user_info_api_for_unknown_users
-      create(:lesson, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      create(:lesson, user_id:)
 
       user = described_class.all.users.first
       expect(user).to be_nil
@@ -179,8 +180,9 @@ RSpec.describe Lesson do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      stub_user_info_api_for_unknown_users
-      lesson = create(:lesson, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      lesson = create(:lesson, user_id:)
 
       pair = described_class.all.with_users.first
       expect(pair).to eq([lesson, nil])
@@ -205,8 +207,9 @@ RSpec.describe Lesson do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      stub_user_info_api_for_unknown_users
-      lesson = create(:lesson, user_id: SecureRandom.uuid)
+      user_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id:)
+      lesson = create(:lesson, user_id:)
 
       pair = lesson.with_user
       expect(pair).to eq([lesson, nil])

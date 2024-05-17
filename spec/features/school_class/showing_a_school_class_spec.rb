@@ -48,15 +48,18 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(data[:teacher_name]).to eq('School Teacher')
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do
-    stub_user_info_api_for_unknown_users
-    school_class.update!(teacher_id: SecureRandom.uuid)
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
+    school_class.update!(teacher_id:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:teacher_name]).to be_nil
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 404 Not Found when no school exists' do
     get("/api/schools/not-a-real-id/classes/#{school_class.id}", headers:)
@@ -81,14 +84,17 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    stub_user_info_api_for_unknown_users
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     authenticate_as_school_teacher
-    school_class.update!(teacher_id: SecureRandom.uuid)
+    school_class.update!(teacher_id:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is not a school-student for the class' do
     authenticate_as_school_student

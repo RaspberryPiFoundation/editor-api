@@ -52,8 +52,8 @@ RSpec.describe 'Creating a class member', type: :request do
 
   # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the student if their user profile doesn't exist" do
-    stub_user_info_api_for_unknown_users
     student_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: student_id)
     new_params = { class_member: params[:class_member].merge(student_id:) }
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: new_params)
@@ -86,13 +86,16 @@ RSpec.describe 'Creating a class member', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    stub_user_info_api_for_unknown_users
+    teacher_id = SecureRandom.uuid
+    stub_user_info_api_for_unknown_users(user_id: teacher_id)
     authenticate_as_school_teacher
-    school_class.update!(teacher_id: SecureRandom.uuid)
+    school_class.update!(teacher_id:)
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:forbidden)
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is a school-student' do
     authenticate_as_school_student

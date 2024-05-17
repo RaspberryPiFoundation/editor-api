@@ -90,8 +90,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'ignores members where no profile account exists' do
-      stub_user_info_api_for_unknown_users
-      create(:school_class, teacher_id: SecureRandom.uuid)
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
+      create(:school_class, teacher_id:)
 
       teacher = described_class.all.teachers.first
       expect(teacher).to be_nil
@@ -116,8 +117,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      stub_user_info_api_for_unknown_users
-      school_class = create(:school_class, teacher_id: SecureRandom.uuid)
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
+      school_class = create(:school_class, teacher_id:)
 
       pair = described_class.all.with_teachers.first
       expect(pair).to eq([school_class, nil])
@@ -142,8 +144,9 @@ RSpec.describe SchoolClass do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      stub_user_info_api_for_unknown_users
-      school_class = create(:school_class, teacher_id: SecureRandom.uuid)
+      teacher_id = SecureRandom.uuid
+      stub_user_info_api_for_unknown_users(user_id: teacher_id)
+      school_class = create(:school_class, teacher_id:)
 
       pair = school_class.with_teacher
       expect(pair).to eq([school_class, nil])
