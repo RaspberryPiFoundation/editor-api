@@ -4,9 +4,6 @@ module UserProfileMock
   USERS = File.read('spec/fixtures/users.json')
   TOKEN = 'fake-user-access-token'
 
-  # Stubs that API that returns user profile data for a given list of UUIDs.
-  def stub_user_info_api; end
-
   def stub_user_info_api_for_unknown_users
     stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
       .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" })

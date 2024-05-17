@@ -10,10 +10,6 @@ RSpec.describe Lesson::Create, type: :unit do
     { name: 'Test Lesson', user_id: teacher_id }
   end
 
-  before do
-    stub_user_info_api
-  end
-
   it 'returns a successful operation response' do
     response = described_class.call(lesson_params:)
     expect(response.success?).to be(true)

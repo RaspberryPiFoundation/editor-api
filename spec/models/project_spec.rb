@@ -3,10 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Project do
-  before do
-    stub_user_info_api
-  end
-
   describe 'associations' do
     it { is_expected.to belong_to(:school).optional(true) }
     it { is_expected.to belong_to(:lesson).optional(true) }

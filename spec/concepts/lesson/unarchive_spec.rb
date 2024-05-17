@@ -3,10 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe Lesson::Unarchive, type: :unit do
-  before do
-    stub_user_info_api
-  end
-
   let(:lesson) { create(:lesson, archived_at: Time.now.utc) }
 
   it 'returns a successful operation response' do

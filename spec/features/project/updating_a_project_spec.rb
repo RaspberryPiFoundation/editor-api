@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Updating a project', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
 
     create(:component, project:, name: 'main', extension: 'py', content: 'print("hi")')
   end

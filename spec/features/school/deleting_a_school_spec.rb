@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Deleting a school', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

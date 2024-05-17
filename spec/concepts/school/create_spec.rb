@@ -16,10 +16,6 @@ RSpec.describe School::Create, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:user_id) { SecureRandom.uuid }
 
-  before do
-    stub_user_info_api
-  end
-
   it 'returns a successful operation response' do
     response = described_class.call(school_params:, user_id:)
     expect(response.success?).to be(true)
