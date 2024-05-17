@@ -5,9 +5,7 @@ module UserProfileMock
   TOKEN = 'fake-user-access-token'
 
   def stub_user_info_api_for_unknown_users(user_id:)
-    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
-      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
-      .to_return({ body: { users: [] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+    stub_user_info_api(user_id:, users: [])
   end
 
   def stub_user_info_api_for_owner
@@ -28,10 +26,7 @@ module UserProfileMock
 
   def stub_user_info_api_for(user_index:)
     user_attrs = user_attributes_by_index(user_index)
-
-    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
-      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_attrs['id']}/)
-      .to_return({ body: { users: [user_attrs] }.to_json, headers: { 'Content-Type' => 'application/json' } })
+    stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 
   def authenticate_as_school_owner
@@ -85,5 +80,11 @@ module UserProfileMock
         headers: { content_type: 'application/json' },
         body: user_attributes_by_index(user_index).to_json
       )
+  end
+
+  def stub_user_info_api(user_id:, users:)
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
+      .to_return({ body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
 end
