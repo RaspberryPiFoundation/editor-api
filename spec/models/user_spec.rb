@@ -241,9 +241,25 @@ RSpec.describe User do
   end
 
   describe '#admin?' do
-    subject { user.admin? }
+    it 'returns true if the user has the editor-admin role in Hydra' do
+      user = build(:user, roles: 'editor-admin')
+      expect(user).to be_admin
+    end
 
-    include_examples 'role_check', 'editor-admin'
+    it 'returns false if the user does not have the editor-admin role in Hydra' do
+      user = build(:user, roles: 'another-editor-admin')
+      expect(user).not_to be_admin
+    end
+
+    it 'returns false if roles are empty in Hydra' do
+      user = build(:user, roles: '')
+      expect(user).not_to be_admin
+    end
+
+    it 'returns false if roles are nil in Hydra' do
+      user = build(:user, roles: nil)
+      expect(user).not_to be_admin
+    end
   end
 
   describe '.where' do
