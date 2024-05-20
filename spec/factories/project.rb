@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :project do
-    user_id { '22222222-2222-2222-2222-222222222222' } # Matches users.json.
+    user_id { User::STUDENT_ID } # Matches users.json.
     name { Faker::Book.title }
     identifier { "#{Faker::Verb.base}-#{Faker::Verb.base}-#{Faker::Verb.base}" }
     project_type { 'python' }
