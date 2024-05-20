@@ -47,7 +47,6 @@ RSpec.describe ClassMember do
     end
 
     it 'requires a student that has the school-student role for the school' do
-      stub_user_info_api_for_teacher
       class_member.student_id = User::TEACHER_ID
       expect(class_member).to be_invalid
     end

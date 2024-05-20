@@ -29,7 +29,6 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for_teacher
     get("/api/lessons/#{lesson.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 

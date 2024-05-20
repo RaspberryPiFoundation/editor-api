@@ -25,7 +25,6 @@ RSpec.describe SchoolTeacher::List, type: :unit do
   end
 
   it 'returns the school teachers in the operation response' do
-    stub_user_info_api_for_teacher
     response = described_class.call(school:, token:)
     expect(response[:school_teachers].first).to be_a(User)
   end
