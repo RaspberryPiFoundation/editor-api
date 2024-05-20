@@ -16,8 +16,8 @@ module UserProfileMock
     stub_user_info_api_for(user_index: 1)
   end
 
-  def stub_user_info_api_for_student
-    stub_user_info_api_for(user_index: 2)
+  def stub_user_info_api_for_student(student_id:)
+    stub_user_info_api_for(user_index: 2, user_id: student_id)
   end
 
   def stub_user_info_api_for_student_without_organisations(student_id:)

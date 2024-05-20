@@ -71,7 +71,7 @@ RSpec.describe Lesson do
       end
 
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
-        stub_user_info_api_for_student
+        stub_user_info_api_for_student(student_id: User::STUDENT_ID)
         lesson.user_id = User::STUDENT_ID
         expect(lesson).to be_invalid
       end
