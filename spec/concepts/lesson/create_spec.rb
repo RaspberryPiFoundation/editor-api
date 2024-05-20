@@ -3,8 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Lesson::Create, type: :unit do
-  let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { user_id_by_index(teacher_index) }
+  let(:teacher_id) { User::TEACHER_ID }
 
   let(:lesson_params) do
     { name: 'Test Lesson', user_id: teacher_id }

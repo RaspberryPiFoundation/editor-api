@@ -53,8 +53,7 @@ RSpec.describe 'Creating a project', type: :request do
 
   context 'when the project is associated with a school (library)' do
     let(:school) { create(:school) }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
       {
@@ -115,8 +114,7 @@ RSpec.describe 'Creating a project', type: :request do
   context 'when the project is associated with a lesson' do
     let(:school) { create(:school) }
     let(:lesson) { create(:lesson, school:) }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
       {
@@ -137,7 +135,7 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 201 Created when the current user is the owner of the lesson' do
       authenticate_as_school_teacher
-      lesson.update!(user_id: user_id_by_index(teacher_index))
+      lesson.update!(user_id: User::TEACHER_ID)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)

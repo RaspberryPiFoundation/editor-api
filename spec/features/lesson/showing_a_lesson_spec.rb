@@ -111,8 +111,7 @@ RSpec.describe 'Showing a lesson', type: :request do
   context "when the lesson's visibility is 'students'" do
     let(:school_class) { create(:school_class) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:teacher_id) { User::TEACHER_ID }
 
     it 'responds 200 OK when the user owns the lesson' do
       authenticate_as_school_teacher

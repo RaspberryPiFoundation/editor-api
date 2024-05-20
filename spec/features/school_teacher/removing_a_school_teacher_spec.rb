@@ -10,8 +10,7 @@ RSpec.describe 'Removing a school teacher', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { user_id_by_index(teacher_index) }
+  let(:teacher_id) { User::TEACHER_ID }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/teachers/#{teacher_id}", headers:)

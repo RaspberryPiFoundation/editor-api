@@ -52,8 +52,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
       {
@@ -112,8 +111,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   context 'when the lesson is associated with a school class' do
     let(:school_class) { create(:school_class) }
     let(:school) { school_class.school }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
       {
@@ -132,10 +130,8 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
-      teacher_index = user_index_by_role('school-teacher')
-
       authenticate_as_school_teacher
-      school_class.update!(teacher_id: user_id_by_index(teacher_index))
+      school_class.update!(teacher_id: User::TEACHER_ID)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
