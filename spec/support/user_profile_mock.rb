@@ -57,18 +57,6 @@ module UserProfileMock
     JSON.parse(USERS)['users'][user_index] if user_index
   end
 
-  def user_id_by_index(user_index)
-    user_attributes_by_index(user_index)&.fetch('id')
-  end
-
-  def user_index_by_uuid(uuid)
-    JSON.parse(USERS)['users'].find_index { |attr| attr['id'] == uuid }
-  end
-
-  def user_index_by_role(name)
-    JSON.parse(USERS)['users'].find_index { |attr| attr['roles'].include?(name) }
-  end
-
   private
 
   # Stubs the API that returns user profile data for the logged in user.
