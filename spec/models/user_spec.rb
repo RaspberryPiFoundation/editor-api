@@ -85,7 +85,7 @@ RSpec.describe User do
     end
 
     context 'when no organisations are returned' do
-      let(:ids) { ['33333333-3333-3333-3333-333333333333'] } # student without organisations
+      let(:ids) { [User::STUDENT_WITHOUT_ORGANISATIONS_ID] }
 
       it 'returns a user with the correct organisations' do
         stub_user_info_api_for_student_without_organisations
