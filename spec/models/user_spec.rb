@@ -57,7 +57,7 @@ RSpec.describe User do
     let(:user) { users.first }
 
     before do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id: ids.first)
     end
 
     it 'returns an Array' do
@@ -268,7 +268,7 @@ RSpec.describe User do
     subject(:user) { described_class.where(id: User::OWNER_ID).first }
 
     before do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id: User::OWNER_ID)
     end
 
     it 'returns an instance of the described class' do

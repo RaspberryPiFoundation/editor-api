@@ -19,13 +19,13 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds 201 Created' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id: User::OWNER_ID)
     post('/api/lessons', headers:, params:)
     expect(response).to have_http_status(:created)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id: User::OWNER_ID)
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -33,7 +33,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds with the user JSON which is set from the current user' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id: User::OWNER_ID)
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 

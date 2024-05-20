@@ -71,7 +71,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner_id) { User::OWNER_ID }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id: User::OWNER_ID)
       lesson.update!(user_id: owner_id)
 
       get('/api/lessons', headers:)
@@ -94,7 +94,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner_id) { User::OWNER_ID }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id: User::OWNER_ID)
       lesson.update!(user_id: owner_id)
 
       get('/api/lessons', headers:)
