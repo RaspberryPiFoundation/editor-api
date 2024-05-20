@@ -11,8 +11,7 @@ RSpec.describe 'Updating a project', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:project) { create(:project, name: 'Test Project', user_id: owner_id) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { User::OWNER_ID }
 
   let(:params) do
     {

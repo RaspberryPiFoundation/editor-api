@@ -65,8 +65,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
 
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
-    let(:owner_index) { user_index_by_role('school-owner') }
-    let(:owner_id) { user_id_by_index(owner_index) }
+    let(:owner_id) { User::OWNER_ID }
 
     it 'responds 201 Created when the user owns the lesson' do
       lesson.update!(user_id: owner_id)
@@ -84,8 +83,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
-    let(:owner_index) { user_index_by_role('school-owner') }
-    let(:owner_id) { user_id_by_index(owner_index) }
+    let(:owner_id) { User::OWNER_ID }
 
     let(:params) do
       {

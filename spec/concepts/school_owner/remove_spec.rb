@@ -5,8 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolOwner::Remove, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { User::OWNER_ID }
 
   before do
     stub_profile_api_remove_school_owner

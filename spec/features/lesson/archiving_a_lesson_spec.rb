@@ -10,8 +10,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, user_id: owner_id) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { User::OWNER_ID }
 
   it 'responds 204 No Content' do
     delete("/api/lessons/#{lesson.id}", headers:)

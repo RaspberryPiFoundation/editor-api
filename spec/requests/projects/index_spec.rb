@@ -9,7 +9,7 @@ RSpec.describe 'Project index requests' do
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
 
   before do
-    create_list(:project, 2, user_id: user_id_by_index(0))
+    create_list(:project, 2, user_id: User::OWNER_ID)
   end
 
   context 'when user is logged in' do

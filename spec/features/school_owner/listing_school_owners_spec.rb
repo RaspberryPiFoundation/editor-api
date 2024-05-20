@@ -11,8 +11,7 @@ RSpec.describe 'Listing school owners', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { User::OWNER_ID }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/owners", headers:)

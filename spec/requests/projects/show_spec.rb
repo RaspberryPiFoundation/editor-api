@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Project show requests' do
-  let!(:project) { create(:project, user_id: user_id_by_index(0), locale: nil) }
+  let!(:project) { create(:project, user_id: User::OWNER_ID, locale: nil) }
   let(:project_json) do
     {
       identifier: project.identifier,
