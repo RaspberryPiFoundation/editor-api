@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Showing a school class', type: :request do
   before do
     authenticate_as_school_owner
-    stub_user_info_api_for_teacher
+    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
   end
 
   let!(:school_class) { create(:school_class, name: 'Test School Class') }
