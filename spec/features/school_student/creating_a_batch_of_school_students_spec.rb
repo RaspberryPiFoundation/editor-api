@@ -10,8 +10,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { User::STUDENT_ID }
 
   let(:file) { fixture_file_upload('students.csv') }
 

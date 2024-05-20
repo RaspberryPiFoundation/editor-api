@@ -10,8 +10,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
   let!(:school_class) { create(:school_class) }
   let(:school) { school_class.school }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { User::STUDENT_ID }
 
   let(:class_member_params) do
     { student_id: }

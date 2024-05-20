@@ -13,8 +13,7 @@ RSpec.describe 'Deleting a class member', type: :request do
   let!(:class_member) { create(:class_member) }
   let(:school_class) { class_member.school_class }
   let(:school) { school_class.school }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { User::STUDENT_ID }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)

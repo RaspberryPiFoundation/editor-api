@@ -12,8 +12,7 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class) }
   let(:school) { school_class.school }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { User::STUDENT_ID }
 
   let(:params) do
     {

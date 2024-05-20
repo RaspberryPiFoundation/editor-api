@@ -11,8 +11,7 @@ RSpec.describe 'Listing school students', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { User::STUDENT_ID }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/students", headers:)
