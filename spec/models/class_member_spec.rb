@@ -48,7 +48,7 @@ RSpec.describe ClassMember do
 
     it 'requires a student that has the school-student role for the school' do
       stub_user_info_api_for_teacher
-      class_member.student_id = '11111111-1111-1111-1111-111111111111' # school-teacher
+      class_member.student_id = User::TEACHER_ID
       expect(class_member).to be_invalid
     end
 

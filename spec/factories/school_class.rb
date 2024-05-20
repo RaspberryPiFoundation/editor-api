@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :school_class do
     school
-    teacher_id { '11111111-1111-1111-1111-111111111111' } # Matches users.json.
+    teacher_id { User::TEACHER_ID } # Matches users.json.
     sequence(:name) { |n| "Class #{n}" }
   end
 end
