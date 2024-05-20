@@ -4,6 +4,8 @@ class User
   include ActiveModel::Serialization
   include ActiveModel::Model
 
+  OWNER_ID = '00000000-0000-0000-0000-000000000000'
+
   ATTRIBUTES = %w[
     country
     country_code

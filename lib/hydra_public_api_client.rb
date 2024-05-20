@@ -4,7 +4,7 @@ require 'faraday'
 
 class HydraPublicApiClient
   API_URL = ENV.fetch('HYDRA_PUBLIC_URL', 'http://localhost:9001')
-  BYPASS_AUTH_USER_ID = '00000000-0000-0000-0000-000000000000'
+  BYPASS_AUTH_USER_ID = User::OWNER_ID
 
   class << self
     def fetch_oauth_user(...)

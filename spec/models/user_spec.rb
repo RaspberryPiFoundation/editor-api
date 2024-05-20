@@ -53,7 +53,7 @@ RSpec.describe User do
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
 
-    let(:ids) { ['00000000-0000-0000-0000-000000000000'] }
+    let(:ids) { [User::OWNER_ID] }
     let(:user) { users.first }
 
     before do
@@ -69,7 +69,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+      expect(user.id).to eq User::OWNER_ID
     end
 
     it 'returns a user with the correct name' do
@@ -107,7 +107,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+      expect(user.id).to eq User::OWNER_ID
     end
 
     it 'returns a user with the correct name' do
@@ -265,7 +265,7 @@ RSpec.describe User do
   end
 
   describe '.where' do
-    subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
+    subject(:user) { described_class.where(id: User::OWNER_ID).first }
 
     before do
       stub_user_info_api_for_owner
@@ -276,7 +276,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+      expect(user.id).to eq User::OWNER_ID
     end
 
     it 'returns a user with the correct name' do
