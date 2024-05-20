@@ -61,7 +61,6 @@ RSpec.describe ClassMember do
 
   describe '.students' do
     it 'returns User instances for the current scope' do
-      stub_user_info_api_for_student
       create(:class_member)
 
       student = described_class.all.students.first
