@@ -8,7 +8,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
   end
 
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: User::TEACHER_ID) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   it 'responds 200 OK' do
@@ -73,7 +73,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
     let(:owner_id) { User::OWNER_ID }
 
     it 'responds 200 OK when the user owns the lesson' do
@@ -107,7 +107,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school_class) { create(:school_class, teacher_id:) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: User::TEACHER_ID) }
     let(:teacher_id) { User::TEACHER_ID }
 
     it 'responds 200 OK when the user owns the lesson' do

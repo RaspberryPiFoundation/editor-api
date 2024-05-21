@@ -10,7 +10,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: User::TEACHER_ID) }
   let(:params) { {} }
 
   it 'responds 201 Created' do
@@ -81,7 +81,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
     let(:owner_id) { User::OWNER_ID }
 
     let(:params) do

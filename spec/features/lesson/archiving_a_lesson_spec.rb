@@ -50,7 +50,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, visibility: 'teachers', user_id: User::TEACHER_ID) }
 
     it 'responds 204 No Content when the user is a school-owner' do
       delete("/api/lessons/#{lesson.id}", headers:)

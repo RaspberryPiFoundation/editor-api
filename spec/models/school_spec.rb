@@ -17,7 +17,7 @@ RSpec.describe School do
     end
 
     it 'has many lessons' do
-      school = create(:school, lessons: [build(:lesson), build(:lesson)])
+      school = create(:school, lessons: [build(:lesson, user_id: User::TEACHER_ID), build(:lesson, user_id: User::TEACHER_ID)])
       expect(school.lessons.size).to eq(2)
     end
 
@@ -27,8 +27,8 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let(:lesson_1) { build(:lesson) }
-      let(:lesson_2) { build(:lesson) }
+      let(:lesson_1) { build(:lesson, user_id: User::TEACHER_ID) }
+      let(:lesson_2) { build(:lesson, user_id: User::TEACHER_ID) }
       let(:project) { build(:project) }
 
       let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1], teacher_id: User::TEACHER_ID) }

@@ -61,7 +61,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -106,7 +106,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school class' do
     let(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: User::TEACHER_ID) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)

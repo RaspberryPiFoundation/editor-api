@@ -113,7 +113,7 @@ RSpec.describe 'Creating a project', type: :request do
 
   context 'when the project is associated with a lesson' do
     let(:school) { create(:school) }
-    let(:lesson) { create(:lesson, school:) }
+    let(:lesson) { create(:lesson, school:, user_id: User::TEACHER_ID) }
     let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do

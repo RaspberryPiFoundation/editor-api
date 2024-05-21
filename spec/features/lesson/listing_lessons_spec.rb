@@ -9,7 +9,7 @@ RSpec.describe 'Listing lessons', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: User::TEACHER_ID) }
 
   it 'responds 200 OK' do
     get('/api/lessons', headers:)
@@ -90,7 +90,7 @@ RSpec.describe 'Listing lessons', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
     let(:owner_id) { User::OWNER_ID }
 
     it 'includes the lesson when the user owns the lesson' do
@@ -132,7 +132,7 @@ RSpec.describe 'Listing lessons', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school_class) { create(:school_class, teacher_id:) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: User::TEACHER_ID) }
     let(:teacher_id) { User::TEACHER_ID }
 
     it 'includes the lesson when the user owns the lesson' do

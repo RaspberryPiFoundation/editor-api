@@ -9,14 +9,14 @@ RSpec.describe Lesson do
 
   describe 'associations' do
     it 'optionally belongs to a school (library)' do
-      lesson = create(:lesson, school: build(:school))
+      lesson = create(:lesson, school: build(:school), user_id: User::TEACHER_ID)
       expect(lesson.school).to be_a(School)
     end
 
     it 'optionally belongs to a school class' do
       school_class = create(:school_class, teacher_id: User::TEACHER_ID)
 
-      lesson = create(:lesson, school_class:, school: school_class.school)
+      lesson = create(:lesson, school_class:, school: school_class.school, user_id: User::TEACHER_ID)
       expect(lesson.school_class).to be_a(SchoolClass)
     end
 
@@ -45,7 +45,7 @@ RSpec.describe Lesson do
   end
 
   describe 'validations' do
-    subject(:lesson) { build(:lesson) }
+    subject(:lesson) { build(:lesson, user_id: User::TEACHER_ID) }
 
     it 'has a valid default factory' do
       expect(lesson).to be_valid
@@ -133,19 +133,19 @@ RSpec.describe Lesson do
 
   describe '#school' do
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_id: User::TEACHER_ID))
+      lesson = create(:lesson, school_class: build(:school_class, teacher_id: User::TEACHER_ID), user_id: User::TEACHER_ID)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 
     it 'is not nullified when there is no school_class' do
-      lesson = create(:lesson, school: build(:school))
+      lesson = create(:lesson, school: build(:school), user_id: User::TEACHER_ID)
       expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      create(:lesson)
+      create(:lesson, user_id: User::TEACHER_ID)
 
       user = described_class.all.users.first
       expect(user.name).to eq('School Teacher')
@@ -170,7 +170,7 @@ RSpec.describe Lesson do
 
   describe '.with_users' do
     it 'returns an array of class members paired with their User instance' do
-      lesson = create(:lesson)
+      lesson = create(:lesson, user_id: User::TEACHER_ID)
 
       pair = described_class.all.with_users.first
       user = described_class.all.users.first
@@ -197,7 +197,7 @@ RSpec.describe Lesson do
 
   describe '#with_user' do
     it 'returns the class member paired with their User instance' do
-      lesson = create(:lesson)
+      lesson = create(:lesson, user_id: User::TEACHER_ID)
 
       pair = lesson.with_user
       user = described_class.all.users.first

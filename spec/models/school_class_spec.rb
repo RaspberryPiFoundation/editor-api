@@ -22,12 +22,12 @@ RSpec.describe SchoolClass do
     end
 
     it 'has many lessons' do
-      school_class = create(:school_class, lessons: [build(:lesson)], teacher_id: User::TEACHER_ID)
+      school_class = create(:school_class, lessons: [build(:lesson, user_id: User::TEACHER_ID)], teacher_id: User::TEACHER_ID)
       expect(school_class.lessons.size).to eq(1)
     end
 
     context 'when a school_class is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id:)], lessons: [build(:lesson)], teacher_id: User::TEACHER_ID) }
+      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id:)], lessons: [build(:lesson, user_id: User::TEACHER_ID)], teacher_id: User::TEACHER_ID) }
 
       it 'also destroys class members to avoid making them invalid' do
         expect { school_class.destroy! }.to change(ClassMember, :count).by(-1)
