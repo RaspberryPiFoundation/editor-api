@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Lesson do
   before do
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
+    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
   end
 
   describe 'associations' do

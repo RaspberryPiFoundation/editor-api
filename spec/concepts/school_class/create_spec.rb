@@ -11,7 +11,7 @@ RSpec.describe SchoolClass::Create, type: :unit do
   end
 
   before do
-    stub_user_info_api_for_teacher(teacher_id:)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
   end
 
   it 'returns a successful operation response' do

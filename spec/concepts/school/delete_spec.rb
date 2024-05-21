@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe School::Delete, type: :unit do
   before do
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
+    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
     stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
 
     create(:class_member, student_id: User::STUDENT_ID, school_class:)
