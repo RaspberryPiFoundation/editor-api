@@ -39,8 +39,8 @@ module UserProfileMock
     stub_hydra_public_api(user_index: 1)
   end
 
-  def authenticate_as_school_student
-    stub_hydra_public_api(user_index: 2)
+  def authenticate_as_school_student(student_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 2, user_id: student_id)
   end
 
   def authenticate_as_school_student_without_organisations(student_id: SecureRandom.uuid)

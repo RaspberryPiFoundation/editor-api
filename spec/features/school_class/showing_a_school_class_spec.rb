@@ -26,7 +26,7 @@ RSpec.describe 'Showing a school class', type: :request do
 
   it 'responds 200 OK when the user is a student in the class' do
     stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
-    authenticate_as_school_student
+    authenticate_as_school_student(student_id: User::STUDENT_ID)
     create(:class_member, school_class:, student_id: User::STUDENT_ID)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)

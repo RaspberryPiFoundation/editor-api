@@ -65,7 +65,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-student isn't a member of" do
     teacher_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_student
+    authenticate_as_school_student(student_id: User::STUDENT_ID)
     create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)
