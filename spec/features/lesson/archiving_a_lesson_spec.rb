@@ -49,7 +49,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school (library)' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let!(:lesson) { create(:lesson, school:, visibility: 'teachers', user_id: User::TEACHER_ID) }
 
     it 'responds 204 No Content when the user is a school-owner' do

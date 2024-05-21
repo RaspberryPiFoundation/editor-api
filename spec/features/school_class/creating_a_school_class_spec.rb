@@ -9,7 +9,7 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, id: School::ID) }
   let(:teacher_id) { User::TEACHER_ID }
 
   let(:params) do

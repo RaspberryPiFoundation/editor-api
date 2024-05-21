@@ -52,7 +52,7 @@ RSpec.describe 'Creating a project', type: :request do
   end
 
   context 'when the project is associated with a school (library)' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
@@ -112,7 +112,7 @@ RSpec.describe 'Creating a project', type: :request do
   end
 
   context 'when the project is associated with a lesson' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let(:lesson) { create(:lesson, school:, user_id: User::TEACHER_ID) }
     let(:teacher_id) { User::TEACHER_ID }
 

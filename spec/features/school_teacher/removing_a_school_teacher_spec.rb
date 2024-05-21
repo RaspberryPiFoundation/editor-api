@@ -9,7 +9,7 @@ RSpec.describe 'Removing a school teacher', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, id: School::ID) }
   let(:teacher_id) { User::TEACHER_ID }
 
   it 'responds 204 No Content' do

@@ -80,7 +80,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   end
 
   context "when the lesson's visibility is 'teachers'" do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
     let(:owner_id) { User::OWNER_ID }
 

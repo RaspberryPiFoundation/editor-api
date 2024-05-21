@@ -8,8 +8,8 @@ RSpec.describe ClassMember::Create, type: :unit do
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
-  let!(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID) }
-  let(:school) { school_class.school }
+  let!(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID, school:) }
+  let(:school) { build(:school, id: School::ID) }
   let(:student_id) { User::STUDENT_ID }
 
   let(:class_member_params) do

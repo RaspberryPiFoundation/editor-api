@@ -9,7 +9,7 @@ RSpec.describe 'Removing a school owner', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, id: School::ID) }
   let(:owner_id) { User::OWNER_ID }
 
   it 'responds 204 No Content' do

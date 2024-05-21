@@ -10,7 +10,7 @@ RSpec.describe 'Listing school teachers', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, id: School::ID) }
   let(:teacher_id) { User::TEACHER_ID }
 
   it 'responds 200 OK' do

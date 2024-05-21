@@ -7,7 +7,7 @@ RSpec.describe 'Updating a school', type: :request do
     authenticate_as_school_owner
   end
 
-  let!(:school) { create(:school) }
+  let!(:school) { create(:school, id: School::ID) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   let(:params) do

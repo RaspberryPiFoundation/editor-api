@@ -11,8 +11,8 @@ RSpec.describe 'Listing class members', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:class_member) { create(:class_member, student_id:, school_class:) }
-  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID) }
-  let(:school) { school_class.school }
+  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID, school:) }
+  let(:school) { build(:school, id: School::ID) }
   let(:student_id) { User::STUDENT_ID }
 
   it 'responds 200 OK' do

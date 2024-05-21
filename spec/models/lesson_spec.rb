@@ -9,12 +9,12 @@ RSpec.describe Lesson do
 
   describe 'associations' do
     it 'optionally belongs to a school (library)' do
-      lesson = create(:lesson, school: build(:school), user_id: User::TEACHER_ID)
+      lesson = create(:lesson, school: build(:school, id: School::ID), user_id: User::TEACHER_ID)
       expect(lesson.school).to be_a(School)
     end
 
     it 'optionally belongs to a school class' do
-      school_class = create(:school_class, teacher_id: User::TEACHER_ID)
+      school_class = create(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID))
 
       lesson = create(:lesson, school_class:, school: school_class.school, user_id: User::TEACHER_ID)
       expect(lesson.school_class).to be_a(SchoolClass)
@@ -67,7 +67,7 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school' do
       before do
-        lesson.update!(school: create(:school))
+        lesson.update!(school: create(:school, id: School::ID))
       end
 
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
@@ -79,7 +79,7 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class, teacher_id: User::TEACHER_ID))
+        lesson.update!(school_class: create(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID)))
       end
 
       it 'requires that the user that is the school-teacher for the school_class' do
@@ -133,12 +133,12 @@ RSpec.describe Lesson do
 
   describe '#school' do
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_id: User::TEACHER_ID), user_id: User::TEACHER_ID)
+      lesson = create(:lesson, school_class: build(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID)), user_id: User::TEACHER_ID)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 
     it 'is not nullified when there is no school_class' do
-      lesson = create(:lesson, school: build(:school), user_id: User::TEACHER_ID)
+      lesson = create(:lesson, school: build(:school, id: School::ID), user_id: User::TEACHER_ID)
       expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end

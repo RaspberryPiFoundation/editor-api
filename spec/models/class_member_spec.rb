@@ -9,7 +9,7 @@ RSpec.describe ClassMember do
   end
 
   let(:student_id) { User::STUDENT_ID }
-  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID) }
+  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID)) }
 
   describe 'associations' do
     it 'belongs to a school_class' do

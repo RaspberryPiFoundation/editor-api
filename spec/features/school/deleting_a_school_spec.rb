@@ -8,7 +8,7 @@ RSpec.describe 'Deleting a school', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, id: School::ID) }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}", headers:)

@@ -6,7 +6,7 @@ RSpec.describe 'Listing schools', type: :request do
   before do
     authenticate_as_school_owner
 
-    create(:school, name: 'Test School')
+    create(:school, name: 'Test School', id: School::ID)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

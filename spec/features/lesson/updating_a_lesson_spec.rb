@@ -60,7 +60,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school (library)' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
 
     it 'responds 200 OK when the user is a school-owner' do
@@ -105,7 +105,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID) }
+    let(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID)) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: User::TEACHER_ID) }
 
     it 'responds 200 OK when the user is a school-owner' do

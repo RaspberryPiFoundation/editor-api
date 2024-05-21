@@ -12,27 +12,29 @@ RSpec.describe School do
 
   describe 'associations' do
     it 'has many classes' do
-      school = create(:school, classes: [build(:school_class, teacher_id: User::TEACHER_ID), build(:school_class, teacher_id: User::TEACHER_ID)])
+      school = create(:school, classes: [build(:school_class, teacher_id: User::TEACHER_ID), build(:school_class, teacher_id: User::TEACHER_ID)], id: School::ID)
       expect(school.classes.size).to eq(2)
     end
 
     it 'has many lessons' do
-      school = create(:school, lessons: [build(:lesson, user_id: User::TEACHER_ID), build(:lesson, user_id: User::TEACHER_ID)])
+      school = create(:school, lessons: [build(:lesson, user_id: User::TEACHER_ID), build(:lesson, user_id: User::TEACHER_ID)], id: School::ID)
       expect(school.lessons.size).to eq(2)
     end
 
     it 'has many projects' do
-      school = create(:school, projects: [build(:project, user_id: User::STUDENT_ID), build(:project, user_id: User::STUDENT_ID)])
+      school = create(:school, id: School::ID)
+      create(:project, user_id: User::STUDENT_ID, school:)
+      create(:project, user_id: User::STUDENT_ID, school:)
       expect(school.projects.size).to eq(2)
     end
 
     context 'when a school is destroyed' do
       let(:lesson_1) { build(:lesson, user_id: User::TEACHER_ID) }
       let(:lesson_2) { build(:lesson, user_id: User::TEACHER_ID) }
-      let(:project) { build(:project, user_id: User::STUDENT_ID) }
+      let!(:project) { create(:project, user_id: User::STUDENT_ID, school:) }
 
       let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1], teacher_id: User::TEACHER_ID) }
-      let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], projects: [project]) }
+      let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], id: School::ID) }
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)

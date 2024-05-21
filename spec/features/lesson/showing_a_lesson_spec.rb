@@ -72,7 +72,7 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   context "when the lesson's visibility is 'teachers'" do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
     let(:owner_id) { User::OWNER_ID }
 
@@ -106,7 +106,7 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   context "when the lesson's visibility is 'students'" do
-    let(:school_class) { create(:school_class, teacher_id:) }
+    let(:school_class) { create(:school_class, teacher_id:, school: build(:school, id: School::ID)) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: User::TEACHER_ID) }
     let(:teacher_id) { User::TEACHER_ID }
 

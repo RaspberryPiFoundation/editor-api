@@ -9,7 +9,7 @@ RSpec.describe 'Inviting a school owner', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school, verified_at: Time.zone.now) }
+  let(:school) { create(:school, verified_at: Time.zone.now, id: School::ID) }
   let(:owner_id) { User::OWNER_ID }
 
   let(:params) do

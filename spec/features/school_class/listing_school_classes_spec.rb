@@ -12,8 +12,8 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: User::TEACHER_ID) }
-  let(:school) { school_class.school }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: User::TEACHER_ID, school:) }
+  let(:school) { build(:school, id: School::ID) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)

@@ -8,8 +8,8 @@ RSpec.describe 'Showing a school class', type: :request do
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
   end
 
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: User::TEACHER_ID) }
-  let(:school) { school_class.school }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: User::TEACHER_ID, school:) }
+  let(:school) { build(:school, id: School::ID) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   it 'responds 200 OK' do

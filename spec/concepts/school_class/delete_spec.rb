@@ -10,9 +10,9 @@ RSpec.describe SchoolClass::Delete, type: :unit do
     create(:class_member, student_id: User::STUDENT_ID, school_class:)
   end
 
-  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID) }
+  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID, school:) }
   let(:school_class_id) { school_class.id }
-  let(:school) { school_class.school }
+  let(:school) { build(:school, id: School::ID) }
 
   it 'returns a successful operation response' do
     response = described_class.call(school:, school_class_id:)

@@ -51,7 +51,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school (library)' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school, id: School::ID) }
     let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
@@ -109,8 +109,8 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class, teacher_id:) }
-    let(:school) { school_class.school }
+    let(:school_class) { create(:school_class, teacher_id:, school:) }
+    let(:school) { build(:school, id: School::ID) }
     let(:teacher_id) { User::TEACHER_ID }
 
     let(:params) do
@@ -154,6 +154,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
       school = create(:school, id: SecureRandom.uuid)
       school_class.update!(school_id: school.id)
+      params[:lesson][:school_id] = school.id
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)
