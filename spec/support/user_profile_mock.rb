@@ -43,8 +43,8 @@ module UserProfileMock
     stub_hydra_public_api(user_index: 2)
   end
 
-  def authenticate_as_school_student_without_organisations
-    stub_hydra_public_api(user_index: 3)
+  def authenticate_as_school_student_without_organisations(student_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 3, user_id: student_id)
   end
 
   def unauthenticated_user
@@ -62,13 +62,16 @@ module UserProfileMock
   private
 
   # Stubs the API that returns user profile data for the logged in user.
-  def stub_hydra_public_api(user_index:)
+  def stub_hydra_public_api(user_index:, user_id: nil)
+    user_attrs = user_attributes_by_index(user_index)
+    user_attrs['id'] = user_id if user_id
+
     stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo")
       .with(headers: { Authorization: "Bearer #{TOKEN}" })
       .to_return(
         status: 200,
         headers: { content_type: 'application/json' },
-        body: user_attributes_by_index(user_index).to_json
+        body: user_attrs.to_json
       )
   end
 
