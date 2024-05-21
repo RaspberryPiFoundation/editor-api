@@ -72,7 +72,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-teacher for the school' do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(teacher_id:)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -94,7 +94,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'sets the project user to the current user for school-teacher users' do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(teacher_id:)
       new_params = { project: params[:project].merge(user_id: 'ignored') }
 
       post('/api/projects', headers:, params: new_params)
@@ -134,7 +134,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the current user is the owner of the lesson' do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(teacher_id:)
       lesson.update!(user_id: User::TEACHER_ID)
 
       post('/api/projects', headers:, params:)
