@@ -85,7 +85,7 @@ RSpec.describe User do
     end
 
     context 'when no organisations are returned' do
-      let(:ids) { [User::STUDENT_WITHOUT_ORGANISATIONS_ID] }
+      let(:ids) { [SecureRandom.uuid] }
 
       it 'returns a user with the correct organisations' do
         stub_user_info_api_for_student_without_organisations(student_id: ids.first)
