@@ -5,8 +5,10 @@ require 'rails_helper'
 RSpec.describe School do
   before do
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
-    stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+    stub_user_info_api_for_student(student_id:)
   end
+
+  let(:student_id) { User::STUDENT_ID }
 
   describe 'associations' do
     it 'has many classes' do
@@ -29,7 +31,7 @@ RSpec.describe School do
       let(:lesson_2) { build(:lesson) }
       let(:project) { build(:project) }
 
-      let!(:school_class) { build(:school_class, members: [build(:class_member)], lessons: [lesson_1]) }
+      let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1]) }
       let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], projects: [project]) }
 
       it 'also destroys school classes to avoid making them invalid' do

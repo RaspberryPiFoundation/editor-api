@@ -8,7 +8,7 @@ RSpec.describe School::Delete, type: :unit do
     stub_user_info_api_for_student(student_id: User::STUDENT_ID)
   end
 
-  let!(:class_member) { create(:class_member) }
+  let!(:class_member) { create(:class_member, student_id: User::STUDENT_ID) }
   let(:school_class) { class_member.school_class }
   let(:school) { school_class.school }
   let(:school_id) { school.id }

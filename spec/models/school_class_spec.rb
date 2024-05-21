@@ -5,8 +5,10 @@ require 'rails_helper'
 RSpec.describe SchoolClass do
   before do
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
-    stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+    stub_user_info_api_for_student(student_id:)
   end
+
+  let(:student_id) { User::STUDENT_ID }
 
   describe 'associations' do
     it 'belongs to a school' do
@@ -15,7 +17,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'has many members' do
-      school_class = create(:school_class, members: [build(:class_member)])
+      school_class = create(:school_class, members: [build(:class_member, student_id:)])
       expect(school_class.members.size).to eq(1)
     end
 
@@ -25,7 +27,7 @@ RSpec.describe SchoolClass do
     end
 
     context 'when a school_class is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member)], lessons: [build(:lesson)]) }
+      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id:)], lessons: [build(:lesson)]) }
 
       it 'also destroys class members to avoid making them invalid' do
         expect { school_class.destroy! }.to change(ClassMember, :count).by(-1)

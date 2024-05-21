@@ -121,7 +121,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       authenticate_as_school_student
       stub_user_info_api_for_student(student_id: User::STUDENT_ID)
-      create(:class_member, school_class:)
+      create(:class_member, school_class:, student_id: User::STUDENT_ID)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)
