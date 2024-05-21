@@ -6,10 +6,11 @@ RSpec.describe School::Delete, type: :unit do
   before do
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
     stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+
+    create(:class_member, student_id: User::STUDENT_ID, school_class:)
   end
 
-  let!(:class_member) { create(:class_member, student_id: User::STUDENT_ID) }
-  let(:school_class) { class_member.school_class }
+  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID) }
   let(:school) { school_class.school }
   let(:school_id) { school.id }
 

@@ -8,9 +8,9 @@ RSpec.describe ClassMember::Delete, type: :unit do
     stub_user_info_api_for_student(student_id: User::STUDENT_ID)
   end
 
-  let!(:class_member) { create(:class_member, student_id: User::STUDENT_ID) }
+  let!(:class_member) { create(:class_member, student_id: User::STUDENT_ID, school_class:) }
   let(:class_member_id) { class_member.id }
-  let(:school_class) { class_member.school_class }
+  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID) }
   let(:school) { school_class.school }
 
   it 'returns a successful operation response' do

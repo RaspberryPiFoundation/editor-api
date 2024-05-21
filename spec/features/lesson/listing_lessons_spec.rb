@@ -131,7 +131,7 @@ RSpec.describe 'Listing lessons', type: :request do
   end
 
   context "when the lesson's visibility is 'students'" do
-    let(:school_class) { create(:school_class) }
+    let(:school_class) { create(:school_class, teacher_id:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
     let(:teacher_id) { User::TEACHER_ID }
 

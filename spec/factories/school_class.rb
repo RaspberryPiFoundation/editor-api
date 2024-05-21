@@ -3,7 +3,7 @@
 FactoryBot.define do
   factory :school_class do
     school
-    teacher_id { User::TEACHER_ID } # Matches users.json.
+    teacher_id { SecureRandom.uuid }
     sequence(:name) { |n| "Class #{n}" }
   end
 end

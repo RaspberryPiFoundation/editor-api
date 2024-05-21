@@ -12,7 +12,7 @@ RSpec.describe School do
 
   describe 'associations' do
     it 'has many classes' do
-      school = create(:school, classes: [build(:school_class), build(:school_class)])
+      school = create(:school, classes: [build(:school_class, teacher_id: User::TEACHER_ID), build(:school_class, teacher_id: User::TEACHER_ID)])
       expect(school.classes.size).to eq(2)
     end
 
@@ -31,7 +31,7 @@ RSpec.describe School do
       let(:lesson_2) { build(:lesson) }
       let(:project) { build(:project) }
 
-      let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1]) }
+      let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1], teacher_id: User::TEACHER_ID) }
       let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], projects: [project]) }
 
       it 'also destroys school classes to avoid making them invalid' do

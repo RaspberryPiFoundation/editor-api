@@ -10,8 +10,8 @@ RSpec.describe 'Listing class members', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:class_member) { create(:class_member, student_id:) }
-  let(:school_class) { class_member.school_class }
+  let!(:class_member) { create(:class_member, student_id:, school_class:) }
+  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID) }
   let(:school) { school_class.school }
   let(:student_id) { User::STUDENT_ID }
 
@@ -51,7 +51,7 @@ RSpec.describe 'Listing class members', type: :request do
   it 'does not include class members that belong to a different class' do
     student_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: student_id)
-    different_class = create(:school_class, school:)
+    different_class = create(:school_class, school:, teacher_id: User::TEACHER_ID)
     create(:class_member, school_class: different_class, student_id:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)

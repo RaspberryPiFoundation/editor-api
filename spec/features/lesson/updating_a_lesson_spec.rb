@@ -69,7 +69,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 200 OK when assigning the lesson to a school class' do
-      school_class = create(:school_class, school:)
+      school_class = create(:school_class, school:, teacher_id: User::TEACHER_ID)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -105,7 +105,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class) }
+    let(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
 
     it 'responds 200 OK when the user is a school-owner' do

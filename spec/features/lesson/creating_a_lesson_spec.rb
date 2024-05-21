@@ -109,7 +109,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class) }
+    let(:school_class) { create(:school_class, teacher_id:) }
     let(:school) { school_class.school }
     let(:teacher_id) { User::TEACHER_ID }
 

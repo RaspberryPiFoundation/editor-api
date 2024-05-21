@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe SchoolClass::Update, type: :unit do
-  let(:school_class) { create(:school_class, name: 'Test School Class Name') }
+  let(:school_class) { create(:school_class, name: 'Test School Class Name', teacher_id: User::TEACHER_ID) }
   let(:school_class_params) { { name: 'New Name' } }
 
   before do
