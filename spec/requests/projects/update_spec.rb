@@ -26,7 +26,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(owner_id: User::OWNER_ID)
     end
 
     it 'returns success response' do

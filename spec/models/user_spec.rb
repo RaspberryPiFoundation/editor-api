@@ -99,7 +99,7 @@ RSpec.describe User do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(owner_id: User::OWNER_ID)
     end
 
     it 'returns an instance of the described class' do

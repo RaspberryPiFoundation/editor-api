@@ -22,7 +22,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        authenticate_as_school_owner
+        authenticate_as_school_owner(owner_id: User::OWNER_ID)
       end
 
       it 'attaches file to project' do

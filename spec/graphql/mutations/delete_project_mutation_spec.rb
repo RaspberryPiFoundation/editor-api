@@ -41,7 +41,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       let(:current_user) { stubbed_user }
 
       before do
-        authenticate_as_school_owner
+        authenticate_as_school_owner(owner_id: stubbed_user.id)
       end
 
       it 'deletes the project' do

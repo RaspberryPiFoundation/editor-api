@@ -31,8 +31,8 @@ module UserProfileMock
     stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 
-  def authenticate_as_school_owner
-    stub_hydra_public_api(user_index: 0)
+  def authenticate_as_school_owner(owner_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 0, user_id: owner_id)
   end
 
   def authenticate_as_school_teacher(teacher_id: SecureRandom.uuid)
