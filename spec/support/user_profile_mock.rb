@@ -8,8 +8,8 @@ module UserProfileMock
     stub_user_info_api(user_id:, users: [])
   end
 
-  def stub_user_info_api_for_owner(owner_id:)
-    stub_user_info_api_for(user_index: 0, user_id: owner_id)
+  def stub_user_info_api_for_owner(owner_id:, school_id:)
+    stub_user_info_api_for(user_index: 0, user_id: owner_id, school_id:)
   end
 
   def stub_user_info_api_for_teacher(teacher_id:, school_id:)
