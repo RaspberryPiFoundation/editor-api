@@ -6,7 +6,7 @@ RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticate_as_school_owner
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
-    stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+    stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
 
     create(:class_member, school_class:, student_id: User::STUDENT_ID)
   end

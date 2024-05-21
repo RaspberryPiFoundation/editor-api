@@ -16,17 +16,18 @@ module UserProfileMock
     stub_user_info_api_for(user_index: 1, user_id: teacher_id)
   end
 
-  def stub_user_info_api_for_student(student_id:)
-    stub_user_info_api_for(user_index: 2, user_id: student_id)
+  def stub_user_info_api_for_student(student_id:, school_id:)
+    stub_user_info_api_for(user_index: 2, user_id: student_id, school_id:)
   end
 
   def stub_user_info_api_for_student_without_organisations(student_id:)
     stub_user_info_api_for(user_index: 3, user_id: student_id)
   end
 
-  def stub_user_info_api_for(user_index:, user_id: nil)
+  def stub_user_info_api_for(user_index:, user_id: nil, school_id: nil)
     user_attrs = user_attributes_by_index(user_index)
     user_attrs['id'] = user_id if user_id
+    user_attrs['organisations'] = { school_id => user_attrs['roles'] } if school_id
     stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe ClassMember do
   before do
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID)
-    stub_user_info_api_for_student(student_id:)
+    stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
   let(:student_id) { User::STUDENT_ID }

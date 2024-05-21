@@ -102,7 +102,7 @@ RSpec.describe Project do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+      stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
       create(:project, user_id: User::STUDENT_ID)
 
       user = described_class.all.users.first
@@ -128,7 +128,7 @@ RSpec.describe Project do
 
   describe '.with_users' do
     it 'returns an array of class members paired with their User instance' do
-      stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+      stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
       project = create(:project, user_id: User::STUDENT_ID)
 
       pair = described_class.all.with_users.first
@@ -156,7 +156,7 @@ RSpec.describe Project do
 
   describe '#with_user' do
     it 'returns the class member paired with their User instance' do
-      stub_user_info_api_for_student(student_id: User::STUDENT_ID)
+      stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
       project = create(:project, user_id: User::STUDENT_ID)
 
       pair = project.with_user
