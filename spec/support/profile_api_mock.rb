@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module ProfileApiMock
-  ORGANISATION_ID = '12345678-1234-1234-1234-123456789abc'
+  ORGANISATION_ID = School::ID
 
   # TODO: Replace with WebMock HTTP stubs once the profile API has been built.
 

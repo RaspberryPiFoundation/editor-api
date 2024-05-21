@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe User do
   subject { build(:user) }
 
-  let(:organisation_id) { '12345678-1234-1234-1234-123456789abc' }
+  let(:organisation_id) { School::ID }
 
   it { is_expected.to respond_to(:id) }
   it { is_expected.to respond_to(:name) }
