@@ -10,7 +10,7 @@ RSpec.describe 'Removing a school owner', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school, id: School::ID) }
-  let(:owner_id) { User::OWNER_ID }
+  let(:owner_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/owners/#{owner_id}", headers:)

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolOwner::List, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:owner_id) { User::OWNER_ID }
+  let(:owner_id) { SecureRandom.uuid }
 
   before do
     stub_profile_api_list_school_owners(user_id: owner_id)

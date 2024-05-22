@@ -10,7 +10,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner_id) }
-  let(:owner_id) { User::OWNER_ID }
+  let(:owner_id) { SecureRandom.uuid }
   let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
@@ -22,13 +22,13 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds 200 OK' do
-    stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -36,7 +36,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -129,7 +129,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
-      stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+      stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
       new_params = { lesson: params[:lesson].merge(user_id: owner_id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 

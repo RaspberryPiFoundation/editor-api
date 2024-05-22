@@ -4,12 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    authenticate_as_school_owner(owner_id:, school_id: School::ID)
     stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher_id) { SecureRandom.uuid }
+  let(:owner_id) { SecureRandom.uuid }
 
   let(:params) do
     {
@@ -20,13 +21,13 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds 201 Created' do
-    stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
     post('/api/lessons', headers:, params:)
     expect(response).to have_http_status(:created)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -34,7 +35,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds with the user JSON which is set from the current user' do
-    stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 

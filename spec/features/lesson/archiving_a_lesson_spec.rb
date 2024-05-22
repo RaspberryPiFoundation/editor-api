@@ -10,7 +10,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, user_id: owner_id) }
-  let(:owner_id) { User::OWNER_ID }
+  let(:owner_id) { SecureRandom.uuid }
   let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do

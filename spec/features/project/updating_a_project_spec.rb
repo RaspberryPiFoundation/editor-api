@@ -11,7 +11,7 @@ RSpec.describe 'Updating a project', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:project) { create(:project, name: 'Test Project', user_id: owner_id) }
-  let(:owner_id) { User::OWNER_ID }
+  let(:owner_id) { SecureRandom.uuid }
 
   let(:params) do
     {

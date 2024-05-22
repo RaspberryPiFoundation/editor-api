@@ -4,11 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Project delete requests' do
   context 'when user is logged in' do
-    let!(:project) { create(:project, user_id: User::OWNER_ID, locale: nil) }
+    let!(:project) { create(:project, user_id: owner_id, locale: nil) }
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+    let(:owner_id) { SecureRandom.uuid }
 
     before do
-      authenticate_as_school_owner(owner_id: User::OWNER_ID)
+      authenticate_as_school_owner(owner_id:)
     end
 
     context 'when deleting a project the user owns' do
