@@ -80,7 +80,7 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 201 Created when the user is a school-student for the school' do
       stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
-      authenticate_as_school_student(student_id: User::STUDENT_ID)
+      authenticate_as_school_student(student_id: User::STUDENT_ID, school_id: School::ID)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
