@@ -19,7 +19,7 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 200 OK when the user is a school-teacher' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(school_id: school.id)
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:ok)

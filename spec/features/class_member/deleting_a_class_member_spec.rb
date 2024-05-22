@@ -21,7 +21,7 @@ RSpec.describe 'Deleting a class member', type: :request do
   end
 
   it 'responds 204 No Content when the user is the class teacher' do
-    authenticate_as_school_teacher(teacher_id: User::TEACHER_ID)
+    authenticate_as_school_teacher(teacher_id: User::TEACHER_ID, school_id: school.id)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
     expect(response).to have_http_status(:no_content)

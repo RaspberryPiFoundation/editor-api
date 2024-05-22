@@ -27,7 +27,7 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    authenticate_as_school_teacher(teacher_id:)
+    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
     post("/api/schools/#{school.id}/classes", headers:, params:)
     expect(response).to have_http_status(:created)
@@ -68,7 +68,7 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   it 'sets the class teacher to the current user for school-teacher users' do
-    authenticate_as_school_teacher(teacher_id:)
+    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
     new_params = { school_class: params[:school_class].merge(teacher_id: 'ignored') }
 
