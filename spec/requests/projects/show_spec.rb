@@ -43,7 +43,7 @@ RSpec.describe 'Project show requests' do
     end
 
     context 'when loading another user\'s project' do
-      let!(:another_project) { create(:project, user_id: User::TEACHER_ID, locale: nil) }
+      let!(:another_project) { create(:project, user_id: SecureRandom.uuid, locale: nil) }
       let(:another_project_json) do
         {
           identifier: another_project.identifier,

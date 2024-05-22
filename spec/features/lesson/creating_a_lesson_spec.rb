@@ -5,10 +5,11 @@ require 'rails_helper'
 RSpec.describe 'Creating a lesson', type: :request do
   before do
     authenticate_as_school_owner(owner_id: User::OWNER_ID, school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
     {
@@ -52,7 +53,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school, id: School::ID) }
-    let(:teacher_id) { User::TEACHER_ID }
+    let(:teacher_id) { SecureRandom.uuid }
 
     let(:params) do
       {
@@ -111,7 +112,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   context 'when the lesson is associated with a school class' do
     let(:school_class) { create(:school_class, teacher_id:, school:) }
     let(:school) { build(:school, id: School::ID) }
-    let(:teacher_id) { User::TEACHER_ID }
+    let(:teacher_id) { SecureRandom.uuid }
 
     let(:params) do
       {
@@ -131,7 +132,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
       authenticate_as_school_teacher(teacher_id:, school_id: school.id)
-      school_class.update!(teacher_id: User::TEACHER_ID)
+      school_class.update!(teacher_id:)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)

@@ -11,7 +11,7 @@ RSpec.describe 'Updating a school class', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
   let(:school) { build(:school, id: School::ID) }
-  let(:teacher_id) { User::TEACHER_ID }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
     {

@@ -4,20 +4,21 @@ require 'rails_helper'
 
 RSpec.describe School do
   before do
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
   let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
 
   describe 'associations' do
     it 'has many classes' do
-      school = create(:school, classes: [build(:school_class, teacher_id: User::TEACHER_ID), build(:school_class, teacher_id: User::TEACHER_ID)], id: School::ID)
+      school = create(:school, classes: [build(:school_class, teacher_id:), build(:school_class, teacher_id:)], id: School::ID)
       expect(school.classes.size).to eq(2)
     end
 
     it 'has many lessons' do
-      school = create(:school, lessons: [build(:lesson, user_id: User::TEACHER_ID), build(:lesson, user_id: User::TEACHER_ID)], id: School::ID)
+      school = create(:school, lessons: [build(:lesson, user_id: teacher_id), build(:lesson, user_id: teacher_id)], id: School::ID)
       expect(school.lessons.size).to eq(2)
     end
 
@@ -29,11 +30,11 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let(:lesson_1) { build(:lesson, user_id: User::TEACHER_ID) }
-      let(:lesson_2) { build(:lesson, user_id: User::TEACHER_ID) }
+      let(:lesson_1) { build(:lesson, user_id: teacher_id) }
+      let(:lesson_2) { build(:lesson, user_id: teacher_id) }
       let!(:project) { create(:project, user_id: student_id, school:) }
 
-      let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1], teacher_id: User::TEACHER_ID) }
+      let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1], teacher_id:) }
       let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], id: School::ID) }
 
       it 'also destroys school classes to avoid making them invalid' do

@@ -11,7 +11,7 @@ RSpec.describe 'Listing school teachers', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school, id: School::ID) }
-  let(:teacher_id) { User::TEACHER_ID }
+  let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/teachers", headers:)

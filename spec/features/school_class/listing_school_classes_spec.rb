@@ -5,16 +5,17 @@ require 'rails_helper'
 RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticate_as_school_owner(school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
 
     create(:class_member, school_class:, student_id:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: User::TEACHER_ID, school:) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
   let(:school) { build(:school, id: School::ID) }
   let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)

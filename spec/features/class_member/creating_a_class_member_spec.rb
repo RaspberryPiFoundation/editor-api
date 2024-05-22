@@ -5,14 +5,15 @@ require 'rails_helper'
 RSpec.describe 'Creating a class member', type: :request do
   before do
     authenticate_as_school_owner(school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID, school:) }
+  let!(:school_class) { create(:school_class, teacher_id:, school:) }
   let(:school) { build(:school, id: School::ID) }
   let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
     {
@@ -28,7 +29,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    authenticate_as_school_teacher(teacher_id: User::TEACHER_ID, school_id: school.id)
+    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:created)

@@ -4,13 +4,14 @@ require 'rails_helper'
 
 RSpec.describe ClassMember::Create, type: :unit do
   before do
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
-  let!(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID, school:) }
+  let!(:school_class) { create(:school_class, teacher_id:, school:) }
   let(:school) { build(:school, id: School::ID) }
   let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:class_member_params) do
     { student_id: }

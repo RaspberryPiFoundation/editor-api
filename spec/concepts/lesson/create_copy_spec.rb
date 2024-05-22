@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Lesson::CreateCopy, type: :unit do
-  let(:teacher_id) { User::TEACHER_ID }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let!(:lesson) do
     create(:lesson, name: 'Test Lesson', description: 'Description', user_id: teacher_id)

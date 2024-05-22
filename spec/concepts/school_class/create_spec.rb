@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass::Create, type: :unit do
   let(:school) { create(:school, id: School::ID) }
-  let(:teacher_id) { User::TEACHER_ID }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:school_class_params) do
     { name: 'Test School Class', teacher_id: }

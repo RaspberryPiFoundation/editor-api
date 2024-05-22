@@ -4,12 +4,13 @@ require 'rails_helper'
 
 RSpec.describe ClassMember do
   before do
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
   let(:student_id) { SecureRandom.uuid }
-  let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID)) }
+  let(:school_class) { build(:school_class, teacher_id:, school: build(:school, id: School::ID)) }
+  let(:teacher_id) { SecureRandom.uuid }
 
   describe 'associations' do
     it 'belongs to a school_class' do
@@ -50,7 +51,7 @@ RSpec.describe ClassMember do
     end
 
     it 'requires a student that has the school-student role for the school' do
-      class_member.student_id = User::TEACHER_ID
+      class_member.student_id = teacher_id
       expect(class_member).to be_invalid
     end
 

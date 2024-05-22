@@ -5,12 +5,13 @@ require 'rails_helper'
 RSpec.describe 'Deleting a school class', type: :request do
   before do
     authenticate_as_school_owner(school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID, school:) }
+  let!(:school_class) { create(:school_class, teacher_id:, school:) }
   let(:school) { build(:school, id: School::ID) }
+  let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -18,7 +19,7 @@ RSpec.describe 'Deleting a school class', type: :request do
   end
 
   it 'responds 204 No Content when the user is the class teacher' do
-    authenticate_as_school_teacher(teacher_id: User::TEACHER_ID, school_id: school.id)
+    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:no_content)

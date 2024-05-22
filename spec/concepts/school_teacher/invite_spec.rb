@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolTeacher::Invite, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:teacher_id) { User::TEACHER_ID }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:school_teacher_params) do
     { email_address: 'teacher-to-invite@example.com' }

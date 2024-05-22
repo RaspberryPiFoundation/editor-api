@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Lesson::Create, type: :unit do
-  let(:teacher_id) { User::TEACHER_ID }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:lesson_params) do
     { name: 'Test Lesson', user_id: teacher_id }

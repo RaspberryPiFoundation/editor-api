@@ -6,12 +6,13 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   before do
     authenticate_as_school_owner(owner_id: User::OWNER_ID, school_id: School::ID)
     stub_user_info_api_for_owner(owner_id: User::OWNER_ID, school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: User::TEACHER_ID) }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher_id) }
   let(:params) { {} }
+  let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 201 Created' do
     post("/api/lessons/#{lesson.id}/copy", headers:, params:)
@@ -81,7 +82,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school, id: School::ID) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: User::TEACHER_ID) }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
     let(:owner_id) { User::OWNER_ID }
 
     let(:params) do
