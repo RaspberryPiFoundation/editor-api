@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing schools', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: School::ID)
 
     create(:school, name: 'Test School', id: School::ID)
   end

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school students', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_list_school_students(user_id: student_id)
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end

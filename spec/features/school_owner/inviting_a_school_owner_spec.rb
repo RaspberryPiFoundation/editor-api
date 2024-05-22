@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Inviting a school owner', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_invite_school_owner
   end
 

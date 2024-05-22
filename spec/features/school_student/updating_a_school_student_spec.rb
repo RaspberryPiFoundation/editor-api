@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school student', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_update_school_student
   end
 

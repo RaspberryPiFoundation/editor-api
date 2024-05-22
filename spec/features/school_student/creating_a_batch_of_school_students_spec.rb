@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a batch of school students', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_create_school_student
   end
 

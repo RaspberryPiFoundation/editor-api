@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id: User::OWNER_ID)
+    authenticate_as_school_owner(owner_id: User::OWNER_ID, school_id: School::ID)
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
   end
 
