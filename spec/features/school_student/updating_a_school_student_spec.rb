@@ -9,7 +9,7 @@ RSpec.describe 'Updating a school student', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school, id: School::ID) }
+  let(:school) { create(:school) }
   let(:student_id) { SecureRandom.uuid }
 
   let(:params) do

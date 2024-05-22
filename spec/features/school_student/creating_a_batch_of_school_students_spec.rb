@@ -9,7 +9,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school, verified_at: Time.zone.now, id: School::ID) }
+  let(:school) { create(:school, verified_at: Time.zone.now) }
   let(:student_id) { SecureRandom.uuid }
 
   let(:file) { fixture_file_upload('students.csv') }

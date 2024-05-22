@@ -3,12 +3,13 @@
 require 'rails_helper'
 
 RSpec.describe SchoolClass::Update, type: :unit do
-  let(:school_class) { create(:school_class, name: 'Test School Class Name', teacher_id:, school: build(:school, id: School::ID)) }
+  let(:school) { create(:school) }
+  let(:school_class) { create(:school_class, name: 'Test School Class Name', teacher_id:, school:) }
   let(:school_class_params) { { name: 'New Name' } }
   let(:teacher_id) { SecureRandom.uuid }
 
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   it 'returns a successful operation response' do

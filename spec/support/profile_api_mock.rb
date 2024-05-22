@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module ProfileApiMock
-  ORGANISATION_ID = School::ID
-
   # TODO: Replace with WebMock HTTP stubs once the profile API has been built.
 
   def stub_profile_api_list_school_owners(user_id:)

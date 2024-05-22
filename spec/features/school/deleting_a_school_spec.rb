@@ -4,11 +4,11 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a school', type: :request do
   before do
-    authenticate_as_school_owner(school_id: School::ID)
+    authenticate_as_school_owner(school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school, id: School::ID) }
+  let(:school) { create(:school) }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}", headers:)

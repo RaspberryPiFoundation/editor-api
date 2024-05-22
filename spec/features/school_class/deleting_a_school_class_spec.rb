@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a school class', type: :request do
   before do
-    authenticate_as_school_owner(school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
+    authenticate_as_school_owner(school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, teacher_id:, school:) }
-  let(:school) { build(:school, id: School::ID) }
+  let(:school) { create(:school) }
   let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do

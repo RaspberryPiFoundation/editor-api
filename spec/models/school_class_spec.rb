@@ -4,31 +4,32 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass do
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
-    stub_user_info_api_for_student(student_id:, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
 
   let(:student_id) { SecureRandom.uuid }
   let(:teacher_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   describe 'associations' do
     it 'belongs to a school' do
-      school_class = create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      school_class = create(:school_class, teacher_id:, school:)
       expect(school_class.school).to be_a(School)
     end
 
     it 'has many members' do
-      school_class = create(:school_class, members: [build(:class_member, student_id:)], teacher_id:, school: build(:school, id: School::ID))
+      school_class = create(:school_class, members: [build(:class_member, student_id:)], teacher_id:, school:)
       expect(school_class.members.size).to eq(1)
     end
 
     it 'has many lessons' do
-      school_class = create(:school_class, lessons: [build(:lesson, user_id: teacher_id)], teacher_id:, school: build(:school, id: School::ID))
+      school_class = create(:school_class, lessons: [build(:lesson, user_id: teacher_id)], teacher_id:, school:)
       expect(school_class.lessons.size).to eq(1)
     end
 
     context 'when a school_class is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id:)], lessons: [build(:lesson, user_id: teacher_id)], teacher_id:, school: build(:school, id: School::ID)) }
+      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id:)], lessons: [build(:lesson, user_id: teacher_id)], teacher_id:, school:) }
 
       it 'also destroys class members to avoid making them invalid' do
         expect { school_class.destroy! }.to change(ClassMember, :count).by(-1)
@@ -46,7 +47,7 @@ RSpec.describe SchoolClass do
   end
 
   describe 'validations' do
-    subject(:school_class) { build(:school_class, teacher_id:, school: build(:school, id: School::ID)) }
+    subject(:school_class) { build(:school_class, teacher_id:, school:) }
 
     it 'has a valid default factory' do
       expect(school_class).to be_valid
@@ -84,7 +85,7 @@ RSpec.describe SchoolClass do
 
   describe '.teachers' do
     it 'returns User instances for the current scope' do
-      create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      create(:school_class, teacher_id:, school:)
 
       teacher = described_class.all.teachers.first
       expect(teacher.name).to eq('School Teacher')
@@ -100,7 +101,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'ignores members not included in the current scope' do
-      create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      create(:school_class, teacher_id:, school:)
 
       teacher = described_class.none.teachers.first
       expect(teacher).to be_nil
@@ -109,7 +110,7 @@ RSpec.describe SchoolClass do
 
   describe '.with_teachers' do
     it 'returns an array of class members paired with their User instance' do
-      school_class = create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      school_class = create(:school_class, teacher_id:, school:)
 
       pair = described_class.all.with_teachers.first
       teacher = described_class.all.teachers.first
@@ -127,7 +128,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'ignores members not included in the current scope' do
-      create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      create(:school_class, teacher_id:, school:)
 
       pair = described_class.none.with_teachers.first
       expect(pair).to be_nil
@@ -136,7 +137,7 @@ RSpec.describe SchoolClass do
 
   describe '#with_teacher' do
     it 'returns the class member paired with their User instance' do
-      school_class = create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      school_class = create(:school_class, teacher_id:, school:)
 
       pair = school_class.with_teacher
       teacher = described_class.all.teachers.first

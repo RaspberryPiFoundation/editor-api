@@ -4,19 +4,20 @@ require 'rails_helper'
 
 RSpec.describe Lesson do
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:teacher_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   describe 'associations' do
     it 'optionally belongs to a school (library)' do
-      lesson = create(:lesson, school: build(:school, id: School::ID), user_id: teacher_id)
+      lesson = create(:lesson, school:, user_id: teacher_id)
       expect(lesson.school).to be_a(School)
     end
 
     it 'optionally belongs to a school class' do
-      school_class = create(:school_class, teacher_id:, school: build(:school, id: School::ID))
+      school_class = create(:school_class, teacher_id:, school:)
 
       lesson = create(:lesson, school_class:, school: school_class.school, user_id: teacher_id)
       expect(lesson.school_class).to be_a(SchoolClass)
@@ -69,12 +70,14 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school' do
       before do
-        lesson.update!(school: create(:school, id: School::ID))
+        lesson.update!(school:)
       end
+
+      let(:school) { create(:school) }
 
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
         student_id = SecureRandom.uuid
-        stub_user_info_api_for_student(student_id:, school_id: School::ID)
+        stub_user_info_api_for_student(student_id:, school_id: school.id)
         lesson.user_id = student_id
         expect(lesson).to be_invalid
       end
@@ -82,12 +85,14 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class, teacher_id:, school: build(:school, id: School::ID)))
+        lesson.update!(school_class: create(:school_class, teacher_id:, school:))
       end
+
+      let(:school) { create(:school) }
 
       it 'requires that the user that is the school-teacher for the school_class' do
         owner_id = SecureRandom.uuid
-        stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
+        stub_user_info_api_for_owner(owner_id:, school_id: school.id)
         lesson.user_id = owner_id
         expect(lesson).to be_invalid
       end
@@ -136,13 +141,15 @@ RSpec.describe Lesson do
   end
 
   describe '#school' do
+    let(:school) { create(:school) }
+
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_id:, school: build(:school, id: School::ID)), user_id: teacher_id)
+      lesson = create(:lesson, school_class: build(:school_class, teacher_id:, school:), user_id: teacher_id)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 
     it 'is not nullified when there is no school_class' do
-      lesson = create(:lesson, school: build(:school, id: School::ID), user_id: teacher_id)
+      lesson = create(:lesson, school:, user_id: teacher_id)
       expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end

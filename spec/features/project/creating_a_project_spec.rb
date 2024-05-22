@@ -4,13 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
   before do
-    authenticate_as_school_owner(school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
+    authenticate_as_school_owner(school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
     mock_phrase_generation
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   let(:params) do
     {
@@ -53,7 +54,7 @@ RSpec.describe 'Creating a project', type: :request do
   end
 
   context 'when the project is associated with a school (library)' do
-    let(:school) { create(:school, id: School::ID) }
+    let(:school) { create(:school) }
     let(:teacher_id) { SecureRandom.uuid }
 
     let(:params) do
@@ -81,8 +82,8 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 201 Created when the user is a school-student for the school' do
       student_id = SecureRandom.uuid
-      stub_user_info_api_for_student(student_id:, school_id: School::ID)
-      authenticate_as_school_student(student_id:, school_id: School::ID)
+      stub_user_info_api_for_student(student_id:, school_id: school.id)
+      authenticate_as_school_student(student_id:, school_id: school.id)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -114,7 +115,7 @@ RSpec.describe 'Creating a project', type: :request do
   end
 
   context 'when the project is associated with a lesson' do
-    let(:school) { create(:school, id: School::ID) }
+    let(:school) { create(:school) }
     let(:lesson) { create(:lesson, school:, user_id: teacher_id) }
     let(:teacher_id) { SecureRandom.uuid }
 

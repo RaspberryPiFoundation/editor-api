@@ -4,9 +4,9 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a copy of a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school_id: School::ID)
-    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
+    authenticate_as_school_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -14,6 +14,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   let(:params) { {} }
   let(:teacher_id) { SecureRandom.uuid }
   let(:owner_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   it 'responds 201 Created' do
     post("/api/lessons/#{lesson.id}/copy", headers:, params:)
@@ -82,7 +83,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   end
 
   context "when the lesson's visibility is 'teachers'" do
-    let(:school) { create(:school, id: School::ID) }
+    let(:school) { create(:school) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
     let(:owner_id) { SecureRandom.uuid }
 

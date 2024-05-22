@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Showing a school class', type: :request do
   before do
-    authenticate_as_school_owner(school_id: School::ID)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
+    authenticate_as_school_owner(school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
-  let(:school) { build(:school, id: School::ID) }
+  let(:school) { create(:school) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher_id) { SecureRandom.uuid }
 
@@ -28,8 +28,8 @@ RSpec.describe 'Showing a school class', type: :request do
   # rubocop:disable RSpec/ExampleLength
   it 'responds 200 OK when the user is a student in the class' do
     student_id = SecureRandom.uuid
-    stub_user_info_api_for_student(student_id:, school_id: School::ID)
-    authenticate_as_school_student(student_id:, school_id: School::ID)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
+    authenticate_as_school_student(student_id:, school_id: school.id)
     create(:class_member, school_class:, student_id:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)

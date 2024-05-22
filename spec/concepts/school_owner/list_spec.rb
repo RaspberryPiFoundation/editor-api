@@ -9,7 +9,7 @@ RSpec.describe SchoolOwner::List, type: :unit do
 
   before do
     stub_profile_api_list_school_owners(user_id: owner_id)
-    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
   end
 
   it 'returns a successful operation response' do

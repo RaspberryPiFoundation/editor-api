@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school owners', type: :request do
   before do
-    authenticate_as_school_owner(school_id: School::ID)
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_list_school_owners(user_id: owner_id)
-    stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school, id: School::ID) }
+  let(:school) { create(:school) }
   let(:owner_id) { SecureRandom.uuid }
 
   it 'responds 200 OK' do

@@ -4,12 +4,13 @@ require 'rails_helper'
 
 RSpec.describe ClassMember do
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: School::ID)
-    stub_user_info_api_for_student(student_id:, school_id: School::ID)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
 
   let(:student_id) { SecureRandom.uuid }
-  let(:school_class) { build(:school_class, teacher_id:, school: build(:school, id: School::ID)) }
+  let(:school) { create(:school) }
+  let(:school_class) { build(:school_class, teacher_id:, school:) }
   let(:teacher_id) { SecureRandom.uuid }
 
   describe 'associations' do

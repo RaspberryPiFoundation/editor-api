@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe User do
   subject { build(:user) }
 
-  let(:organisation_id) { School::ID }
+  let(:school) { create(:school) }
+  let(:organisation_id) { school.id }
 
   it { is_expected.to respond_to(:id) }
   it { is_expected.to respond_to(:name) }
@@ -57,7 +58,7 @@ RSpec.describe User do
     let(:user) { users.first }
 
     before do
-      stub_user_info_api_for_owner(owner_id: ids.first, school_id: School::ID)
+      stub_user_info_api_for_owner(owner_id: ids.first, school_id: school.id)
     end
 
     it 'returns an Array' do
@@ -90,7 +91,7 @@ RSpec.describe User do
       it 'returns a user with the correct organisations' do
         stub_user_info_api_for_student_without_organisations(student_id: ids.first)
 
-        expect(user.organisations).to eq(organisation_id => 'school-student')
+        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
       end
     end
   end
@@ -130,7 +131,7 @@ RSpec.describe User do
       end
 
       it 'returns a user with the correct organisations' do
-        expect(user.organisations).to eq(organisation_id => 'school-student')
+        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
       end
     end
 
@@ -196,7 +197,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct organisations' do
-      expect(auth_subject.organisations).to eq(organisation_id => 'school-student')
+      expect(auth_subject.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
     end
 
     context 'when info includes organisations' do
@@ -272,7 +273,7 @@ RSpec.describe User do
     let(:owner_id) { SecureRandom.uuid }
 
     before do
-      stub_user_info_api_for_owner(owner_id:, school_id: School::ID)
+      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     end
 
     it 'returns an instance of the described class' do
