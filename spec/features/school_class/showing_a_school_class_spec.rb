@@ -24,14 +24,17 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
+  # rubocop:disable RSpec/ExampleLength
   it 'responds 200 OK when the user is a student in the class' do
-    stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
-    authenticate_as_school_student(student_id: User::STUDENT_ID, school_id: School::ID)
-    create(:class_member, school_class:, student_id: User::STUDENT_ID)
+    student_id = SecureRandom.uuid
+    stub_user_info_api_for_student(student_id:, school_id: School::ID)
+    authenticate_as_school_student(student_id:, school_id: School::ID)
+    create(:class_member, school_class:, student_id:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)
   end
+  # rubocop:enable RSpec/ExampleLength
 
   it 'responds with the school class JSON' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)

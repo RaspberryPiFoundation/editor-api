@@ -6,14 +6,15 @@ RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticate_as_school_owner(school_id: School::ID)
     stub_user_info_api_for_teacher(teacher_id: User::TEACHER_ID, school_id: School::ID)
-    stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
+    stub_user_info_api_for_student(student_id:, school_id: School::ID)
 
-    create(:class_member, school_class:, student_id: User::STUDENT_ID)
+    create(:class_member, school_class:, student_id:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: User::TEACHER_ID, school:) }
   let(:school) { build(:school, id: School::ID) }
+  let(:student_id) { SecureRandom.uuid }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)
@@ -65,7 +66,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-student isn't a member of" do
     teacher_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_student(student_id: User::STUDENT_ID, school_id: School::ID)
+    authenticate_as_school_student(student_id:, school_id: School::ID)
     create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)

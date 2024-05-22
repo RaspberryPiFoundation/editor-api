@@ -10,7 +10,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
   let!(:school_class) { create(:school_class, teacher_id: User::TEACHER_ID, school:) }
   let(:school) { build(:school, id: School::ID) }
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
 
   let(:class_member_params) do
     { student_id: }

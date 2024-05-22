@@ -13,7 +13,7 @@ RSpec.describe 'Listing class members', type: :request do
   let!(:class_member) { create(:class_member, student_id:, school_class:) }
   let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID, school:) }
   let(:school) { build(:school, id: School::ID) }
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)

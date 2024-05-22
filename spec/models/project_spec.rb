@@ -102,8 +102,9 @@ RSpec.describe Project do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
-      create(:project, user_id: User::STUDENT_ID)
+      student_id = SecureRandom.uuid
+      stub_user_info_api_for_student(student_id:, school_id: School::ID)
+      create(:project, user_id: student_id)
 
       user = described_class.all.users.first
       expect(user.name).to eq('School Student')
@@ -127,15 +128,18 @@ RSpec.describe Project do
   end
 
   describe '.with_users' do
+    # rubocop:disable RSpec/ExampleLength
     it 'returns an array of class members paired with their User instance' do
-      stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
-      project = create(:project, user_id: User::STUDENT_ID)
+      student_id = SecureRandom.uuid
+      stub_user_info_api_for_student(student_id:, school_id: School::ID)
+      project = create(:project, user_id: student_id)
 
       pair = described_class.all.with_users.first
       user = described_class.all.users.first
 
       expect(pair).to eq([project, user])
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it 'returns nil values for members where no profile account exists' do
       user_id = SecureRandom.uuid
@@ -155,15 +159,18 @@ RSpec.describe Project do
   end
 
   describe '#with_user' do
+    # rubocop:disable RSpec/ExampleLength
     it 'returns the class member paired with their User instance' do
-      stub_user_info_api_for_student(student_id: User::STUDENT_ID, school_id: School::ID)
-      project = create(:project, user_id: User::STUDENT_ID)
+      student_id = SecureRandom.uuid
+      stub_user_info_api_for_student(student_id:, school_id: School::ID)
+      project = create(:project, user_id: student_id)
 
       pair = project.with_user
       user = described_class.all.users.first
 
       expect(pair).to eq([project, user])
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it 'returns a nil value if the member has no profile account' do
       user_id = SecureRandom.uuid

@@ -8,7 +8,7 @@ RSpec.describe School do
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
 
   describe 'associations' do
     it 'has many classes' do
@@ -23,15 +23,15 @@ RSpec.describe School do
 
     it 'has many projects' do
       school = create(:school, id: School::ID)
-      create(:project, user_id: User::STUDENT_ID, school:)
-      create(:project, user_id: User::STUDENT_ID, school:)
+      create(:project, user_id: student_id, school:)
+      create(:project, user_id: student_id, school:)
       expect(school.projects.size).to eq(2)
     end
 
     context 'when a school is destroyed' do
       let(:lesson_1) { build(:lesson, user_id: User::TEACHER_ID) }
       let(:lesson_2) { build(:lesson, user_id: User::TEACHER_ID) }
-      let!(:project) { create(:project, user_id: User::STUDENT_ID, school:) }
+      let!(:project) { create(:project, user_id: student_id, school:) }
 
       let!(:school_class) { build(:school_class, members: [build(:class_member, student_id:)], lessons: [lesson_1], teacher_id: User::TEACHER_ID) }
       let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], id: School::ID) }

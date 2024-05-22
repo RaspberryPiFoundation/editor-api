@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolStudent::Update, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
 
   let(:school_student_params) do
     {

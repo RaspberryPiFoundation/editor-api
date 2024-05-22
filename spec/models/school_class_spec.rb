@@ -8,7 +8,7 @@ RSpec.describe SchoolClass do
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
 
   describe 'associations' do
     it 'belongs to a school' do
@@ -71,7 +71,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'requires a teacher that has the school-teacher role for the school' do
-      school_class.teacher_id = User::STUDENT_ID
+      school_class.teacher_id = student_id
       expect(school_class).to be_invalid
     end
 

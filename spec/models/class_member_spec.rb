@@ -8,7 +8,7 @@ RSpec.describe ClassMember do
     stub_user_info_api_for_student(student_id:, school_id: School::ID)
   end
 
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
   let(:school_class) { build(:school_class, teacher_id: User::TEACHER_ID, school: build(:school, id: School::ID)) }
 
   describe 'associations' do

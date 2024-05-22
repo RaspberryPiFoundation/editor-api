@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolStudent::List, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:student_id) { User::STUDENT_ID }
+  let(:student_id) { SecureRandom.uuid }
 
   before do
     stub_profile_api_list_school_students(user_id: student_id)
