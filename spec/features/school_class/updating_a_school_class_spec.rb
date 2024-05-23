@@ -4,15 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school class', type: :request do
   before do
-    authenticate_as_school_owner
-    stub_user_info_api_for_teacher
+    authenticate_as_school_owner(school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, name: 'Test School Class') }
-  let(:school) { school_class.school }
-  let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { user_id_by_index(teacher_index) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
+  let(:school) { create(:school) }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
     {
@@ -28,7 +27,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the school-teacher for the class' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
@@ -42,7 +41,6 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds with the teacher JSON' do
-    stub_user_info_api_for_teacher
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 

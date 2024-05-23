@@ -4,7 +4,6 @@ require 'faraday'
 
 class HydraPublicApiClient
   API_URL = ENV.fetch('HYDRA_PUBLIC_URL', 'http://localhost:9001')
-  BYPASS_AUTH_USER_ID = '00000000-0000-0000-0000-000000000000'
 
   class << self
     def fetch_oauth_user(...)
@@ -15,7 +14,7 @@ class HydraPublicApiClient
   def fetch_oauth_user(token:)
     if bypass_auth?
       users = stubbed_data['users']
-      user = users.detect { |attr| attr['id'] == BYPASS_AUTH_USER_ID }
+      user = users.detect { |attr| attr['id'] == '00000000-0000-0000-0000-000000000000' }
       return user
     end
 

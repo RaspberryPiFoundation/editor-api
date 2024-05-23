@@ -8,41 +8,43 @@ module UserProfileMock
     stub_user_info_api(user_id:, users: [])
   end
 
-  def stub_user_info_api_for_owner
-    stub_user_info_api_for(user_index: 0)
+  def stub_user_info_api_for_owner(owner_id:, school_id:)
+    stub_user_info_api_for(user_index: 0, user_id: owner_id, school_id:)
   end
 
-  def stub_user_info_api_for_teacher
-    stub_user_info_api_for(user_index: 1)
+  def stub_user_info_api_for_teacher(teacher_id:, school_id:)
+    stub_user_info_api_for(user_index: 1, user_id: teacher_id, school_id:)
   end
 
-  def stub_user_info_api_for_student
-    stub_user_info_api_for(user_index: 2)
+  def stub_user_info_api_for_student(student_id:, school_id:)
+    stub_user_info_api_for(user_index: 2, user_id: student_id, school_id:)
   end
 
-  def stub_user_info_api_for_student_without_organisations
-    stub_user_info_api_for(user_index: 3)
+  def stub_user_info_api_for_student_without_organisations(student_id:)
+    stub_user_info_api_for(user_index: 3, user_id: student_id)
   end
 
-  def stub_user_info_api_for(user_index:)
+  def stub_user_info_api_for(user_index:, user_id: nil, school_id: nil)
     user_attrs = user_attributes_by_index(user_index)
+    user_attrs['id'] = user_id if user_id
+    user_attrs['organisations'] = { school_id => user_attrs['roles'] } if school_id
     stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 
-  def authenticate_as_school_owner
-    stub_hydra_public_api(user_index: 0)
+  def authenticate_as_school_owner(owner_id: SecureRandom.uuid, school_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 0, user_id: owner_id, school_id:)
   end
 
-  def authenticate_as_school_teacher
-    stub_hydra_public_api(user_index: 1)
+  def authenticate_as_school_teacher(teacher_id: SecureRandom.uuid, school_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 1, user_id: teacher_id, school_id:)
   end
 
-  def authenticate_as_school_student
-    stub_hydra_public_api(user_index: 2)
+  def authenticate_as_school_student(student_id: SecureRandom.uuid, school_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 2, user_id: student_id, school_id:)
   end
 
-  def authenticate_as_school_student_without_organisations
-    stub_hydra_public_api(user_index: 3)
+  def authenticate_as_school_student_without_organisations(student_id: SecureRandom.uuid)
+    stub_hydra_public_api(user_index: 3, user_id: student_id)
   end
 
   def unauthenticated_user
@@ -57,28 +59,20 @@ module UserProfileMock
     JSON.parse(USERS)['users'][user_index] if user_index
   end
 
-  def user_id_by_index(user_index)
-    user_attributes_by_index(user_index)&.fetch('id')
-  end
-
-  def user_index_by_uuid(uuid)
-    JSON.parse(USERS)['users'].find_index { |attr| attr['id'] == uuid }
-  end
-
-  def user_index_by_role(name)
-    JSON.parse(USERS)['users'].find_index { |attr| attr['roles'].include?(name) }
-  end
-
   private
 
   # Stubs the API that returns user profile data for the logged in user.
-  def stub_hydra_public_api(user_index:)
+  def stub_hydra_public_api(user_index:, user_id: nil, school_id: nil)
+    user_attrs = user_attributes_by_index(user_index)
+    user_attrs['id'] = user_id if user_id
+    user_attrs['organisations'] = { school_id => user_attrs['roles'] } if school_id
+
     stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo")
       .with(headers: { Authorization: "Bearer #{TOKEN}" })
       .to_return(
         status: 200,
         headers: { content_type: 'application/json' },
-        body: user_attributes_by_index(user_index).to_json
+        body: user_attrs.to_json
       )
   end
 

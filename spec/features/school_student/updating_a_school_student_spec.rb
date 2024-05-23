@@ -4,14 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school student', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_update_school_student
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { SecureRandom.uuid }
 
   let(:params) do
     {
@@ -29,7 +28,7 @@ RSpec.describe 'Updating a school student', type: :request do
   end
 
   it 'responds 204 No Content when the user is a school-teacher' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(school_id: school.id)
 
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
     expect(response).to have_http_status(:no_content)

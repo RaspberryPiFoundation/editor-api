@@ -4,14 +4,16 @@ require 'rails_helper'
 
 RSpec.describe ClassMember::Delete, type: :unit do
   before do
-    stub_user_info_api_for_teacher
-    stub_user_info_api_for_student
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
 
-  let!(:class_member) { create(:class_member) }
+  let!(:class_member) { create(:class_member, student_id:, school_class:) }
   let(:class_member_id) { class_member.id }
-  let(:school_class) { class_member.school_class }
-  let(:school) { school_class.school }
+  let(:school_class) { build(:school_class, teacher_id:, school:) }
+  let(:school) { create(:school) }
+  let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
 
   it 'returns a successful operation response' do
     response = described_class.call(school_class:, class_member_id:)

@@ -30,7 +30,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     before do
       # Instantiate project
       project
-      authenticate_as_school_owner
+      authenticate_as_school_owner(owner_id: stubbed_user.id)
     end
 
     context 'when unauthenticated' do

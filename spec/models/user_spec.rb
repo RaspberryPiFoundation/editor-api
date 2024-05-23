@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe User do
   subject { build(:user) }
 
-  let(:organisation_id) { '12345678-1234-1234-1234-123456789abc' }
+  let(:school) { create(:school) }
+  let(:organisation_id) { school.id }
 
   it { is_expected.to respond_to(:id) }
   it { is_expected.to respond_to(:name) }
@@ -53,11 +54,11 @@ RSpec.describe User do
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
 
-    let(:ids) { ['00000000-0000-0000-0000-000000000000'] }
+    let(:ids) { [SecureRandom.uuid] }
     let(:user) { users.first }
 
     before do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id: ids.first, school_id: school.id)
     end
 
     it 'returns an Array' do
@@ -69,7 +70,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+      expect(user.id).to eq ids.first
     end
 
     it 'returns a user with the correct name' do
@@ -85,12 +86,12 @@ RSpec.describe User do
     end
 
     context 'when no organisations are returned' do
-      let(:ids) { ['33333333-3333-3333-3333-333333333333'] } # student without organisations
+      let(:ids) { [SecureRandom.uuid] }
 
       it 'returns a user with the correct organisations' do
-        stub_user_info_api_for_student_without_organisations
+        stub_user_info_api_for_student_without_organisations(student_id: ids.first)
 
-        expect(user.organisations).to eq(organisation_id => 'school-student')
+        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
       end
     end
   end
@@ -98,8 +99,10 @@ RSpec.describe User do
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
+    let(:owner_id) { SecureRandom.uuid }
+
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(owner_id:, school_id: organisation_id)
     end
 
     it 'returns an instance of the described class' do
@@ -107,7 +110,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+      expect(user.id).to eq owner_id
     end
 
     it 'returns a user with the correct name' do
@@ -128,7 +131,7 @@ RSpec.describe User do
       end
 
       it 'returns a user with the correct organisations' do
-        expect(user.organisations).to eq(organisation_id => 'school-student')
+        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
       end
     end
 
@@ -194,7 +197,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct organisations' do
-      expect(auth_subject.organisations).to eq(organisation_id => 'school-student')
+      expect(auth_subject.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
     end
 
     context 'when info includes organisations' do
@@ -265,10 +268,12 @@ RSpec.describe User do
   end
 
   describe '.where' do
-    subject(:user) { described_class.where(id: '00000000-0000-0000-0000-000000000000').first }
+    subject(:user) { described_class.where(id: owner_id).first }
+
+    let(:owner_id) { SecureRandom.uuid }
 
     before do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     end
 
     it 'returns an instance of the described class' do
@@ -276,7 +281,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq '00000000-0000-0000-0000-000000000000'
+      expect(user.id).to eq owner_id
     end
 
     it 'returns a user with the correct name' do
@@ -293,6 +298,8 @@ RSpec.describe User do
           example.run
         end
       end
+
+      let(:owner_id) { '00000000-0000-0000-0000-000000000000' }
 
       it 'does not call the API' do
         user

@@ -5,12 +5,11 @@ require 'rails_helper'
 RSpec.describe SchoolTeacher::List, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { user_id_by_index(teacher_index) }
+  let(:teacher_id) { SecureRandom.uuid }
 
   before do
     stub_profile_api_list_school_teachers(user_id: teacher_id)
-    stub_user_info_api_for_teacher
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   it 'returns a successful operation response' do
@@ -26,7 +25,6 @@ RSpec.describe SchoolTeacher::List, type: :unit do
   end
 
   it 'returns the school teachers in the operation response' do
-    stub_user_info_api_for_teacher
     response = described_class.call(school:, token:)
     expect(response[:school_teachers].first).to be_a(User)
   end
