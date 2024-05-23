@@ -15,7 +15,6 @@ module Api
     end
 
     def create
-      puts "the school params are: #{school_params}"
       result = School::Create.call(school_params:, creator_id: current_user.id)
 
       if result.success?

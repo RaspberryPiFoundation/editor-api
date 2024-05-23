@@ -9,7 +9,6 @@ class School
         response[:school].save!
         response
       rescue StandardError => e
-        pp e
         Sentry.capture_exception(e)
         response[:error] = response[:school].errors
         response
