@@ -31,11 +31,18 @@ RSpec.describe School do
       expect(school.projects.size).to eq(2)
     end
 
+    it 'has many roles' do
+      create(:student_role, school:)
+      create(:owner_role, school:)
+      expect(school.roles.size).to eq(2)
+    end
+
     context 'when a school is destroyed' do
       let!(:school_class) { create(:school_class, school:, teacher_id:) }
       let!(:lesson_1) { create(:lesson, user_id: teacher_id, school_class:) }
       let!(:lesson_2) { create(:lesson, user_id: teacher_id, school:) }
       let!(:project) { create(:project, user_id: student_id, school:) }
+      let!(:role) { create(:role, school:) }
 
       before do
         create(:class_member, school_class:, student_id:)
@@ -69,6 +76,15 @@ RSpec.describe School do
       it 'nullifies the school_id field on projects' do
         school.destroy!
         expect(project.reload.school_id).to be_nil
+      end
+
+      it 'does not destroy roles' do
+        expect { school.destroy! }.not_to change(Role, :count)
+      end
+
+      it 'nullifies the school_id field on roles' do
+        school.destroy!
+        expect(role.reload.school_id).to be_nil
       end
     end
   end
