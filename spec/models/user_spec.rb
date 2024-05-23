@@ -47,16 +47,6 @@ RSpec.describe User do
     it 'returns a user with the correct organisations' do
       expect(user.organisations).to eq(organisation_id => 'school-owner')
     end
-
-    context 'when no organisations are returned' do
-      let(:ids) { [SecureRandom.uuid] }
-
-      it 'returns a user with the correct organisations' do
-        stub_user_info_api_for_student_without_organisations(student_id: ids.first)
-
-        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
-      end
-    end
   end
 
   describe '.from_token' do
@@ -86,16 +76,6 @@ RSpec.describe User do
 
     it 'returns a user with the correct organisations' do
       expect(user.organisations).to eq(organisation_id => 'school-owner')
-    end
-
-    context 'when no organisations are returned' do
-      before do
-        authenticate_as_school_student_without_organisations
-      end
-
-      it 'returns a user with the correct organisations' do
-        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
-      end
     end
 
     context 'when BYPASS_AUTH is true' do
@@ -157,10 +137,6 @@ RSpec.describe User do
 
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'john.doe@example.com'
-    end
-
-    it 'returns a user with the correct organisations' do
-      expect(auth_subject.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
     end
 
     context 'when info includes organisations' do

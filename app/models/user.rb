@@ -70,9 +70,6 @@ class User
       info = info.stringify_keys
       args = info.slice(*ATTRIBUTES)
 
-      # TODO: remove once the UserInfoApi returns the 'organisations' key.
-      temporarily_add_organisations_until_the_profile_app_is_updated(args)
-
       new(args)
     end
   end
@@ -89,9 +86,6 @@ class User
     args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
     args['id'] = auth.uid
 
-    # TODO: remove once the OmniAuth info returns the 'organisations' key.
-    temporarily_add_organisations_until_the_profile_app_is_updated(args)
-
     new(args)
   end
 
@@ -107,16 +101,6 @@ class User
     args['id'] ||= auth['sub']
     args['token'] = token
 
-    # TODO: remove once the HydraPublicApi returns the 'organisations' key.
-    temporarily_add_organisations_until_the_profile_app_is_updated(args)
-
     new(args)
-  end
-
-  def self.temporarily_add_organisations_until_the_profile_app_is_updated(hash)
-    return hash if hash.key?('organisations')
-
-    # Use the same organisation ID as the one from users.json for now.
-    hash.merge!('organisations' => { '12345678-1234-1234-1234-123456789abc' => hash['roles'] })
   end
 end
