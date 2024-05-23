@@ -53,7 +53,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        authenticate_as_school_teacher
+        authenticate_as_school_teacher(school_id: SecureRandom.uuid)
       end
 
       it 'returns forbidden response' do

@@ -177,7 +177,7 @@ RSpec.describe 'Creating a project', type: :request do
     # rubocop:disable RSpec/ExampleLength
     it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
       user_id = SecureRandom.uuid
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(school_id: school.id)
       stub_user_info_api_for_unknown_users(user_id:)
       lesson.update!(user_id:)
 

@@ -59,7 +59,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
       context 'with another users project' do
         before do
-          authenticate_as_school_teacher
+          authenticate_as_school_teacher(school_id: SecureRandom.uuid)
         end
 
         it 'returns an error' do
