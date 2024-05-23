@@ -124,7 +124,7 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it 'does not include the lesson when the user is a school-student' do
-      authenticate_as_school_student
+      authenticate_as_school_student(school_id: school.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
@@ -164,7 +164,7 @@ RSpec.describe 'Listing lessons', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
-      authenticate_as_school_student
+      authenticate_as_school_student(school_id: school.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)

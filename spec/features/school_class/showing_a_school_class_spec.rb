@@ -100,7 +100,7 @@ RSpec.describe 'Showing a school class', type: :request do
   # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is not a school-student for the class' do
-    authenticate_as_school_student
+    authenticate_as_school_student(school_id: school.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

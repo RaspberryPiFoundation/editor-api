@@ -51,7 +51,7 @@ RSpec.describe 'Deleting a school class', type: :request do
   # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student
+    authenticate_as_school_student(school_id: school.id)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)
