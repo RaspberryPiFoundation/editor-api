@@ -37,10 +37,6 @@ class Ability
     # Any authenticated user can manage their own lessons.
     can %i[read create_copy update destroy], Lesson, user_id: user.id
 
-    user.organisation_ids.each do |organisation_id|
-      define_school_owner_abilities(organisation_id:) if user.school_owner?(organisation_id:)
-    end
-
     user.schools.each do |school|
       if user.school_student?(organisation_id: school.id)
         define_school_student_abilities(user:,
@@ -50,6 +46,7 @@ class Ability
         define_school_teacher_abilities(user:,
                                         organisation_id: school.id)
       end
+      define_school_owner_abilities(organisation_id: school.id) if user.school_owner?(organisation_id: school.id)
     end
   end
   # rubocop:enable Metrics/AbcSize

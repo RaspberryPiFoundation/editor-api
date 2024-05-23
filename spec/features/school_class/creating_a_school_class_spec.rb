@@ -4,13 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school class', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
+    authenticate_as_school_owner(school_id: school.id, owner_id:)
     stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:teacher_id) { SecureRandom.uuid }
+  let(:owner_id) { SecureRandom.uuid }
 
   let(:params) do
     {
@@ -95,6 +96,7 @@ RSpec.describe 'Creating a school class', type: :request do
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
     Role.teacher.find_by(user_id: teacher_id, school:).delete
+    Role.owner.find_by(user_id: owner_id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     post("/api/schools/#{school.id}/classes", headers:, params:)

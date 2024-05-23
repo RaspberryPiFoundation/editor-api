@@ -4,13 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a school student', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
+    authenticate_as_school_owner(school_id: school.id, owner_id:)
     stub_profile_api_delete_school_student
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:student_id) { SecureRandom.uuid }
+  let(:owner_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/students/#{student_id}", headers:)
@@ -23,6 +24,7 @@ RSpec.describe 'Deleting a school student', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+    Role.owner.find_by(user_id: owner_id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     delete("/api/schools/#{school.id}/students/#{student_id}", headers:)
