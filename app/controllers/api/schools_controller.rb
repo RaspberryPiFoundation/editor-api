@@ -15,7 +15,8 @@ module Api
     end
 
     def create
-      result = School::Create.call(school_params:, user_id: current_user.id)
+      puts "the school params are: #{school_params}"
+      result = School::Create.call(school_params:, creator_id: current_user.id)
 
       if result.success?
         @school = result[:school]
@@ -59,7 +60,11 @@ module Api
         :municipality,
         :administrative_area,
         :postal_code,
-        :country_code
+        :country_code,
+        :creator_role,
+        :creator_department,
+        :creator_agree_authority,
+        :creator_agree_terms_and_conditions
       )
     end
   end
