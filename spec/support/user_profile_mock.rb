@@ -18,6 +18,7 @@ module UserProfileMock
 
   def stub_user_info_api_for_student(student_id:, school_id:)
     stub_user_info_api_for(user_index: 2, user_id: student_id, school_id:)
+    create_student_role(school_id:, student_id:)
   end
 
   def stub_user_info_api_for_student_without_organisations(student_id:)
@@ -41,6 +42,7 @@ module UserProfileMock
 
   def authenticate_as_school_student(school_id:, student_id: SecureRandom.uuid)
     stub_hydra_public_api(user_index: 2, user_id: student_id, school_id:)
+    create_student_role(school_id:, student_id:)
   end
 
   def authenticate_as_school_student_without_organisations(student_id: SecureRandom.uuid)
@@ -80,5 +82,11 @@ module UserProfileMock
     stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
       .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
       .to_return({ body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
+
+  def create_student_role(school_id:, student_id:)
+    return if Role.student.exists?(user_id: student_id, school_id:)
+
+    create(:student_role, user_id: student_id, school_id:)
   end
 end

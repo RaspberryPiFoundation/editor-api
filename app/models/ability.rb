@@ -40,7 +40,13 @@ class Ability
     user.organisation_ids.each do |organisation_id|
       define_school_owner_abilities(organisation_id:) if user.school_owner?(organisation_id:)
       define_school_teacher_abilities(user:, organisation_id:) if user.school_teacher?(organisation_id:)
-      define_school_student_abilities(user:, organisation_id:) if user.school_student?(organisation_id:)
+    end
+
+    user.schools.each do |school|
+      if user.school_student?(organisation_id: school.id)
+        define_school_student_abilities(user:,
+                                        organisation_id: school.id)
+      end
     end
   end
   # rubocop:enable Metrics/AbcSize

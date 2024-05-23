@@ -38,6 +38,7 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+    Role.student.find_by(user_id: student_id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/students", headers:)

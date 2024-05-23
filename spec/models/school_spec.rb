@@ -32,6 +32,7 @@ RSpec.describe School do
     end
 
     it 'has many roles' do
+      Role.delete_all
       create(:student_role, school:)
       create(:owner_role, school:)
       expect(school.roles.size).to eq(2)
