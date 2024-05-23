@@ -4,11 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a lesson', type: :request do
   before do
-    authenticate_as_school_owner
-    stub_user_info_api_for_teacher
+    authenticate_as_school_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:teacher_id) { SecureRandom.uuid }
+  let(:owner_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   let(:params) do
     {
@@ -19,13 +22,13 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds 201 Created' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     post('/api/lessons', headers:, params:)
     expect(response).to have_http_status(:created)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -33,7 +36,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   it 'responds with the user JSON which is set from the current user' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     post('/api/lessons', headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -52,8 +55,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:teacher_id) { SecureRandom.uuid }
 
     let(:params) do
       {
@@ -71,7 +73,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-teacher for the school' do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -85,7 +87,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'sets the lesson user to the current user for school-teacher users' do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
       new_params = { lesson: params[:lesson].merge(user_id: 'ignored') }
 
       post('/api/lessons', headers:, params: new_params)
@@ -110,10 +112,9 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class) }
-    let(:school) { school_class.school }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:school_class) { create(:school_class, teacher_id:, school:) }
+    let(:school) { create(:school) }
+    let(:teacher_id) { SecureRandom.uuid }
 
     let(:params) do
       {
@@ -132,10 +133,8 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
-      teacher_index = user_index_by_role('school-teacher')
-
-      authenticate_as_school_teacher
-      school_class.update!(teacher_id: user_id_by_index(teacher_index))
+      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+      school_class.update!(teacher_id:)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -158,6 +157,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
       school = create(:school, id: SecureRandom.uuid)
       school_class.update!(school_id: school.id)
+      params[:lesson][:school_id] = school.id
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)

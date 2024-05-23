@@ -4,12 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Showing a lesson', type: :request do
   before do
-    authenticate_as_school_owner
-    stub_user_info_api_for_teacher
+    authenticate_as_school_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public') }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher_id) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:teacher_id) { SecureRandom.uuid }
+  let(:owner_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   it 'responds 200 OK' do
     get("/api/lessons/#{lesson.id}", headers:)
@@ -29,7 +32,6 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for_teacher
     get("/api/lessons/#{lesson.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -56,11 +58,10 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
-    let(:owner_index) { user_index_by_role('school-owner') }
-    let(:owner_id) { user_id_by_index(owner_index) }
+    let(:owner_id) { SecureRandom.uuid }
 
     it 'responds 200 OK when the user owns the lesson' do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
       lesson.update!(user_id: owner_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -75,12 +76,11 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
-    let(:owner_index) { user_index_by_role('school-owner') }
-    let(:owner_id) { user_id_by_index(owner_index) }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
+    let(:owner_id) { SecureRandom.uuid }
 
     it 'responds 200 OK when the user owns the lesson' do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
       lesson.update!(user_id: owner_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -109,27 +109,30 @@ RSpec.describe 'Showing a lesson', type: :request do
   end
 
   context "when the lesson's visibility is 'students'" do
-    let(:school_class) { create(:school_class) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
-    let(:teacher_index) { user_index_by_role('school-teacher') }
-    let(:teacher_id) { user_id_by_index(teacher_index) }
+    let(:school) { create(:school) }
+    let(:school_class) { create(:school_class, teacher_id:, school:) }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher_id) }
+    let(:teacher_id) { SecureRandom.uuid }
 
     it 'responds 200 OK when the user owns the lesson' do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(school_id: school.id)
       lesson.update!(user_id: teacher_id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)
     end
 
+    # rubocop:disable RSpec/ExampleLength
     it "responds 200 OK when the user is a school-student within the lesson's class" do
-      authenticate_as_school_student
-      stub_user_info_api_for_student
-      create(:class_member, school_class:)
+      student_id = SecureRandom.uuid
+      authenticate_as_school_student(student_id:, school_id: school.id)
+      stub_user_info_api_for_student(student_id:, school_id: school.id)
+      create(:class_member, school_class:, student_id:)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)
     end
+    # rubocop:enable RSpec/ExampleLength
 
     it "responds 403 Forbidden when the user is a school-student but isn't within the lesson's class" do
       authenticate_as_school_student

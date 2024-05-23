@@ -4,14 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Removing a school owner', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_remove_school_owner
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/owners/#{owner_id}", headers:)

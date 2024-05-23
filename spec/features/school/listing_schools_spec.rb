@@ -4,9 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Listing schools', type: :request do
   before do
-    authenticate_as_school_owner
-
-    create(:school, name: 'Test School')
+    school = create(:school, name: 'Test School')
+    authenticate_as_school_owner(school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

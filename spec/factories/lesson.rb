@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :lesson do
-    user_id { '11111111-1111-1111-1111-111111111111' } # Matches users.json.
+    user_id { SecureRandom.uuid }
     sequence(:name) { |n| "Lesson #{n}" }
     visibility { 'private' }
   end
