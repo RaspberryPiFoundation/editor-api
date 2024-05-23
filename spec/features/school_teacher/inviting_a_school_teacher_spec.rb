@@ -4,14 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Inviting a school teacher', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_invite_school_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:teacher_index) { user_index_by_role('school-teacher') }
-  let(:teacher_id) { user_id_by_index(teacher_index) }
+  let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
     {

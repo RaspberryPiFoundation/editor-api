@@ -4,14 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Archiving a lesson', type: :request do
   before do
-    authenticate_as_school_owner
-    stub_user_info_api_for_teacher
+    authenticate_as_school_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, user_id: owner_id) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   it 'responds 204 No Content' do
     delete("/api/lessons/#{lesson.id}", headers:)
@@ -51,7 +52,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, visibility: 'teachers', user_id: teacher_id) }
 
     it 'responds 204 No Content when the user is a school-owner' do
       delete("/api/lessons/#{lesson.id}", headers:)

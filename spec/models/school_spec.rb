@@ -4,33 +4,42 @@ require 'rails_helper'
 
 RSpec.describe School do
   before do
-    stub_user_info_api_for_teacher
-    stub_user_info_api_for_student
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
+
+  let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   describe 'associations' do
     it 'has many classes' do
-      school = create(:school, classes: [build(:school_class), build(:school_class)])
+      create(:school_class, school:, teacher_id:)
+      create(:school_class, school:, teacher_id:)
       expect(school.classes.size).to eq(2)
     end
 
     it 'has many lessons' do
-      school = create(:school, lessons: [build(:lesson), build(:lesson)])
+      create(:lesson, school:, user_id: teacher_id)
+      create(:lesson, school:, user_id: teacher_id)
       expect(school.lessons.size).to eq(2)
     end
 
     it 'has many projects' do
-      school = create(:school, projects: [build(:project), build(:project)])
+      create(:project, user_id: student_id, school:)
+      create(:project, user_id: student_id, school:)
       expect(school.projects.size).to eq(2)
     end
 
     context 'when a school is destroyed' do
-      let(:lesson_1) { build(:lesson) }
-      let(:lesson_2) { build(:lesson) }
-      let(:project) { build(:project) }
+      let!(:school_class) { create(:school_class, school:, teacher_id:) }
+      let!(:lesson_1) { create(:lesson, user_id: teacher_id, school_class:) }
+      let!(:lesson_2) { create(:lesson, user_id: teacher_id, school:) }
+      let!(:project) { create(:project, user_id: student_id, school:) }
 
-      let!(:school_class) { build(:school_class, members: [build(:class_member)], lessons: [lesson_1]) }
-      let!(:school) { create(:school, classes: [school_class], lessons: [lesson_2], projects: [project]) }
+      before do
+        create(:class_member, school_class:, student_id:)
+      end
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
@@ -65,7 +74,7 @@ RSpec.describe School do
   end
 
   describe 'validations' do
-    subject(:school) { build(:school) }
+    subject(:school) { create(:school) }
 
     it 'has a valid default factory' do
       expect(school).to be_valid

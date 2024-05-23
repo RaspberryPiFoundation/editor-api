@@ -4,14 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a lesson', type: :request do
   before do
-    authenticate_as_school_owner
-    stub_user_info_api_for_teacher
+    authenticate_as_school_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner_id) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   let(:params) do
     {
@@ -22,13 +23,13 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds 200 OK' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -36,7 +37,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for_owner
+    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -62,7 +63,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers') }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -70,7 +71,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 200 OK when assigning the lesson to a school class' do
-      school_class = create(:school_class, school:)
+      school_class = create(:school_class, school:, teacher_id:)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -106,8 +107,9 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students') }
+    let(:school) { create(:school) }
+    let(:school_class) { create(:school_class, teacher_id:, school:) }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher_id) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -129,7 +131,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
-      stub_user_info_api_for_owner
+      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
       new_params = { lesson: params[:lesson].merge(user_id: owner_id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 

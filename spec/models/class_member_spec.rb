@@ -4,24 +4,29 @@ require 'rails_helper'
 
 RSpec.describe ClassMember do
   before do
-    stub_user_info_api_for_teacher
-    stub_user_info_api_for_student
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
+
+  let(:student_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
+  let(:school_class) { build(:school_class, teacher_id:, school:) }
+  let(:teacher_id) { SecureRandom.uuid }
 
   describe 'associations' do
     it 'belongs to a school_class' do
-      class_member = create(:class_member)
+      class_member = create(:class_member, student_id:, school_class:)
       expect(class_member.school_class).to be_a(SchoolClass)
     end
 
     it 'belongs to a school (via school_class)' do
-      class_member = create(:class_member)
+      class_member = create(:class_member, student_id:, school_class:)
       expect(class_member.school).to be_a(School)
     end
   end
 
   describe 'validations' do
-    subject(:class_member) { build(:class_member) }
+    subject(:class_member) { build(:class_member, student_id:, school_class:) }
 
     it 'has a valid default factory' do
       expect(class_member).to be_valid
@@ -47,8 +52,7 @@ RSpec.describe ClassMember do
     end
 
     it 'requires a student that has the school-student role for the school' do
-      stub_user_info_api_for_teacher
-      class_member.student_id = '11111111-1111-1111-1111-111111111111' # school-teacher
+      class_member.student_id = teacher_id
       expect(class_member).to be_invalid
     end
 
@@ -61,8 +65,7 @@ RSpec.describe ClassMember do
 
   describe '.students' do
     it 'returns User instances for the current scope' do
-      stub_user_info_api_for_student
-      create(:class_member)
+      create(:class_member, student_id:, school_class:)
 
       student = described_class.all.students.first
       expect(student.name).to eq('School Student')
@@ -71,14 +74,14 @@ RSpec.describe ClassMember do
     it 'ignores members where no profile account exists' do
       student_id = SecureRandom.uuid
       stub_user_info_api_for_unknown_users(user_id: student_id)
-      create(:class_member, student_id:)
+      create(:class_member, student_id:, school_class:)
 
       student = described_class.all.students.first
       expect(student).to be_nil
     end
 
     it 'ignores members not included in the current scope' do
-      create(:class_member)
+      create(:class_member, student_id:, school_class:)
 
       student = described_class.none.students.first
       expect(student).to be_nil
@@ -87,7 +90,7 @@ RSpec.describe ClassMember do
 
   describe '.with_students' do
     it 'returns an array of class members paired with their User instance' do
-      class_member = create(:class_member)
+      class_member = create(:class_member, student_id:, school_class:)
 
       pair = described_class.all.with_students.first
       student = described_class.all.students.first
@@ -98,14 +101,14 @@ RSpec.describe ClassMember do
     it 'returns nil values for members where no profile account exists' do
       student_id = SecureRandom.uuid
       stub_user_info_api_for_unknown_users(user_id: student_id)
-      class_member = create(:class_member, student_id:)
+      class_member = create(:class_member, student_id:, school_class:)
 
       pair = described_class.all.with_students.first
       expect(pair).to eq([class_member, nil])
     end
 
     it 'ignores members not included in the current scope' do
-      create(:class_member)
+      create(:class_member, student_id:, school_class:)
 
       pair = described_class.none.with_students.first
       expect(pair).to be_nil
@@ -114,7 +117,7 @@ RSpec.describe ClassMember do
 
   describe '#with_student' do
     it 'returns the class member paired with their User instance' do
-      class_member = create(:class_member)
+      class_member = create(:class_member, student_id:, school_class:)
 
       pair = class_member.with_student
       student = described_class.all.students.first
@@ -125,7 +128,7 @@ RSpec.describe ClassMember do
     it 'returns a nil value if the member has no profile account' do
       student_id = SecureRandom.uuid
       stub_user_info_api_for_unknown_users(user_id: student_id)
-      class_member = create(:class_member, student_id:)
+      class_member = create(:class_member, student_id:, school_class:)
 
       pair = class_member.with_student
       expect(pair).to eq([class_member, nil])

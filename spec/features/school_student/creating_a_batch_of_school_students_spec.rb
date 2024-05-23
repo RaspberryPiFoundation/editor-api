@@ -4,14 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a batch of school students', type: :request do
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: school.id)
     stub_profile_api_create_school_student
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let(:student_id) { SecureRandom.uuid }
 
   let(:file) { fixture_file_upload('students.csv') }
 
@@ -21,7 +20,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
   end
 
   it 'responds 204 No Content when the user is a school-teacher' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(school_id: school.id)
 
     post("/api/schools/#{school.id}/students/batch", headers:, params: { file: })
     expect(response).to have_http_status(:no_content)

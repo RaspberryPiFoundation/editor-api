@@ -5,8 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolOwner::Invite, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:owner_index) { user_index_by_role('school-owner') }
-  let(:owner_id) { user_id_by_index(owner_index) }
+  let(:owner_id) { SecureRandom.uuid }
 
   let(:school_owner_params) do
     { email_address: 'owner-to-invite@example.com' }

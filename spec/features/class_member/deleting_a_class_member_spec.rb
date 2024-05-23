@@ -4,17 +4,17 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a class member', type: :request do
   before do
-    authenticate_as_school_owner
-    stub_user_info_api_for_teacher
-    stub_user_info_api_for_student
+    authenticate_as_school_owner(school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:class_member) { create(:class_member) }
-  let(:school_class) { class_member.school_class }
-  let(:school) { school_class.school }
-  let(:student_index) { user_index_by_role('school-student') }
-  let(:student_id) { user_id_by_index(student_index) }
+  let!(:class_member) { create(:class_member, student_id:, school_class:) }
+  let(:school_class) { build(:school_class, teacher_id:, school:) }
+  let(:school) { create(:school) }
+  let(:student_id) { SecureRandom.uuid }
+  let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
@@ -22,7 +22,7 @@ RSpec.describe 'Deleting a class member', type: :request do
   end
 
   it 'responds 204 No Content when the user is the class teacher' do
-    authenticate_as_school_teacher
+    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
     expect(response).to have_http_status(:no_content)
