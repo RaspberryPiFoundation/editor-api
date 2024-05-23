@@ -39,10 +39,6 @@ class User
     Role.where(school:, user_id: id).map(&:role)
   end
 
-  def org_role?(organisation_id:, role:)
-    org_roles(organisation_id:).include?(role.to_s)
-  end
-
   def school_owner?(school)
     Role.owner.find_by(school:, user_id: id)
   end
