@@ -27,7 +27,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      authenticate_as_school_owner(owner_id:)
+      authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
     end
 
     it 'returns success response' do
@@ -82,7 +82,7 @@ RSpec.describe 'Project update requests' do
     let(:params) { { project: { components: [] } } }
 
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(school_id: SecureRandom.uuid)
     end
 
     it 'returns forbidden response' do

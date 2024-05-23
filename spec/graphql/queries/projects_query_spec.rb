@@ -49,7 +49,7 @@ RSpec.describe 'projects { }' do
     let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(school_id: SecureRandom.uuid)
     end
 
     it { expect(query).to be_a_valid_graphql_query }
@@ -87,7 +87,7 @@ RSpec.describe 'projects { }' do
     let(:project) { create(:project, user_id: stubbed_user.id) }
 
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(school_id: SecureRandom.uuid)
     end
 
     it { expect(query).to be_a_valid_graphql_query }
