@@ -97,6 +97,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+      Role.teacher.find_by(user_id: teacher_id, school:).delete
       school.update!(id: SecureRandom.uuid)
 
       post('/api/lessons', headers:, params:)

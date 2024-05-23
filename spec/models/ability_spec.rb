@@ -138,7 +138,7 @@ RSpec.describe Ability do
 
     context 'when user is a school teacher' do
       before do
-        user.organisations = { school.id => 'school-teacher' }
+        create(:teacher_role, user_id: user.id, school:)
       end
 
       it { is_expected.to be_able_to(:read, school) }

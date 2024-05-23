@@ -14,6 +14,7 @@ module UserProfileMock
 
   def stub_user_info_api_for_teacher(teacher_id:, school_id:)
     stub_user_info_api_for(user_index: 1, user_id: teacher_id, school_id:)
+    create_teacher_role(school_id:, teacher_id:)
   end
 
   def stub_user_info_api_for_student(student_id:, school_id:)
@@ -38,6 +39,7 @@ module UserProfileMock
 
   def authenticate_as_school_teacher(school_id:, teacher_id: SecureRandom.uuid)
     stub_hydra_public_api(user_index: 1, user_id: teacher_id, school_id:)
+    create_teacher_role(school_id:, teacher_id:)
   end
 
   def authenticate_as_school_student(school_id:, student_id: SecureRandom.uuid)
@@ -88,5 +90,12 @@ module UserProfileMock
     return if Role.student.exists?(user_id: student_id, school_id:)
 
     create(:student_role, user_id: student_id, school_id:)
+  end
+
+  def create_teacher_role(school_id:, teacher_id:)
+    return unless School.exists?(id: school_id)
+    return if Role.teacher.exists?(user_id: teacher_id, school_id:)
+
+    create(:teacher_role, user_id: teacher_id, school_id:)
   end
 end
