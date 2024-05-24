@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe User do
-  subject { build(:user) }
+  subject(:user) { build(:user) }
 
   let(:school) { create(:school) }
   let(:organisation_id) { school.id }
@@ -309,6 +309,33 @@ RSpec.describe User do
       it 'returns a stubbed user' do
         expect(user.name).to eq('School Owner')
       end
+    end
+  end
+
+  describe '#schools' do
+    it 'includes schools where the user has the owner role' do
+      create(:owner_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
+    end
+
+    it 'includes schools where the user has the teacher role' do
+      create(:teacher_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
+    end
+
+    it 'includes schools where the user has the student role' do
+      create(:student_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
+    end
+
+    it 'does not include schools where the user has no role' do
+      expect(user.schools).to be_empty
+    end
+
+    it 'only includes a school once even if the user has multiple roles' do
+      create(:owner_role, school:, user_id: user.id)
+      create(:teacher_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
     end
   end
 end

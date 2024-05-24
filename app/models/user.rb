@@ -27,6 +27,10 @@ class User
     ATTRIBUTES.index_with { |_k| nil }
   end
 
+  def schools
+    School.joins(:roles).merge(Role.where(user_id: id)).distinct
+  end
+
   def organisation_ids
     organisations&.keys || []
   end
