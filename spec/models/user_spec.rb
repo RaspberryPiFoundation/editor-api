@@ -14,43 +14,6 @@ RSpec.describe User do
   it { is_expected.to respond_to(:organisations) }
   it { is_expected.to respond_to(:organisation_ids) }
 
-  shared_examples 'role_check' do |role|
-    let(:organisations) { {} }
-    let(:user) { build(:user, organisations:) }
-
-    it { is_expected.to be_falsey }
-
-    context 'with a blank roles entry' do
-      let(:organisations) { { organisation_id => ' ' } }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'with an unrelated role given' do
-      let(:organisations) { { organisation_id => 'foo' } }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context "with a #{role} role given" do
-      let(:organisations) { { organisation_id => role } }
-
-      it { is_expected.to be_truthy }
-
-      context 'with unrelated roles too' do
-        let(:organisations) { { organisation_id => "foo,bar,#{role},quux" } }
-
-        it { is_expected.to be_truthy }
-      end
-
-      context 'with weird extra whitespace in role' do
-        let(:organisations) { { organisation_id => " #{role} " } }
-
-        it { is_expected.to be_truthy }
-      end
-    end
-  end
-
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
 
