@@ -10,9 +10,8 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_14_163045) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_23_143911) do
   # These are extensions that must be enabled in order to support this database
-  enable_extension "pg_stat_statements"
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
 
@@ -197,8 +196,12 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_14_163045) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.datetime "rejected_at"
-    t.uuid "user_id"
+    t.uuid "creator_id"
     t.string "website", null: false
+    t.string "creator_role"
+    t.string "creator_department"
+    t.boolean "creator_agree_authority"
+    t.boolean "creator_agree_terms_and_conditions"
     t.index ["reference"], name: "index_schools_on_reference", unique: true
   end
 

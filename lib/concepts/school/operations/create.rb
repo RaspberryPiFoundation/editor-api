@@ -3,9 +3,9 @@
 class School
   class Create
     class << self
-      def call(school_params:, user_id:)
+      def call(school_params:, creator_id:)
         response = OperationResponse.new
-        response[:school] = build_school(school_params.merge!(user_id:))
+        response[:school] = build_school(school_params.merge!(creator_id:))
         response[:school].save!
         response
       rescue StandardError => e
