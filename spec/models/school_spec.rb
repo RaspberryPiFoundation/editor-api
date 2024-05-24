@@ -133,5 +133,25 @@ RSpec.describe School do
       school.country_code = 'GBR'
       expect(school).to be_invalid
     end
+
+    it 'does not require a creator_role' do
+      school.creator_role = nil
+      expect(school).to be_valid
+    end
+
+    it 'does not require a creator_department' do
+      school.creator_department = nil
+      expect(school).to be_valid
+    end
+
+    it 'requires creator_agree_authority to be true' do
+      school.creator_agree_authority = false
+      expect(school).to be_invalid
+    end
+
+    it 'requires creator_agree_terms_and_conditions to be true' do
+      school.creator_agree_terms_and_conditions = false
+      expect(school).to be_invalid
+    end
   end
 end
