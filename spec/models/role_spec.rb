@@ -38,5 +38,105 @@ RSpec.describe Role do
       duplicate_role = build(:role, school: role.school, user_id: role.user_id, role: role.role)
       expect(duplicate_role).to be_invalid
     end
+
+    context 'when the student role exists for a user and school' do
+      let(:user) { build(:user) }
+      let(:school) { build(:school) }
+
+      before do
+        create(:student_role, user_id: user.id, school:)
+      end
+
+      it 'prevents an owner role being created for the user and school' do
+        role = build(:owner_role, user_id: user.id, school:)
+        expect(role).to be_invalid
+      end
+
+      it 'adds a message to explain why the owner role cannot be created' do
+        role = build(:owner_role, user_id: user.id, school:)
+        role.valid?
+        expect(role.errors[:base]).to include('Cannot create owner role as this user already has the student role for this school')
+      end
+
+      it 'prevents a teacher role being created for the user and school' do
+        role = build(:teacher_role, user_id: user.id, school:)
+        expect(role).to be_invalid
+      end
+
+      it 'adds a message to explain why the teacher role cannot be created' do
+        role = build(:teacher_role, user_id: user.id, school:)
+        role.valid?
+        expect(role.errors[:base]).to include('Cannot create teacher role as this user already has the student role for this school')
+      end
+    end
+
+    context 'when the teacher role exists for a user and school' do
+      let(:user) { build(:user) }
+      let(:school) { build(:school) }
+
+      before do
+        create(:teacher_role, user_id: user.id, school:)
+      end
+
+      it 'allows an owner role to be created for the user and school' do
+        expect(create(:owner_role, user_id: user.id, school:)).to be_persisted
+      end
+
+      it 'prevents a student role being created for the user and school' do
+        role = build(:student_role, user_id: user.id, school:)
+        expect(role).to be_invalid
+      end
+
+      it 'adds a message to explain why the student role cannot be created' do
+        role = build(:student_role, user_id: user.id, school:)
+        role.valid?
+        expect(role.errors[:base]).to include('Cannot create student role as this user already has the teacher role for this school')
+      end
+    end
+
+    context 'when the owner role exists for a user and school' do
+      let(:user) { build(:user) }
+      let(:school) { build(:school) }
+
+      before do
+        create(:owner_role, user_id: user.id, school:)
+      end
+
+      it 'allows a teacher role to be created for the user and school' do
+        expect(create(:teacher_role, user_id: user.id, school:)).to be_persisted
+      end
+
+      it 'prevents a student role being created for the user and school' do
+        role = build(:student_role, user_id: user.id, school:)
+        expect(role).to be_invalid
+      end
+
+      it 'adds a message to explain why the student role cannot be created' do
+        role = build(:student_role, user_id: user.id, school:)
+        role.valid?
+        expect(role.errors[:base]).to include('Cannot create student role as this user already has the owner role for this school')
+      end
+    end
+
+    context 'when the owner and teacher roles exist for a user and school' do
+      let(:user) { build(:user) }
+      let(:school) { build(:school) }
+
+      before do
+        create(:owner_role, user_id: user.id, school:)
+        create(:teacher_role, user_id: user.id, school:)
+      end
+
+      it 'prevents a student role being created for the user and school' do
+        role = build(:student_role, user_id: user.id, school:)
+        expect(role).to be_invalid
+      end
+
+      it 'adds a message to explain why the student role cannot be created' do
+        role = build(:student_role, user_id: user.id, school:)
+        role.valid?
+        expect(role.errors[:base]).to include('Cannot create student role as this user already has the owner and teacher roles for this school')
+      end
+    end
   end
 end
