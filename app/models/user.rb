@@ -12,7 +12,6 @@ class User
     id
     name
     nickname
-    organisations
     picture
     postcode
     profile

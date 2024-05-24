@@ -11,7 +11,6 @@ RSpec.describe User do
   it { is_expected.to respond_to(:id) }
   it { is_expected.to respond_to(:name) }
   it { is_expected.to respond_to(:email) }
-  it { is_expected.to respond_to(:organisations) }
 
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
@@ -42,10 +41,6 @@ RSpec.describe User do
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'school-owner@example.com'
     end
-
-    it 'returns a user with the correct organisations' do
-      expect(user.organisations).to eq(organisation_id => 'school-owner')
-    end
   end
 
   describe '.from_token' do
@@ -71,10 +66,6 @@ RSpec.describe User do
 
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'school-owner@example.com'
-    end
-
-    it 'returns a user with the correct organisations' do
-      expect(user.organisations).to eq(organisation_id => 'school-owner')
     end
 
     context 'when BYPASS_AUTH is true' do
@@ -136,14 +127,6 @@ RSpec.describe User do
 
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'john.doe@example.com'
-    end
-
-    context 'when info includes organisations' do
-      let(:info) { info_without_organisations.merge!('organisations' => { 'c78ab987-5fa8-482e-a9cf-a5e93513349b' => 'school-student' }) }
-
-      it 'returns a user with the supplied organisations' do
-        expect(auth_subject.organisations).to eq('c78ab987-5fa8-482e-a9cf-a5e93513349b' => 'school-student')
-      end
     end
 
     context 'with unusual keys in info' do
