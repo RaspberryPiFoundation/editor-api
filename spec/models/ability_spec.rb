@@ -114,7 +114,7 @@ RSpec.describe Ability do
   end
 
   describe 'School' do
-    let(:school) { build(:school, user_id:, verified_at: nil) }
+    let(:school) { build(:school, creator_id: user_id, verified_at: nil) }
 
     context 'when user is not a school-owner but is the creator of the school' do
       let(:user) { build(:user, id: user_id) }
