@@ -31,10 +31,6 @@ class User
     School.joins(:roles).merge(Role.where(user_id: id)).distinct
   end
 
-  def organisation_ids
-    organisations&.keys || []
-  end
-
   def school_roles(school)
     Role.where(school:, user_id: id).map(&:role)
   end

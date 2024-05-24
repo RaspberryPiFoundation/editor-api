@@ -12,7 +12,6 @@ RSpec.describe User do
   it { is_expected.to respond_to(:name) }
   it { is_expected.to respond_to(:email) }
   it { is_expected.to respond_to(:organisations) }
-  it { is_expected.to respond_to(:organisation_ids) }
 
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
