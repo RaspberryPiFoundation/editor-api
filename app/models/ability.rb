@@ -38,7 +38,7 @@ class Ability
     can %i[read create_copy update destroy], Lesson, user_id: user.id
 
     user.schools.each do |school|
-      if user.school_student?(organisation_id: school.id)
+      if user.school_student?(school)
         define_school_student_abilities(user:,
                                         organisation_id: school.id)
       end
