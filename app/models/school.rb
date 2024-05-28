@@ -19,6 +19,10 @@ class School < ApplicationRecord
 
   before_validation :normalize_reference
 
+  def self.find_for_user!(user)
+    Role.find_by!(user_id: user.id).school
+  end
+
   def user
     User.from_userinfo(ids: creator_id).first
   end

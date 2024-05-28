@@ -188,4 +188,16 @@ RSpec.describe School do
       expect(school.user.id).to eq(creator_id)
     end
   end
+
+  describe '.find_for_user!' do
+    it 'returns the school that the user has a role in' do
+      user = User.where(id: teacher_id).first
+      expect(described_class.find_for_user!(user)).to eq(school)
+    end
+
+    it "raises ActiveRecord::RecordNotFound if the user doesn't have a role in a school" do
+      user = build(:user)
+      expect { described_class.find_for_user!(user) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
 end
