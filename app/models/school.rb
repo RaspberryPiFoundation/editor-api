@@ -19,7 +19,7 @@ class School < ApplicationRecord
   before_validation :normalize_reference
 
   def user
-    User.from_userinfo(ids: user_id).first
+    User.from_userinfo(ids: creator_id).first
   end
 
   private

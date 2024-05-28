@@ -10,7 +10,7 @@ RSpec.describe School do
 
   let(:student_id) { SecureRandom.uuid }
   let(:teacher_id) { SecureRandom.uuid }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, creator_id: SecureRandom.uuid) }
 
   describe 'associations' do
     it 'has many classes' do
@@ -152,6 +152,23 @@ RSpec.describe School do
     it 'requires creator_agree_terms_and_conditions to be true' do
       school.creator_agree_terms_and_conditions = false
       expect(school).to be_invalid
+    end
+  end
+
+  describe '#user' do
+    let(:creator_id) { SecureRandom.uuid }
+
+    before do
+      school.update!(creator_id:)
+      stub_user_info_api_for_owner(owner_id: creator_id, school_id: school.id)
+    end
+
+    it 'returns a User instance' do
+      expect(school.user).to be_instance_of(User)
+    end
+
+    it 'returns the user from the UserInfo API matching the creator_id' do
+      expect(school.user.id).to eq(creator_id)
     end
   end
 end
