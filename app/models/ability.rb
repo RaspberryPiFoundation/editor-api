@@ -38,10 +38,7 @@ class Ability
     can %i[read create_copy update destroy], Lesson, user_id: user.id
 
     user.schools.each do |school|
-      if user.school_student?(school)
-        define_school_student_abilities(user:,
-                                        organisation_id: school.id)
-      end
+      define_school_student_abilities(user:, school:) if user.school_student?(school)
       if user.school_teacher?(school)
         define_school_teacher_abilities(user:,
                                         organisation_id: school.id)
@@ -79,11 +76,11 @@ class Ability
   end
 
   # rubocop:disable Layout/LineLength
-  def define_school_student_abilities(user:, organisation_id:)
-    can(%i[read], School, id: organisation_id)
-    can(%i[read], SchoolClass, school: { id: organisation_id }, members: { student_id: user.id })
-    can(%i[read], Lesson, school_id: organisation_id, visibility: 'students', school_class: { members: { student_id: user.id } })
-    can(%i[create], Project, school_id: organisation_id, user_id: user.id, lesson_id: nil)
+  def define_school_student_abilities(user:, school:)
+    can(%i[read], School, id: school.id)
+    can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
+    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
+    can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
   end
   # rubocop:enable Layout/LineLength
 
