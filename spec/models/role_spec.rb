@@ -138,5 +138,26 @@ RSpec.describe Role do
         expect(role.errors[:base]).to include('Cannot create student role as this user already has the owner and teacher roles for this school')
       end
     end
+
+    context 'when a user has a role within a school' do
+      let(:user) { build(:user) }
+      let(:school_1) { build(:school) }
+      let(:school_2) { build(:school) }
+
+      before do
+        create(:role, user_id: user.id, school: school_1)
+      end
+
+      it 'prevents the user from having a role within a different school' do
+        role = build(:role, user_id: user.id, school: school_2)
+        expect(role).to be_invalid
+      end
+
+      it 'adds a message to explain that a user can only have roles within a single school' do
+        role = build(:role, user_id: user.id, school: school_2)
+        role.valid?
+        expect(role.errors[:base]).to include('Cannot create role as this user already has a role in a different school')
+      end
+    end
   end
 end

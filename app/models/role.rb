@@ -8,6 +8,7 @@ class Role < ApplicationRecord
   validates :user_id, presence: true
   validates :role, presence: true, uniqueness: { scope: %i[school_id user_id] }
   validate :students_cannot_have_additional_roles
+  validate :users_can_only_have_roles_in_one_school
 
   private
 
@@ -23,5 +24,12 @@ class Role < ApplicationRecord
       ].join(' ')
       errors.add(:base, "Cannot create student role as this user already has the #{other_role_names} for this school")
     end
+  end
+
+  def users_can_only_have_roles_in_one_school
+    schools = Role.where(user_id:).map(&:school)
+    return if schools.empty? || (schools.any? && schools.first == school)
+
+    errors.add(:base, 'Cannot create role as this user already has a role in a different school')
   end
 end
