@@ -69,7 +69,7 @@ class Ability
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
     can(%i[create destroy], Lesson) do |lesson|
-      school_teacher_can_manage_lesson?(user:, organisation_id: school.id, lesson:)
+      school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
@@ -87,8 +87,8 @@ class Ability
   end
   # rubocop:enable Layout/LineLength
 
-  def school_teacher_can_manage_lesson?(user:, organisation_id:, lesson:)
-    is_my_lesson = lesson.school_id == organisation_id && lesson.user_id == user.id
+  def school_teacher_can_manage_lesson?(user:, school:, lesson:)
+    is_my_lesson = lesson.school_id == school.id && lesson.user_id == user.id
     is_my_class = lesson.school_class && lesson.school_class.teacher_id == user.id
 
     is_my_lesson && (is_my_class || !lesson.school_class)
