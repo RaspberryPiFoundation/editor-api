@@ -42,7 +42,7 @@ class Ability
         define_school_student_abilities(user:,
                                         organisation_id: school.id)
       end
-      if user.school_teacher?(organisation_id: school.id)
+      if user.school_teacher?(school)
         define_school_teacher_abilities(user:,
                                         organisation_id: school.id)
       end

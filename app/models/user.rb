@@ -47,8 +47,8 @@ class User
     Role.owner.find_by(school_id: organisation_id, user_id: id)
   end
 
-  def school_teacher?(organisation_id:)
-    Role.teacher.find_by(school_id: organisation_id, user_id: id)
+  def school_teacher?(school)
+    Role.teacher.find_by(school:, user_id: id)
   end
 
   def school_student?(school)
