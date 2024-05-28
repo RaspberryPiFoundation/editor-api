@@ -73,7 +73,7 @@ class Ability
     end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
-      school_teacher_can_manage_project?(user:, organisation_id: school.id, project:)
+      school_teacher_can_manage_project?(user:, school:, project:)
     end
   end
   # rubocop:enable Metrics/AbcSize
@@ -94,8 +94,8 @@ class Ability
     is_my_lesson && (is_my_class || !lesson.school_class)
   end
 
-  def school_teacher_can_manage_project?(user:, organisation_id:, project:)
-    is_my_project = project.school_id == organisation_id && project.user_id == user.id
+  def school_teacher_can_manage_project?(user:, school:, project:)
+    is_my_project = project.school_id == school.id && project.user_id == user.id
     is_my_lesson = project.lesson && project.lesson.user_id == user.id
 
     is_my_project && (is_my_lesson || !project.lesson)
