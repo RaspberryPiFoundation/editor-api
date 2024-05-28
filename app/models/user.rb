@@ -43,8 +43,8 @@ class User
     org_roles(organisation_id:).include?(role.to_s)
   end
 
-  def school_owner?(organisation_id:)
-    Role.owner.find_by(school_id: organisation_id, user_id: id)
+  def school_owner?(school)
+    Role.owner.find_by(school:, user_id: id)
   end
 
   def school_teacher?(school)

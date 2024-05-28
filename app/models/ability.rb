@@ -46,7 +46,7 @@ class Ability
         define_school_teacher_abilities(user:,
                                         organisation_id: school.id)
       end
-      define_school_owner_abilities(organisation_id: school.id) if user.school_owner?(organisation_id: school.id)
+      define_school_owner_abilities(organisation_id: school.id) if user.school_owner?(school)
     end
   end
   # rubocop:enable Metrics/AbcSize

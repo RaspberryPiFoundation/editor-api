@@ -234,12 +234,12 @@ RSpec.describe User do
 
     it 'returns true when the user has the owner role for this school' do
       create(:owner_role, school:, user_id: user.id)
-      expect(user).to be_school_owner(organisation_id: school.id)
+      expect(user).to be_school_owner(school)
     end
 
     it 'returns false when the user does not have the owner role for this school' do
       create(:teacher_role, school:, user_id: user.id)
-      expect(user).not_to be_school_owner(organisation_id: school.id)
+      expect(user).not_to be_school_owner(school)
     end
   end
 
