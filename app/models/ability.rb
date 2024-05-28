@@ -40,23 +40,23 @@ class Ability
     user.schools.each do |school|
       define_school_student_abilities(user:, school:) if user.school_student?(school)
       define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
-      define_school_owner_abilities(organisation_id: school.id) if user.school_owner?(school)
+      define_school_owner_abilities(school:) if user.school_owner?(school)
     end
   end
   # rubocop:enable Metrics/AbcSize
 
   private
 
-  def define_school_owner_abilities(organisation_id:)
-    can(%i[read update destroy], School, id: organisation_id)
-    can(%i[read create update destroy], SchoolClass, school: { id: organisation_id })
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id } })
+  def define_school_owner_abilities(school:)
+    can(%i[read update destroy], School, id: school.id)
+    can(%i[read create update destroy], SchoolClass, school: { id: school.id })
+    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
-    can(%i[create create_copy], Lesson, school_id: organisation_id)
-    can(%i[read update destroy], Lesson, school_id: organisation_id, visibility: %w[teachers students public])
-    can(%i[create], Project, school_id: organisation_id)
+    can(%i[create create_copy], Lesson, school_id: school.id)
+    can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
+    can(%i[create], Project, school_id: school.id)
   end
 
   # rubocop:disable Metrics/AbcSize
