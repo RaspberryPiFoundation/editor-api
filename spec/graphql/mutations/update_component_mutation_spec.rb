@@ -23,7 +23,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
   context 'with an existing component' do
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(school_id: SecureRandom.uuid)
     end
 
     let(:project) { create(:project, user_id: stubbed_user.id) }
@@ -77,7 +77,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
       context 'with another users component' do
         before do
-          authenticate_as_school_teacher
+          authenticate_as_school_teacher(school_id: SecureRandom.uuid)
         end
 
         it 'returns an error' do

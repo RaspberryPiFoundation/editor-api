@@ -97,6 +97,8 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+      Role.teacher.find_by(user_id: teacher_id, school:).delete
+      Role.owner.find_by(user_id: owner_id, school:).delete
       school.update!(id: SecureRandom.uuid)
 
       post('/api/lessons', headers:, params:)
@@ -104,7 +106,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student
+      authenticate_as_school_student(school_id: school.id)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)
@@ -167,7 +169,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     it 'responds 403 Forbidden when the current user is a school-teacher for a different class' do
       teacher_id = SecureRandom.uuid
       stub_user_info_api_for_unknown_users(user_id: teacher_id)
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(school_id: school.id)
       school_class.update!(teacher_id:)
 
       post('/api/lessons', headers:, params:)

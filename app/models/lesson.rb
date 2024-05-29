@@ -57,20 +57,18 @@ class Lesson < ApplicationRecord
     self.school ||= school_class&.school
   end
 
-  # rubocop:disable Metrics/AbcSize
   def user_has_the_school_owner_or_school_teacher_role_for_the_school
     return unless user_id_changed? && errors.blank? && school
 
     _, user = with_user
 
     return if user.blank?
-    return if user.school_owner?(organisation_id: school.id)
-    return if user.school_teacher?(organisation_id: school.id)
+    return if user.school_owner?(school)
+    return if user.school_teacher?(school)
 
     msg = "'#{user_id}' does not have the 'school-owner' or 'school-teacher' role for organisation '#{school.id}'"
     errors.add(:user, msg)
   end
-  # rubocop:enable Metrics/AbcSize
 
   def user_is_the_school_teacher_for_the_school_class
     return if !school_class || user_id == school_class.teacher_id

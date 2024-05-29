@@ -9,7 +9,7 @@ RSpec.describe 'Project delete requests' do
     let(:owner_id) { SecureRandom.uuid }
 
     before do
-      authenticate_as_school_owner(owner_id:)
+      authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
     end
 
     context 'when deleting a project the user owns' do

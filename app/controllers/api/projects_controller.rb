@@ -90,7 +90,7 @@ module Api
     end
 
     def school_owner?
-      school && current_user.school_owner?(organisation_id: school.id)
+      school && current_user.school_owner?(school)
     end
 
     def school

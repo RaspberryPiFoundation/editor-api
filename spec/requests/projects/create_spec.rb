@@ -10,7 +10,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project is successful' do
       before do
-        authenticate_as_school_owner
+        authenticate_as_school_owner(school_id: SecureRandom.uuid)
 
         response = OperationResponse.new
         response[:project] = project
@@ -26,7 +26,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project fails' do
       before do
-        authenticate_as_school_owner
+        authenticate_as_school_owner(school_id: SecureRandom.uuid)
 
         response = OperationResponse.new
         response[:error] = 'Error creating project'

@@ -5,7 +5,6 @@ FactoryBot.define do
     id { SecureRandom.uuid }
     name { Faker::Name.name }
     email { Faker::Internet.email }
-    organisations { {} }
 
     factory :admin_user do
       roles { 'editor-admin' }
