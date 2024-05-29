@@ -107,6 +107,24 @@ RSpec.describe Project do
       end
     end
 
+    context "when the project has a school and a user_id that doesn't match a user in Hydra" do
+      let(:user_id) { SecureRandom.uuid }
+      let(:project) { build(:project, school:, user_id:) }
+
+      before do
+        stub_user_info_api_for_unknown_users(user_id:)
+      end
+
+      it 'is invalid' do
+        expect(project).to be_invalid
+      end
+
+      it 'adds an error message' do
+        project.valid?
+        expect(project.errors[:user]).to include("'#{user_id}' does not have any roles for organisation '#{school.id}'")
+      end
+    end
+
     context 'when the project has a lesson' do
       before do
         lesson = create(:lesson)

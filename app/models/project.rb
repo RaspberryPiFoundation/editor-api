@@ -56,9 +56,7 @@ class Project < ApplicationRecord
     return unless user_id_changed? && errors.blank? && school
 
     _, user = with_user
-
-    return if user.blank?
-    return if user.school_roles(school).any?
+    return if (user&.school_roles(school) || []).any?
 
     msg = "'#{user_id}' does not have any roles for organisation '#{school_id}'"
     errors.add(:user, msg)
