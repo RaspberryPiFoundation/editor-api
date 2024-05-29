@@ -35,23 +35,19 @@ RSpec.describe 'Listing class members', type: :request do
     expect(data.first[:student_name]).to eq('School Student')
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for students if the user profile doesn't exist" do
-    student_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: student_id)
-    class_member.update!(student_id:)
+    stub_user_info_api_for_unknown_users(user_id: class_member.student_id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:student_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   # rubocop:disable RSpec/ExampleLength
   it 'does not include class members that belong to a different class' do
     student_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: student_id)
+    stub_user_info_api_for_student(student_id:, school_id: school.id)
     different_class = create(:school_class, school:, teacher_id:)
     create(:class_member, school_class: different_class, student_id:)
 

@@ -61,6 +61,11 @@ RSpec.describe ClassMember do
       duplicate = build(:class_member, student_id: class_member.student_id, school_class: class_member.school_class)
       expect(duplicate).to be_invalid
     end
+
+    it 'requires the student_id to match a user in the UserInfo API' do
+      stub_user_info_api_for_unknown_users(user_id: student_id)
+      expect(class_member).to be_invalid
+    end
   end
 
   describe '.students' do
@@ -72,9 +77,8 @@ RSpec.describe ClassMember do
     end
 
     it 'ignores members where no profile account exists' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: student_id)
       create(:class_member, student_id:, school_class:)
+      stub_user_info_api_for_unknown_users(user_id: student_id)
 
       student = described_class.all.students.first
       expect(student).to be_nil
@@ -99,9 +103,8 @@ RSpec.describe ClassMember do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: student_id)
       class_member = create(:class_member, student_id:, school_class:)
+      stub_user_info_api_for_unknown_users(user_id: student_id)
 
       pair = described_class.all.with_students.first
       expect(pair).to eq([class_member, nil])
@@ -126,9 +129,8 @@ RSpec.describe ClassMember do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: student_id)
       class_member = create(:class_member, student_id:, school_class:)
+      stub_user_info_api_for_unknown_users(user_id: student_id)
 
       pair = class_member.with_student
       expect(pair).to eq([class_member, nil])
