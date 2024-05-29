@@ -114,8 +114,8 @@ RSpec.describe 'Updating a lesson', type: :request do
     # rubocop:disable RSpec/ExampleLength
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
       teacher_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: teacher_id)
       school = create(:school, id: SecureRandom.uuid)
+      stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
       school_class = create(:school_class, school:, teacher_id:)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
