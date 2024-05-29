@@ -62,9 +62,8 @@ class Lesson < ApplicationRecord
 
     _, user = with_user
 
-    return if user.blank?
-    return if user.school_owner?(school)
-    return if user.school_teacher?(school)
+    return if user&.school_owner?(school)
+    return if user&.school_teacher?(school)
 
     msg = "'#{user_id}' does not have the 'school-owner' or 'school-teacher' role for organisation '#{school.id}'"
     errors.add(:user, msg)

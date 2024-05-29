@@ -86,17 +86,12 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
-      user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       authenticate_as_school_teacher(school_id: school.id)
-      lesson.update!(user_id:)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)
       expect(response).to have_http_status(:forbidden)
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'responds 403 Forbidden when the user is a school-student' do
       authenticate_as_school_student(school_id: school.id)
