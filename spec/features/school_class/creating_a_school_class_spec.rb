@@ -15,7 +15,8 @@ RSpec.describe 'Creating a school class', type: :request do
   let(:params) do
     {
       school_class: {
-        name: 'Test School Class'
+        name: 'Test School Class',
+        description: 'Test School Class Description'
       }
     }
   end
@@ -37,6 +38,7 @@ RSpec.describe 'Creating a school class', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:name]).to eq('Test School Class')
+    expect(data[:description]).to eq('Test School Class Description')
   end
 
   it 'responds with the teacher JSON' do
