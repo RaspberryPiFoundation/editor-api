@@ -114,12 +114,46 @@ RSpec.describe Ability do
   end
 
   describe 'School' do
-    let(:school) { build(:school, creator_id: user_id, verified_at: nil) }
+    let(:school) { create(:school) }
+    let(:user) { build(:user) }
 
     context 'when user is not a school-owner but is the creator of the school' do
-      let(:user) { build(:user, id: user_id) }
+      before do
+        user.id = user_id
+        school.update(creator_id: user_id, verified_at: nil)
+      end
 
       it { is_expected.to be_able_to(:read, school) }
+    end
+
+    context 'when user is a school owner' do
+      before do
+        create(:owner_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:read, school) }
+      it { is_expected.to be_able_to(:update, school) }
+      it { is_expected.to be_able_to(:destroy, school) }
+    end
+
+    context 'when user is a school teacher' do
+      before do
+        create(:teacher_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:read, school) }
+      it { is_expected.not_to be_able_to(:update, school) }
+      it { is_expected.not_to be_able_to(:destroy, school) }
+    end
+
+    context 'when user is a school student' do
+      before do
+        create(:student_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:read, school) }
+      it { is_expected.not_to be_able_to(:update, school) }
+      it { is_expected.not_to be_able_to(:destroy, school) }
     end
   end
 end

@@ -22,7 +22,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   let(:remix_origin) { 'editor.com' }
 
   before do
-    authenticate_as_school_owner
+    authenticate_as_school_owner(school_id: SecureRandom.uuid)
     project
   end
 
@@ -54,7 +54,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   context 'when user cannot view original project' do
     before do
-      authenticate_as_school_teacher
+      authenticate_as_school_teacher(school_id: SecureRandom.uuid)
     end
 
     it 'returns "not permitted to read" error' do

@@ -10,7 +10,7 @@ RSpec.describe School do
 
   let(:student_id) { SecureRandom.uuid }
   let(:teacher_id) { SecureRandom.uuid }
-  let(:school) { create(:school) }
+  let(:school) { create(:school, creator_id: SecureRandom.uuid) }
 
   describe 'associations' do
     it 'has many classes' do
@@ -31,11 +31,19 @@ RSpec.describe School do
       expect(school.projects.size).to eq(2)
     end
 
+    it 'has many roles' do
+      Role.delete_all
+      create(:student_role, school:)
+      create(:owner_role, school:)
+      expect(school.roles.size).to eq(2)
+    end
+
     context 'when a school is destroyed' do
       let!(:school_class) { create(:school_class, school:, teacher_id:) }
       let!(:lesson_1) { create(:lesson, user_id: teacher_id, school_class:) }
       let!(:lesson_2) { create(:lesson, user_id: teacher_id, school:) }
       let!(:project) { create(:project, user_id: student_id, school:) }
+      let!(:role) { create(:role, school:) }
 
       before do
         create(:class_member, school_class:, student_id:)
@@ -70,6 +78,15 @@ RSpec.describe School do
         school.destroy!
         expect(project.reload.school_id).to be_nil
       end
+
+      it 'does not destroy roles' do
+        expect { school.destroy! }.not_to change(Role, :count)
+      end
+
+      it 'nullifies the school_id field on roles' do
+        school.destroy!
+        expect(role.reload.school_id).to be_nil
+      end
     end
   end
 
@@ -91,6 +108,11 @@ RSpec.describe School do
 
     it 'requires a website' do
       school.website = ' '
+      expect(school).to be_invalid
+    end
+
+    it 'requires a creator_id' do
+      school.creator_id = nil
       expect(school).to be_invalid
     end
 
@@ -152,6 +174,35 @@ RSpec.describe School do
     it 'requires creator_agree_terms_and_conditions to be true' do
       school.creator_agree_terms_and_conditions = false
       expect(school).to be_invalid
+    end
+  end
+
+  describe '#user' do
+    let(:creator_id) { SecureRandom.uuid }
+
+    before do
+      school.update!(creator_id:)
+      stub_user_info_api_for_owner(owner_id: creator_id, school_id: school.id)
+    end
+
+    it 'returns a User instance' do
+      expect(school.user).to be_instance_of(User)
+    end
+
+    it 'returns the user from the UserInfo API matching the creator_id' do
+      expect(school.user.id).to eq(creator_id)
+    end
+  end
+
+  describe '.find_for_user!' do
+    it 'returns the school that the user has a role in' do
+      user = User.where(id: teacher_id).first
+      expect(described_class.find_for_user!(user)).to eq(school)
+    end
+
+    it "raises ActiveRecord::RecordNotFound if the user doesn't have a role in a school" do
+      user = build(:user)
+      expect { described_class.find_for_user!(user) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 end

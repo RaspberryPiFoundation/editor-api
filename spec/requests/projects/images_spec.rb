@@ -23,7 +23,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        authenticate_as_school_owner(owner_id:)
+        authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
       end
 
       it 'attaches file to project' do
@@ -53,7 +53,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        authenticate_as_school_teacher
+        authenticate_as_school_teacher(school_id: SecureRandom.uuid)
       end
 
       it 'returns forbidden response' do

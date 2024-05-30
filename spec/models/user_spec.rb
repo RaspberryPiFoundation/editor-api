@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe User do
-  subject { build(:user) }
+  subject(:user) { build(:user) }
 
   let(:school) { create(:school) }
   let(:organisation_id) { school.id }
@@ -11,45 +11,6 @@ RSpec.describe User do
   it { is_expected.to respond_to(:id) }
   it { is_expected.to respond_to(:name) }
   it { is_expected.to respond_to(:email) }
-  it { is_expected.to respond_to(:organisations) }
-  it { is_expected.to respond_to(:organisation_ids) }
-
-  shared_examples 'role_check' do |role|
-    let(:organisations) { {} }
-    let(:user) { build(:user, organisations:) }
-
-    it { is_expected.to be_falsey }
-
-    context 'with a blank roles entry' do
-      let(:organisations) { { organisation_id => ' ' } }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context 'with an unrelated role given' do
-      let(:organisations) { { organisation_id => 'foo' } }
-
-      it { is_expected.to be_falsey }
-    end
-
-    context "with a #{role} role given" do
-      let(:organisations) { { organisation_id => role } }
-
-      it { is_expected.to be_truthy }
-
-      context 'with unrelated roles too' do
-        let(:organisations) { { organisation_id => "foo,bar,#{role},quux" } }
-
-        it { is_expected.to be_truthy }
-      end
-
-      context 'with weird extra whitespace in role' do
-        let(:organisations) { { organisation_id => " #{role} " } }
-
-        it { is_expected.to be_truthy }
-      end
-    end
-  end
 
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
@@ -80,20 +41,6 @@ RSpec.describe User do
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'school-owner@example.com'
     end
-
-    it 'returns a user with the correct organisations' do
-      expect(user.organisations).to eq(organisation_id => 'school-owner')
-    end
-
-    context 'when no organisations are returned' do
-      let(:ids) { [SecureRandom.uuid] }
-
-      it 'returns a user with the correct organisations' do
-        stub_user_info_api_for_student_without_organisations(student_id: ids.first)
-
-        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
-      end
-    end
   end
 
   describe '.from_token' do
@@ -119,20 +66,6 @@ RSpec.describe User do
 
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'school-owner@example.com'
-    end
-
-    it 'returns a user with the correct organisations' do
-      expect(user.organisations).to eq(organisation_id => 'school-owner')
-    end
-
-    context 'when no organisations are returned' do
-      before do
-        authenticate_as_school_student_without_organisations
-      end
-
-      it 'returns a user with the correct organisations' do
-        expect(user.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
-      end
     end
 
     context 'when BYPASS_AUTH is true' do
@@ -196,18 +129,6 @@ RSpec.describe User do
       expect(user.email).to eq 'john.doe@example.com'
     end
 
-    it 'returns a user with the correct organisations' do
-      expect(auth_subject.organisations).to eq('12345678-1234-1234-1234-123456789abc' => 'school-student')
-    end
-
-    context 'when info includes organisations' do
-      let(:info) { info_without_organisations.merge!('organisations' => { 'c78ab987-5fa8-482e-a9cf-a5e93513349b' => 'school-student' }) }
-
-      it 'returns a user with the supplied organisations' do
-        expect(auth_subject.organisations).to eq('c78ab987-5fa8-482e-a9cf-a5e93513349b' => 'school-student')
-      end
-    end
-
     context 'with unusual keys in info' do
       let(:info) { { foo: :bar, flibble: :woo } }
 
@@ -228,21 +149,51 @@ RSpec.describe User do
   end
 
   describe '#school_owner?' do
-    subject { user.school_owner?(organisation_id:) }
+    subject(:user) { create(:user) }
 
-    include_examples 'role_check', 'school-owner'
+    let(:school) { create(:school) }
+
+    it 'returns true when the user has the owner role for this school' do
+      create(:owner_role, school:, user_id: user.id)
+      expect(user).to be_school_owner(school)
+    end
+
+    it 'returns false when the user does not have the owner role for this school' do
+      create(:teacher_role, school:, user_id: user.id)
+      expect(user).not_to be_school_owner(school)
+    end
   end
 
   describe '#school_teacher?' do
-    subject { user.school_teacher?(organisation_id:) }
+    subject(:user) { create(:user) }
 
-    include_examples 'role_check', 'school-teacher'
+    let(:school) { create(:school) }
+
+    it 'returns true when the user has the teacher role for this school' do
+      create(:teacher_role, school:, user_id: user.id)
+      expect(user).to be_school_teacher(school)
+    end
+
+    it 'returns false when the user does not have the teacher role for this school' do
+      create(:owner_role, school:, user_id: user.id)
+      expect(user).not_to be_school_teacher(school)
+    end
   end
 
   describe '#school_student?' do
-    subject { user.school_student?(organisation_id:) }
+    subject(:user) { create(:user) }
 
-    include_examples 'role_check', 'school-student'
+    let(:school) { create(:school) }
+
+    it 'returns true when the user has the student role for this school' do
+      create(:student_role, school:, user_id: user.id)
+      expect(user).to be_school_student(school)
+    end
+
+    it 'returns false when the user does not have the student role for this school' do
+      create(:owner_role, school:, user_id: user.id)
+      expect(user).not_to be_school_student(school)
+    end
   end
 
   describe '#admin?' do
@@ -264,6 +215,29 @@ RSpec.describe User do
     it 'returns false if roles are nil in Hydra' do
       user = build(:user, roles: nil)
       expect(user).not_to be_admin
+    end
+  end
+
+  describe '#school_roles' do
+    subject(:user) { build(:user) }
+
+    let(:school) { create(:school) }
+
+    context 'when the user has no roles' do
+      it 'returns an empty array if the user has no role in this school' do
+        expect(user.school_roles(school)).to be_empty
+      end
+    end
+
+    context 'when the user has an organisation and roles' do
+      before do
+        create(:role, school:, user_id: user.id, role: 'owner')
+        create(:role, school:, user_id: user.id, role: 'teacher')
+      end
+
+      it 'returns an array of the roles the user has at the school' do
+        expect(user.school_roles(school)).to match_array(%w[owner teacher])
+      end
     end
   end
 
@@ -309,6 +283,33 @@ RSpec.describe User do
       it 'returns a stubbed user' do
         expect(user.name).to eq('School Owner')
       end
+    end
+  end
+
+  describe '#schools' do
+    it 'includes schools where the user has the owner role' do
+      create(:owner_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
+    end
+
+    it 'includes schools where the user has the teacher role' do
+      create(:teacher_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
+    end
+
+    it 'includes schools where the user has the student role' do
+      create(:student_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
+    end
+
+    it 'does not include schools where the user has no role' do
+      expect(user.schools).to be_empty
+    end
+
+    it 'only includes a school once even if the user has multiple roles' do
+      create(:owner_role, school:, user_id: user.id)
+      create(:teacher_role, school:, user_id: user.id)
+      expect(user.schools).to eq([school])
     end
   end
 end
