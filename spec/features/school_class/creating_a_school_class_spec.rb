@@ -15,7 +15,7 @@ RSpec.describe 'Creating a school class', type: :request do
   let(:params) do
     {
       school_class: {
-        name: 'Test School Class',
+        name: 'Test School Class'
       }
     }
   end
