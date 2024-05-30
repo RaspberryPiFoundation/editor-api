@@ -54,6 +54,14 @@ module Api
     def school_class_params
       # A school teacher may only create classes they own.
       params.require(:school_class).permit(:name, :description).merge(teacher_id: current_user.id)
+
+      # if school_owner?
+      #   # A school owner must specify who the class teacher is.
+      #   params.require(:school_class).permit(:teacher_id, :name)
+      # else
+      #   # A school teacher may only create classes they own.
+      #   params.require(:school_class).permit(:name).merge(teacher_id: current_user.id)
+      # end
     end
 
     def school_owner?
