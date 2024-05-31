@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a project', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:)
+    authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
 
     create(:component, project:, name: 'main', extension: 'py', content: 'print("hi")')
   end

@@ -25,7 +25,7 @@ RSpec.describe 'Remix requests' do
     end
 
     before do
-      authenticate_as_school_owner
+      authenticate_as_school_owner(school_id: SecureRandom.uuid)
     end
 
     describe '#show' do
@@ -62,7 +62,7 @@ RSpec.describe 'Remix requests' do
 
       context 'when project cannot be saved' do
         before do
-          authenticate_as_school_owner
+          authenticate_as_school_owner(school_id: SecureRandom.uuid)
           error_response = OperationResponse.new
           error_response[:error] = 'Something went wrong'
           allow(Project::CreateRemix).to receive(:call).and_return(error_response)

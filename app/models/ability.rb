@@ -37,59 +37,65 @@ class Ability
     # Any authenticated user can manage their own lessons.
     can %i[read create_copy update destroy], Lesson, user_id: user.id
 
-    user.organisation_ids.each do |organisation_id|
-      define_school_owner_abilities(organisation_id:) if user.school_owner?(organisation_id:)
-      define_school_teacher_abilities(user:, organisation_id:) if user.school_teacher?(organisation_id:)
-      define_school_student_abilities(user:, organisation_id:) if user.school_student?(organisation_id:)
+    user.schools.each do |school|
+      define_school_student_abilities(user:, school:) if user.school_student?(school)
+      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
+      define_school_owner_abilities(school:) if user.school_owner?(school)
     end
   end
   # rubocop:enable Metrics/AbcSize
 
   private
 
-  def define_school_owner_abilities(organisation_id:)
-    can(%i[read update destroy], School, id: organisation_id)
-    can(%i[read create update destroy], SchoolClass, school: { id: organisation_id })
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id } })
+  def define_school_owner_abilities(school:)
+    can(%i[read update destroy], School, id: school.id)
+    can(%i[read create update destroy], SchoolClass, school: { id: school.id })
+    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
-    can(%i[create create_copy], Lesson, school_id: organisation_id)
-    can(%i[read update destroy], Lesson, school_id: organisation_id, visibility: %w[teachers students public])
-    can(%i[create], Project, school_id: organisation_id)
+    can(%i[create create_copy], Lesson, school_id: school.id)
+    can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
+    can(%i[create], Project, school_id: school.id)
   end
 
-  def define_school_teacher_abilities(user:, organisation_id:)
-    can(%i[read], School, id: organisation_id)
-    can(%i[create], SchoolClass, school: { id: organisation_id })
-    can(%i[read update destroy], SchoolClass, school: { id: organisation_id }, teacher_id: user.id)
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: organisation_id }, teacher_id: user.id })
+  # rubocop:disable Metrics/AbcSize
+  def define_school_teacher_abilities(user:, school:)
+    can(%i[read], School, id: school.id)
+    can(%i[create], SchoolClass, school: { id: school.id })
+    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
+    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id }, teacher_id: user.id })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
-    can(%i[create destroy], Lesson) { |lesson| school_teacher_can_manage_lesson?(user:, organisation_id:, lesson:) }
-    can(%i[read create_copy], Lesson, school_id: organisation_id, visibility: %w[teachers students])
-    can(%i[create], Project) { |project| school_teacher_can_manage_project?(user:, organisation_id:, project:) }
+    can(%i[create destroy], Lesson) do |lesson|
+      school_teacher_can_manage_lesson?(user:, school:, lesson:)
+    end
+    can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
+    can(%i[create], Project) do |project|
+      school_teacher_can_manage_project?(user:, school:, project:)
+    end
   end
+  # rubocop:enable Metrics/AbcSize
 
   # rubocop:disable Layout/LineLength
-  def define_school_student_abilities(user:, organisation_id:)
-    can(%i[read], School, id: organisation_id)
-    can(%i[read], SchoolClass, school: { id: organisation_id }, members: { student_id: user.id })
-    can(%i[read], Lesson, school_id: organisation_id, visibility: 'students', school_class: { members: { student_id: user.id } })
-    can(%i[create], Project, school_id: organisation_id, user_id: user.id, lesson_id: nil)
+  def define_school_student_abilities(user:, school:)
+    can(%i[read], School, id: school.id)
+    can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
+    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
+    can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
   end
   # rubocop:enable Layout/LineLength
 
-  def school_teacher_can_manage_lesson?(user:, organisation_id:, lesson:)
-    is_my_lesson = lesson.school_id == organisation_id && lesson.user_id == user.id
+  def school_teacher_can_manage_lesson?(user:, school:, lesson:)
+    is_my_lesson = lesson.school_id == school.id && lesson.user_id == user.id
     is_my_class = lesson.school_class && lesson.school_class.teacher_id == user.id
 
     is_my_lesson && (is_my_class || !lesson.school_class)
   end
 
-  def school_teacher_can_manage_project?(user:, organisation_id:, project:)
-    is_my_project = project.school_id == organisation_id && project.user_id == user.id
+  def school_teacher_can_manage_project?(user:, school:, project:)
+    is_my_project = project.school_id == school.id && project.user_id == user.id
     is_my_lesson = project.lesson && project.lesson.user_id == user.id
 
     is_my_project && (is_my_lesson || !project.lesson)
