@@ -11,6 +11,7 @@ class SchoolVerificationService
       school = School.find(@school_id)
       school.update(verified_at: Time.zone.now, rejected_at: nil)
       Role.owner.create(user_id: school.creator_id, school:)
+      Role.teacher.create(user_id: school.creator_id, school:)
     end
   rescue StandardError => e
     Sentry.capture_exception(e)

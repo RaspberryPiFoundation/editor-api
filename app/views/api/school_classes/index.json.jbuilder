@@ -4,6 +4,7 @@ json.array!(@school_classes_with_teachers) do |school_class, teacher|
   json.call(
     school_class,
     :id,
+    :description,
     :school_id,
     :teacher_id,
     :name,

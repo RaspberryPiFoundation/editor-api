@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school class', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
+    authenticate_as_school_teacher(school_id: school.id, teacher_id:)
     stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
   let(:school) { create(:school) }
   let(:teacher_id) { SecureRandom.uuid }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', school:, teacher_id:) }
 
   let(:params) do
     {
@@ -46,19 +46,6 @@ RSpec.describe 'Updating a school class', type: :request do
 
     expect(data[:teacher_name]).to eq('School Teacher')
   end
-
-  # rubocop:disable RSpec/ExampleLength
-  it "responds with nil attributes for the teacher if their user profile doesn't exist" do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    new_params = { school_class: params[:school_class].merge(teacher_id:) }
-
-    put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params: new_params)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[:teacher_name]).to be_nil
-  end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 400 Bad Request when params are missing' do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)

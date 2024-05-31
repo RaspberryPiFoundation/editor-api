@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2024_05_23_143911) do
+ActiveRecord::Schema[7.0].define(version: 2024_05_24_144838) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -190,6 +190,7 @@ ActiveRecord::Schema[7.0].define(version: 2024_05_23_143911) do
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "description"
     t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end

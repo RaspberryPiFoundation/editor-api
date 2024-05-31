@@ -5,6 +5,7 @@ school_class, teacher = @school_class_with_teacher
 json.call(
   school_class,
   :id,
+  :description,
   :school_id,
   :teacher_id,
   :name,
