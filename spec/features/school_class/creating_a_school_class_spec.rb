@@ -33,11 +33,17 @@ RSpec.describe 'Creating a school class', type: :request do
     expect(response).to have_http_status(:created)
   end
 
-  it 'responds with the school class JSON' do
+  it 'responds with the school class JSON containing the correct name' do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:name]).to eq('Test School Class')
+  end
+
+  it 'responds with the school class JSON containing the correct description' do
+    post("/api/schools/#{school.id}/classes", headers:, params:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
     expect(data[:description]).to eq('Test School Class Description')
   end
 
