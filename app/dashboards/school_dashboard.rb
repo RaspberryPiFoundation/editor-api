@@ -11,7 +11,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     id: Field::String,
-    user: Field::BelongsTo.with_options(class_name: 'User'),
+    creator: Field::BelongsTo.with_options(class_name: 'User'),
     name: Field::String,
     website: Field::String,
     address_line_1: Field::String,
@@ -48,7 +48,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     name
     verified_at
     rejected_at
-    user
+    creator
     reference
     website
     address_line_1
