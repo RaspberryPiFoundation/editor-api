@@ -24,7 +24,7 @@ class School < ApplicationRecord
     Role.find_by!(user_id: user.id).school
   end
 
-  def user
+  def creator
     User.from_userinfo(ids: creator_id).first
   end
 
