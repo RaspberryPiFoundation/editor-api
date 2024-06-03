@@ -69,14 +69,41 @@ RSpec.describe Project do
       end
     end
 
-    context 'when the project has a school' do
+    context 'when the project has a school and no user_id' do
+      let(:project) { build(:project, school:, user_id: nil) }
+
+      it 'is valid' do
+        expect(project).to be_valid
+      end
+    end
+
+    context 'when the project has a school and a user_id matching a user in Hydra' do
+      let(:user_id) { SecureRandom.uuid }
+      let(:project) { build(:project, school:, user_id:) }
+
       before do
-        project.update!(school: create(:school))
+        stub_user_info_api_for(user_index: 0, user_id:, school_id: school.id)
       end
 
-      it 'requires that the user that has a role within the school' do
-        project.user_id = SecureRandom.uuid
-        expect(project).to be_invalid
+      context 'when the user has a role in the school' do
+        before do
+          create(:student_role, user_id:, school:)
+        end
+
+        it 'is valid' do
+          expect(project).to be_valid
+        end
+      end
+
+      context "when the user doesn't have a role in the school" do
+        it 'is invalid' do
+          expect(project).to be_invalid
+        end
+
+        it 'adds an error message' do
+          project.valid?
+          expect(project.errors[:user]).to include("'#{user_id}' does not have any roles for organisation '#{school.id}'")
+        end
       end
     end
 

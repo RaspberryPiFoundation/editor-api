@@ -60,7 +60,7 @@ class Project < ApplicationRecord
     return if user.blank?
     return if user.school_roles(school).any?
 
-    msg = "'#{user_id}' does not have any roles for for organisation '#{school_id}'"
+    msg = "'#{user_id}' does not have any roles for organisation '#{school_id}'"
     errors.add(:user, msg)
   end
 
