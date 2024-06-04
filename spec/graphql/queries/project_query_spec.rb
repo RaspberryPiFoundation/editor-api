@@ -90,9 +90,10 @@ RSpec.describe 'query { project { ... } }' do
     context 'when logged in' do
       let(:current_user) { stubbed_user }
       let(:project) { create(:project, user_id: stubbed_user.id) }
+      let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_owner(school_id: SecureRandom.uuid)
+        authenticate_as_school_owner(school_id: school.id)
       end
 
       it 'returns the project global id' do

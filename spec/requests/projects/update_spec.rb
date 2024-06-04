@@ -17,6 +17,7 @@ RSpec.describe 'Project update requests' do
       )
     end
     let(:owner_id) { SecureRandom.uuid }
+    let(:school) { create(:school) }
 
     let(:params) do
       { project:
@@ -27,7 +28,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner_id:, school_id: school.id)
     end
 
     it 'returns success response' do
@@ -80,9 +81,10 @@ RSpec.describe 'Project update requests' do
   context 'when authed user is not creator' do
     let(:project) { create(:project, locale: nil) }
     let(:params) { { project: { components: [] } } }
+    let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(school_id: SecureRandom.uuid)
+      authenticate_as_school_owner(school_id: school.id)
     end
 
     it 'returns forbidden response' do

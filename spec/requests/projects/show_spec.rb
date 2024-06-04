@@ -20,9 +20,10 @@ RSpec.describe 'Project show requests' do
 
   context 'when user is logged in' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+    let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner_id:, school_id: school.id)
     end
 
     context 'when loading own project' do

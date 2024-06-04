@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a project', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
+    authenticate_as_school_owner(owner_id:, school_id: school.id)
 
     create(:component, project:, name: 'main', extension: 'py', content: 'print("hi")')
   end
@@ -12,6 +12,7 @@ RSpec.describe 'Updating a project', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:project) { create(:project, name: 'Test Project', user_id: owner_id) }
   let(:owner_id) { SecureRandom.uuid }
+  let(:school) { create(:school) }
 
   let(:params) do
     {

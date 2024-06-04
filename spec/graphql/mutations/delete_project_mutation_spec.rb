@@ -6,9 +6,10 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    authenticate_as_school_owner(school_id: SecureRandom.uuid)
+    authenticate_as_school_owner(school_id: school.id)
   end
 
+  let(:school) { create(:school) }
   let(:mutation) { 'mutation DeleteProject($project: DeleteProjectInput!) { deleteProject(input: $project) { id } }' }
   let(:project_id) { 'dummy-id' }
   let(:variables) { { project: { id: project_id } } }
@@ -39,9 +40,10 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
     context 'when authenticated' do
       let(:current_user) { stubbed_user }
+      let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: SecureRandom.uuid)
+        authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: school.id)
       end
 
       it 'deletes the project' do
@@ -59,7 +61,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
       context 'with another users project' do
         before do
-          authenticate_as_school_teacher(school_id: SecureRandom.uuid)
+          authenticate_as_school_teacher(school_id: school.id)
         end
 
         it 'returns an error' do

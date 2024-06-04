@@ -6,9 +6,10 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    authenticate_as_school_owner(school_id: SecureRandom.uuid)
+    authenticate_as_school_owner(school_id: school.id)
   end
 
+  let(:school) { create(:school) }
   let(:mutation) { 'mutation UpdateProject($project: UpdateProjectInput!) { updateProject(input: $project) { project { id } } }' }
   let(:project_id) { 'dummy-id' }
   let(:variables) do
@@ -26,11 +27,12 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   context 'with an existing project' do
     let(:project) { create(:project, user_id: stubbed_user.id, project_type: :python) }
     let(:project_id) { project.to_gid_param }
+    let(:school) { create(:school) }
 
     before do
       # Instantiate project
       project
-      authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: school.id)
     end
 
     context 'when unauthenticated' do

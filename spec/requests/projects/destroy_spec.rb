@@ -7,9 +7,10 @@ RSpec.describe 'Project delete requests' do
     let!(:project) { create(:project, user_id: owner_id, locale: nil) }
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
     let(:owner_id) { SecureRandom.uuid }
+    let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner_id:, school_id: school.id)
     end
 
     context 'when deleting a project the user owns' do

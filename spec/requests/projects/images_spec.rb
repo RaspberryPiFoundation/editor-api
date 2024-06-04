@@ -21,9 +21,10 @@ RSpec.describe 'Images requests' do
   describe 'create' do
     context 'when auth is correct' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+      let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
+        authenticate_as_school_owner(owner_id:, school_id: school.id)
       end
 
       it 'attaches file to project' do
