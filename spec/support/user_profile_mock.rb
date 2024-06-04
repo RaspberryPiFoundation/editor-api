@@ -45,10 +45,6 @@ module UserProfileMock
     create_student_role(school_id:, student_id:)
   end
 
-  def authenticate_as_school_student_without_organisations(student_id: SecureRandom.uuid)
-    stub_hydra_public_api(user_index: 3, user_id: student_id)
-  end
-
   def unauthenticated_user
     stub_hydra_public_api(user_index: nil)
   end
