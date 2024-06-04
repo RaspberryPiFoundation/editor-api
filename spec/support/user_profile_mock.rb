@@ -23,9 +23,9 @@ module UserProfileMock
     create_student_role(school_id:, student_id:)
   end
 
-  def stub_user_info_api_for(user_index:, user_id: nil)
+  def stub_user_info_api_for(user_index:, user_id:)
     user_attrs = user_attributes_by_index(user_index)
-    user_attrs['id'] = user_id if user_id
+    user_attrs['id'] = user_id
     stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 
