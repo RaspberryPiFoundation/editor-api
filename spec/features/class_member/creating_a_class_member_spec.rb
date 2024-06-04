@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a class member', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
+    authenticate_as_school_owner(school:)
     stub_user_info_api_for_teacher(teacher_id:, school:)
     stub_user_info_api_for_student(student_id:, school:)
   end

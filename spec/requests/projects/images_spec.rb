@@ -24,7 +24,7 @@ RSpec.describe 'Images requests' do
       let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_owner(owner_id:, school_id: school.id)
+        authenticate_as_school_owner(owner_id:, school:)
       end
 
       it 'attaches file to project' do

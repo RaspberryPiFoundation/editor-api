@@ -49,7 +49,7 @@ RSpec.describe User do
     let(:owner_id) { SecureRandom.uuid }
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: organisation_id)
+      authenticate_as_school_owner(owner_id:, school:)
     end
 
     it 'returns an instance of the described class' do

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id, owner_id:)
+    authenticate_as_school_owner(school:, owner_id:)
     stub_user_info_api_for_teacher(teacher_id:, school:)
     mock_phrase_generation
   end

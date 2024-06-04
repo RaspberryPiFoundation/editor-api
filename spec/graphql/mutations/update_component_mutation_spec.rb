@@ -23,7 +23,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
   context 'with an existing component' do
     before do
-      authenticate_as_school_owner(school_id: school.id)
+      authenticate_as_school_owner(school:)
     end
 
     let(:school) { create(:school) }

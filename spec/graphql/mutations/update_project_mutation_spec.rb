@@ -6,7 +6,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    authenticate_as_school_owner(school_id: school.id)
+    authenticate_as_school_owner(school:)
   end
 
   let(:school) { create(:school) }
@@ -32,7 +32,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     before do
       # Instantiate project
       project
-      authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: school.id)
+      authenticate_as_school_owner(owner_id: stubbed_user.id, school:)
     end
 
     context 'when unauthenticated' do

@@ -28,7 +28,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: school.id)
+      authenticate_as_school_owner(owner_id:, school:)
     end
 
     it 'returns success response' do
@@ -84,7 +84,7 @@ RSpec.describe 'Project update requests' do
     let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(school_id: school.id)
+      authenticate_as_school_owner(school:)
     end
 
     it 'returns forbidden response' do

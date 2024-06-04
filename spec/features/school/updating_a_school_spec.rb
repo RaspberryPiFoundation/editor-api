@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id, owner_id:)
+    authenticate_as_school_owner(school:, owner_id:)
   end
 
   let!(:school) { create(:school) }

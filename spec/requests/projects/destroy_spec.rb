@@ -10,7 +10,7 @@ RSpec.describe 'Project delete requests' do
     let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: school.id)
+      authenticate_as_school_owner(owner_id:, school:)
     end
 
     context 'when deleting a project the user owns' do
