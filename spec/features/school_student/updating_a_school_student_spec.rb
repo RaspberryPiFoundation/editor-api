@@ -29,7 +29,7 @@ RSpec.describe 'Updating a school student', type: :request do
   end
 
   it 'responds 204 No Content when the user is a school-teacher' do
-    authenticate_as_school_teacher(school_id: school.id)
+    authenticate_as_school_teacher(school:)
 
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
     expect(response).to have_http_status(:no_content)

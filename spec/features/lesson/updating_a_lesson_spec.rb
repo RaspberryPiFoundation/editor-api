@@ -90,7 +90,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
       user_id = SecureRandom.uuid
       stub_user_info_api_for_unknown_users(user_id:)
-      authenticate_as_school_teacher(school_id: school.id)
+      authenticate_as_school_teacher(school:)
       lesson.update!(user_id:)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)

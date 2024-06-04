@@ -55,7 +55,7 @@ RSpec.describe 'Images requests' do
       let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_teacher(school_id: school.id)
+        authenticate_as_school_teacher(school:)
       end
 
       it 'returns forbidden response' do

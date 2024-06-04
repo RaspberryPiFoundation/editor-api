@@ -34,9 +34,9 @@ module UserProfileMock
     create_owner_role(school_id: school.id, owner_id:)
   end
 
-  def authenticate_as_school_teacher(school_id:, teacher_id: SecureRandom.uuid)
+  def authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
     stub_hydra_public_api(user_index: 1, user_id: teacher_id)
-    create_teacher_role(school_id:, teacher_id:)
+    create_teacher_role(school_id: school.id, teacher_id:)
   end
 
   def authenticate_as_school_student(school_id:, student_id: SecureRandom.uuid)

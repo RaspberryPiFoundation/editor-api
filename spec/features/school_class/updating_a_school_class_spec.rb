@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school class', type: :request do
   before do
-    authenticate_as_school_teacher(school_id: school.id, teacher_id:)
+    authenticate_as_school_teacher(school:, teacher_id:)
     stub_user_info_api_for_teacher(teacher_id:, school:)
   end
 
@@ -27,7 +27,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the school-teacher for the class' do
-    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+    authenticate_as_school_teacher(teacher_id:, school:)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
@@ -74,7 +74,7 @@ RSpec.describe 'Updating a school class', type: :request do
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
     teacher_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_teacher(school_id: school.id)
+    authenticate_as_school_teacher(school:)
     school_class.update!(teacher_id:)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)

@@ -73,7 +73,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-teacher for the school' do
-      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+      authenticate_as_school_teacher(teacher_id:, school:)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -87,7 +87,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'sets the lesson user to the current user for school-teacher users' do
-      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+      authenticate_as_school_teacher(teacher_id:, school:)
       new_params = { lesson: params[:lesson].merge(user_id: 'ignored') }
 
       post('/api/lessons', headers:, params: new_params)
@@ -135,7 +135,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
-      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+      authenticate_as_school_teacher(teacher_id:, school:)
       school_class.update!(teacher_id:)
 
       post('/api/lessons', headers:, params:)
@@ -169,7 +169,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     it 'responds 403 Forbidden when the current user is a school-teacher for a different class' do
       teacher_id = SecureRandom.uuid
       stub_user_info_api_for_unknown_users(user_id: teacher_id)
-      authenticate_as_school_teacher(school_id: school.id)
+      authenticate_as_school_teacher(school:)
       school_class.update!(teacher_id:)
 
       post('/api/lessons', headers:, params:)
