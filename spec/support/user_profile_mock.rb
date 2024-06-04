@@ -10,7 +10,7 @@ module UserProfileMock
 
   def stub_user_info_api_for_owner(owner_id:, school:)
     stub_user_info_api_for(user_index: 0, user_id: owner_id)
-    create_owner_role(school_id: school.id, owner_id:)
+    create_owner_role(school:, owner_id:)
   end
 
   def stub_user_info_api_for_teacher(teacher_id:, school:)
@@ -31,7 +31,7 @@ module UserProfileMock
 
   def authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
     stub_hydra_public_api(user_index: 0, user_id: owner_id)
-    create_owner_role(school_id: school.id, owner_id:)
+    create_owner_role(school:, owner_id:)
   end
 
   def authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
@@ -91,10 +91,10 @@ module UserProfileMock
     create(:teacher_role, user_id: teacher_id, school:)
   end
 
-  def create_owner_role(school_id:, owner_id:)
-    return unless School.exists?(id: school_id)
-    return if Role.owner.exists?(user_id: owner_id, school_id:)
+  def create_owner_role(school:, owner_id:)
+    return unless School.exists?(id: school)
+    return if Role.owner.exists?(user_id: owner_id, school:)
 
-    create(:owner_role, user_id: owner_id, school_id:)
+    create(:owner_role, user_id: owner_id, school:)
   end
 end
