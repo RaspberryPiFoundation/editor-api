@@ -74,7 +74,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
 
       context 'with another users project' do
         before do
-          authenticate_as_school_teacher(school_id: SecureRandom.uuid)
+          authenticate_as_school_teacher(school_id: school.id)
         end
 
         it 'returns an error' do

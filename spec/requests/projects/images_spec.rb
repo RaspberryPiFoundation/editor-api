@@ -52,9 +52,10 @@ RSpec.describe 'Images requests' do
 
     context 'when authed user is not creator' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+      let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_teacher(school_id: SecureRandom.uuid)
+        authenticate_as_school_teacher(school_id: school.id)
       end
 
       it 'returns forbidden response' do
