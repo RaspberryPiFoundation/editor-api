@@ -57,7 +57,7 @@ RSpec.describe 'Inviting a school teacher', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student(school_id: school.id)
+    authenticate_as_school_student(school:)
 
     post("/api/schools/#{school.id}/teachers", headers:, params:)
     expect(response).to have_http_status(:forbidden)

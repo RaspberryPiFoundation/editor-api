@@ -97,7 +97,7 @@ RSpec.describe 'Creating a class member', type: :request do
   # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student(school_id: school.id)
+    authenticate_as_school_student(school:)
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     expect(response).to have_http_status(:forbidden)
