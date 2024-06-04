@@ -9,7 +9,7 @@ RSpec.describe SchoolClass::Update, type: :unit do
   let(:teacher_id) { SecureRandom.uuid }
 
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school:)
   end
 
   it 'returns a successful operation response' do

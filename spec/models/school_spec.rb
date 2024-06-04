@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe School do
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school:)
     stub_user_info_api_for_student(student_id:, school_id: school.id)
   end
 

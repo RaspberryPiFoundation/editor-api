@@ -6,7 +6,7 @@ RSpec.describe 'Listing school teachers', type: :request do
   before do
     authenticate_as_school_owner(school_id: school.id, owner_id:)
     stub_profile_api_list_school_teachers(user_id: teacher_id)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

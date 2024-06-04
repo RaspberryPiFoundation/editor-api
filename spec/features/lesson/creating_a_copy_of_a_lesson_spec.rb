@@ -6,7 +6,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   before do
     authenticate_as_school_owner(owner_id:, school_id: school.id)
     stub_user_info_api_for_owner(owner_id:, school:)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for_teacher(teacher_id:, school:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

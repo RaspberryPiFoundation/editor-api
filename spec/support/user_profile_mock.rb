@@ -13,9 +13,9 @@ module UserProfileMock
     create_owner_role(school_id: school.id, owner_id:)
   end
 
-  def stub_user_info_api_for_teacher(teacher_id:, school_id:)
+  def stub_user_info_api_for_teacher(teacher_id:, school:)
     stub_user_info_api_for(user_index: 1, user_id: teacher_id)
-    create_teacher_role(school_id:, teacher_id:)
+    create_teacher_role(school_id: school.id, teacher_id:)
   end
 
   def stub_user_info_api_for_student(student_id:, school_id:)
