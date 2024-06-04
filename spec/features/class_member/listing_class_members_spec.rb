@@ -7,10 +7,10 @@ RSpec.describe 'Listing class members', type: :request do
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(teacher)
     stub_user_info_api_for(student)
+    create(:class_member, student_id: student.id, school_class:)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
   let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:, name: 'School Student') }
@@ -36,25 +36,21 @@ RSpec.describe 'Listing class members', type: :request do
     expect(data.first[:student_name]).to eq('School Student')
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for students if the user profile doesn't exist" do
-    student_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: student_id)
-    class_member.update!(student_id:)
+    stub_user_info_api_for_unknown_users(user_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:student_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   # rubocop:disable RSpec/ExampleLength
   it 'does not include class members that belong to a different class' do
-    student_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: student_id)
+    student = create(:student, school:)
+    stub_user_info_api_for(student)
     different_class = create(:school_class, school:, teacher_id: teacher.id)
-    create(:class_member, school_class: different_class, student_id:)
+    create(:class_member, school_class: different_class, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
