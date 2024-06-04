@@ -9,24 +9,23 @@ module UserProfileMock
   end
 
   def stub_user_info_api_for_owner(owner_id:, school_id:)
-    stub_user_info_api_for(user_index: 0, user_id: owner_id, school_id:)
+    stub_user_info_api_for(user_index: 0, user_id: owner_id)
     create_owner_role(school_id:, owner_id:)
   end
 
   def stub_user_info_api_for_teacher(teacher_id:, school_id:)
-    stub_user_info_api_for(user_index: 1, user_id: teacher_id, school_id:)
+    stub_user_info_api_for(user_index: 1, user_id: teacher_id)
     create_teacher_role(school_id:, teacher_id:)
   end
 
   def stub_user_info_api_for_student(student_id:, school_id:)
-    stub_user_info_api_for(user_index: 2, user_id: student_id, school_id:)
+    stub_user_info_api_for(user_index: 2, user_id: student_id)
     create_student_role(school_id:, student_id:)
   end
 
-  def stub_user_info_api_for(user_index:, user_id: nil, school_id: nil)
+  def stub_user_info_api_for(user_index:, user_id: nil)
     user_attrs = user_attributes_by_index(user_index)
     user_attrs['id'] = user_id if user_id
-    user_attrs['organisations'] = { school_id => user_attrs['roles'] } if school_id
     stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
   end
 
