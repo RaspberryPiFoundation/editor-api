@@ -37,25 +37,21 @@ RSpec.describe 'Listing school classes', type: :request do
     expect(data.first[:teacher_name]).to eq('School Teacher')
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for teachers if the user profile doesn't exist" do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    school_class.update!(teacher_id:)
+    stub_user_info_api_for_unknown_users(user_id: teacher.id)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:teacher_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-teacher doesn't teach" do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
+    teacher = create(:teacher, school:)
+    stub_user_info_api_for(teacher)
     authenticated_in_hydra_as(teacher)
-    create(:school_class, school:, teacher_id:)
+    create(:school_class, school:, teacher_id: teacher.id)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
@@ -66,10 +62,10 @@ RSpec.describe 'Listing school classes', type: :request do
 
   # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-student isn't a member of" do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
+    teacher = create(:teacher, school:)
+    stub_user_info_api_for(teacher)
     authenticated_in_hydra_as(student)
-    create(:school_class, school:, teacher_id:)
+    create(:school_class, school:, teacher_id: teacher.id)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)

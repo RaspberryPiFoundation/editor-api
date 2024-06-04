@@ -27,8 +27,7 @@ class SchoolClass < ApplicationRecord
   def teacher_has_the_school_teacher_role_for_the_school
     return unless teacher_id_changed? && errors.blank?
 
-    _, user = with_teacher
-    return if user.blank?
+    user = User.new(id: teacher_id)
     return if user.school_teacher?(school)
 
     msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{school.id}'"
