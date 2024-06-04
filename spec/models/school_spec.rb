@@ -182,7 +182,7 @@ RSpec.describe School do
 
     before do
       school.update!(creator_id:)
-      stub_user_info_api_for_owner(owner_id: creator_id, school_id: school.id)
+      stub_user_info_api_for_owner(owner_id: creator_id, school:)
     end
 
     it 'returns a User instance' do

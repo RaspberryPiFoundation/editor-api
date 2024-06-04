@@ -19,7 +19,7 @@ RSpec.describe User do
     let(:user) { users.first }
 
     before do
-      stub_user_info_api_for_owner(owner_id: ids.first, school_id: school.id)
+      stub_user_info_api_for_owner(owner_id: ids.first, school:)
     end
 
     it 'returns an Array' do
@@ -247,7 +247,7 @@ RSpec.describe User do
     let(:owner_id) { SecureRandom.uuid }
 
     before do
-      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+      stub_user_info_api_for_owner(owner_id:, school:)
     end
 
     it 'returns an instance of the described class' do

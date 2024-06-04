@@ -92,7 +92,7 @@ RSpec.describe Lesson do
 
       it 'requires that the user that is the school-teacher for the school_class' do
         owner_id = SecureRandom.uuid
-        stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+        stub_user_info_api_for_owner(owner_id:, school:)
         lesson.user_id = owner_id
         expect(lesson).to be_invalid
       end

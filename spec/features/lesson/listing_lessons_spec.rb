@@ -74,7 +74,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner_id) { SecureRandom.uuid }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+      stub_user_info_api_for_owner(owner_id:, school:)
       lesson.update!(user_id: owner_id)
 
       get('/api/lessons', headers:)
@@ -97,7 +97,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner_id) { SecureRandom.uuid }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+      stub_user_info_api_for_owner(owner_id:, school:)
       lesson.update!(user_id: owner_id)
 
       get('/api/lessons', headers:)
