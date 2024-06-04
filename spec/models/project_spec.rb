@@ -105,7 +105,7 @@ RSpec.describe Project do
   describe '.users' do
     it 'returns User instances for the current scope' do
       student_id = SecureRandom.uuid
-      stub_user_info_api_for_student(student_id:, school_id: school.id)
+      stub_user_info_api_for_student(student_id:, school:)
       create(:project, user_id: student_id)
 
       user = described_class.all.users.first
@@ -133,7 +133,7 @@ RSpec.describe Project do
     # rubocop:disable RSpec/ExampleLength
     it 'returns an array of class members paired with their User instance' do
       student_id = SecureRandom.uuid
-      stub_user_info_api_for_student(student_id:, school_id: school.id)
+      stub_user_info_api_for_student(student_id:, school:)
       project = create(:project, user_id: student_id)
 
       pair = described_class.all.with_users.first
@@ -164,7 +164,7 @@ RSpec.describe Project do
     # rubocop:disable RSpec/ExampleLength
     it 'returns the class member paired with their User instance' do
       student_id = SecureRandom.uuid
-      stub_user_info_api_for_student(student_id:, school_id: school.id)
+      stub_user_info_api_for_student(student_id:, school:)
       project = create(:project, user_id: student_id)
 
       pair = project.with_user

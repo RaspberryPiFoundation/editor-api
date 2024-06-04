@@ -83,7 +83,7 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 201 Created when the user is a school-student for the school' do
       student_id = SecureRandom.uuid
-      stub_user_info_api_for_student(student_id:, school_id: school.id)
+      stub_user_info_api_for_student(student_id:, school:)
       authenticate_as_school_student(student_id:, school_id: school.id)
 
       post('/api/projects', headers:, params:)

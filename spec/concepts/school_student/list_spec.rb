@@ -9,7 +9,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
 
   before do
     stub_profile_api_list_school_students(user_id: student_id)
-    stub_user_info_api_for_student(student_id:, school_id: school.id)
+    stub_user_info_api_for_student(student_id:, school:)
   end
 
   it 'returns a successful operation response' do
