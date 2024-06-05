@@ -16,6 +16,10 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
     expect(response.success?).to be(true)
   end
 
+  it 'creates an Invitation' do
+    expect { described_class.call(school:, school_teacher_params:, token:) }.to change(Invitation, :count)
+  end
+
   context 'when creation fails' do
     let(:school_teacher_params) do
       { email_address: 'invalid' }
