@@ -8,4 +8,10 @@ RSpec.describe Invitation do
 
     expect(invitation).to be_valid
   end
+
+  it 'is invalid with an incorrectly formatted email address' do
+    invitation = build(:invitation, email_address: 'not-an-email-address')
+
+    expect(invitation).not_to be_valid
+  end
 end

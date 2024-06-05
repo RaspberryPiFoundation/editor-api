@@ -19,9 +19,8 @@ module SchoolTeacher
         email_address = school_teacher_params.fetch(:email_address)
 
         raise ArgumentError, 'school is not verified' unless school.verified_at
-        raise ArgumentError, "email address '#{email_address}' is invalid" unless EmailValidator.valid?(email_address)
 
-        Invitation.create(school:, email_address:)
+        Invitation.create!(school:, email_address:)
       end
     end
   end

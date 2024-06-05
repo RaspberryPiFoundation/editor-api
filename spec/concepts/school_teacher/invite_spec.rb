@@ -36,7 +36,7 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_teacher_params:, token:)
-      expect(response[:error]).to match(/email address 'invalid' is invalid/)
+      expect(response[:error]).to match(/Email address 'invalid' is invalid/)
     end
 
     it 'sent the exception to Sentry' do
