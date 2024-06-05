@@ -14,4 +14,11 @@ RSpec.describe Invitation do
 
     expect(invitation).not_to be_valid
   end
+
+  it 'is invalid with an unverified school' do
+    school = build(:school, verified_at: nil)
+    invitation = build(:invitation, school:)
+
+    expect(invitation).not_to be_valid
+  end
 end

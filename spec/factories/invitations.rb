@@ -3,6 +3,6 @@
 FactoryBot.define do
   factory :invitation do
     email_address { 'teacher@example.com' }
-    school
+    school factory: :school, verified_at: Time.zone.now
   end
 end
