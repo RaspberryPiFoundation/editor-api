@@ -151,6 +151,14 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_12_153270) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
+  create_table "invitations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "email_address"
+    t.uuid "school_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_invitations_on_school_id"
+  end
+
   create_table "lessons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_id"
     t.uuid "school_class_id"
@@ -250,6 +258,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_12_153270) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "class_members", "school_classes"
   add_foreign_key "components", "projects"
+  add_foreign_key "invitations", "schools"
   add_foreign_key "lessons", "lessons", column: "copied_from_id"
   add_foreign_key "lessons", "school_classes"
   add_foreign_key "lessons", "schools"
