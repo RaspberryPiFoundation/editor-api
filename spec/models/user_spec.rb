@@ -47,10 +47,10 @@ RSpec.describe User do
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(owner_id:, school:)
+      authenticate_as_school_owner(owner)
     end
 
     it 'returns an instance of the described class' do
@@ -58,7 +58,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq owner_id
+      expect(user.id).to eq owner.id
     end
 
     it 'returns a user with the correct name' do

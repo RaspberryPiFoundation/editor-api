@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
   before do
-    authenticate_as_school_owner(school:, owner_id:)
+    authenticate_as_school_owner(owner)
     stub_user_info_api_for_teacher(teacher)
     mock_phrase_generation
   end
@@ -12,7 +12,7 @@ RSpec.describe 'Creating a project', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
@@ -109,7 +109,7 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
       Role.teacher.find_by(user_id: teacher.id, school:).delete
-      Role.owner.find_by(user_id: owner_id, school:).delete
+      Role.owner.find_by(user_id: owner.id, school:).delete
       school.update!(id: SecureRandom.uuid)
 
       post('/api/projects', headers:, params:)

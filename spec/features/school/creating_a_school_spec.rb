@@ -4,11 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
   before do
-    authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+    authenticate_as_school_owner(owner)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
+  let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {

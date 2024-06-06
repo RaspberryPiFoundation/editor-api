@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a school class', type: :request do
   before do
-    authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+    authenticate_as_school_owner(owner)
     stub_user_info_api_for_teacher(teacher)
   end
 
@@ -12,6 +12,7 @@ RSpec.describe 'Deleting a school class', type: :request do
   let!(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)

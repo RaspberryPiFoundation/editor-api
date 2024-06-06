@@ -6,7 +6,7 @@ RSpec.describe 'Project update requests' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   context 'when authed user is project creator' do
-    let(:project) { create(:project, :with_default_component, user_id: owner_id, locale: nil) }
+    let(:project) { create(:project, :with_default_component, user_id: owner.id, locale: nil) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(
@@ -16,7 +16,7 @@ RSpec.describe 'Project update requests' do
         :extension
       )
     end
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:) }
     let(:school) { create(:school) }
 
     let(:params) do
@@ -28,7 +28,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      authenticate_as_school_owner(owner_id:, school:)
+      authenticate_as_school_owner(owner)
     end
 
     it 'returns success response' do
@@ -82,9 +82,10 @@ RSpec.describe 'Project update requests' do
     let(:project) { create(:project, locale: nil) }
     let(:params) { { project: { components: [] } } }
     let(:school) { create(:school) }
+    let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner)
     end
 
     it 'returns forbidden response' do

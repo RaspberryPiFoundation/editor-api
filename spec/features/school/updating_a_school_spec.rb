@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school', type: :request do
   before do
-    authenticate_as_school_owner(school:, owner_id:)
+    authenticate_as_school_owner(owner)
   end
 
   let!(:school) { create(:school) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
@@ -60,7 +60,7 @@ RSpec.describe 'Updating a school', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    Role.owner.find_by(user_id: owner_id, school:).delete
+    Role.owner.find_by(user_id: owner.id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     put("/api/schools/#{school.id}", headers:, params:)

@@ -5,13 +5,14 @@ require 'rails_helper'
 RSpec.describe 'Create project requests' do
   let(:project) { create(:project, user_id: stubbed_user.id) }
   let(:school) { create(:school) }
+  let(:owner) { create(:owner, school:) }
 
   context 'when auth is correct' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     context 'when creating project is successful' do
       before do
-        authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+        authenticate_as_school_owner(owner)
 
         response = OperationResponse.new
         response[:project] = project
@@ -27,7 +28,7 @@ RSpec.describe 'Create project requests' do
 
     context 'when creating project fails' do
       before do
-        authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+        authenticate_as_school_owner(owner)
 
         response = OperationResponse.new
         response[:error] = 'Error creating project'

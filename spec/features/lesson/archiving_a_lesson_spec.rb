@@ -4,14 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Archiving a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school:)
+    authenticate_as_school_owner(owner)
     stub_user_info_api_for_teacher(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, user_id: owner_id) }
+  let!(:lesson) { create(:lesson, user_id: owner.id) }
   let(:owner_id) { SecureRandom.uuid }
   let(:teacher) { create(:teacher, school:) }
+  let(:owner) { create(:owner, school:) }
   let(:school) { create(:school) }
 
   it 'responds 204 No Content' do

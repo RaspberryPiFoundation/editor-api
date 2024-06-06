@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing class members', type: :request do
   before do
-    authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+    authenticate_as_school_owner(owner)
     stub_user_info_api_for_teacher(teacher)
     stub_user_info_api_for_student(student)
   end
@@ -15,6 +15,7 @@ RSpec.describe 'Listing class members', type: :request do
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)

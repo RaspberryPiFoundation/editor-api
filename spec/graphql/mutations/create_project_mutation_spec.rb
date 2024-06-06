@@ -44,9 +44,10 @@ RSpec.describe 'mutation CreateProject() { ... }' do
   context 'when authenticated' do
     let(:current_user) { stubbed_user }
     let(:school) { create(:school) }
+    let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner)
       mock_phrase_generation
     end
 

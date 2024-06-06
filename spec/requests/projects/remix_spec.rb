@@ -12,6 +12,7 @@ RSpec.describe 'Remix requests' do
     }
   end
   let(:school) { create(:school) }
+  let(:owner) { create(:owner, school:) }
 
   before do
     mock_phrase_generation
@@ -26,7 +27,7 @@ RSpec.describe 'Remix requests' do
     end
 
     before do
-      authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+      authenticate_as_school_owner(owner)
     end
 
     describe '#show' do
@@ -63,7 +64,7 @@ RSpec.describe 'Remix requests' do
 
       context 'when project cannot be saved' do
         before do
-          authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
+          authenticate_as_school_owner(owner)
           error_response = OperationResponse.new
           error_response[:error] = 'Something went wrong'
           allow(Project::CreateRemix).to receive(:call).and_return(error_response)

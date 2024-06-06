@@ -7,18 +7,18 @@ RSpec.describe 'Project index requests' do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:project_keys) { %w[identifier project_type name user_id updated_at] }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
   let(:school) { create(:school) }
 
   before do
-    create_list(:project, 2, user_id: owner_id)
+    create_list(:project, 2, user_id: owner.id)
   end
 
   context 'when user is logged in' do
     before do
       # create non user projects
       create_list(:project, 2)
-      authenticate_as_school_owner(owner_id:, school:)
+      authenticate_as_school_owner(owner)
     end
 
     it 'returns success response' do
@@ -47,7 +47,7 @@ RSpec.describe 'Project index requests' do
 
   context 'when the projects index has pagination' do
     before do
-      authenticate_as_school_owner(owner_id:, school:)
+      authenticate_as_school_owner(owner)
       create_list(:project, 10, user_id: stubbed_user.id)
     end
 
