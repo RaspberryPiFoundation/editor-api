@@ -185,7 +185,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school:)
+      authenticate_as_school_student(school:, student_id: SecureRandom.uuid)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
