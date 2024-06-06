@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 module UserProfileMock
-  USERS = File.read('spec/fixtures/users.json')
   TOKEN = 'fake-user-access-token'
 
   def stub_user_info_api_for_unknown_users(user_id:)
@@ -22,10 +21,6 @@ module UserProfileMock
 
   def stubbed_user
     User.from_token(token: TOKEN)
-  end
-
-  def user_attributes_by_index(user_index = 0)
-    JSON.parse(USERS)['users'][user_index] if user_index
   end
 
   private
