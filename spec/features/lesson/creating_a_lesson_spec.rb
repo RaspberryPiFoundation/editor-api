@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.describe 'Creating a lesson', type: :request do
   before do
     authenticate_as_school_owner(owner_id:, school:)
-    stub_user_info_api_for_teacher(teacher_id:, school:)
+    stub_user_info_api_for_teacher(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
   let(:owner_id) { SecureRandom.uuid }
   let(:school) { create(:school) }
 
@@ -55,14 +55,14 @@ RSpec.describe 'Creating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let(:teacher_id) { SecureRandom.uuid }
+    let(:teacher) { create(:teacher, school:) }
 
     let(:params) do
       {
         lesson: {
           name: 'Test Lesson',
           school_id: school.id,
-          user_id: teacher_id
+          user_id: teacher.id
         }
       }
     end
@@ -73,7 +73,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-teacher for the school' do
-      authenticate_as_school_teacher(teacher_id:, school:)
+      authenticate_as_school_teacher(teacher_id: teacher.id, school:)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -83,21 +83,21 @@ RSpec.describe 'Creating a lesson', type: :request do
       post('/api/lessons', headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:user_id]).to eq(teacher_id)
+      expect(data[:user_id]).to eq(teacher.id)
     end
 
     it 'sets the lesson user to the current user for school-teacher users' do
-      authenticate_as_school_teacher(teacher_id:, school:)
+      authenticate_as_school_teacher(teacher_id: teacher.id, school:)
       new_params = { lesson: params[:lesson].merge(user_id: 'ignored') }
 
       post('/api/lessons', headers:, params: new_params)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:user_id]).to eq(teacher_id)
+      expect(data[:user_id]).to eq(teacher.id)
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-      Role.teacher.find_by(user_id: teacher_id, school:).delete
+      Role.teacher.find_by(user_id: teacher.id, school:).delete
       Role.owner.find_by(user_id: owner_id, school:).delete
       school.update!(id: SecureRandom.uuid)
 
@@ -114,9 +114,9 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class, teacher_id:, school:) }
+    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
     let(:school) { create(:school) }
-    let(:teacher_id) { SecureRandom.uuid }
+    let(:teacher) { create(:teacher, school:) }
 
     let(:params) do
       {
@@ -124,7 +124,7 @@ RSpec.describe 'Creating a lesson', type: :request do
           name: 'Test Lesson',
           school_id: school.id,
           school_class_id: school_class.id,
-          user_id: teacher_id
+          user_id: teacher.id
         }
       }
     end
@@ -135,8 +135,8 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
-      authenticate_as_school_teacher(teacher_id:, school:)
-      school_class.update!(teacher_id:)
+      authenticate_as_school_teacher(teacher_id: teacher.id, school:)
+      school_class.update!(teacher_id: teacher.id)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)

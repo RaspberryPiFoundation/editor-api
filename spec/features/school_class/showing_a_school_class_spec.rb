@@ -5,13 +5,13 @@ require 'rails_helper'
 RSpec.describe 'Showing a school class', type: :request do
   before do
     authenticate_as_school_owner(school:)
-    stub_user_info_api_for_teacher(teacher_id:, school:)
+    stub_user_info_api_for_teacher(teacher)
   end
 
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -19,7 +19,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the class teacher' do
-    authenticate_as_school_teacher(teacher_id:, school:)
+    authenticate_as_school_teacher(teacher_id: teacher.id, school:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)

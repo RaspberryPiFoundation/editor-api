@@ -20,6 +20,16 @@ FactoryBot.define do
       end
     end
 
+    factory :teacher do
+      transient do
+        school { nil }
+      end
+
+      after(:create) do |user, context|
+        create(:teacher_role, user_id: user.id, school: context.school)
+      end
+    end
+
     skip_create
   end
 end

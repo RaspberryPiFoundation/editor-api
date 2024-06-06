@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school class', type: :request do
   before do
-    authenticate_as_school_teacher(school:, teacher_id:)
-    stub_user_info_api_for_teacher(teacher_id:, school:)
+    authenticate_as_school_teacher(school:, teacher_id: teacher.id)
+    stub_user_info_api_for_teacher(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
 
   let(:params) do
     {
@@ -27,7 +27,7 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   it 'responds 201 Created when the user is a school-teacher' do
-    authenticate_as_school_teacher(teacher_id:, school:)
+    authenticate_as_school_teacher(teacher_id: teacher.id, school:)
 
     post("/api/schools/#{school.id}/classes", headers:, params:)
     expect(response).to have_http_status(:created)
@@ -58,18 +58,18 @@ RSpec.describe 'Creating a school class', type: :request do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_id]).to eq(teacher_id)
+    expect(data[:teacher_id]).to eq(teacher.id)
   end
 
   it 'sets the class teacher to the current user for school-teacher users' do
-    authenticate_as_school_teacher(teacher_id:, school:)
+    authenticate_as_school_teacher(teacher_id: teacher.id, school:)
 
     new_params = { school_class: params[:school_class].merge(teacher_id: 'ignored') }
 
     post("/api/schools/#{school.id}/classes", headers:, params: new_params)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_id]).to eq(teacher_id)
+    expect(data[:teacher_id]).to eq(teacher.id)
   end
 
   it 'responds 400 Bad Request when params are missing' do
@@ -88,7 +88,7 @@ RSpec.describe 'Creating a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    Role.teacher.find_by(user_id: teacher_id, school:).delete
+    Role.teacher.find_by(user_id: teacher.id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     post("/api/schools/#{school.id}/classes", headers:, params:)

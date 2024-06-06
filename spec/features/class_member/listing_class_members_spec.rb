@@ -5,16 +5,16 @@ require 'rails_helper'
 RSpec.describe 'Listing class members', type: :request do
   before do
     authenticate_as_school_owner(school:)
-    stub_user_info_api_for_teacher(teacher_id:, school:)
+    stub_user_info_api_for_teacher(teacher)
     stub_user_info_api_for_student(student)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
-  let(:school_class) { build(:school_class, teacher_id:, school:) }
+  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
@@ -52,7 +52,7 @@ RSpec.describe 'Listing class members', type: :request do
   it 'does not include class members that belong to a different class' do
     student_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: student_id)
-    different_class = create(:school_class, school:, teacher_id:)
+    different_class = create(:school_class, school:, teacher_id: teacher.id)
     create(:class_member, school_class: different_class, student_id:)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)

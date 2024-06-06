@@ -5,12 +5,12 @@ require 'rails_helper'
 RSpec.describe 'Showing a lesson', type: :request do
   before do
     authenticate_as_school_owner(owner_id:, school:)
-    stub_user_info_api_for_teacher(teacher_id:, school:)
+    stub_user_info_api_for_teacher(teacher)
   end
 
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher_id) }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher.id) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
   let(:owner_id) { SecureRandom.uuid }
   let(:school) { create(:school) }
 
@@ -76,7 +76,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
     let(:owner_id) { SecureRandom.uuid }
 
     it 'responds 200 OK when the user owns the lesson' do
@@ -110,13 +110,13 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id:, school:) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher_id) }
-    let(:teacher_id) { SecureRandom.uuid }
+    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
+    let(:teacher) { create(:teacher, school:) }
 
     it 'responds 200 OK when the user owns the lesson' do
       authenticate_as_school_teacher(school:)
-      lesson.update!(user_id: teacher_id)
+      lesson.update!(user_id: teacher.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)

@@ -5,13 +5,13 @@ require 'rails_helper'
 RSpec.describe 'Updating a lesson', type: :request do
   before do
     authenticate_as_school_owner(owner_id:, school:)
-    stub_user_info_api_for_teacher(teacher_id:, school:)
+    stub_user_info_api_for_teacher(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner_id) }
   let(:owner_id) { SecureRandom.uuid }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
 
   let(:params) do
@@ -63,7 +63,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -71,7 +71,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 200 OK when assigning the lesson to a school class' do
-      school_class = create(:school_class, school:, teacher_id:)
+      school_class = create(:school_class, school:, teacher_id: teacher.id)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -108,8 +108,8 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school class' do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id:, school:) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher_id) }
+    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
