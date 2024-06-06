@@ -92,7 +92,7 @@ RSpec.describe Lesson do
 
       it 'requires that the user that is the school-teacher for the school_class' do
         owner = create(:owner, school:)
-        stub_user_info_api_for_owner(owner)
+        stub_user_info_api_for(owner)
         lesson.user_id = owner.id
         expect(lesson).to be_invalid
       end

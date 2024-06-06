@@ -20,7 +20,7 @@ RSpec.describe User do
     let(:user) { users.first }
 
     before do
-      stub_user_info_api_for_owner(owner)
+      stub_user_info_api_for(owner)
     end
 
     it 'returns an Array' do
@@ -248,7 +248,7 @@ RSpec.describe User do
     let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
     before do
-      stub_user_info_api_for_owner(owner)
+      stub_user_info_api_for(owner)
     end
 
     it 'returns an instance of the described class' do

@@ -61,7 +61,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner) { create(:owner, school:) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      stub_user_info_api_for_owner(owner)
+      stub_user_info_api_for(owner)
       lesson.update!(user_id: owner.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -80,7 +80,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner) { create(:owner, school:) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      stub_user_info_api_for_owner(owner)
+      stub_user_info_api_for(owner)
       lesson.update!(user_id: owner.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
