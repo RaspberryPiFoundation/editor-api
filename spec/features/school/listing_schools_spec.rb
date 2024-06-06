@@ -6,7 +6,7 @@ RSpec.describe 'Listing schools', type: :request do
   before do
     school = create(:school, name: 'Test School')
     owner = create(:owner, school:)
-    authenticate_as_school_owner(owner)
+    authenticated_in_hydra_as(owner)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

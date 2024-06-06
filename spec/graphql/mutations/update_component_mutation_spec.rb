@@ -23,7 +23,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
   context 'with an existing component' do
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     let(:school) { create(:school) }

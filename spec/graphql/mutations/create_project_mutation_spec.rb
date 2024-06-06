@@ -47,7 +47,7 @@ RSpec.describe 'mutation CreateProject() { ... }' do
     let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
       mock_phrase_generation
     end
 

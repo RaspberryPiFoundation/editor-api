@@ -12,10 +12,6 @@ module UserProfileMock
     stub_user_info_api(user_id: user.id, users: [user_to_hash(user)])
   end
 
-  def authenticate_as_school_owner(owner)
-    authenticated_in_hydra_as(owner)
-  end
-
   def authenticated_in_hydra_as(user)
     stub_hydra_public_api(user_to_hash(user))
   end

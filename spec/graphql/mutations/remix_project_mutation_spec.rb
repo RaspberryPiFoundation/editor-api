@@ -23,7 +23,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   before do
     owner = create(:owner, school: create(:school))
-    authenticate_as_school_owner(owner)
+    authenticated_in_hydra_as(owner)
     project
   end
 

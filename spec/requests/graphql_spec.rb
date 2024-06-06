@@ -79,7 +79,7 @@ RSpec.describe 'POST /graphql' do
         let(:owner) { create(:owner, school:) }
 
         before do
-          authenticate_as_school_owner(owner)
+          authenticated_in_hydra_as(owner)
         end
 
         it 'sets the current_user in the context' do

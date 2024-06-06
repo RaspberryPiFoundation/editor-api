@@ -28,7 +28,7 @@ RSpec.describe 'Project update requests' do
     end
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     it 'returns success response' do
@@ -85,7 +85,7 @@ RSpec.describe 'Project update requests' do
     let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     it 'returns forbidden response' do

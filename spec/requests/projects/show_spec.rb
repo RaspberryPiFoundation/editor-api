@@ -23,7 +23,7 @@ RSpec.describe 'Project show requests' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     context 'when loading own project' do

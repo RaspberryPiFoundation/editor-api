@@ -51,7 +51,7 @@ RSpec.describe 'projects { }' do
     let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     it { expect(query).to be_a_valid_graphql_query }
@@ -91,7 +91,7 @@ RSpec.describe 'projects { }' do
     let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     it { expect(query).to be_a_valid_graphql_query }

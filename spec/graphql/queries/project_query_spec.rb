@@ -94,7 +94,7 @@ RSpec.describe 'query { project { ... } }' do
       let(:owner) { create(:owner, school:) }
 
       before do
-        authenticate_as_school_owner(owner)
+        authenticated_in_hydra_as(owner)
       end
 
       it 'returns the project global id' do

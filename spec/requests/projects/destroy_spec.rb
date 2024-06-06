@@ -10,7 +10,7 @@ RSpec.describe 'Project delete requests' do
     let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     context 'when deleting a project the user owns' do

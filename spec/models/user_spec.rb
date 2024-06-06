@@ -50,7 +50,7 @@ RSpec.describe User do
     let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     it 'returns an instance of the described class' do

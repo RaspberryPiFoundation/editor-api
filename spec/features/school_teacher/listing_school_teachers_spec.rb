@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school teachers', type: :request do
   before do
-    authenticate_as_school_owner(owner)
+    authenticated_in_hydra_as(owner)
     stub_profile_api_list_school_teachers(user_id: teacher.id)
     stub_user_info_api_for(teacher)
   end

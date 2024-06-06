@@ -24,7 +24,7 @@ RSpec.describe 'Images requests' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        authenticate_as_school_owner(owner)
+        authenticated_in_hydra_as(owner)
       end
 
       it 'attaches file to project' do

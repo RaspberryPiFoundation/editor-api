@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a project', type: :request do
   before do
-    authenticate_as_school_owner(owner)
+    authenticated_in_hydra_as(owner)
 
     create(:component, project:, name: 'main', extension: 'py', content: 'print("hi")')
   end

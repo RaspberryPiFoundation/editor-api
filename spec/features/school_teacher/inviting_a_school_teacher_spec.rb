@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Inviting a school teacher', type: :request do
   before do
-    authenticate_as_school_owner(owner)
+    authenticated_in_hydra_as(owner)
     stub_profile_api_invite_school_teacher
   end
 

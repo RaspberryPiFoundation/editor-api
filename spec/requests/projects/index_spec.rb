@@ -18,7 +18,7 @@ RSpec.describe 'Project index requests' do
     before do
       # create non user projects
       create_list(:project, 2)
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
     end
 
     it 'returns success response' do
@@ -47,7 +47,7 @@ RSpec.describe 'Project index requests' do
 
   context 'when the projects index has pagination' do
     before do
-      authenticate_as_school_owner(owner)
+      authenticated_in_hydra_as(owner)
       create_list(:project, 10, user_id: stubbed_user.id)
     end
 
