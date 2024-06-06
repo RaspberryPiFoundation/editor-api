@@ -71,24 +71,4 @@ module UserProfileMock
       .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
       .to_return({ body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
-
-  def create_student_role(school:, student_id:)
-    return if Role.student.exists?(user_id: student_id, school:)
-
-    create(:student_role, user_id: student_id, school:)
-  end
-
-  def create_teacher_role(school:, teacher_id:)
-    return unless School.exists?(id: school)
-    return if Role.teacher.exists?(user_id: teacher_id, school:)
-
-    create(:teacher_role, user_id: teacher_id, school:)
-  end
-
-  def create_owner_role(school:, owner_id:)
-    return unless School.exists?(id: school)
-    return if Role.owner.exists?(user_id: owner_id, school:)
-
-    create(:owner_role, user_id: owner_id, school:)
-  end
 end
