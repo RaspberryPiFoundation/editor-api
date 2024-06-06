@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe Invitation do
+  include ActionMailer::TestHelper
+
   it 'has a valid factory' do
     invitation = build(:invitation)
 
@@ -20,5 +22,13 @@ RSpec.describe Invitation do
     invitation = build(:invitation, school:)
 
     expect(invitation).not_to be_valid
+  end
+
+  it 'sends an invitation email after create' do
+    school = create(:school, verified_at: Time.zone.now)
+
+    invitation = described_class.create!(email_address: 'teacher@example.com', school:)
+
+    assert_enqueued_email_with InvitationMailer, :invite_teacher, params: { invitation: }
   end
 end
