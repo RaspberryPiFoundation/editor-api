@@ -9,7 +9,7 @@ RSpec.describe SchoolClass::Update, type: :unit do
   let(:teacher) { create(:teacher, school:) }
 
   before do
-    stub_user_info_api_for_teacher(teacher)
+    stub_user_info_api_for(teacher)
   end
 
   it 'returns a successful operation response' do

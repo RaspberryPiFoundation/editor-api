@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Creating a school class', type: :request do
   before do
     authenticate_as_school_teacher(teacher)
-    stub_user_info_api_for_teacher(teacher)
+    stub_user_info_api_for(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

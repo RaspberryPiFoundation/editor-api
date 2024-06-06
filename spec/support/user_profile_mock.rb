@@ -12,10 +12,6 @@ module UserProfileMock
     stub_user_info_api_for(owner)
   end
 
-  def stub_user_info_api_for_teacher(teacher)
-    stub_user_info_api_for(teacher)
-  end
-
   def stub_user_info_api_for(user)
     stub_user_info_api(user_id: user.id, users: [user_to_hash(user)])
   end
