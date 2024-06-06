@@ -84,7 +84,7 @@ RSpec.describe 'Creating a project', type: :request do
     it 'responds 201 Created when the user is a school-student for the school' do
       student = create(:student, school:)
       stub_user_info_api_for_student(student)
-      authenticate_as_school_student(student_id: student.id, school:)
+      authenticate_as_school_student(student)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -185,7 +185,8 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school:, student_id: SecureRandom.uuid)
+      student = create(:student, school:)
+      authenticate_as_school_student(student)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)

@@ -74,7 +74,8 @@ RSpec.describe 'Archiving a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school:, student_id: SecureRandom.uuid)
+      student = create(:student, school:)
+      authenticate_as_school_student(student)
 
       delete("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:forbidden)

@@ -29,7 +29,7 @@ RSpec.describe 'Showing a school class', type: :request do
   it 'responds 200 OK when the user is a student in the class' do
     student = create(:student, school:)
     stub_user_info_api_for_student(student)
-    authenticate_as_school_student(student_id: student.id, school:)
+    authenticate_as_school_student(student)
     create(:class_member, school_class:, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -95,7 +95,8 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not a school-student for the class' do
-    authenticate_as_school_student(school:, student_id: SecureRandom.uuid)
+    student = create(:student, school:)
+    authenticate_as_school_student(student)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

@@ -101,7 +101,8 @@ RSpec.describe 'Showing a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school:, student_id: SecureRandom.uuid)
+      student = create(:student, school:)
+      authenticate_as_school_student(student)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:forbidden)
@@ -125,7 +126,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     # rubocop:disable RSpec/ExampleLength
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
-      authenticate_as_school_student(student_id: student.id, school:)
+      authenticate_as_school_student(student)
       stub_user_info_api_for_student(student)
       create(:class_member, school_class:, student_id: student.id)
 
@@ -135,7 +136,8 @@ RSpec.describe 'Showing a lesson', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it "responds 403 Forbidden when the user is a school-student but isn't within the lesson's class" do
-      authenticate_as_school_student(school:, student_id: SecureRandom.uuid)
+      student = create(:student, school:)
+      authenticate_as_school_student(student)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:forbidden)
