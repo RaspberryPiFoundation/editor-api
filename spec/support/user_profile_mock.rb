@@ -13,10 +13,7 @@ module UserProfileMock
   end
 
   def authenticate_as_school_owner(owner)
-    user = user_attributes_by_index(0)
-    user['id'] = owner.id
-
-    stub_hydra_public_api(user)
+    stub_hydra_public_api(user_to_hash(owner))
   end
 
   def authenticate_as_school_teacher(teacher)

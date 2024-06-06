@@ -47,7 +47,7 @@ RSpec.describe User do
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
-    let(:owner) { create(:owner, school:) }
+    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
     before do
       authenticate_as_school_owner(owner)
