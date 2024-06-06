@@ -53,7 +53,7 @@ RSpec.describe 'Updating a school', type: :request do
 
   it 'responds 403 Forbidden when the user is not a school-owner' do
     teacher = create(:teacher, school:)
-    authenticate_as_school_teacher(teacher)
+    authenticated_in_hydra_as(teacher)
 
     put("/api/schools/#{school.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)

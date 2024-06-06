@@ -16,10 +16,6 @@ module UserProfileMock
     authenticated_in_hydra_as(owner)
   end
 
-  def authenticate_as_school_teacher(teacher)
-    authenticated_in_hydra_as(teacher)
-  end
-
   def authenticated_in_hydra_as(user)
     stub_hydra_public_api(user_to_hash(user))
   end

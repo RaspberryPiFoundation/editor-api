@@ -56,7 +56,7 @@ RSpec.describe 'Images requests' do
 
       before do
         teacher = create(:teacher, school:)
-        authenticate_as_school_teacher(teacher)
+        authenticated_in_hydra_as(teacher)
       end
 
       it 'returns forbidden response' do

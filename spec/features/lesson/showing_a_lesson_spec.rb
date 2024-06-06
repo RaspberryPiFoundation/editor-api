@@ -117,7 +117,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
     it 'responds 200 OK when the user owns the lesson' do
       another_teacher = create(:teacher, school:)
-      authenticate_as_school_teacher(another_teacher)
+      authenticated_in_hydra_as(another_teacher)
       lesson.update!(user_id: teacher.id)
 
       get("/api/lessons/#{lesson.id}", headers:)

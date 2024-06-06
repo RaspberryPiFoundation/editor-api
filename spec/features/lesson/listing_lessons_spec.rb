@@ -143,7 +143,7 @@ RSpec.describe 'Listing lessons', type: :request do
     # rubocop:disable RSpec/ExampleLength
     it 'includes the lesson when the user owns the lesson' do
       another_teacher = create(:teacher, school:)
-      authenticate_as_school_teacher(another_teacher)
+      authenticated_in_hydra_as(another_teacher)
       lesson.update!(user_id: teacher.id)
 
       get('/api/lessons', headers:)

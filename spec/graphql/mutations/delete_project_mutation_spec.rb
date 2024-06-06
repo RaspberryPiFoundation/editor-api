@@ -63,7 +63,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       context 'with another users project' do
         before do
           teacher = create(:teacher, school:)
-          authenticate_as_school_teacher(teacher)
+          authenticated_in_hydra_as(teacher)
         end
 
         it 'returns an error' do

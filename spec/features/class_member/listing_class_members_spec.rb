@@ -78,7 +78,7 @@ RSpec.describe 'Listing class members', type: :request do
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
     teacher = create(:teacher, school:)
-    authenticate_as_school_teacher(teacher)
+    authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     expect(response).to have_http_status(:forbidden)

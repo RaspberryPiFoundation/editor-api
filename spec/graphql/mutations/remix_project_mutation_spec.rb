@@ -56,7 +56,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   context 'when user cannot view original project' do
     before do
       teacher = create(:teacher, school: create(:school))
-      authenticate_as_school_teacher(teacher)
+      authenticated_in_hydra_as(teacher)
     end
 
     it 'returns "not permitted to read" error' do

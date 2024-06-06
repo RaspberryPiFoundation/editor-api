@@ -69,7 +69,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
 
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
       teacher = create(:teacher, school:)
-      authenticate_as_school_teacher(teacher)
+      authenticated_in_hydra_as(teacher)
 
       delete("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:forbidden)
