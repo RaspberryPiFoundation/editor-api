@@ -68,7 +68,7 @@ RSpec.describe 'POST /graphql' do
 
       context 'when the token is invalid' do
         before do
-          unauthenticated_user
+          unauthenticated_in_hydra
         end
 
         it_behaves_like 'an unidentified request'

@@ -98,7 +98,7 @@ RSpec.describe 'Project update requests' do
     let(:project) { create(:project) }
 
     before do
-      unauthenticated_user
+      unauthenticated_in_hydra
     end
 
     it 'returns unauthorized' do
