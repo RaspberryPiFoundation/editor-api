@@ -20,10 +20,7 @@ module UserProfileMock
   end
 
   def authenticate_as_school_teacher(teacher)
-    user = user_attributes_by_index(1)
-    user['id'] = teacher.id
-
-    stub_hydra_public_api(user)
+    stub_hydra_public_api(user_to_hash(teacher))
   end
 
   def authenticate_as_school_student(student)
