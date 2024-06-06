@@ -7,7 +7,7 @@ RSpec.describe Lesson do
     stub_user_info_api_for_teacher(teacher)
   end
 
-  let(:teacher) { create(:teacher, school:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:school) { create(:school) }
 
   describe 'associations' do

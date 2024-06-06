@@ -13,7 +13,7 @@ module UserProfileMock
   end
 
   def stub_user_info_api_for_teacher(teacher)
-    stub_user_info_api_for(user_index: 1, user_id: teacher.id)
+    stub_user_info_api(user_id: teacher.id, users: [user_to_hash(teacher)])
   end
 
   def stub_user_info_api_for_student(student)

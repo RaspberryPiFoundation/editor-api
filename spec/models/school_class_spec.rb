@@ -9,7 +9,7 @@ RSpec.describe SchoolClass do
   end
 
   let(:student) { create(:student, school:) }
-  let(:teacher) { create(:teacher, school:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:school) { create(:school) }
 
   describe 'associations' do

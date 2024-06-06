@@ -15,7 +15,7 @@ RSpec.describe 'Listing school classes', type: :request do
   let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
-  let(:teacher) { create(:teacher, school:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do

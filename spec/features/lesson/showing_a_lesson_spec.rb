@@ -10,7 +10,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher.id) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:teacher) { create(:teacher, school:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
   let(:school) { create(:school) }
 
