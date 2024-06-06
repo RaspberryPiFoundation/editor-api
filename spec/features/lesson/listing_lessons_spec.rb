@@ -140,8 +140,10 @@ RSpec.describe 'Listing lessons', type: :request do
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
+    # rubocop:disable RSpec/ExampleLength
     it 'includes the lesson when the user owns the lesson' do
-      authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
+      another_teacher = create(:teacher, school:)
+      authenticate_as_school_teacher(another_teacher)
       lesson.update!(user_id: teacher.id)
 
       get('/api/lessons', headers:)
@@ -149,6 +151,7 @@ RSpec.describe 'Listing lessons', type: :request do
 
       expect(data.size).to eq(1)
     end
+    # rubocop:enable RSpec/ExampleLength
 
     # rubocop:disable RSpec/ExampleLength
     it "includes the lesson when the user is a school-student within the lesson's class" do

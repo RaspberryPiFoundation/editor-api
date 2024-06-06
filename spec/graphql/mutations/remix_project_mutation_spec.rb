@@ -54,7 +54,8 @@ RSpec.describe 'mutation RemixProject() { ... }' do
 
   context 'when user cannot view original project' do
     before do
-      authenticate_as_school_teacher(school: create(:school), teacher_id: SecureRandom.uuid)
+      teacher = create(:teacher, school: create(:school))
+      authenticate_as_school_teacher(teacher)
     end
 
     it 'returns "not permitted to read" error' do

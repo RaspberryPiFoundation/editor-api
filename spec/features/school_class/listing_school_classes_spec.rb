@@ -53,7 +53,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-teacher doesn't teach" do
     teacher_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_teacher(teacher_id:, school:)
+    authenticate_as_school_teacher(teacher)
     create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)

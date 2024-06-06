@@ -28,7 +28,8 @@ RSpec.describe 'Creating a school student', type: :request do
   end
 
   it 'responds 204 No Content when the user is a school-teacher' do
-    authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
+    teacher = create(:teacher, school:)
+    authenticate_as_school_teacher(teacher)
 
     post("/api/schools/#{school.id}/students", headers:, params:)
     expect(response).to have_http_status(:no_content)
