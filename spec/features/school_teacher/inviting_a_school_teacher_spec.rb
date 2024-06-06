@@ -59,7 +59,7 @@ RSpec.describe 'Inviting a school teacher', type: :request do
 
   it 'responds 403 Forbidden when the user is a school-student' do
     student = create(:student, school:)
-    authenticate_as_school_student(student)
+    authenticated_in_hydra_as(student)
 
     post("/api/schools/#{school.id}/teachers", headers:, params:)
     expect(response).to have_http_status(:forbidden)

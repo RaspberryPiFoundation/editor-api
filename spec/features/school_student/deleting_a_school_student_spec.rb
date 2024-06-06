@@ -41,7 +41,7 @@ RSpec.describe 'Deleting a school student', type: :request do
 
   it 'responds 403 Forbidden when the user is a school-student' do
     student = create(:student, school:)
-    authenticate_as_school_student(student)
+    authenticated_in_hydra_as(student)
 
     delete("/api/schools/#{school.id}/students/#{student_id}", headers:)
     expect(response).to have_http_status(:forbidden)

@@ -84,7 +84,7 @@ RSpec.describe 'Creating a project', type: :request do
     it 'responds 201 Created when the user is a school-student for the school' do
       student = create(:student, school:)
       stub_user_info_api_for(student)
-      authenticate_as_school_student(student)
+      authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -187,7 +187,7 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 403 Forbidden when the user is a school-student' do
       student = create(:student, school:)
-      authenticate_as_school_student(student)
+      authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
