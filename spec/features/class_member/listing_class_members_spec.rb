@@ -76,7 +76,7 @@ RSpec.describe 'Listing class members', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    authenticate_as_school_teacher(school:)
+    authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     expect(response).to have_http_status(:forbidden)

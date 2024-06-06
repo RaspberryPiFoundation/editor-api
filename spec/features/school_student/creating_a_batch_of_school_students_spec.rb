@@ -21,7 +21,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
   end
 
   it 'responds 204 No Content when the user is a school-teacher' do
-    authenticate_as_school_teacher(school:)
+    authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
     post("/api/schools/#{school.id}/students/batch", headers:, params: { file: })
     expect(response).to have_http_status(:no_content)

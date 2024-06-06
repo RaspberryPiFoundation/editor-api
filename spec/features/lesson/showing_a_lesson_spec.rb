@@ -115,7 +115,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:teacher) { create(:teacher, school:) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      authenticate_as_school_teacher(school:)
+      authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
       lesson.update!(user_id: teacher.id)
 
       get("/api/lessons/#{lesson.id}", headers:)

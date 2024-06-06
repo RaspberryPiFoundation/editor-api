@@ -52,7 +52,7 @@ RSpec.describe 'Updating a school', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not a school-owner' do
-    authenticate_as_school_teacher(school:)
+    authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
     put("/api/schools/#{school.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)

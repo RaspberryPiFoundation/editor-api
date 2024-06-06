@@ -39,7 +39,7 @@ RSpec.describe 'Deleting a school class', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    authenticate_as_school_teacher(school:)
+    authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

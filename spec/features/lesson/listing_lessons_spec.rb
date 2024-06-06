@@ -140,7 +140,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:teacher) { create(:teacher, school:) }
 
     it 'includes the lesson when the user owns the lesson' do
-      authenticate_as_school_teacher(school:)
+      authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
       lesson.update!(user_id: teacher.id)
 
       get('/api/lessons', headers:)

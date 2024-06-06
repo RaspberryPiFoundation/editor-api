@@ -78,7 +78,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
       context 'with another users component' do
         before do
-          authenticate_as_school_teacher(school:)
+          authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
         end
 
         it 'returns an error' do

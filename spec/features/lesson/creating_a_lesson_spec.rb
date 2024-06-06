@@ -166,7 +166,7 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the current user is a school-teacher for a different class' do
-      authenticate_as_school_teacher(school:)
+      authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:forbidden)

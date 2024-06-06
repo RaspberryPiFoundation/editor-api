@@ -87,7 +87,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
-      authenticate_as_school_teacher(school:)
+      authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)
       expect(response).to have_http_status(:forbidden)

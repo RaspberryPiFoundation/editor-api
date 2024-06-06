@@ -178,7 +178,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
-      authenticate_as_school_teacher(school:)
+      authenticate_as_school_teacher(school:, teacher_id: SecureRandom.uuid)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
