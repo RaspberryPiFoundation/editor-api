@@ -13,15 +13,19 @@ module UserProfileMock
   end
 
   def authenticate_as_school_owner(owner)
-    stub_hydra_public_api(user_to_hash(owner))
+    authenticated_in_hydra_as(owner)
   end
 
   def authenticate_as_school_teacher(teacher)
-    stub_hydra_public_api(user_to_hash(teacher))
+    authenticated_in_hydra_as(teacher)
   end
 
   def authenticate_as_school_student(student)
-    stub_hydra_public_api(user_to_hash(student))
+    authenticated_in_hydra_as(student)
+  end
+
+  def authenticated_in_hydra_as(user)
+    stub_hydra_public_api(user_to_hash(user))
   end
 
   def unauthenticated_user
