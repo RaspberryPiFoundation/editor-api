@@ -156,7 +156,7 @@ RSpec.describe 'Listing lessons', type: :request do
     # rubocop:disable RSpec/ExampleLength
     it "includes the lesson when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
-      stub_user_info_api_for_student(student)
+      stub_user_info_api_for(student)
       authenticate_as_school_student(student)
       create(:class_member, school_class:, student_id: student.id)
 

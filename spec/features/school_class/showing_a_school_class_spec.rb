@@ -29,7 +29,7 @@ RSpec.describe 'Showing a school class', type: :request do
   # rubocop:disable RSpec/ExampleLength
   it 'responds 200 OK when the user is a student in the class' do
     student = create(:student, school:)
-    stub_user_info_api_for_student(student)
+    stub_user_info_api_for(student)
     authenticate_as_school_student(student)
     create(:class_member, school_class:, student_id: student.id)
 

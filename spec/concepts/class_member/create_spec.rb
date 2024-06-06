@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe ClassMember::Create, type: :unit do
   before do
     stub_user_info_api_for_teacher(teacher)
-    stub_user_info_api_for_student(student)
+    stub_user_info_api_for(student)
   end
 
   let!(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
