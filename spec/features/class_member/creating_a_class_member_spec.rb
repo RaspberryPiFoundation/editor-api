@@ -6,19 +6,19 @@ RSpec.describe 'Creating a class member', type: :request do
   before do
     authenticate_as_school_owner(school:)
     stub_user_info_api_for_teacher(teacher_id:, school:)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_user_info_api_for_student(student)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:school_class) { create(:school_class, teacher_id:, school:) }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:teacher_id) { SecureRandom.uuid }
 
   let(:params) do
     {
       class_member: {
-        student_id:
+        student_id: student.id
       }
     }
   end
@@ -39,7 +39,7 @@ RSpec.describe 'Creating a class member', type: :request do
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:student_id]).to eq(student_id)
+    expect(data[:student_id]).to eq(student.id)
   end
 
   it 'responds with the student JSON' do

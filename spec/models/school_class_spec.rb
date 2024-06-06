@@ -5,10 +5,10 @@ require 'rails_helper'
 RSpec.describe SchoolClass do
   before do
     stub_user_info_api_for_teacher(teacher_id:, school:)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_user_info_api_for_student(student)
   end
 
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:teacher_id) { SecureRandom.uuid }
   let(:school) { create(:school) }
 
@@ -19,7 +19,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'has many members' do
-      school_class = create(:school_class, members: [build(:class_member, student_id:)], teacher_id:, school:)
+      school_class = create(:school_class, members: [build(:class_member, student_id: student.id)], teacher_id:, school:)
       expect(school_class.members.size).to eq(1)
     end
 
@@ -29,7 +29,7 @@ RSpec.describe SchoolClass do
     end
 
     context 'when a school_class is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id:)], lessons: [build(:lesson, user_id: teacher_id)], teacher_id:, school:) }
+      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id: student.id)], lessons: [build(:lesson, user_id: teacher_id)], teacher_id:, school:) }
 
       it 'also destroys class members to avoid making them invalid' do
         expect { school_class.destroy! }.to change(ClassMember, :count).by(-1)
@@ -73,7 +73,7 @@ RSpec.describe SchoolClass do
     end
 
     it 'requires a teacher that has the school-teacher role for the school' do
-      school_class.teacher_id = student_id
+      school_class.teacher_id = student.id
       expect(school_class).to be_invalid
     end
 

@@ -5,15 +5,15 @@ require 'rails_helper'
 RSpec.describe SchoolClass::Delete, type: :unit do
   before do
     stub_user_info_api_for_teacher(teacher_id:, school:)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_user_info_api_for_student(student)
 
-    create(:class_member, student_id:, school_class:)
+    create(:class_member, student_id: student.id, school_class:)
   end
 
   let(:school_class) { build(:school_class, teacher_id:, school:) }
   let(:school_class_id) { school_class.id }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:teacher_id) { SecureRandom.uuid }
 
   it 'returns a successful operation response' do

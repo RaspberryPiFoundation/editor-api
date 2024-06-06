@@ -5,28 +5,28 @@ require 'rails_helper'
 RSpec.describe ClassMember do
   before do
     stub_user_info_api_for_teacher(teacher_id:, school:)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_user_info_api_for_student(student)
   end
 
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:school) { create(:school) }
   let(:school_class) { build(:school_class, teacher_id:, school:) }
   let(:teacher_id) { SecureRandom.uuid }
 
   describe 'associations' do
     it 'belongs to a school_class' do
-      class_member = create(:class_member, student_id:, school_class:)
+      class_member = create(:class_member, student_id: student.id, school_class:)
       expect(class_member.school_class).to be_a(SchoolClass)
     end
 
     it 'belongs to a school (via school_class)' do
-      class_member = create(:class_member, student_id:, school_class:)
+      class_member = create(:class_member, student_id: student.id, school_class:)
       expect(class_member.school).to be_a(School)
     end
   end
 
   describe 'validations' do
-    subject(:class_member) { build(:class_member, student_id:, school_class:) }
+    subject(:class_member) { build(:class_member, student_id: student.id, school_class:) }
 
     it 'has a valid default factory' do
       expect(class_member).to be_valid
@@ -65,7 +65,7 @@ RSpec.describe ClassMember do
 
   describe '.students' do
     it 'returns User instances for the current scope' do
-      create(:class_member, student_id:, school_class:)
+      create(:class_member, student_id: student.id, school_class:)
 
       student = described_class.all.students.first
       expect(student.name).to eq('School Student')
@@ -81,7 +81,7 @@ RSpec.describe ClassMember do
     end
 
     it 'ignores members not included in the current scope' do
-      create(:class_member, student_id:, school_class:)
+      create(:class_member, student_id: student.id, school_class:)
 
       student = described_class.none.students.first
       expect(student).to be_nil
@@ -90,7 +90,7 @@ RSpec.describe ClassMember do
 
   describe '.with_students' do
     it 'returns an array of class members paired with their User instance' do
-      class_member = create(:class_member, student_id:, school_class:)
+      class_member = create(:class_member, student_id: student.id, school_class:)
 
       pair = described_class.all.with_students.first
       student = described_class.all.students.first
@@ -108,7 +108,7 @@ RSpec.describe ClassMember do
     end
 
     it 'ignores members not included in the current scope' do
-      create(:class_member, student_id:, school_class:)
+      create(:class_member, student_id: student.id, school_class:)
 
       pair = described_class.none.with_students.first
       expect(pair).to be_nil
@@ -117,7 +117,7 @@ RSpec.describe ClassMember do
 
   describe '#with_student' do
     it 'returns the class member paired with their User instance' do
-      class_member = create(:class_member, student_id:, school_class:)
+      class_member = create(:class_member, student_id: student.id, school_class:)
 
       pair = class_member.with_student
       student = described_class.all.students.first

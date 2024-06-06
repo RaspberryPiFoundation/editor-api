@@ -27,10 +27,10 @@ RSpec.describe 'Showing a school class', type: :request do
 
   # rubocop:disable RSpec/ExampleLength
   it 'responds 200 OK when the user is a student in the class' do
-    student_id = SecureRandom.uuid
-    stub_user_info_api_for_student(student_id:, school:)
-    authenticate_as_school_student(student_id:, school:)
-    create(:class_member, school_class:, student_id:)
+    student = create(:student, school:)
+    stub_user_info_api_for_student(student)
+    authenticate_as_school_student(student_id: student.id, school:)
+    create(:class_member, school_class:, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)

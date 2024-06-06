@@ -5,11 +5,11 @@ require 'rails_helper'
 RSpec.describe SchoolStudent::List, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
 
   before do
-    stub_profile_api_list_school_students(user_id: student_id)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_profile_api_list_school_students(user_id: student.id)
+    stub_user_info_api_for_student(student)
   end
 
   it 'returns a successful operation response' do

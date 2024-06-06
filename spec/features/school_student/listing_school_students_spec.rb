@@ -5,13 +5,13 @@ require 'rails_helper'
 RSpec.describe 'Listing school students', type: :request do
   before do
     authenticate_as_school_owner(school:, owner_id:)
-    stub_profile_api_list_school_students(user_id: student_id)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_profile_api_list_school_students(user_id: student.id)
+    stub_user_info_api_for_student(student)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:owner_id) { SecureRandom.uuid }
 
   it 'responds 200 OK' do
@@ -39,7 +39,7 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    Role.student.find_by(user_id: student_id, school:).delete
+    Role.student.find_by(user_id: student.id, school:).delete
     Role.owner.find_by(user_id: owner_id, school:).delete
     school.update!(id: SecureRandom.uuid)
 

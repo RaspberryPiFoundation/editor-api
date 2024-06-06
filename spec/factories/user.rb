@@ -10,6 +10,16 @@ FactoryBot.define do
       roles { 'editor-admin' }
     end
 
+    factory :student do
+      transient do
+        school { nil }
+      end
+
+      after(:create) do |user, context|
+        create(:student_role, user_id: user.id, school: context.school)
+      end
+    end
+
     skip_create
   end
 end

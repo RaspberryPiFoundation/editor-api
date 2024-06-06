@@ -6,14 +6,14 @@ RSpec.describe 'Deleting a class member', type: :request do
   before do
     authenticate_as_school_owner(school:)
     stub_user_info_api_for_teacher(teacher_id:, school:)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_user_info_api_for_student(student)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:class_member) { create(:class_member, student_id:, school_class:) }
+  let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
   let(:school_class) { build(:school_class, teacher_id:, school:) }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:teacher_id) { SecureRandom.uuid }
 
   it 'responds 204 No Content' do

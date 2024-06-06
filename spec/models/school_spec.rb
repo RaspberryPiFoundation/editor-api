@@ -5,10 +5,10 @@ require 'rails_helper'
 RSpec.describe School do
   before do
     stub_user_info_api_for_teacher(teacher_id:, school:)
-    stub_user_info_api_for_student(student_id:, school:)
+    stub_user_info_api_for_student(student)
   end
 
-  let(:student_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
   let(:teacher_id) { SecureRandom.uuid }
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
 
@@ -26,8 +26,8 @@ RSpec.describe School do
     end
 
     it 'has many projects' do
-      create(:project, user_id: student_id, school:)
-      create(:project, user_id: student_id, school:)
+      create(:project, user_id: student.id, school:)
+      create(:project, user_id: student.id, school:)
       expect(school.projects.size).to eq(2)
     end
 
@@ -42,11 +42,11 @@ RSpec.describe School do
       let!(:school_class) { create(:school_class, school:, teacher_id:) }
       let!(:lesson_1) { create(:lesson, user_id: teacher_id, school_class:) }
       let!(:lesson_2) { create(:lesson, user_id: teacher_id, school:) }
-      let!(:project) { create(:project, user_id: student_id, school:) }
+      let!(:project) { create(:project, user_id: student.id, school:) }
       let!(:role) { create(:role, school:) }
 
       before do
-        create(:class_member, school_class:, student_id:)
+        create(:class_member, school_class:, student_id: student.id)
       end
 
       it 'also destroys school classes to avoid making them invalid' do
