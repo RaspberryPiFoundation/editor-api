@@ -9,7 +9,7 @@ module UserProfileMock
   end
 
   def stub_user_info_api_for_owner(owner)
-    stub_user_info_api_for(user_index: 0, user_id: owner.id)
+    stub_user_info_api(user_id: owner.id, users: [user_to_hash(owner)])
   end
 
   def stub_user_info_api_for_teacher(teacher)
@@ -55,7 +55,8 @@ module UserProfileMock
   def user_to_hash(user)
     {
       id: user.id,
-      name: user.name
+      name: user.name,
+      email: user.email
     }
   end
 

@@ -13,7 +13,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher.id) }
   let(:params) { {} }
   let(:teacher) { create(:teacher, school:) }
-  let(:owner) { create(:owner, school:) }
+  let(:owner) { create(:owner, school:, name: 'School Owner') }
   let(:school) { create(:school) }
 
   it 'responds 201 Created' do

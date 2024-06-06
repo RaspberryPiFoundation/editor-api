@@ -15,7 +15,7 @@ RSpec.describe User do
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
 
-    let(:owner) { create(:owner, school:) }
+    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
     let(:ids) { [owner.id] }
     let(:user) { users.first }
 
@@ -245,7 +245,7 @@ RSpec.describe User do
   describe '.where' do
     subject(:user) { described_class.where(id: owner.id).first }
 
-    let(:owner) { create(:owner, school:) }
+    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
     before do
       stub_user_info_api_for_owner(owner)
