@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Listing lessons', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school:)
+    authenticate_as_school_owner(owner_id: owner.id, school:)
     stub_user_info_api_for_teacher(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher.id) }
   let(:teacher) { create(:teacher, school:) }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
   let(:school) { create(:school) }
 
   it 'responds 200 OK' do
@@ -71,11 +71,11 @@ RSpec.describe 'Listing lessons', type: :request do
 
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:) }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for_owner(owner_id:, school:)
-      lesson.update!(user_id: owner_id)
+      stub_user_info_api_for_owner(owner)
+      lesson.update!(user_id: owner.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
@@ -94,11 +94,11 @@ RSpec.describe 'Listing lessons', type: :request do
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:) }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for_owner(owner_id:, school:)
-      lesson.update!(user_id: owner_id)
+      stub_user_info_api_for_owner(owner)
+      lesson.update!(user_id: owner.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)

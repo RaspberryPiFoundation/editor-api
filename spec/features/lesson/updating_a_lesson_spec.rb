@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school:)
+    authenticate_as_school_owner(owner_id: owner.id, school:)
     stub_user_info_api_for_teacher(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner_id) }
-  let(:owner_id) { SecureRandom.uuid }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
+  let(:owner) { create(:owner, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
 
@@ -23,13 +23,13 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds 200 OK' do
-    stub_user_info_api_for_owner(owner_id:, school:)
+    stub_user_info_api_for_owner(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner(owner_id:, school:)
+    stub_user_info_api_for_owner(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -37,7 +37,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for_owner(owner_id:, school:)
+    stub_user_info_api_for_owner(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -131,8 +131,8 @@ RSpec.describe 'Updating a lesson', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
-      stub_user_info_api_for_owner(owner_id:, school:)
-      new_params = { lesson: params[:lesson].merge(user_id: owner_id) }
+      stub_user_info_api_for_owner(owner)
+      new_params = { lesson: params[:lesson].merge(user_id: owner.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 
       expect(response).to have_http_status(:unprocessable_entity)

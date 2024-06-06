@@ -91,9 +91,9 @@ RSpec.describe Lesson do
       let(:school) { create(:school) }
 
       it 'requires that the user that is the school-teacher for the school_class' do
-        owner_id = SecureRandom.uuid
-        stub_user_info_api_for_owner(owner_id:, school:)
-        lesson.user_id = owner_id
+        owner = create(:owner, school:)
+        stub_user_info_api_for_owner(owner)
+        lesson.user_id = owner.id
         expect(lesson).to be_invalid
       end
     end

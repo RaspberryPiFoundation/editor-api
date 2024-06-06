@@ -178,11 +178,11 @@ RSpec.describe School do
   end
 
   describe '#creator' do
-    let(:creator_id) { SecureRandom.uuid }
+    let(:creator) { create(:owner, school:) }
 
     before do
-      school.update!(creator_id:)
-      stub_user_info_api_for_owner(owner_id: creator_id, school:)
+      school.update!(creator_id: creator.id)
+      stub_user_info_api_for_owner(creator)
     end
 
     it 'returns a User instance' do
@@ -190,7 +190,7 @@ RSpec.describe School do
     end
 
     it 'returns the creator from the UserInfo API matching the creator_id' do
-      expect(school.creator.id).to eq(creator_id)
+      expect(school.creator.id).to eq(creator.id)
     end
   end
 
