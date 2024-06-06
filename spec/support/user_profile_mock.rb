@@ -9,21 +9,19 @@ module UserProfileMock
   end
 
   def stub_user_info_api_for_owner(owner)
-    stub_user_info_api(user_id: owner.id, users: [user_to_hash(owner)])
+    stub_user_info_api_for(owner)
   end
 
   def stub_user_info_api_for_teacher(teacher)
-    stub_user_info_api(user_id: teacher.id, users: [user_to_hash(teacher)])
+    stub_user_info_api_for(teacher)
   end
 
   def stub_user_info_api_for_student(student)
-    stub_user_info_api(user_id: student.id, users: [user_to_hash(student)])
+    stub_user_info_api_for(student)
   end
 
-  def stub_user_info_api_for(user_index:, user_id:)
-    user_attrs = user_attributes_by_index(user_index)
-    user_attrs['id'] = user_id
-    stub_user_info_api(user_id: user_attrs['id'], users: [user_attrs])
+  def stub_user_info_api_for(user)
+    stub_user_info_api(user_id: user.id, users: [user_to_hash(user)])
   end
 
   def authenticate_as_school_owner(owner)
