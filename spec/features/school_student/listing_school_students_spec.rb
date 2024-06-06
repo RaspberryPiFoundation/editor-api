@@ -11,7 +11,7 @@ RSpec.describe 'Listing school students', type: :request do
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student) { create(:student, school:) }
+  let(:student) { create(:student, school:, name: 'School Student') }
   let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do

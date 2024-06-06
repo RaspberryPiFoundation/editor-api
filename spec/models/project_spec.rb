@@ -104,7 +104,7 @@ RSpec.describe Project do
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      student = create(:student, school:)
+      student = create(:student, school:, name: 'School Student')
       stub_user_info_api_for_student(student)
       create(:project, user_id: student.id)
 

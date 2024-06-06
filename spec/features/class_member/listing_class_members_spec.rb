@@ -13,7 +13,7 @@ RSpec.describe 'Listing class members', type: :request do
   let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
   let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
-  let(:student) { create(:student, school:) }
+  let(:student) { create(:student, school:, name: 'School Student') }
   let(:teacher) { create(:teacher, school:) }
   let(:owner) { create(:owner, school:) }
 

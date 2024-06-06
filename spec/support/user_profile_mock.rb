@@ -17,7 +17,7 @@ module UserProfileMock
   end
 
   def stub_user_info_api_for_student(student)
-    stub_user_info_api_for(user_index: 2, user_id: student.id)
+    stub_user_info_api(user_id: student.id, users: [user_to_hash(student)])
   end
 
   def stub_user_info_api_for(user_index:, user_id:)
@@ -51,6 +51,13 @@ module UserProfileMock
   end
 
   private
+
+  def user_to_hash(user)
+    {
+      id: user.id,
+      name: user.name
+    }
+  end
 
   # Stubs the API that returns user profile data for the logged in user.
   def stub_hydra_public_api(user_index:, user_id: nil)
