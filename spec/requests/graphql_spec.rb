@@ -78,7 +78,7 @@ RSpec.describe 'POST /graphql' do
         let(:school) { create(:school) }
 
         before do
-          authenticate_as_school_owner(school:)
+          authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
         end
 
         it 'sets the current_user in the context' do

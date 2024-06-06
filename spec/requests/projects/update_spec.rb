@@ -84,7 +84,7 @@ RSpec.describe 'Project update requests' do
     let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(school:)
+      authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
     end
 
     it 'returns forbidden response' do

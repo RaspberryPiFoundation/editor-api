@@ -22,7 +22,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   let(:remix_origin) { 'editor.com' }
 
   before do
-    authenticate_as_school_owner(school: create(:school))
+    authenticate_as_school_owner(school: create(:school), owner_id: SecureRandom.uuid)
     project
   end
 

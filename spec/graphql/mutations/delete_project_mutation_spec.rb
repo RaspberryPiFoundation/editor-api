@@ -6,7 +6,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    authenticate_as_school_owner(school:)
+    authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
   end
 
   let(:school) { create(:school) }

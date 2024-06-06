@@ -48,7 +48,7 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
     let(:school) { create(:school) }
 
     before do
-      authenticate_as_school_owner(school:)
+      authenticate_as_school_owner(school:, owner_id: SecureRandom.uuid)
     end
 
     it 'returns the component ID' do
