@@ -43,8 +43,8 @@ RSpec.describe 'mutation CreateComponent() { ... }' do
   end
 
   context 'when authenticated' do
-    let(:current_user) { stubbed_user }
-    let(:project) { create(:project, user_id: stubbed_user.id) }
+    let(:current_user) { authenticated_user }
+    let(:project) { create(:project, user_id: authenticated_user.id) }
     let(:school) { create(:school) }
     let(:owner) { create(:owner, school:) }
 

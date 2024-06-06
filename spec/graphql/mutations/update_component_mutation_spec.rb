@@ -28,7 +28,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
 
     let(:school) { create(:school) }
     let(:owner) { create(:owner, school:) }
-    let(:project) { create(:project, user_id: stubbed_user.id) }
+    let(:project) { create(:project, user_id: authenticated_user.id) }
     let!(:component) { create(:component, project:, name: 'bob', extension: 'html', content: 'new', default: true) }
     let(:component_id) { component.to_gid_param }
 
@@ -51,7 +51,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user) { stubbed_user }
+      let(:current_user) { authenticated_user }
 
       it 'updates the component name' do
         expect { result }.to change { component.reload.name }.from(component.name).to(variables.dig(:component, :name))

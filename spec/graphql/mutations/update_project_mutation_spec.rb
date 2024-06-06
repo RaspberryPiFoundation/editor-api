@@ -26,14 +26,14 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let(:project) { create(:project, user_id: stubbed_user.id, project_type: :python) }
+    let(:project) { create(:project, user_id: authenticated_user.id, project_type: :python) }
     let(:project_id) { project.to_gid_param }
     let(:school) { create(:school) }
 
     before do
       # Instantiate project
       project
-      authenticated_in_hydra_as(stubbed_user)
+      authenticated_in_hydra_as(authenticated_user)
     end
 
     context 'when unauthenticated' do
@@ -55,7 +55,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user) { stubbed_user }
+      let(:current_user) { authenticated_user }
 
       it 'updates the project name' do
         expect { result }.to change { project.reload.name }.from(project.name).to(variables.dig(:project, :name))

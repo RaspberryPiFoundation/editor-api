@@ -35,7 +35,7 @@ RSpec.describe 'Project index requests' do
     it 'returns users projects' do
       get('/api/projects', headers:)
       returned = response.parsed_body
-      expect(returned.all? { |proj| proj['user_id'] == stubbed_user.id }).to be(true)
+      expect(returned.all? { |proj| proj['user_id'] == authenticated_user.id }).to be(true)
     end
 
     it 'returns all keys in response' do
@@ -48,7 +48,7 @@ RSpec.describe 'Project index requests' do
   context 'when the projects index has pagination' do
     before do
       authenticated_in_hydra_as(owner)
-      create_list(:project, 10, user_id: stubbed_user.id)
+      create_list(:project, 10, user_id: authenticated_user.id)
     end
 
     it 'returns the default number of projects on the first page' do

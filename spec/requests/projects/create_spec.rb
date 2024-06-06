@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Create project requests' do
-  let(:project) { create(:project, user_id: stubbed_user.id) }
+  let(:project) { create(:project, user_id: authenticated_user.id) }
   let(:school) { create(:school) }
   let(:owner) { create(:owner, school:) }
 

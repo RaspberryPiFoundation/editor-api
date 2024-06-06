@@ -19,7 +19,7 @@ module UserProfileMock
     stub_hydra_public_api({})
   end
 
-  def stubbed_user
+  def authenticated_user
     User.from_token(token: TOKEN)
   end
 

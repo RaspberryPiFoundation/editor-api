@@ -18,7 +18,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let!(:project) { create(:project, user_id: stubbed_user.id) }
+    let!(:project) { create(:project, user_id: authenticated_user.id) }
     let(:project_id) { project.to_gid_param }
 
     context 'when unauthenticated' do
@@ -40,11 +40,11 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user) { stubbed_user }
+      let(:current_user) { authenticated_user }
       let(:school) { create(:school) }
 
       before do
-        authenticated_in_hydra_as(stubbed_user)
+        authenticated_in_hydra_as(authenticated_user)
       end
 
       it 'deletes the project' do

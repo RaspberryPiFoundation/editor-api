@@ -32,7 +32,7 @@ RSpec.describe 'Remix requests' do
 
     describe '#show' do
       before do
-        create(:project, remixed_from_id: original_project.id, user_id: stubbed_user.id)
+        create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id)
       end
 
       it 'returns success response' do

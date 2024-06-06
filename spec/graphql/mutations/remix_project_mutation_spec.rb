@@ -15,8 +15,8 @@ RSpec.describe 'mutation RemixProject() { ... }' do
   }
   '
   end
-  let(:current_user) { stubbed_user }
-  let(:project) { create(:project, :with_default_component, user_id: stubbed_user.id) }
+  let(:current_user) { authenticated_user }
+  let(:project) { create(:project, :with_default_component, user_id: authenticated_user.id) }
   let(:project_id) { project.to_gid_param }
   let(:variables) { { id: project_id } }
   let(:remix_origin) { 'editor.com' }

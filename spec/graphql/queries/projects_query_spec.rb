@@ -45,8 +45,8 @@ RSpec.describe 'projects { }' do
 
   context 'when fetching project when logged in' do
     let(:query) { 'query { projects { edges { node { id } } } }' }
-    let(:current_user) { stubbed_user }
-    let(:project) { create(:project, user_id: stubbed_user.id) }
+    let(:current_user) { authenticated_user }
+    let(:project) { create(:project, user_id: authenticated_user.id) }
     let(:school) { create(:school) }
     let(:owner) { create(:owner, school:) }
 
@@ -84,9 +84,9 @@ RSpec.describe 'projects { }' do
 
   context 'when fetching projects by user ID when logged in' do
     let(:query) { 'query ($userId: String) { projects(userId: $userId) { edges { node { id } } } }' }
-    let(:current_user) { stubbed_user }
-    let(:variables) { { userId: stubbed_user.id } }
-    let(:project) { create(:project, user_id: stubbed_user.id) }
+    let(:current_user) { authenticated_user }
+    let(:variables) { { userId: authenticated_user.id } }
+    let(:project) { create(:project, user_id: authenticated_user.id) }
     let(:school) { create(:school) }
     let(:owner) { create(:owner, school:) }
 

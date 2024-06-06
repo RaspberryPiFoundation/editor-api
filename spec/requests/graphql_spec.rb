@@ -84,7 +84,7 @@ RSpec.describe 'POST /graphql' do
 
         it 'sets the current_user in the context' do
           request
-          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user: stubbed_user)))
+          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user: authenticated_user)))
         end
 
         it 'sets the request origin from the headers' do
