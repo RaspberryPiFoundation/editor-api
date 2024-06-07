@@ -28,7 +28,8 @@ class SchoolClass < ApplicationRecord
     return unless teacher_id_changed? && errors.blank?
 
     _, user = with_teacher
-    return unless user && !user.school_teacher?(school)
+    return if user.blank?
+    return if user.school_teacher?(school)
 
     msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{school.id}'"
     errors.add(:user, msg)
