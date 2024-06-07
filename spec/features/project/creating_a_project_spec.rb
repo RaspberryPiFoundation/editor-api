@@ -148,7 +148,6 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 422 Unprocessable when when the user_id is not the owner of the lesson' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       new_params = { project: params[:project].merge(user_id:) }
 
       post('/api/projects', headers:, params: new_params)

@@ -114,7 +114,6 @@ RSpec.describe 'Updating a lesson', type: :request do
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
       school = create(:school, id: SecureRandom.uuid)
       teacher = create(:teacher, school:)
-      stub_user_info_api_for_unknown_users(user_id: teacher.id)
       school_class = create(:school_class, school:, teacher_id: teacher.id)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }

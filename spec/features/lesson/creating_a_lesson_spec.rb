@@ -173,7 +173,6 @@ RSpec.describe 'Creating a lesson', type: :request do
 
     it 'responds 422 Unprocessable Entity when the user_id is a school-teacher for a different class' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       new_params = { lesson: params[:lesson].merge(user_id:) }
 
       post('/api/lessons', headers:, params: new_params)
