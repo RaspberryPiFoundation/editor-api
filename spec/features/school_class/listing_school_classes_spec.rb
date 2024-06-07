@@ -6,7 +6,6 @@ RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(teacher)
-    stub_user_info_api_for(student)
 
     create(:class_member, school_class:, student_id: student.id)
   end
@@ -49,7 +48,6 @@ RSpec.describe 'Listing school classes', type: :request do
   # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-teacher doesn't teach" do
     teacher = create(:teacher, school:)
-    stub_user_info_api_for(teacher)
     authenticated_in_hydra_as(teacher)
     create(:school_class, school:, teacher_id: teacher.id)
 
@@ -63,7 +61,6 @@ RSpec.describe 'Listing school classes', type: :request do
   # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-student isn't a member of" do
     teacher = create(:teacher, school:)
-    stub_user_info_api_for(teacher)
     authenticated_in_hydra_as(student)
     create(:school_class, school:, teacher_id: teacher.id)
 

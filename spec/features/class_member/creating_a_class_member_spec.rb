@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Creating a class member', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
     stub_user_info_api_for(student)
   end
 

@@ -8,10 +8,6 @@ RSpec.describe SchoolClass::Update, type: :unit do
   let(:school_class_params) { { name: 'New Name' } }
   let(:teacher) { create(:teacher, school:) }
 
-  before do
-    stub_user_info_api_for(teacher)
-  end
-
   it 'returns a successful operation response' do
     response = described_class.call(school_class:, school_class_params:)
     expect(response.success?).to be(true)

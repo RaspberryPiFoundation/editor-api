@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Creating a project', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
     mock_phrase_generation
   end
 

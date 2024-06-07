@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe SchoolClass do
   before do
     stub_user_info_api_for(teacher)
-    stub_user_info_api_for(student)
   end
 
   let(:student) { create(:student, school:) }

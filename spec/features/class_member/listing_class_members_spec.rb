@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Listing class members', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
     stub_user_info_api_for(student)
     create(:class_member, student_id: student.id, school_class:)
   end
@@ -48,7 +47,6 @@ RSpec.describe 'Listing class members', type: :request do
   # rubocop:disable RSpec/ExampleLength
   it 'does not include class members that belong to a different class' do
     student = create(:student, school:)
-    stub_user_info_api_for(student)
     different_class = create(:school_class, school:, teacher_id: teacher.id)
     create(:class_member, school_class: different_class, student_id: student.id)
 
