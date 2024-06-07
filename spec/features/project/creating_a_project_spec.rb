@@ -4,15 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id, owner_id:)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
     mock_phrase_generation
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
@@ -56,7 +56,7 @@ RSpec.describe 'Creating a project', type: :request do
 
   context 'when the project is associated with a school (library)' do
     let(:school) { create(:school) }
-    let(:teacher_id) { SecureRandom.uuid }
+    let(:teacher) { create(:teacher, school:) }
 
     let(:params) do
       {
@@ -64,7 +64,7 @@ RSpec.describe 'Creating a project', type: :request do
           name: 'Test Project',
           components: [],
           school_id: school.id,
-          user_id: teacher_id
+          user_id: teacher.id
         }
       }
     end
@@ -75,16 +75,16 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the user is a school-teacher for the school' do
-      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+      authenticated_in_hydra_as(teacher)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
     end
 
     it 'responds 201 Created when the user is a school-student for the school' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_student(student_id:, school_id: school.id)
-      authenticate_as_school_student(student_id:, school_id: school.id)
+      student = create(:student, school:)
+      stub_user_info_api_for(student)
+      authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -94,22 +94,22 @@ RSpec.describe 'Creating a project', type: :request do
       post('/api/projects', headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:user_id]).to eq(teacher_id)
+      expect(data[:user_id]).to eq(teacher.id)
     end
 
     it 'sets the project user to the current user for school-teacher users' do
-      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+      authenticated_in_hydra_as(teacher)
       new_params = { project: params[:project].merge(user_id: 'ignored') }
 
       post('/api/projects', headers:, params: new_params)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:user_id]).to eq(teacher_id)
+      expect(data[:user_id]).to eq(teacher.id)
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-      Role.teacher.find_by(user_id: teacher_id, school:).delete
-      Role.owner.find_by(user_id: owner_id, school:).delete
+      Role.teacher.find_by(user_id: teacher.id, school:).delete
+      Role.owner.find_by(user_id: owner.id, school:).delete
       school.update!(id: SecureRandom.uuid)
 
       post('/api/projects', headers:, params:)
@@ -119,8 +119,8 @@ RSpec.describe 'Creating a project', type: :request do
 
   context 'when the project is associated with a lesson' do
     let(:school) { create(:school) }
-    let(:lesson) { create(:lesson, school:, user_id: teacher_id) }
-    let(:teacher_id) { SecureRandom.uuid }
+    let(:lesson) { create(:lesson, school:, user_id: teacher.id) }
+    let(:teacher) { create(:teacher, school:) }
 
     let(:params) do
       {
@@ -129,7 +129,7 @@ RSpec.describe 'Creating a project', type: :request do
           components: [],
           school_id: school.id,
           lesson_id: lesson.id,
-          user_id: teacher_id
+          user_id: teacher.id
         }
       }
     end
@@ -140,8 +140,8 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created when the current user is the owner of the lesson' do
-      authenticate_as_school_teacher(teacher_id:, school_id: school.id)
-      lesson.update!(user_id: teacher_id)
+      authenticated_in_hydra_as(teacher)
+      lesson.update!(user_id: teacher.id)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
@@ -177,20 +177,17 @@ RSpec.describe 'Creating a project', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'responds 403 Forbidden when the current user is not the owner of the lesson' do
-      user_id = SecureRandom.uuid
-      authenticate_as_school_teacher(school_id: school.id)
-      stub_user_info_api_for_unknown_users(user_id:)
-      lesson.update!(user_id:)
+      teacher = create(:teacher, school:)
+      authenticated_in_hydra_as(teacher)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school_id: school.id)
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)

@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school_id: school.id)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner_id) }
-  let(:owner_id) { SecureRandom.uuid }
-  let(:teacher_id) { SecureRandom.uuid }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
+  let(:owner) { create(:owner, school:, name: 'School Owner') }
+  let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
 
   let(:params) do
@@ -23,13 +23,13 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds 200 OK' do
-    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -37,7 +37,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+    stub_user_info_api_for(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -63,7 +63,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -71,7 +71,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 200 OK when assigning the lesson to a school class' do
-      school_class = create(:school_class, school:, teacher_id:)
+      school_class = create(:school_class, school:, teacher_id: teacher.id)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -86,20 +86,17 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'responds 403 Forbidden when the user is another school-teacher in the school' do
-      user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
-      authenticate_as_school_teacher(school_id: school.id)
-      lesson.update!(user_id:)
+      teacher = create(:teacher, school:)
+      authenticated_in_hydra_as(teacher)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)
       expect(response).to have_http_status(:forbidden)
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school_id: school.id)
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
 
       put("/api/lessons/#{lesson.id}", headers:, params:)
       expect(response).to have_http_status(:forbidden)
@@ -108,8 +105,8 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school class' do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id:, school:) }
-    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher_id) }
+    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -131,8 +128,8 @@ RSpec.describe 'Updating a lesson', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
-      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
-      new_params = { lesson: params[:lesson].merge(user_id: owner_id) }
+      stub_user_info_api_for(owner)
+      new_params = { lesson: params[:lesson].merge(user_id: owner.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 
       expect(response).to have_http_status(:unprocessable_entity)

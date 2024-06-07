@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Showing my school', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id, owner_id:)
+    authenticated_in_hydra_as(owner)
   end
 
   let!(:school) { create(:school, name: 'school-name') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do
     get('/api/school', headers:)
@@ -27,7 +27,7 @@ RSpec.describe 'Showing my school', type: :request do
   end
 
   it "responds 404 Not Found when the user doesn't have a role in any school" do
-    Role.find_by(school:, user_id: owner_id).delete
+    Role.find_by(school:, user_id: owner.id).delete
     get('/api/school', headers:)
     expect(response).to have_http_status(:not_found)
   end

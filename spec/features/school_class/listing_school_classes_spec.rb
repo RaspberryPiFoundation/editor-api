@@ -4,18 +4,19 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school classes', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
-    stub_user_info_api_for_student(student_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
+    stub_user_info_api_for(student)
 
-    create(:class_member, school_class:, student_id:)
+    create(:class_member, school_class:, student_id: student.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)
@@ -53,7 +54,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-teacher doesn't teach" do
     teacher_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(teacher)
     create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)
@@ -67,7 +68,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-student isn't a member of" do
     teacher_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_student(student_id:, school_id: school.id)
+    authenticated_in_hydra_as(student)
     create(:school_class, school:, teacher_id:)
 
     get("/api/schools/#{school.id}/classes", headers:)

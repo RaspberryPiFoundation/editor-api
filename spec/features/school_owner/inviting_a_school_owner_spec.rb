@@ -4,13 +4,13 @@ require 'rails_helper'
 
 RSpec.describe 'Inviting a school owner', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id, owner_id:)
+    authenticated_in_hydra_as(owner)
     stub_profile_api_invite_school_owner
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school, verified_at: Time.zone.now) }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
@@ -41,7 +41,7 @@ RSpec.describe 'Inviting a school owner', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    Role.owner.find_by(user_id: owner_id, school:).delete
+    Role.owner.find_by(user_id: owner.id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     post("/api/schools/#{school.id}/owners", headers:, params:)
@@ -49,14 +49,16 @@ RSpec.describe 'Inviting a school owner', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-teacher' do
-    authenticate_as_school_teacher(school_id: school.id)
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
 
     post("/api/schools/#{school.id}/owners", headers:, params:)
     expect(response).to have_http_status(:forbidden)
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student(school_id: school.id)
+    student = create(:student, school:)
+    authenticated_in_hydra_as(student)
 
     post("/api/schools/#{school.id}/owners", headers:, params:)
     expect(response).to have_http_status(:forbidden)

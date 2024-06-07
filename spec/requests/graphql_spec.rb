@@ -68,20 +68,23 @@ RSpec.describe 'POST /graphql' do
 
       context 'when the token is invalid' do
         before do
-          unauthenticated_user
+          unauthenticated_in_hydra
         end
 
         it_behaves_like 'an unidentified request'
       end
 
       context 'when the token is valid' do
+        let(:school) { create(:school) }
+        let(:owner) { create(:owner, school:) }
+
         before do
-          authenticate_as_school_owner(school_id: SecureRandom.uuid)
+          authenticated_in_hydra_as(owner)
         end
 
         it 'sets the current_user in the context' do
           request
-          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user: stubbed_user)))
+          expect(EditorApiSchema).to have_received(:execute).with(anything, hash_including(context: hash_including(current_user: authenticated_user)))
         end
 
         it 'sets the request origin from the headers' do

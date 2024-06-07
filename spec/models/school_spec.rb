@@ -4,30 +4,30 @@ require 'rails_helper'
 
 RSpec.describe School do
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
-    stub_user_info_api_for_student(student_id:, school_id: school.id)
+    stub_user_info_api_for(teacher)
+    stub_user_info_api_for(student)
   end
 
-  let(:student_id) { SecureRandom.uuid }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
+  let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
 
   describe 'associations' do
     it 'has many classes' do
-      create(:school_class, school:, teacher_id:)
-      create(:school_class, school:, teacher_id:)
+      create(:school_class, school:, teacher_id: teacher.id)
+      create(:school_class, school:, teacher_id: teacher.id)
       expect(school.classes.size).to eq(2)
     end
 
     it 'has many lessons' do
-      create(:lesson, school:, user_id: teacher_id)
-      create(:lesson, school:, user_id: teacher_id)
+      create(:lesson, school:, user_id: teacher.id)
+      create(:lesson, school:, user_id: teacher.id)
       expect(school.lessons.size).to eq(2)
     end
 
     it 'has many projects' do
-      create(:project, user_id: student_id, school:)
-      create(:project, user_id: student_id, school:)
+      create(:project, user_id: student.id, school:)
+      create(:project, user_id: student.id, school:)
       expect(school.projects.size).to eq(2)
     end
 
@@ -39,14 +39,14 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let!(:school_class) { create(:school_class, school:, teacher_id:) }
-      let!(:lesson_1) { create(:lesson, user_id: teacher_id, school_class:) }
-      let!(:lesson_2) { create(:lesson, user_id: teacher_id, school:) }
-      let!(:project) { create(:project, user_id: student_id, school:) }
+      let!(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
+      let!(:lesson_2) { create(:lesson, user_id: teacher.id, school:) }
+      let!(:project) { create(:project, user_id: student.id, school:) }
       let!(:role) { create(:role, school:) }
 
       before do
-        create(:class_member, school_class:, student_id:)
+        create(:class_member, school_class:, student_id: student.id)
       end
 
       it 'also destroys school classes to avoid making them invalid' do
@@ -178,11 +178,11 @@ RSpec.describe School do
   end
 
   describe '#creator' do
-    let(:creator_id) { SecureRandom.uuid }
+    let(:creator) { create(:owner, school:) }
 
     before do
-      school.update!(creator_id:)
-      stub_user_info_api_for_owner(owner_id: creator_id, school_id: school.id)
+      school.update!(creator_id: creator.id)
+      stub_user_info_api_for(creator)
     end
 
     it 'returns a User instance' do
@@ -190,13 +190,13 @@ RSpec.describe School do
     end
 
     it 'returns the creator from the UserInfo API matching the creator_id' do
-      expect(school.creator.id).to eq(creator_id)
+      expect(school.creator.id).to eq(creator.id)
     end
   end
 
   describe '.find_for_user!' do
     it 'returns the school that the user has a role in' do
-      user = User.where(id: teacher_id).first
+      user = User.where(id: teacher.id).first
       expect(described_class.find_for_user!(user)).to eq(school)
     end
 

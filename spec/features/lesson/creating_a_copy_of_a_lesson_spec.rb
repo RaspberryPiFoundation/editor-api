@@ -4,16 +4,16 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a copy of a lesson', type: :request do
   before do
-    authenticate_as_school_owner(owner_id:, school_id: school.id)
-    stub_user_info_api_for_owner(owner_id:, school_id: school.id)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(owner)
+    stub_user_info_api_for(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher_id) }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher.id) }
   let(:params) { {} }
-  let(:teacher_id) { SecureRandom.uuid }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
+  let(:owner) { create(:owner, school:, name: 'School Owner') }
   let(:school) { create(:school) }
 
   it 'responds 201 Created' do
@@ -67,10 +67,10 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
 
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:) }
 
     it 'responds 201 Created when the user owns the lesson' do
-      lesson.update!(user_id: owner_id)
+      lesson.update!(user_id: owner.id)
 
       post("/api/lessons/#{lesson.id}/copy", headers:, params:)
       expect(response).to have_http_status(:created)
@@ -84,19 +84,19 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
 
   context "when the lesson's visibility is 'teachers'" do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher_id) }
-    let(:owner_id) { SecureRandom.uuid }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
+    let(:owner) { create(:owner, school:) }
 
     let(:params) do
       {
         lesson: {
-          user_id: owner_id
+          user_id: owner.id
         }
       }
     end
 
     it 'responds 201 Created when the user owns the lesson' do
-      lesson.update!(user_id: owner_id)
+      lesson.update!(user_id: owner.id)
 
       post("/api/lessons/#{lesson.id}/copy", headers:, params:)
       expect(response).to have_http_status(:created)
@@ -116,7 +116,8 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
     end
 
     it 'responds 403 Forbidden when the user is a school-student' do
-      authenticate_as_school_student(school_id: school.id)
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
 
       post("/api/lessons/#{lesson.id}/copy", headers:, params:)
       expect(response).to have_http_status(:forbidden)

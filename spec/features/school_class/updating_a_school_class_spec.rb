@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a school class', type: :request do
   before do
-    authenticate_as_school_teacher(school_id: school.id, teacher_id:)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(teacher)
+    stub_user_info_api_for(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:teacher_id) { SecureRandom.uuid }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', school:, teacher_id:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', school:, teacher_id: teacher.id) }
 
   let(:params) do
     {
@@ -27,7 +27,7 @@ RSpec.describe 'Updating a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the school-teacher for the class' do
-    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(teacher)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
@@ -70,20 +70,17 @@ RSpec.describe 'Updating a school class', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_teacher(school_id: school.id)
-    school_class.update!(teacher_id:)
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student(school_id: school.id)
+    student = create(:student, school:)
+    authenticated_in_hydra_as(student)
 
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)

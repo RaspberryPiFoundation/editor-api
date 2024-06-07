@@ -4,17 +4,18 @@ require 'rails_helper'
 
 RSpec.describe 'Deleting a class member', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
-    stub_user_info_api_for_student(student_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
+    stub_user_info_api_for(student)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:class_member) { create(:class_member, student_id:, school_class:) }
-  let(:school_class) { build(:school_class, teacher_id:, school:) }
+  let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
+  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:) }
+  let(:teacher) { create(:teacher, school:) }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 204 No Content' do
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
@@ -22,7 +23,7 @@ RSpec.describe 'Deleting a class member', type: :request do
   end
 
   it 'responds 204 No Content when the user is the class teacher' do
-    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(teacher)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
     expect(response).to have_http_status(:no_content)
@@ -41,20 +42,17 @@ RSpec.describe 'Deleting a class member', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_teacher(school_id: school.id)
-    school_class.update!(teacher_id:)
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
     expect(response).to have_http_status(:forbidden)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student(school_id: school.id)
+    student = create(:student, school:)
+    authenticated_in_hydra_as(student)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}/members/#{class_member.id}", headers:)
     expect(response).to have_http_status(:forbidden)

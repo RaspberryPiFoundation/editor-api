@@ -4,22 +4,22 @@ require 'rails_helper'
 
 RSpec.describe Lesson do
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for(teacher)
   end
 
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:school) { create(:school) }
 
   describe 'associations' do
     it 'optionally belongs to a school (library)' do
-      lesson = create(:lesson, school:, user_id: teacher_id)
+      lesson = create(:lesson, school:, user_id: teacher.id)
       expect(lesson.school).to be_a(School)
     end
 
     it 'optionally belongs to a school class' do
-      school_class = create(:school_class, teacher_id:, school:)
+      school_class = create(:school_class, teacher_id: teacher.id, school:)
 
-      lesson = create(:lesson, school_class:, school: school_class.school, user_id: teacher_id)
+      lesson = create(:lesson, school_class:, school: school_class.school, user_id: teacher.id)
       expect(lesson.school_class).to be_a(SchoolClass)
     end
 
@@ -48,7 +48,7 @@ RSpec.describe Lesson do
   end
 
   describe 'validations' do
-    subject(:lesson) { build(:lesson, user_id: teacher_id) }
+    subject(:lesson) { build(:lesson, user_id: teacher.id) }
 
     it 'has a valid default factory' do
       expect(lesson).to be_valid
@@ -76,24 +76,24 @@ RSpec.describe Lesson do
       let(:school) { create(:school) }
 
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
-        student_id = SecureRandom.uuid
-        stub_user_info_api_for_student(student_id:, school_id: school.id)
-        lesson.user_id = student_id
+        student = create(:student, school:)
+        stub_user_info_api_for(student)
+        lesson.user_id = student.id
         expect(lesson).to be_invalid
       end
     end
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class, teacher_id:, school:))
+        lesson.update!(school_class: create(:school_class, teacher_id: teacher.id, school:))
       end
 
       let(:school) { create(:school) }
 
       it 'requires that the user that is the school-teacher for the school_class' do
-        owner_id = SecureRandom.uuid
-        stub_user_info_api_for_owner(owner_id:, school_id: school.id)
-        lesson.user_id = owner_id
+        owner = create(:owner, school:)
+        stub_user_info_api_for(owner)
+        lesson.user_id = owner.id
         expect(lesson).to be_invalid
       end
     end
@@ -144,19 +144,19 @@ RSpec.describe Lesson do
     let(:school) { create(:school) }
 
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_id:, school:), user_id: teacher_id)
+      lesson = create(:lesson, school_class: build(:school_class, teacher_id: teacher.id, school:), user_id: teacher.id)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 
     it 'is not nullified when there is no school_class' do
-      lesson = create(:lesson, school:, user_id: teacher_id)
+      lesson = create(:lesson, school:, user_id: teacher.id)
       expect(lesson.school).not_to eq(lesson.school_class&.school)
     end
   end
 
   describe '.users' do
     it 'returns User instances for the current scope' do
-      create(:lesson, user_id: teacher_id)
+      create(:lesson, user_id: teacher.id)
 
       user = described_class.all.users.first
       expect(user.name).to eq('School Teacher')
@@ -181,7 +181,7 @@ RSpec.describe Lesson do
 
   describe '.with_users' do
     it 'returns an array of class members paired with their User instance' do
-      lesson = create(:lesson, user_id: teacher_id)
+      lesson = create(:lesson, user_id: teacher.id)
 
       pair = described_class.all.with_users.first
       user = described_class.all.users.first
@@ -208,7 +208,7 @@ RSpec.describe Lesson do
 
   describe '#with_user' do
     it 'returns the class member paired with their User instance' do
-      lesson = create(:lesson, user_id: teacher_id)
+      lesson = create(:lesson, user_id: teacher.id)
 
       pair = lesson.with_user
       user = described_class.all.users.first

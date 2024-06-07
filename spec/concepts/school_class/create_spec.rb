@@ -4,14 +4,14 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass::Create, type: :unit do
   let(:school) { create(:school) }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:) }
 
   let(:school_class_params) do
-    { name: 'Test School Class', teacher_id: }
+    { name: 'Test School Class', teacher_id: teacher.id }
   end
 
   before do
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    stub_user_info_api_for(teacher)
   end
 
   it 'returns a successful operation response' do
@@ -40,7 +40,7 @@ RSpec.describe SchoolClass::Create, type: :unit do
 
   it 'assigns the teacher_id' do
     response = described_class.call(school:, school_class_params:)
-    expect(response[:school_class].teacher_id).to eq(teacher_id)
+    expect(response[:school_class].teacher_id).to eq(teacher.id)
   end
 
   context 'when creation fails' do

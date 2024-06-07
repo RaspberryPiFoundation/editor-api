@@ -4,14 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Showing a school class', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id)
-    stub_user_info_api_for_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
   end
 
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id:, school:) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:teacher_id) { SecureRandom.uuid }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -19,7 +20,7 @@ RSpec.describe 'Showing a school class', type: :request do
   end
 
   it 'responds 200 OK when the user is the class teacher' do
-    authenticate_as_school_teacher(teacher_id:, school_id: school.id)
+    authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)
@@ -27,10 +28,10 @@ RSpec.describe 'Showing a school class', type: :request do
 
   # rubocop:disable RSpec/ExampleLength
   it 'responds 200 OK when the user is a student in the class' do
-    student_id = SecureRandom.uuid
-    stub_user_info_api_for_student(student_id:, school_id: school.id)
-    authenticate_as_school_student(student_id:, school_id: school.id)
-    create(:class_member, school_class:, student_id:)
+    student = create(:student, school:)
+    stub_user_info_api_for(student)
+    authenticated_in_hydra_as(student)
+    create(:class_member, school_class:, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)
@@ -87,20 +88,17 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    authenticate_as_school_teacher(school_id: school.id)
-    school_class.update!(teacher_id:)
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 403 Forbidden when the user is not a school-student for the class' do
-    authenticate_as_school_student(school_id: school.id)
+    student = create(:student, school:)
+    authenticated_in_hydra_as(student)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

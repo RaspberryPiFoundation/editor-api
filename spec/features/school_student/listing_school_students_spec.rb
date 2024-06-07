@@ -4,15 +4,15 @@ require 'rails_helper'
 
 RSpec.describe 'Listing school students', type: :request do
   before do
-    authenticate_as_school_owner(school_id: school.id, owner_id:)
-    stub_profile_api_list_school_students(user_id: student_id)
-    stub_user_info_api_for_student(student_id:, school_id: school.id)
+    authenticated_in_hydra_as(owner)
+    stub_profile_api_list_school_students(user_id: student.id)
+    stub_user_info_api_for(student)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student_id) { SecureRandom.uuid }
-  let(:owner_id) { SecureRandom.uuid }
+  let(:student) { create(:student, school:, name: 'School Student') }
+  let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/students", headers:)
@@ -20,7 +20,8 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 200 OK when the user is a school-teacher' do
-    authenticate_as_school_teacher(school_id: school.id)
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:ok)
@@ -39,8 +40,8 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    Role.student.find_by(user_id: student_id, school:).delete
-    Role.owner.find_by(user_id: owner_id, school:).delete
+    Role.student.find_by(user_id: student.id, school:).delete
+    Role.owner.find_by(user_id: owner.id, school:).delete
     school.update!(id: SecureRandom.uuid)
 
     get("/api/schools/#{school.id}/students", headers:)
@@ -48,7 +49,8 @@ RSpec.describe 'Listing school students', type: :request do
   end
 
   it 'responds 403 Forbidden when the user is a school-student' do
-    authenticate_as_school_student(school_id: school.id)
+    student = create(:student, school:)
+    authenticated_in_hydra_as(student)
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:forbidden)

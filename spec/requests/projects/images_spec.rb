@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Images requests' do
-  let(:project) { create(:project, user_id: owner_id) }
+  let(:project) { create(:project, user_id: owner.id) }
   let(:image_filename) { 'test_image_1.png' }
   let(:params) { { images: [fixture_file_upload(image_filename, 'image/png')] } }
   let(:expected_json) do
@@ -16,14 +16,15 @@ RSpec.describe 'Images requests' do
       ]
     }.to_json
   end
-  let(:owner_id) { SecureRandom.uuid }
+  let(:owner) { create(:owner, school:) }
+  let(:school) { create(:school) }
 
   describe 'create' do
     context 'when auth is correct' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
       before do
-        authenticate_as_school_owner(owner_id:, school_id: SecureRandom.uuid)
+        authenticated_in_hydra_as(owner)
       end
 
       it 'attaches file to project' do
@@ -51,9 +52,11 @@ RSpec.describe 'Images requests' do
 
     context 'when authed user is not creator' do
       let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+      let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_teacher(school_id: SecureRandom.uuid)
+        teacher = create(:teacher, school:)
+        authenticated_in_hydra_as(teacher)
       end
 
       it 'returns forbidden response' do

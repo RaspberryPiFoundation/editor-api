@@ -15,11 +15,12 @@ RSpec.describe User do
   describe '.from_userinfo' do
     subject(:users) { described_class.from_userinfo(ids:) }
 
-    let(:ids) { [SecureRandom.uuid] }
+    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
+    let(:ids) { [owner.id] }
     let(:user) { users.first }
 
     before do
-      stub_user_info_api_for_owner(owner_id: ids.first, school_id: school.id)
+      stub_user_info_api_for(owner)
     end
 
     it 'returns an Array' do
@@ -46,10 +47,10 @@ RSpec.describe User do
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
     before do
-      authenticate_as_school_owner(owner_id:, school_id: organisation_id)
+      authenticated_in_hydra_as(owner)
     end
 
     it 'returns an instance of the described class' do
@@ -57,7 +58,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq owner_id
+      expect(user.id).to eq owner.id
     end
 
     it 'returns a user with the correct name' do
@@ -242,12 +243,12 @@ RSpec.describe User do
   end
 
   describe '.where' do
-    subject(:user) { described_class.where(id: owner_id).first }
+    subject(:user) { described_class.where(id: owner.id).first }
 
-    let(:owner_id) { SecureRandom.uuid }
+    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
     before do
-      stub_user_info_api_for_owner(owner_id:, school_id: school.id)
+      stub_user_info_api_for(owner)
     end
 
     it 'returns an instance of the described class' do
@@ -255,7 +256,7 @@ RSpec.describe User do
     end
 
     it 'returns a user with the correct ID' do
-      expect(user.id).to eq owner_id
+      expect(user.id).to eq owner.id
     end
 
     it 'returns a user with the correct name' do
@@ -273,7 +274,7 @@ RSpec.describe User do
         end
       end
 
-      let(:owner_id) { '00000000-0000-0000-0000-000000000000' }
+      let(:owner) { create(:owner, school:, id: '00000000-0000-0000-0000-000000000000') }
 
       it 'does not call the API' do
         user

@@ -6,9 +6,11 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    authenticate_as_school_owner(school_id: SecureRandom.uuid)
+    authenticated_in_hydra_as(owner)
   end
 
+  let(:school) { create(:school) }
+  let(:owner) { create(:owner, school:) }
   let(:mutation) { 'mutation DeleteProject($project: DeleteProjectInput!) { deleteProject(input: $project) { id } }' }
   let(:project_id) { 'dummy-id' }
   let(:variables) { { project: { id: project_id } } }
@@ -16,7 +18,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let!(:project) { create(:project, user_id: stubbed_user.id) }
+    let!(:project) { create(:project, user_id: authenticated_user.id) }
     let(:project_id) { project.to_gid_param }
 
     context 'when unauthenticated' do
@@ -38,10 +40,11 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user) { stubbed_user }
+      let(:current_user) { authenticated_user }
+      let(:school) { create(:school) }
 
       before do
-        authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: SecureRandom.uuid)
+        authenticated_in_hydra_as(authenticated_user)
       end
 
       it 'deletes the project' do
@@ -59,7 +62,8 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
 
       context 'with another users project' do
         before do
-          authenticate_as_school_teacher(school_id: SecureRandom.uuid)
+          teacher = create(:teacher, school:)
+          authenticated_in_hydra_as(teacher)
         end
 
         it 'returns an error' do

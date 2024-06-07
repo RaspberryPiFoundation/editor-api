@@ -6,9 +6,11 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   subject(:result) { execute_query(query: mutation, variables:) }
 
   before do
-    authenticate_as_school_owner(school_id: SecureRandom.uuid)
+    authenticated_in_hydra_as(owner)
   end
 
+  let(:school) { create(:school) }
+  let(:owner) { create(:owner, school:) }
   let(:mutation) { 'mutation UpdateProject($project: UpdateProjectInput!) { updateProject(input: $project) { project { id } } }' }
   let(:project_id) { 'dummy-id' }
   let(:variables) do
@@ -24,13 +26,14 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let(:project) { create(:project, user_id: stubbed_user.id, project_type: :python) }
+    let(:project) { create(:project, user_id: authenticated_user.id, project_type: :python) }
     let(:project_id) { project.to_gid_param }
+    let(:school) { create(:school) }
 
     before do
       # Instantiate project
       project
-      authenticate_as_school_owner(owner_id: stubbed_user.id, school_id: SecureRandom.uuid)
+      authenticated_in_hydra_as(authenticated_user)
     end
 
     context 'when unauthenticated' do
@@ -52,7 +55,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
     end
 
     context 'when authenticated' do
-      let(:current_user) { stubbed_user }
+      let(:current_user) { authenticated_user }
 
       it 'updates the project name' do
         expect { result }.to change { project.reload.name }.from(project.name).to(variables.dig(:project, :name))
@@ -72,7 +75,8 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
 
       context 'with another users project' do
         before do
-          authenticate_as_school_teacher(school_id: SecureRandom.uuid)
+          teacher = create(:teacher, school:)
+          authenticated_in_hydra_as(teacher)
         end
 
         it 'returns an error' do

@@ -42,10 +42,12 @@ RSpec.describe 'mutation CreateProject() { ... }' do
   end
 
   context 'when authenticated' do
-    let(:current_user) { stubbed_user }
+    let(:current_user) { authenticated_user }
+    let(:school) { create(:school) }
+    let(:owner) { create(:owner, school:) }
 
     before do
-      authenticate_as_school_owner(school_id: SecureRandom.uuid)
+      authenticated_in_hydra_as(owner)
       mock_phrase_generation
     end
 
