@@ -28,7 +28,7 @@ gem 'omniauth-rpi',
     tag: 'v1.3.1'
 gem 'open-uri'
 gem 'pg', '~> 1.1'
-gem 'puma', '~> 5.6'
+gem 'puma', '~> 6'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
 gem 'roo'
