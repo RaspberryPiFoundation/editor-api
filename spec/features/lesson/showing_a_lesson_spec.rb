@@ -61,7 +61,6 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner) { create(:owner, school:) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      stub_user_info_api_for(owner)
       lesson.update!(user_id: owner.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -80,7 +79,6 @@ RSpec.describe 'Showing a lesson', type: :request do
     let(:owner) { create(:owner, school:) }
 
     it 'responds 200 OK when the user owns the lesson' do
-      stub_user_info_api_for(owner)
       lesson.update!(user_id: owner.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
@@ -124,17 +122,14 @@ RSpec.describe 'Showing a lesson', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
-      stub_user_info_api_for(student)
       create(:class_member, school_class:, student_id: student.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it "responds 403 Forbidden when the user is a school-student but isn't within the lesson's class" do
       student = create(:student, school:)

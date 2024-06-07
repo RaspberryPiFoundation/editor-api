@@ -83,7 +83,6 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 201 Created when the user is a school-student for the school' do
       student = create(:student, school:)
-      stub_user_info_api_for(student)
       authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
