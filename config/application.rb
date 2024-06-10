@@ -26,6 +26,8 @@ module App
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 7.0
 
+    config.add_autoload_paths_to_load_path = false
+
     config.autoload_paths << "#{root}/lib"
     config.autoload_paths << "#{root}/lib/concepts"
     Rails.autoloaders.main.collapse('lib/concepts/*/operations')
