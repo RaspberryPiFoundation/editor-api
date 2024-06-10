@@ -26,17 +26,14 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it 'responds 200 OK when the user is a student in the class' do
     student = create(:student, school:)
-    stub_user_info_api_for(student)
     authenticated_in_hydra_as(student)
     create(:class_member, school_class:, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds with the school class JSON' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
@@ -52,18 +49,14 @@ RSpec.describe 'Showing a school class', type: :request do
     expect(data[:teacher_name]).to eq('School Teacher')
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do
-    teacher_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: teacher_id)
-    school_class.update!(teacher_id:)
+    stub_user_info_api_for_unknown_users(user_id: teacher.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:teacher_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 404 Not Found when no school exists' do
     get("/api/schools/not-a-real-id/classes/#{school_class.id}", headers:)

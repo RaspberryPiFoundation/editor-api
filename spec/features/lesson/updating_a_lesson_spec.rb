@@ -23,13 +23,11 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds 200 OK' do
-    stub_user_info_api_for(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     expect(response).to have_http_status(:ok)
   end
 
   it 'responds with the lesson JSON' do
-    stub_user_info_api_for(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -37,7 +35,6 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   it 'responds with the user JSON' do
-    stub_user_info_api_for(owner)
     put("/api/lessons/#{lesson.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -115,10 +112,9 @@ RSpec.describe 'Updating a lesson', type: :request do
 
     # rubocop:disable RSpec/ExampleLength
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
-      teacher_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: teacher_id)
       school = create(:school, id: SecureRandom.uuid)
-      school_class = create(:school_class, school:, teacher_id:)
+      teacher = create(:teacher, school:)
+      school_class = create(:school_class, school:, teacher_id: teacher.id)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -128,7 +124,6 @@ RSpec.describe 'Updating a lesson', type: :request do
     # rubocop:enable RSpec/ExampleLength
 
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
-      stub_user_info_api_for(owner)
       new_params = { lesson: params[:lesson].merge(user_id: owner.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 

@@ -60,9 +60,7 @@ class Lesson < ApplicationRecord
   def user_has_the_school_owner_or_school_teacher_role_for_the_school
     return unless user_id_changed? && errors.blank? && school
 
-    _, user = with_user
-
-    return if user.blank?
+    user = User.new(id: user_id)
     return if user.school_owner?(school)
     return if user.school_teacher?(school)
 

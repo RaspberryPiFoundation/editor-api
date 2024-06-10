@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Creating a project', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
     mock_phrase_generation
   end
 
@@ -83,7 +82,6 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 201 Created when the user is a school-student for the school' do
       student = create(:student, school:)
-      stub_user_info_api_for(student)
       authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
@@ -149,7 +147,6 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 422 Unprocessable when when the user_id is not the owner of the lesson' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       new_params = { project: params[:project].merge(user_id:) }
 
       post('/api/projects', headers:, params: new_params)

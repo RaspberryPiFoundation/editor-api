@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Creating a class member', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
     stub_user_info_api_for(student)
   end
 
@@ -50,10 +49,8 @@ RSpec.describe 'Creating a class member', type: :request do
     expect(data[:student_name]).to eq('School Student')
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the student if their user profile doesn't exist" do
     student_id = SecureRandom.uuid
-    stub_user_info_api_for_unknown_users(user_id: student_id)
     new_params = { class_member: params[:class_member].merge(student_id:) }
 
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: new_params)
@@ -61,7 +58,6 @@ RSpec.describe 'Creating a class member', type: :request do
 
     expect(data[:student_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 400 Bad Request when params are missing' do
     post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)

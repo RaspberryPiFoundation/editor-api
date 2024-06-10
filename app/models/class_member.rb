@@ -29,8 +29,8 @@ class ClassMember < ApplicationRecord
   def student_has_the_school_student_role_for_the_school
     return unless student_id_changed? && errors.blank?
 
-    _, user = with_student
-    return unless user && !user.school_student?(school)
+    user = User.new(id: student_id)
+    return if user.school_student?(school)
 
     msg = "'#{student_id}' does not have the 'school-student' role for organisation '#{school.id}'"
     errors.add(:student, msg)

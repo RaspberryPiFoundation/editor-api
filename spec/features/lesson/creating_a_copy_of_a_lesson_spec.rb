@@ -5,8 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Creating a copy of a lesson', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(owner)
-    stub_user_info_api_for(teacher)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

@@ -74,7 +74,6 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner) { create(:owner, school:) }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for(owner)
       lesson.update!(user_id: owner.id)
 
       get('/api/lessons', headers:)
@@ -97,7 +96,6 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:owner) { create(:owner, school:) }
 
     it 'includes the lesson when the user owns the lesson' do
-      stub_user_info_api_for(owner)
       lesson.update!(user_id: owner.id)
 
       get('/api/lessons', headers:)
@@ -156,7 +154,6 @@ RSpec.describe 'Listing lessons', type: :request do
     # rubocop:disable RSpec/ExampleLength
     it "includes the lesson when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
-      stub_user_info_api_for(student)
       authenticated_in_hydra_as(student)
       create(:class_member, school_class:, student_id: student.id)
 

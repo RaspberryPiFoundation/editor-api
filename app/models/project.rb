@@ -55,9 +55,7 @@ class Project < ApplicationRecord
   def user_has_a_role_within_the_school
     return unless user_id_changed? && errors.blank? && school
 
-    _, user = with_user
-
-    return if user.blank?
+    user = User.new(id: user_id)
     return if user.school_roles(school).any?
 
     msg = "'#{user_id}' does not have any roles for for organisation '#{school_id}'"

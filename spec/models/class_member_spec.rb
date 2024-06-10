@@ -4,7 +4,6 @@ require 'rails_helper'
 
 RSpec.describe ClassMember do
   before do
-    stub_user_info_api_for(teacher)
     stub_user_info_api_for(student)
   end
 
@@ -72,9 +71,9 @@ RSpec.describe ClassMember do
     end
 
     it 'ignores members where no profile account exists' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: student_id)
-      create(:class_member, student_id:, school_class:)
+      student = create(:student, school:)
+      stub_user_info_api_for_unknown_users(user_id: student.id)
+      create(:class_member, student_id: student.id, school_class:)
 
       student = described_class.all.students.first
       expect(student).to be_nil
@@ -99,9 +98,9 @@ RSpec.describe ClassMember do
     end
 
     it 'returns nil values for members where no profile account exists' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: student_id)
-      class_member = create(:class_member, student_id:, school_class:)
+      student = create(:student, school:)
+      stub_user_info_api_for_unknown_users(user_id: student.id)
+      class_member = create(:class_member, student_id: student.id, school_class:)
 
       pair = described_class.all.with_students.first
       expect(pair).to eq([class_member, nil])
@@ -126,9 +125,9 @@ RSpec.describe ClassMember do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      student_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id: student_id)
-      class_member = create(:class_member, student_id:, school_class:)
+      student = create(:student, school:)
+      stub_user_info_api_for_unknown_users(user_id: student.id)
+      class_member = create(:class_member, student_id: student.id, school_class:)
 
       pair = class_member.with_student
       expect(pair).to eq([class_member, nil])

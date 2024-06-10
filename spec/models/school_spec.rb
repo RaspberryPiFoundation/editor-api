@@ -3,11 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe School do
-  before do
-    stub_user_info_api_for(teacher)
-    stub_user_info_api_for(student)
-  end
-
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
@@ -195,6 +190,10 @@ RSpec.describe School do
   end
 
   describe '.find_for_user!' do
+    before do
+      stub_user_info_api_for(teacher)
+    end
+
     it 'returns the school that the user has a role in' do
       user = User.where(id: teacher.id).first
       expect(described_class.find_for_user!(user)).to eq(school)

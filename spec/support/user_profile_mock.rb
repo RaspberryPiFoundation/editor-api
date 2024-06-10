@@ -13,6 +13,7 @@ module UserProfileMock
 
   def authenticated_in_hydra_as(user)
     stub_hydra_public_api(user_to_hash(user))
+    stub_user_info_api_for(user)
   end
 
   def unauthenticated_in_hydra
