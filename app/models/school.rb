@@ -21,7 +21,10 @@ class School < ApplicationRecord
   before_validation :normalize_reference
 
   def self.find_for_user!(user)
-    Role.find_by!(user_id: user.id).school
+    school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id)
+    raise ActiveRecord::RecordNotFound unless school
+
+    school
   end
 
   def creator
