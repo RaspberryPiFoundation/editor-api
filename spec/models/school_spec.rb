@@ -111,6 +111,13 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'requires a unique creator_id' do
+      school.save!
+      another_school = build(:school, creator_id: school.creator_id)
+      another_school.valid?
+      expect(another_school.errors[:creator_id]).to include('has already been taken')
+    end
+
     it 'rejects a badly formed url for website' do
       school.website = 'http://.example.com'
       expect(school).to be_invalid
@@ -197,6 +204,12 @@ RSpec.describe School do
     it 'returns the school that the user has a role in' do
       user = User.where(id: teacher.id).first
       expect(described_class.find_for_user!(user)).to eq(school)
+    end
+
+    it "returns the school that the user created if they don't have a role in any school" do
+      creator = create(:user)
+      school.update!(creator_id: creator.id)
+      expect(described_class.find_for_user!(creator)).to eq(school)
     end
 
     it "raises ActiveRecord::RecordNotFound if the user doesn't have a role in a school" do
