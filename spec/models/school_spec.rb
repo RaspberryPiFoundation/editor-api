@@ -111,6 +111,13 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'requires a unique creator_id' do
+      school.save!
+      another_school = build(:school, creator_id: school.creator_id)
+      another_school.valid?
+      expect(another_school.errors[:creator_id]).to include('has already been taken')
+    end
+
     it 'rejects a badly formed url for website' do
       school.website = 'http://.example.com'
       expect(school).to be_invalid
