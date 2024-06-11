@@ -56,7 +56,7 @@ module App
 
     config.api_only = false
 
-    config.middleware.insert_before 0, CORPMiddleware
+    config.middleware.insert_before 0, CorpMiddleware
     config.generators.system_tests = nil
   end
 end

@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe CORPMiddleware do
+describe CorpMiddleware do
   let(:app) { instance_double(App::Application) }
   let(:middleware) { described_class.new(app) }
   let(:env) { { 'HTTP_HOST' => 'test.com', 'PATH_INFO' => '/rails/active_storage' } }

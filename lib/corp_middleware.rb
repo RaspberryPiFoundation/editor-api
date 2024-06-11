@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CORPMiddleware
+class CorpMiddleware
   def initialize(app)
     @app = app
   end
