@@ -28,7 +28,6 @@ module App
 
     config.add_autoload_paths_to_load_path = false
 
-    config.autoload_paths << "#{root}/lib"
     config.autoload_paths << "#{root}/lib/concepts"
     Rails.autoloaders.main.collapse('lib/concepts/*/operations')
     config.autoload_lib(ignore: %w[assets tasks])
