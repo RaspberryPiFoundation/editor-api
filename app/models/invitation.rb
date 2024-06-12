@@ -7,6 +7,10 @@ class Invitation < ApplicationRecord
   validate :school_is_verified
   after_create_commit :send_invitation_email
 
+  generates_token_for :teacher_invitation, expires_in: 30.days do
+    email_address
+  end
+
   private
 
   def school_is_verified

@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe Invitation do
   include ActionMailer::TestHelper
+  include ActiveSupport::Testing::TimeHelpers
 
   it 'has a valid factory' do
     invitation = build(:invitation)
@@ -30,5 +31,30 @@ RSpec.describe Invitation do
     invitation = described_class.create!(email_address: 'teacher@example.com', school:)
 
     assert_enqueued_email_with InvitationMailer, :invite_teacher, params: { invitation: }
+  end
+
+  it 'generates a token for teacher invitation' do
+    invitation = create(:invitation)
+    token = invitation.generate_token_for(:teacher_invitation)
+
+    expect(described_class.find_by_token_for(:teacher_invitation, token)).to eq(invitation)
+  end
+
+  it 'generates a token valid for 30 days' do
+    invitation = create(:invitation)
+    token = invitation.generate_token_for(:teacher_invitation)
+
+    travel 31.days do
+      expect(described_class.find_by_token_for(:teacher_invitation, token)).to be_nil
+    end
+  end
+
+  it 'invalidates the token if the email address changes' do
+    invitation = create(:invitation)
+    token = invitation.generate_token_for(:teacher_invitation)
+
+    invitation.update(email_address: 'new-email@example.com')
+
+    expect(described_class.find_by_token_for(:teacher_invitation, token)).to be_nil
   end
 end
