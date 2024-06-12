@@ -286,6 +286,11 @@ GEM
     parser (3.2.1.0)
       ast (~> 2.4.1)
     pg (1.4.6)
+    postmark (1.25.0)
+      json
+    postmark-rails (0.22.1)
+      actionmailer (>= 3.0.0)
+      postmark (>= 1.21.3, < 2.0)
     prism (0.27.0)
     pry (0.14.2)
       coderay (~> 1.1)
@@ -520,6 +525,7 @@ DEPENDENCIES
   omniauth-rpi!
   open-uri
   pg (~> 1.1)
+  postmark-rails
   pry-byebug
   puma (~> 6)
   rack-cors

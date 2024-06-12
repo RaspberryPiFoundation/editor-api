@@ -44,6 +44,14 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
+  if ENV['POSTMARK_API_TOKEN']
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.delivery_method = :postmark
+    config.action_mailer.postmark_settings = {
+      api_token: ENV['POSTMARK_API_TOKEN']
+    }
+  end
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
