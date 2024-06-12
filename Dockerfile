@@ -23,7 +23,8 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
 COPY Gemfile Gemfile.lock /app/
 RUN bundle install --jobs 4 \
-  && bundle binstubs --all --path /usr/local/bundle/bin
+  && bundle binstubs --all --path /usr/local/bundle/bin \
+  && bundle binstubs bundler --force
 
 # Dev container image
 FROM builder AS dev-container

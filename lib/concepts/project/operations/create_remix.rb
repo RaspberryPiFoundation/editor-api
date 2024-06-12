@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'operation_response'
-
 class Project
   class CreateRemix
     class << self
