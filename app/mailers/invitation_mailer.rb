@@ -5,6 +5,8 @@ class InvitationMailer < ApplicationMailer
 
   def invite_teacher
     @school = params[:invitation].school
+    @token = params[:invitation].generate_token_for(:teacher_invitation)
+
     mail(to: params[:invitation].email_address,
          subject: "You have been invited to join #{@school.name}")
   end
