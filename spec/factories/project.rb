@@ -33,5 +33,9 @@ FactoryBot.define do
                              content_type: 'image/png')
       end
     end
+
+    factory :internal_project do
+      user_id { nil }
+    end
   end
 end
