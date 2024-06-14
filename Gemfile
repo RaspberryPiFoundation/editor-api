@@ -33,7 +33,7 @@ gem 'rack-cors'
 gem 'rails', '~> 7.1'
 gem 'roo'
 gem 'scout_apm'
-gem 'sentry-rails', '~> 5.5.0'
+gem 'sentry-rails'
 
 group :development, :test do
   gem 'bullet'
