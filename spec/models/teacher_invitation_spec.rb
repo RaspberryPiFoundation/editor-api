@@ -26,7 +26,7 @@ RSpec.describe TeacherInvitation do
   end
 
   it 'sends an invitation email after create' do
-    school = create(:school, verified_at: Time.zone.now)
+    school = create(:verified_school)
 
     invitation = described_class.create!(email_address: 'teacher@example.com', school:)
 
