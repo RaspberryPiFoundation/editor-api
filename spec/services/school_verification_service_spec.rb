@@ -22,6 +22,10 @@ RSpec.describe SchoolVerificationService do
     it 'grants the creator the owner role for the school' do
       expect(school_creator).to be_school_owner(school)
     end
+
+    it 'grants the creator the teacher role for the school' do
+      expect(school_creator).to be_school_teacher(school)
+    end
   end
 
   describe '#reject' do
