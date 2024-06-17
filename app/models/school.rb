@@ -31,6 +31,10 @@ class School < ApplicationRecord
     User.from_userinfo(ids: creator_id).first
   end
 
+  def verified?
+    verified_at.present?
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string

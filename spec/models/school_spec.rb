@@ -217,4 +217,16 @@ RSpec.describe School do
       expect { described_class.find_for_user!(user) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
+
+  describe '#verified?' do
+    it 'returns true when verified_at is present' do
+      school.verified_at = Time.zone.now
+      expect(school).to be_verified
+    end
+
+    it 'returns false when verified_at is blank' do
+      school.verified_at = nil
+      expect(school).not_to be_verified
+    end
+  end
 end

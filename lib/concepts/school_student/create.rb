@@ -27,7 +27,7 @@ module SchoolStudent
       end
 
       def validate(school:, username:, password:, name:)
-        raise ArgumentError, 'school is not verified' unless school.verified_at
+        raise ArgumentError, 'school is not verified' unless school.verified?
         raise ArgumentError, "username '#{username}' is invalid" if username.blank?
         raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
         raise ArgumentError, "name '#{name}' is invalid" if name.blank?
