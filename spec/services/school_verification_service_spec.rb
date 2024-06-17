@@ -6,7 +6,7 @@ RSpec.describe SchoolVerificationService do
   let(:school) { create(:school, creator_id: school_creator.id) }
   let(:user) { create(:user) }
   let(:school_creator) { create(:user) }
-  let(:service) { described_class.new(school.id, user) }
+  let(:service) { described_class.new(school.id) }
   let(:organisation_id) { SecureRandom.uuid }
 
   describe '#verify' do
