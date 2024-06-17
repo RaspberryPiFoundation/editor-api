@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :school_class do
-    school
+    association :school, factory: :school
     teacher_id { SecureRandom.uuid }
     sequence(:name) { |n| "Class #{n}" }
   end
