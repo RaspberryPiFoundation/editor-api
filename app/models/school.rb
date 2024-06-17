@@ -35,6 +35,10 @@ class School < ApplicationRecord
     verified_at.present?
   end
 
+  def rejected?
+    rejected_at.present?
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string

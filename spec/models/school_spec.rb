@@ -229,4 +229,16 @@ RSpec.describe School do
       expect(school).not_to be_verified
     end
   end
+
+  describe '#rejected?' do
+    it 'returns true when rejected_at is present' do
+      school.rejected_at = Time.zone.now
+      expect(school).to be_rejected
+    end
+
+    it 'returns false when rejected_at is blank' do
+      school.rejected_at = nil
+      expect(school).not_to be_rejected
+    end
+  end
 end

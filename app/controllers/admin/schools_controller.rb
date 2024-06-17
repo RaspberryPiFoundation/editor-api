@@ -5,9 +5,9 @@ module Admin
     def authorized_action?(resource, action)
       case action
       when :verify_school
-        resource&.rejected_at.present? || !resource&.verified?
+        resource&.rejected? || !resource&.verified?
       when :reject_school
-        resource&.verified? || resource&.rejected_at.nil?
+        resource&.verified? || !resource&.rejected?
       else
         super
       end
