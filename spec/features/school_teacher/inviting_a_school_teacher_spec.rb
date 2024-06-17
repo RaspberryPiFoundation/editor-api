@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Inviting a school teacher', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_profile_api_invite_school_teacher
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

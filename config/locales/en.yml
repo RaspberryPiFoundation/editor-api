@@ -13,3 +13,5 @@ en:
   validations:
     school:
       website: 'must be a valid URL'
+    invitation:
+      email_address: "'%<value>s' is invalid"

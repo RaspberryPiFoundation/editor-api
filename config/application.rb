@@ -9,11 +9,11 @@ require 'active_job/railtie'
 require 'active_record/railtie'
 require 'active_storage/engine'
 require 'action_controller/railtie'
-# require 'action_mailer/railtie'
-# require 'action_mailbox/engine'
-# require 'action_text/engine'
+require 'action_mailer/railtie'
+# require "action_mailbox/engine"
+# require "action_text/engine"
 require 'action_view/railtie'
-# require 'action_cable/engine'
+# require "action_cable/engine"
 # require "rails/test_unit/railtie"
 require_relative '../lib/corp_middleware'
 
@@ -24,11 +24,13 @@ Bundler.require(*Rails.groups)
 module App
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.0
+    config.load_defaults 7.1
 
-    config.autoload_paths << "#{root}/lib"
+    config.add_autoload_paths_to_load_path = false
+
     config.autoload_paths << "#{root}/lib/concepts"
     Rails.autoloaders.main.collapse('lib/concepts/*/operations')
+    config.autoload_lib(ignore: %w[assets tasks])
 
     # Configuration for the application, engines, and railties goes here.
     #
@@ -37,7 +39,6 @@ module App
     #
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
-    # config.autoload_paths += %W["#{config.root}/lib"]
 
     config.generators do |g|
       g.orm :active_record, primary_key_type: :uuid
@@ -54,6 +55,7 @@ module App
 
     config.api_only = false
 
-    config.middleware.insert_before 0, CORPMiddleware
+    config.middleware.insert_before 0, CorpMiddleware
+    config.generators.system_tests = nil
   end
 end

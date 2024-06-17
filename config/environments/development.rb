@@ -8,7 +8,7 @@ Rails.application.configure do
   # In the development environment your application's code is reloaded any time
   # it changes. This slows down response time but is perfect for development
   # since you don't have to restart the web server when you make code changes.
-  config.cache_classes = false
+  config.enable_reloading = true
 
   # Do not eager load code on boot.
   config.eager_load = false
@@ -39,6 +39,19 @@ Rails.application.configure do
   config.active_storage.service = :local
   Rails.application.routes.default_url_options = { host: ENV.fetch('HOST_URL', 'http://localhost:3000') }
 
+  # Don't care if the mailer can't send.
+  config.action_mailer.raise_delivery_errors = false
+
+  config.action_mailer.perform_caching = false
+
+  if ENV['POSTMARK_API_TOKEN']
+    config.action_mailer.raise_delivery_errors = true
+    config.action_mailer.delivery_method = :postmark
+    config.action_mailer.postmark_settings = {
+      api_token: ENV['POSTMARK_API_TOKEN']
+    }
+  end
+
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
 
@@ -53,6 +66,12 @@ Rails.application.configure do
 
   # Highlight code that triggered database queries in logs.
   config.active_record.verbose_query_logs = true
+
+  # Highlight code that enqueued background job in logs.
+  config.active_job.verbose_enqueue_logs = true
+
+  # Suppress logger output for asset requests.
+  config.assets.quiet = true
 
   # Raises error for missing translations.
   # config.i18n.raise_on_missing_translations = true
@@ -71,4 +90,6 @@ Rails.application.configure do
     # may need toggling off if too aggressive
     Bullet.raise = false # raise an error if n+1 query occurs
   end
+  # Raise error when a before_action's only/except options reference missing actions
+  config.action_controller.raise_on_missing_callback_actions = true
 end

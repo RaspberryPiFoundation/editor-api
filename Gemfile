@@ -28,12 +28,13 @@ gem 'omniauth-rpi',
     tag: 'v1.3.1'
 gem 'open-uri'
 gem 'pg', '~> 1.1'
-gem 'puma', '~> 5.6'
+gem 'postmark-rails'
+gem 'puma', '~> 6'
 gem 'rack-cors'
-gem 'rails', '~> 7.0.0'
+gem 'rails', '~> 7.1'
 gem 'roo'
 gem 'scout_apm'
-gem 'sentry-rails', '~> 5.5.0'
+gem 'sentry-rails'
 
 group :development, :test do
   gem 'bullet'
