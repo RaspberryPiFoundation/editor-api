@@ -189,6 +189,12 @@ RSpec.describe School do
       school.update(verified_at: Time.zone.now)
       expect(school.errors[:verified_at]).to include('must be blank')
     end
+
+    it "cannot change #verified_at once it's been set" do
+      school.update!(verified_at: Time.zone.now)
+      school.update(verified_at: nil)
+      expect(school.errors[:verified_at]).to include('cannot be changed after verification')
+    end
   end
 
   describe '#creator' do

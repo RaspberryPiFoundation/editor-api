@@ -83,12 +83,12 @@ RSpec.describe SchoolVerificationService do
       school.reload
     end
 
-    it 'sets verified_at to nil' do
-      expect(school.verified_at).to be_nil
+    it 'does not reset verified_at' do
+      expect(school.verified_at).to be_present
     end
 
-    it 'sets rejected_at to a date' do
-      expect(school.rejected_at).to be_a(ActiveSupport::TimeWithZone)
+    it 'does not set rejected_at' do
+      expect(school.rejected_at).to be_nil
     end
   end
 end
