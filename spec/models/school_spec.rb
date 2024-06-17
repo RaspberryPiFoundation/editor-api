@@ -177,6 +177,18 @@ RSpec.describe School do
       school.creator_agree_terms_and_conditions = false
       expect(school).to be_invalid
     end
+
+    it 'cannot have #rejected_at set when #verified_at is present' do
+      school.update!(verified_at: Time.zone.now)
+      school.update(rejected_at: Time.zone.now)
+      expect(school.errors[:rejected_at]).to include('must be blank')
+    end
+
+    it 'cannot have #verified_at set when #rejected_at is present' do
+      school.update!(rejected_at: Time.zone.now)
+      school.update(verified_at: Time.zone.now)
+      expect(school.errors[:verified_at]).to include('must be blank')
+    end
   end
 
   describe '#creator' do
