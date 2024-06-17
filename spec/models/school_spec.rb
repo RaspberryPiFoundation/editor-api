@@ -195,6 +195,12 @@ RSpec.describe School do
       school.update(verified_at: nil)
       expect(school.errors[:verified_at]).to include('cannot be changed after verification')
     end
+
+    it "cannot change #rejected_at once it's been set" do
+      school.update!(rejected_at: Time.zone.now)
+      school.update(rejected_at: nil)
+      expect(school.errors[:rejected_at]).to include('cannot be changed after rejection')
+    end
   end
 
   describe '#creator' do
