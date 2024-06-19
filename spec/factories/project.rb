@@ -3,8 +3,6 @@
 FactoryBot.define do
   factory :project do
     user_id { SecureRandom.uuid }
-    association :school, factory: :school
-    association :lesson, factory: :lesson
     name { Faker::Book.title }
     identifier { "#{Faker::Verb.base}-#{Faker::Verb.base}-#{Faker::Verb.base}" }
     project_type { 'python' }
