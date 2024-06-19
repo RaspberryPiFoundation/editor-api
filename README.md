@@ -60,6 +60,26 @@ This can be done with the `bin/with-builder.sh` script:
 
 which should update the Gems in the container, without the need for rebuilding.
 
+### Seeding
+
+By default in development only, two tasks are called to seed data:
+
+`rails projects:create_all`
+`rails classroom_management:seed_a_school_with_lessons`
+
+If needed manually the following task will create all projects:
+
+`rails projects:create_all`
+
+For classroom management there are two scenarios modelled with the tasks:
+
+`rails classroom_management:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
+`rails classroom_management:seed_a_school_with_lessons` - seeds a school with a class, two lessons, and a project in each
+
+To clear classroom management data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
+
+`rails classroom_management:destroy_seed_data`
+
 #### Syncing the database from Production / Staging
 
 ##### Prerequisites
