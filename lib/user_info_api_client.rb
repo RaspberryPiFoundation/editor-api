@@ -8,7 +8,7 @@ class UserInfoApiClient
     def fetch_by_email(user_email)
       return if user_email.blank?
 
-      return stubbed_by_email(user_email) if bypass_auth?
+      return stubbed_by_email(user_email) if bypass_oauth?
 
       response = conn.get { |r| r.url "/users/#{user_email}" }
       return if response.body.blank?
@@ -18,7 +18,7 @@ class UserInfoApiClient
 
     def fetch_by_ids(user_ids)
       return [] if user_ids.blank?
-      return stubbed_by_ids(user_ids) if bypass_auth?
+      return stubbed_by_ids(user_ids) if bypass_oauth?
 
       response = conn.get do |r|
         r.url '/users'
@@ -31,8 +31,8 @@ class UserInfoApiClient
 
     private
 
-    def bypass_auth?
-      ENV.fetch('BYPASS_AUTH', nil) == 'true'
+    def bypass_oauth?
+      ENV.fetch('BYPASS_OAUTH', nil) == 'true'
     end
 
     def transform_result(result)

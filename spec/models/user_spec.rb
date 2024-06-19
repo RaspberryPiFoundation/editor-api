@@ -69,9 +69,9 @@ RSpec.describe User do
       expect(user.email).to eq 'school-owner@example.com'
     end
 
-    context 'when BYPASS_AUTH is true' do
+    context 'when BYPASS_OAUTH is true' do
       around do |example|
-        ClimateControl.modify(BYPASS_AUTH: 'true') do
+        ClimateControl.modify(BYPASS_OAUTH: 'true') do
           example.run
         end
       end
@@ -267,9 +267,9 @@ RSpec.describe User do
       expect(user.email).to eq 'school-owner@example.com'
     end
 
-    context 'when BYPASS_AUTH is true' do
+    context 'when BYPASS_OAUTH is true' do
       around do |example|
-        ClimateControl.modify(BYPASS_AUTH: 'true') do
+        ClimateControl.modify(BYPASS_OAUTH: 'true') do
           example.run
         end
       end
