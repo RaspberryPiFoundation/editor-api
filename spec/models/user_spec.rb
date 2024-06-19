@@ -69,6 +69,22 @@ RSpec.describe User do
       expect(user.email).to eq 'school-owner@example.com'
     end
 
+    context 'when the access token is invalid' do
+      before do
+        allow(Sentry).to receive(:capture_exception)
+        stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo").to_return(status: 401)
+      end
+
+      it 'returns nil' do
+        expect(user).to be_nil
+      end
+
+      it 'reports the Faraday::UnauthorizedError exception to Sentry' do
+        user
+        expect(Sentry).to have_received(:capture_exception).with(instance_of(Faraday::UnauthorizedError))
+      end
+    end
+
     context 'when BYPASS_AUTH is true' do
       around do |example|
         ClimateControl.modify(BYPASS_AUTH: 'true') do
