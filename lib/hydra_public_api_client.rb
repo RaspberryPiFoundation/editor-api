@@ -20,6 +20,9 @@ class HydraPublicApiClient
 
     response = get('userinfo', {}, { Authorization: "Bearer #{token}" })
     response.body.to_h
+  rescue Faraday::UnauthorizedError => e
+    Sentry.capture_exception(e)
+    nil
   end
 
   private
