@@ -3,8 +3,7 @@
 module Admin
   class SchoolsController < Admin::ApplicationController
     def verify
-      school = School.find(params[:id])
-      service = SchoolVerificationService.new(school)
+      service = SchoolVerificationService.new(requested_resource)
 
       if service.verify
         flash[:notice] = t('administrate.controller.verify_school.success')
@@ -12,12 +11,11 @@ module Admin
         flash[:error] = t('administrate.controller.verify_school.error')
       end
 
-      redirect_to admin_school_path(school)
+      redirect_to admin_school_path(requested_resource)
     end
 
     def reject
-      school = School.find(params[:id])
-      service = SchoolVerificationService.new(school)
+      service = SchoolVerificationService.new(requested_resource)
 
       if service.reject
         flash[:notice] = t('administrate.controller.reject_school.success')
@@ -25,7 +23,7 @@ module Admin
         flash[:error] = t('administrate.controller.reject_school.error')
       end
 
-      redirect_to admin_school_path(school)
+      redirect_to admin_school_path(requested_resource)
     end
 
     def default_sorting_attribute
