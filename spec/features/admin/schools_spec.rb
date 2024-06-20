@@ -64,7 +64,7 @@ RSpec.describe 'Schools', type: :request do
     end
   end
 
-  describe 'POST #verify_school' do
+  describe 'POST #verify' do
     let(:creator) { create(:user) }
     let(:verified_at) { nil }
     let(:school) { create(:school, creator_id: creator.id, verified_at:) }
@@ -75,7 +75,7 @@ RSpec.describe 'Schools', type: :request do
       stub_user_info_api_for(creator)
       allow(SchoolVerificationService).to receive(:new).with(school.id).and_return(verification_service)
 
-      post verify_school_admin_school_path(school)
+      post verify_admin_school_path(school)
     end
 
     it 'redirects to school path' do
@@ -107,7 +107,7 @@ RSpec.describe 'Schools', type: :request do
     end
   end
 
-  describe 'PUT #reject_school' do
+  describe 'PUT #reject' do
     let(:creator) { create(:user) }
     let(:school) { create(:school, creator_id: creator.id) }
     let(:rejection_result) { nil }
@@ -117,7 +117,7 @@ RSpec.describe 'Schools', type: :request do
       stub_user_info_api_for(creator)
       allow(SchoolVerificationService).to receive(:new).with(school.id).and_return(verification_service)
 
-      patch reject_school_admin_school_path(school)
+      patch reject_admin_school_path(school)
     end
 
     it 'redirects to school path' do

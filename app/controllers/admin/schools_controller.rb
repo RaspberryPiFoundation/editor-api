@@ -2,7 +2,7 @@
 
 module Admin
   class SchoolsController < Admin::ApplicationController
-    def verify_school
+    def verify
       school_id = params[:id]
       service = SchoolVerificationService.new(school_id)
 
@@ -15,7 +15,7 @@ module Admin
       redirect_to admin_school_path(id: school_id)
     end
 
-    def reject_school
+    def reject
       school_id = params[:id]
       service = SchoolVerificationService.new(school_id)
 
