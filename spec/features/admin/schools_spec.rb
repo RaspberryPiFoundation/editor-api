@@ -75,7 +75,7 @@ RSpec.describe 'Schools', type: :request do
       stub_user_info_api_for(creator)
       allow(SchoolVerificationService).to receive(:new).with(school.id).and_return(verification_service)
 
-      post admin_school_verify_school_path(school)
+      post verify_school_admin_school_path(school)
     end
 
     it 'redirects to school path' do
@@ -117,7 +117,7 @@ RSpec.describe 'Schools', type: :request do
       stub_user_info_api_for(creator)
       allow(SchoolVerificationService).to receive(:new).with(school.id).and_return(verification_service)
 
-      patch admin_school_reject_school_path(school)
+      patch reject_school_admin_school_path(school)
     end
 
     it 'redirects to school path' do

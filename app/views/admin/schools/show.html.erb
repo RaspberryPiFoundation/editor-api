@@ -32,7 +32,7 @@ as well as a link to its edit page.
 
     <%= link_to(
       t("administrate.actions.verify_school"),
-      admin_school_verify_school_path(page.resource),
+      verify_school_admin_school_path(page.resource),
       class: "button button--verify",
       method: :post,
       style: "background-color: green; margin: 5px;",
@@ -41,7 +41,7 @@ as well as a link to its edit page.
 
     <%= link_to(
       t("administrate.actions.reject_school"),
-      admin_school_reject_school_path(page.resource),
+      reject_school_admin_school_path(page.resource),
       class: "button button--danger",
       method: :patch,
       style: "background-color: hsla(0, 88%, 33%, 1); margin: 5px 5px 5px 0;",

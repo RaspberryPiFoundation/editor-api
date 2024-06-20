@@ -3,7 +3,7 @@
 module Admin
   class SchoolsController < Admin::ApplicationController
     def verify_school
-      school_id = params[:school_id]
+      school_id = params[:id]
       service = SchoolVerificationService.new(school_id)
 
       if service.verify
@@ -16,7 +16,7 @@ module Admin
     end
 
     def reject_school
-      school_id = params[:school_id]
+      school_id = params[:id]
       service = SchoolVerificationService.new(school_id)
 
       if service.reject

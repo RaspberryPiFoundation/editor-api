@@ -11,8 +11,10 @@ Rails.application.routes.draw do
     end
 
     resources :schools, only: %i[index show edit update] do
-      post :verify_school
-      patch :reject_school
+      member do
+        post :verify_school
+        patch :reject_school
+      end
     end
 
     resources :school_classes, only: %i[show]
