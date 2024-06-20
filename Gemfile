@@ -12,6 +12,7 @@ gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'countries'
 gem 'email_validator'
+gem 'factory_bot_rails'
 gem 'faraday'
 gem 'github_webhook', '~> 1.4'
 gem 'globalid'
@@ -39,7 +40,6 @@ gem 'sentry-rails'
 group :development, :test do
   gem 'bullet'
   gem 'dotenv-rails'
-  gem 'factory_bot_rails'
   gem 'faker'
   gem 'graphiql-rails'
   gem 'pry-byebug'
@@ -61,6 +61,7 @@ end
 group :test do
   gem 'capybara'
   gem 'climate_control'
+  gem 'database_cleaner-active_record'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webdrivers'

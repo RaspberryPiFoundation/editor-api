@@ -7,13 +7,8 @@ RSpec.describe 'classroom_management', type: :task do
   let(:creator_id) { '583ba872-b16e-46e1-9f7d-df89d267550d' } # jane.doe@example.com
   let(:teacher_id) { 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' } # john.doe@example.com
 
-  before do
-    Rake.application.rake_require 'tasks/classroom_management'
-    Rake::Task.define_task(:environment)
-  end
-
   describe ':destroy_seed_data' do
-    let(:task) { Rake.application['classroom_management:destroy_seed_data'] }
+    let(:task) { Rake::Task['classroom_management:destroy_seed_data'] }
     let(:school) { create(:school, creator_id:) }
 
     before do
@@ -37,7 +32,7 @@ RSpec.describe 'classroom_management', type: :task do
   end
 
   describe ':seed_an_unverified_school' do
-    let(:task) { Rake.application['classroom_management:seed_an_unverified_school'] }
+    let(:task) { Rake::Task['classroom_management:seed_an_unverified_school'] }
 
     it 'creates an unverified school' do
       task.invoke
@@ -46,7 +41,7 @@ RSpec.describe 'classroom_management', type: :task do
   end
 
   describe ':seed_a_verified_school' do
-    let(:task) { Rake.application['classroom_management:seed_a_verified_school'] }
+    let(:task) { Rake::Task['classroom_management:seed_a_verified_school'] }
 
     it 'creates a verified school' do
       task.invoke
@@ -55,7 +50,7 @@ RSpec.describe 'classroom_management', type: :task do
   end
 
   describe ':seed_a_school_with_lessons' do
-    let(:task) { Rake.application['classroom_management:seed_a_school_with_lessons'] }
+    let(:task) { Rake::Task['classroom_management:seed_a_school_with_lessons'] }
 
     before do
       task.invoke
