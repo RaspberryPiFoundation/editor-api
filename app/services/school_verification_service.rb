@@ -1,9 +1,8 @@
 # frozen_string_literal: true
 
 class SchoolVerificationService
-  def initialize(school_id, current_user)
+  def initialize(school_id)
     @school_id = school_id
-    @current_user = current_user
   end
 
   def verify

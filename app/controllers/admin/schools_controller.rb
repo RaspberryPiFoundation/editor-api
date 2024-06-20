@@ -15,7 +15,7 @@ module Admin
 
     def verify_school
       school_id = params[:school_id]
-      service = SchoolVerificationService.new(school_id, current_user)
+      service = SchoolVerificationService.new(school_id)
 
       if service.verify
         flash[:notice] = t('administrate.controller.verify_school.success')
@@ -28,7 +28,7 @@ module Admin
 
     def reject_school
       school_id = params[:school_id]
-      service = SchoolVerificationService.new(school_id, current_user)
+      service = SchoolVerificationService.new(school_id)
 
       if service.reject
         flash[:notice] = t('administrate.controller.reject_school.success')

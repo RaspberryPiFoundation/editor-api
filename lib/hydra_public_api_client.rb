@@ -12,7 +12,7 @@ class HydraPublicApiClient
   end
 
   def fetch_oauth_user(token:)
-    if bypass_auth?
+    if bypass_oauth?
       users = stubbed_data['users']
       user = users.detect { |attr| attr['id'] == '00000000-0000-0000-0000-000000000000' }
       return user
@@ -27,8 +27,8 @@ class HydraPublicApiClient
 
   private
 
-  def bypass_auth?
-    ENV.fetch('BYPASS_AUTH', nil) == 'true'
+  def bypass_oauth?
+    ENV.fetch('BYPASS_OAUTH', nil) == 'true'
   end
 
   def stubbed_data
