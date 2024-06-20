@@ -10,10 +10,10 @@ module ClassroomManagementHelper
     john: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' # john.doe@example.com
   }.freeze
 
-  def create_school(creator_id)
-    School.find_or_create_by!(creator_id:) do |school|
+  def create_school(creator_id, school_id = nil)
+    School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
-      school.assign_attributes(FactoryBot.attributes_for(:school, creator_id:))
+      school.assign_attributes(FactoryBot.attributes_for(:school, creator_id:, id: school_id))
     end
   end
 

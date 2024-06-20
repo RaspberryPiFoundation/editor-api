@@ -46,7 +46,8 @@ namespace :classroom_management do
   task seed_a_verified_school: :environment do
     Rails.logger.info 'Attempting to seed data...'
     creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane])
-    school = create_school(creator_id)
+    school_id = ENV.fetch('SEEDING_SCHOOL_ID', nil)
+    school = create_school(creator_id, school_id)
     verify_school(school)
     Rails.logger.info 'Done...'
   end
@@ -58,7 +59,7 @@ namespace :classroom_management do
     teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john])
     school_id = ENV.fetch('SEEDING_SCHOOL_ID', nil)
 
-    school = school_id ? School.find(id: school_id) : create_school(creator_id)
+    school = create_school(creator_id, school_id)
     verify_school(school)
     assign_a_teacher(teacher_id, school)
 
