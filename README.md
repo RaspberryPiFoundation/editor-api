@@ -71,14 +71,21 @@ If needed manually the following task will create all projects:
 
 `rails projects:create_all`
 
-For classroom management there are two scenarios modelled with the tasks:
+For classroom management the following scenarios modelled by the tasks:
 
 `rails classroom_management:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
+`rails classroom_management:seed_a_verified_school` - seeds only a verified school
 `rails classroom_management:seed_a_school_with_lessons` - seeds a school with a class, two lessons, and a project in each
 
 To clear classroom management data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
 
 `rails classroom_management:destroy_seed_data`
+
+To override values, you can prefix the tasks with environment variables, for example:
+
+`SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_a_verified_school`
+
+Also avilable to override are: `SEEDING_TEACHER_ID`, `SEEDING_SCHOOL_ID`
 
 #### Syncing the database from Production / Staging
 

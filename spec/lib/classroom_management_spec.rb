@@ -45,6 +45,15 @@ RSpec.describe 'classroom_management', type: :task do
     end
   end
 
+  describe ':seed_a_verified_school' do
+    let(:task) { Rake.application['classroom_management:seed_a_verified_school'] }
+
+    it 'creates a verified school' do
+      task.invoke
+      expect(School.find_by(creator_id:).verified_at).to be_truthy
+    end
+  end
+
   describe ':seed_a_school_with_lessons' do
     let(:task) { Rake.application['classroom_management:seed_a_school_with_lessons'] }
 
