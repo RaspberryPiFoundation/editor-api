@@ -2,17 +2,6 @@
 
 module Admin
   class SchoolsController < Admin::ApplicationController
-    def authorized_action?(resource, action)
-      case action
-      when :verify_school
-        resource&.rejected? || !resource&.verified?
-      when :reject_school
-        resource&.verified? || !resource&.rejected?
-      else
-        super
-      end
-    end
-
     def verify_school
       school_id = params[:school_id]
       service = SchoolVerificationService.new(school_id)
