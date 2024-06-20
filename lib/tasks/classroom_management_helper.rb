@@ -25,7 +25,7 @@ module ClassroomManagementHelper
 
   def verify_school(school)
     Rails.logger.info 'Verifying the school...'
-    SchoolVerificationService.new(school.id).verify
+    SchoolVerificationService.new(school).verify
   end
 
   def create_school_class(teacher_id, school)

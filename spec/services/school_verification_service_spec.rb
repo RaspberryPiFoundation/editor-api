@@ -6,7 +6,7 @@ RSpec.describe SchoolVerificationService do
   let(:school) { create(:school, creator_id: school_creator.id) }
   let(:user) { create(:user) }
   let(:school_creator) { create(:user) }
-  let(:service) { described_class.new(school.id) }
+  let(:service) { described_class.new(school) }
   let(:organisation_id) { SecureRandom.uuid }
 
   describe '#verify' do
@@ -53,18 +53,6 @@ RSpec.describe SchoolVerificationService do
 
       it 'returns false' do
         expect(service.verify).to be(false)
-      end
-    end
-
-    describe 'when the school cannot be found' do
-      before do
-        allow(Sentry).to receive(:capture_exception)
-        allow(School).to receive(:find).with(school.id).and_raise(ActiveRecord::RecordNotFound)
-        service.verify
-      end
-
-      it 'reports the error in Sentry' do
-        expect(Sentry).to have_received(:capture_exception)
       end
     end
   end

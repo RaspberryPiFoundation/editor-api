@@ -1,15 +1,16 @@
 # frozen_string_literal: true
 
 class SchoolVerificationService
-  def initialize(school_id)
-    @school_id = school_id
+  attr_reader :school
+
+  def initialize(school)
+    @school = school
   end
 
+  # rubocop:disable Metrics/AbcSize
   def verify
     School.transaction do
-      school = School.find(@school_id)
       school.update!(verified_at: Time.zone.now, rejected_at: nil)
-
       Role.owner.create(user_id: school.creator_id, school:)
       Role.teacher.create(user_id: school.creator_id, school:)
     end
@@ -20,9 +21,9 @@ class SchoolVerificationService
   else
     true
   end
+  # rubocop:enable Metrics/AbcSize
 
   def reject
-    school = School.find(@school_id)
     school.update(verified_at: nil, rejected_at: Time.zone.now)
   end
 end
