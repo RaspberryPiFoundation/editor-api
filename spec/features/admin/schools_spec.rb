@@ -46,16 +46,16 @@ RSpec.describe 'Schools', type: :request do
         expect(response.body).not_to include(I18n.t('administrate.actions.verify_school'))
       end
 
-      it 'includes link to reject school' do
-        expect(response.body).to include(I18n.t('administrate.actions.reject_school'))
+      it 'does not include a link to reject school' do
+        expect(response.body).not_to include(I18n.t('administrate.actions.reject_school'))
       end
     end
 
     describe 'when the school is rejected' do
       let(:rejected_at) { Time.zone.now }
 
-      it 'includes a link to verify school' do
-        expect(response.body).to include(I18n.t('administrate.actions.verify_school'))
+      it 'does not include a link to verify school' do
+        expect(response.body).not_to include(I18n.t('administrate.actions.verify_school'))
       end
 
       it 'does not include a link to reject school' do

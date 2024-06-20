@@ -37,7 +37,7 @@ as well as a link to its edit page.
       method: :post,
       style: "background-color: green; margin: 5px;",
       data: { confirm: t("administrate.actions.confirm_verify_school") }
-    ) unless page.resource.verified? %>
+    ) unless page.resource.verified? || page.resource.rejected? %>
 
     <%= link_to(
       t("administrate.actions.reject_school"),
@@ -46,7 +46,7 @@ as well as a link to its edit page.
       method: :patch,
       style: "background-color: hsla(0, 88%, 33%, 1); margin: 5px 5px 5px 0;",
       data: { confirm: t("administrate.actions.confirm_reject_school") }
-    ) unless page.resource.rejected? %>
+    ) unless page.resource.verified? || page.resource.rejected? %>
   </div>
 </header>
 
