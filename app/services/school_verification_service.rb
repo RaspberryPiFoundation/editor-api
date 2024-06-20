@@ -10,7 +10,7 @@ class SchoolVerificationService
   # rubocop:disable Metrics/AbcSize
   def verify
     School.transaction do
-      school.update!(verified_at: Time.zone.now, rejected_at: nil)
+      school.verify!
       Role.owner.create(user_id: school.creator_id, school:)
       Role.teacher.create(user_id: school.creator_id, school:)
     end

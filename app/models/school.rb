@@ -43,6 +43,10 @@ class School < ApplicationRecord
     rejected_at.present?
   end
 
+  def verify!
+    update!(verified_at: Time.zone.now)
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string
