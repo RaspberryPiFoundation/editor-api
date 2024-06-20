@@ -97,9 +97,14 @@ RSpec.configure do |config|
   end
 
   config.around(type: :task) do |example|
-    Rails.application.load_tasks
-    example.run
-    Rake::Task.clear
+    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.strategy = :transaction
+
+    DatabaseCleaner.cleaning do
+      Rails.application.load_tasks
+      example.run
+      Rake::Task.clear
+    end
   end
 
   config.before(:suite) do

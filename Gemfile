@@ -61,6 +61,7 @@ end
 group :test do
   gem 'capybara'
   gem 'climate_control'
+  gem 'database_cleaner-active_record'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webdrivers'
