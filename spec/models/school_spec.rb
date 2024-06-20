@@ -180,12 +180,12 @@ RSpec.describe School do
 
     it 'cannot have #rejected_at set when #verified_at is present' do
       school.verify!
-      school.update(rejected_at: Time.zone.now)
+      school.reject
       expect(school.errors[:rejected_at]).to include('must be blank')
     end
 
     it 'cannot have #verified_at set when #rejected_at is present' do
-      school.update!(rejected_at: Time.zone.now)
+      school.reject
       school.update(verified_at: Time.zone.now)
       expect(school.errors[:verified_at]).to include('must be blank')
     end
@@ -197,7 +197,7 @@ RSpec.describe School do
     end
 
     it "cannot change #rejected_at once it's been set" do
-      school.update!(rejected_at: Time.zone.now)
+      school.reject
       school.update(rejected_at: nil)
       expect(school.errors[:rejected_at]).to include('cannot be changed after rejection')
     end
@@ -279,6 +279,22 @@ RSpec.describe School do
     it 'raises ActiveRecord::RecordInvalid if verification fails' do
       school.rejected_at = Time.zone.now
       expect { school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe '#reject' do
+    it 'sets rejected_at to the current time' do
+      school.reject
+      expect(school.rejected_at).to be_within(1.second).of(Time.zone.now)
+    end
+
+    it 'returns true on successful rejection' do
+      expect(school.reject).to be(true)
+    end
+
+    it 'returns false on unsuccessful rejection' do
+      school.verified_at = Time.zone.now
+      expect(school.reject).to be(false)
     end
   end
 end

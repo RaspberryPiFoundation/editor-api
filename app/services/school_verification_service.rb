@@ -23,7 +23,5 @@ class SchoolVerificationService
   end
   # rubocop:enable Metrics/AbcSize
 
-  def reject
-    school.update(verified_at: nil, rejected_at: Time.zone.now)
-  end
+  delegate :reject, to: :school
 end
