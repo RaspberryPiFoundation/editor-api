@@ -14,6 +14,7 @@ RSpec.describe 'Listing lessons', type: :request do
   let(:owner) { create(:owner, school:) }
   let(:school) { create(:school) }
   let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+  let(:another_school_class) { create(:school_class, teacher_id: teacher.id, school:) }
 
   it 'responds 200 OK' do
     get('/api/lessons', headers:)
@@ -70,7 +71,15 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.size).to eq(1)
   end
 
-  it 'does not include lessons from outside the class if school_class_id provided' do
+  it 'does not include lessons with no class if school_class_id provided' do
+    get("/api/lessons?school_class_id=#{school_class.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.size).to eq(0)
+  end
+
+  it 'does not include lessons from another class if school_class_id provided' do
+    lesson.update!(school_class_id: another_school_class.id)
     get("/api/lessons?school_class_id=#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -81,6 +90,24 @@ RSpec.describe 'Listing lessons', type: :request do
     lesson.update!(school_class_id: school_class.id)
 
     get("/api/lessons?school_class_id=#{school_class.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.size).to eq(1)
+  end
+
+  it 'defaults to not including archived lessons from the class if school_class_id provided' do
+    lesson.archive!
+    lesson.update!(school_class_id: school_class.id)
+    get("/api/lessons?school_class_id=#{school_class.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.size).to eq(0)
+  end
+
+  it 'includes archived lessons from class if include_archived=true and school_class_id provided' do
+    lesson.archive!
+    lesson.update!(school_class_id: school_class.id)
+    get("/api/lessons?include_archived=true&school_class_id=#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.size).to eq(1)
