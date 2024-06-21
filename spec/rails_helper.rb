@@ -8,7 +8,7 @@ end
 require 'spec_helper'
 ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../config/environment', __dir__)
-ENV['BYPASS_AUTH'] = nil # Ensure we don't bypass auth in tests
+ENV['BYPASS_OAUTH'] = nil # Ensure we don't bypass auth in tests
 
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
@@ -94,6 +94,17 @@ RSpec.configure do |config|
 
   config.before(:each, type: :system) do
     driven_by :rack_test
+  end
+
+  config.around(type: :task) do |example|
+    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.strategy = :transaction
+
+    DatabaseCleaner.cleaning do
+      Rails.application.load_tasks
+      example.run
+      Rake::Task.clear
+    end
   end
 
   config.before(:suite) do

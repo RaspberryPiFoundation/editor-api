@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :lesson do
     user_id { SecureRandom.uuid }
     sequence(:name) { |n| "Lesson #{n}" }
+    description { 'Description' }
     visibility { 'private' }
   end
 end

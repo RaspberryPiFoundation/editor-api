@@ -6,19 +6,21 @@
   "configurations": [
     {
       "type": "ruby_lsp",
-      "name": "Debug script",
       "request": "launch",
-      "program": "ruby ${file}"
+      "name": "Debug program",
+      "program": "ruby "
     },
     {
-      "type": "ruby_lsp",
-      "name": "Debug test",
+      "type": "rdbg",
+      "name": "Debug current file with rdbg",
       "request": "launch",
-      "program": "ruby -Itest ${relativeFile}"
+      "script": "${file}",
+      "args": [],
+      "askParameters": true
     },
     {
-      "type": "ruby_lsp",
-      "name": "Attach debugger",
+      "type": "rdbg",
+      "name": "Attach with rdbg",
       "request": "attach"
     }
   ]
