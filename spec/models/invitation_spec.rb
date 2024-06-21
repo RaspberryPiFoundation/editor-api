@@ -57,4 +57,11 @@ RSpec.describe Invitation do
 
     expect(described_class.find_by_token_for(:teacher_invitation, token)).to be_nil
   end
+
+  it 'delegates #school_name to School#name' do
+    school = build(:school, name: 'school-name')
+    invitation = build(:invitation, school:)
+
+    expect(invitation.school_name).to eq('school-name')
+  end
 end
