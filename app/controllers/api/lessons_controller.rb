@@ -72,24 +72,20 @@ module Api
     end
 
     def lesson_params
-      if school_owner?
-        # A school owner must specify who the lesson user is.
-        base_params
-      else
-        # A school teacher may only create lessons they own.
-        base_params.merge(user_id: current_user.id)
-      end
+      base_params.merge(user_id: current_user.id)
     end
 
     def base_params
       params.fetch(:lesson, {}).permit(
         :school_id,
         :school_class_id,
-        :user_id,
         :name,
         :description,
         :visibility,
-        :due_date
+        :due_date,
+        {
+          project_attributes: [:name, :project_type, :locale, { components: %i[id name extension content index default] }]
+        }
       )
     end
 
