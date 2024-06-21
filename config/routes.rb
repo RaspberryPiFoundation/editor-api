@@ -54,7 +54,9 @@ Rails.application.routes.draw do
       post :copy, on: :member, to: 'lessons#create_copy'
     end
 
-    resources :teacher_invitations, param: :token, only: :show
+    resources :teacher_invitations, param: :token, only: :show do
+      put :accept, on: :member
+    end
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
