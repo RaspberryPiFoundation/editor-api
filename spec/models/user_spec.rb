@@ -117,6 +117,7 @@ RSpec.describe User do
     end
     let(:info) { info_without_organisations }
     let(:user) { described_class.new(info) }
+    let(:credentials) { { token: 'token' } }
 
     let(:auth) do
       OmniAuth::AuthHash.new(
@@ -125,7 +126,8 @@ RSpec.describe User do
           uid: id,
           extra: {
             raw_info: info
-          }
+          },
+          credentials:
         }
       )
     end
@@ -140,6 +142,10 @@ RSpec.describe User do
 
     it 'returns a user with the correct name' do
       expect(auth_subject.name).to eq 'John Doe'
+    end
+
+    it 'returns a user with the access token supplied in credentials' do
+      expect(auth_subject.token).to eq 'token'
     end
 
     it 'returns a user with the correct email' do
@@ -162,6 +168,14 @@ RSpec.describe User do
       let(:auth) { nil }
 
       it { is_expected.to be_nil }
+    end
+
+    context 'with no credentials set' do
+      let(:credentials) { nil }
+
+      it 'returns a user with no token' do
+        expect(auth_subject.token).to be_nil
+      end
     end
   end
 
