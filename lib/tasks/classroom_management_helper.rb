@@ -11,7 +11,7 @@ module ClassroomManagementHelper
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
-      school.name = 'School Name'
+      school.name = 'Test School'
       school.website = 'http://example.com'
       school.address_line_1 = 'School Address'
       school.municipality = 'City'
@@ -31,7 +31,7 @@ module ClassroomManagementHelper
   def create_school_class(teacher_id, school)
     SchoolClass.find_or_create_by!(teacher_id:, school:) do |school_class|
       Rails.logger.info 'Seeding a class...'
-      school_class.name = 'De§ult Class Name'
+      school_class.name = 'Test Class'
       school_class.teacher_id = teacher_id
       school_class.school = school
     end
@@ -51,7 +51,7 @@ module ClassroomManagementHelper
         lesson.user_id = user_id
         lesson.school = school
         lesson.school_class = school_class
-        lesson.name = "Lesson #{i + 1}"
+        lesson.name = "Test Lesson #{i + 1}"
         lesson.description = "This is lesson #{i + 1}"
         lesson.visibility = visibility
       end
@@ -62,7 +62,7 @@ module ClassroomManagementHelper
   def create_project(user_id, school, lesson)
     Project.find_or_create_by!(user_id:, school:, lesson:) do |project|
       Rails.logger.info "Seeding a project for #{lesson.name}..."
-      project.name = 'Default Project Name'
+      project.name = "Test Project for #{lesson.name}"
       project.user_id = user_id
       project.school = school
       project.lesson = lesson
