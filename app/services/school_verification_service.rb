@@ -8,11 +8,12 @@ class SchoolVerificationService
   end
 
   # rubocop:disable Metrics/AbcSize
-  def verify
+  def verify(token:)
     School.transaction do
       school.verify!
       Role.owner.create!(user_id: school.creator_id, school:)
       Role.teacher.create!(user_id: school.creator_id, school:)
+      ProfileApiClient.create_school(token:, school:)
     end
   rescue StandardError => e
     Sentry.capture_exception(e)
