@@ -26,7 +26,7 @@ module Api
     private
 
     def load_invitation
-      @invitation = Invitation.find_by_token_for!(:teacher_invitation, params[:token])
+      @invitation = TeacherInvitation.find_by_token_for!(:teacher_invitation, params[:token])
     end
 
     def ensure_invitation_email_matches_user_email

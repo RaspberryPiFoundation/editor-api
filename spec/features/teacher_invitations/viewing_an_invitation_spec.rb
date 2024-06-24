@@ -21,7 +21,7 @@ RSpec.describe 'Viewing an invitations', type: :request do
     end
 
     context 'when invitation does not exist' do
-      let(:invitation) { build(:invitation) }
+      let(:invitation) { build(:teacher_invitation) }
       let!(:token) { invitation.generate_token_for(:teacher_invitation) }
 
       it 'responds 404 Not Found' do
@@ -32,7 +32,7 @@ RSpec.describe 'Viewing an invitations', type: :request do
 
     context 'when invitation exists' do
       let(:invitation_email) { user.email }
-      let(:invitation) { create(:invitation, email_address: invitation_email) }
+      let(:invitation) { create(:teacher_invitation, email_address: invitation_email) }
       let!(:token) { invitation.generate_token_for(:teacher_invitation) }
 
       context 'when invitation token is not valid because invitation email has changed' do

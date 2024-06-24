@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class Invitation < ApplicationRecord
+class TeacherInvitation < ApplicationRecord
   delegate :name, to: :school, prefix: true
 
   belongs_to :school

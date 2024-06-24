@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_06_21_082741) do
+ActiveRecord::Schema[7.1].define(version: 2024_06_24_122250) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -151,15 +151,6 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_21_082741) do
     t.index ["scheduled_at"], name: "index_good_jobs_on_scheduled_at", where: "(finished_at IS NULL)"
   end
 
-  create_table "invitations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "email_address"
-    t.uuid "school_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "accepted_at"
-    t.index ["school_id"], name: "index_invitations_on_school_id"
-  end
-
   create_table "lessons", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_id"
     t.uuid "school_class_id"
@@ -255,11 +246,19 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_21_082741) do
     t.index ["reference"], name: "index_schools_on_reference", unique: true
   end
 
+  create_table "teacher_invitations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "email_address"
+    t.uuid "school_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "accepted_at"
+    t.index ["school_id"], name: "index_teacher_invitations_on_school_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "class_members", "school_classes"
   add_foreign_key "components", "projects"
-  add_foreign_key "invitations", "schools"
   add_foreign_key "lessons", "lessons", column: "copied_from_id"
   add_foreign_key "lessons", "school_classes"
   add_foreign_key "lessons", "schools"
@@ -268,4 +267,5 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_21_082741) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "teacher_invitations", "schools"
 end

@@ -6,7 +6,7 @@ RSpec.describe InvitationMailer do
   describe 'invite_teacher' do
     subject(:email) { described_class.with(invitation:).invite_teacher }
 
-    let(:invitation) { create(:invitation) }
+    let(:invitation) { create(:teacher_invitation) }
 
     before do
       allow(ENV).to receive(:fetch).with('EDITOR_PUBLIC_URL').and_return('http://example.com')
