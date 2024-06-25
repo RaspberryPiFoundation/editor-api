@@ -38,6 +38,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     name
     reference
     country_code
+    created_at
     verified_at
     rejected_at
   ].freeze
