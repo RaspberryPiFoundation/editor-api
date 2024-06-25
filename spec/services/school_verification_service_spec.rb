@@ -3,7 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe SchoolVerificationService do
-  let(:school) { create(:school, creator_id: school_creator.id) }
+  let(:website) { 'http://example.com' }
+  let(:school) { build(:school, creator_id: school_creator.id, website:) }
   let(:user) { create(:user) }
   let(:school_creator) { create(:user) }
   let(:service) { described_class.new(school) }
@@ -11,6 +12,11 @@ RSpec.describe SchoolVerificationService do
 
   describe '#verify' do
     describe 'when school can be saved' do
+      it 'saves the school' do
+        service.verify
+        expect(school).to be_persisted
+      end
+
       it 'sets verified_at to a date' do
         service.verify
         expect(school.reload.verified_at).to be_a(ActiveSupport::TimeWithZone)
@@ -32,13 +38,11 @@ RSpec.describe SchoolVerificationService do
     end
 
     describe 'when school cannot be saved' do
-      before do
-        school.update_attribute(:website, 'invalid') # rubocop:disable Rails/SkipsModelValidations
-      end
+      let(:website) { 'invalid' }
 
-      it 'does not set verified_at' do
+      it 'does not save the school' do
         service.verify
-        expect(school.reload.verified_at).to be_nil
+        expect(school).not_to be_persisted
       end
 
       it 'does not create owner role' do
