@@ -3,7 +3,7 @@ RUN gem install bundler \
   && apt-get update \
   && apt-get upgrade --yes \
   && apt-get install --yes --no-install-recommends \
-  libpq5 libxml2 libxslt1.1 \
+  libpq5 libxml2 libxslt1.1 libvips \
   curl gnupg graphviz nodejs \
   && echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
   && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \

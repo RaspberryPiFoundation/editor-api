@@ -17,7 +17,7 @@ module SchoolTeacher
 
       def invite_teacher(school, school_teacher_params, _token)
         email_address = school_teacher_params.fetch(:email_address)
-        Invitation.create!(school:, email_address:)
+        TeacherInvitation.create!(school:, email_address:)
       end
     end
   end

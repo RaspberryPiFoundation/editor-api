@@ -38,5 +38,13 @@ module Admin
 
       redirect_to admin_school_path(id: school_id)
     end
+
+    def default_sorting_attribute
+      :created_at
+    end
+
+    def default_sorting_direction
+      :desc
+    end
   end
 end
