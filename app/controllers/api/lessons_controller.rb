@@ -84,7 +84,12 @@ module Api
         :visibility,
         :due_date,
         {
-          project_attributes: [:name, :project_type, :locale, { components: %i[id name extension content index default] }]
+          project_attributes: [
+            :name,
+            :project_type,
+            :locale,
+            { components: %i[id name extension content index default] }
+          ]
         }
       )
     end

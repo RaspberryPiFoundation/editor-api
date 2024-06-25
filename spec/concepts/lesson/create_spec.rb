@@ -39,7 +39,7 @@ RSpec.describe Lesson::Create, type: :unit do
   end
 
   it 'creates a project for the lesson' do
-    expect { described_class.call(lesson_params: ) }.to change(Project, :count).by(1)
+    expect { described_class.call(lesson_params:) }.to change(Project, :count).by(1)
   end
 
   it 'associates the project to the lesson' do
