@@ -66,5 +66,21 @@ RSpec.describe ProfileApiClient do
 
       expect { described_class.create_school(token:, school:) }.to raise_error('School not created in Profile API. HTTP response code: 401')
     end
+
+    describe 'when BYPASS_OAUTH is true' do
+      before do
+        allow(ENV).to receive(:[]).with('BYPASS_OAUTH').and_return(true)
+      end
+
+      it 'does not make a request to Profile API' do
+        described_class.create_school(token:, school:)
+        expect(WebMock).not_to have_requested(:post, "#{api_url}/api/v1/schools")
+      end
+
+      it 'returns the id and code of the school supplied' do
+        expected = { 'id' => school.id, 'schoolCode' => school.code }
+        expect(described_class.create_school(token:, school:)).to eq(expected)
+      end
+    end
   end
 end
