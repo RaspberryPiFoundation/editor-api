@@ -11,8 +11,8 @@ class SchoolVerificationService
   def verify
     School.transaction do
       school.verify!
-      Role.owner.create(user_id: school.creator_id, school:)
-      Role.teacher.create(user_id: school.creator_id, school:)
+      Role.owner.create!(user_id: school.creator_id, school:)
+      Role.teacher.create!(user_id: school.creator_id, school:)
     end
   rescue StandardError => e
     Sentry.capture_exception(e)
