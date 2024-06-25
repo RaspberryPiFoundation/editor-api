@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolStudent::Create, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
-  let(:school) { create(:school, verified_at: Time.zone.now) }
+  let(:school) { create(:verified_school) }
 
   let(:school_student_params) do
     {
