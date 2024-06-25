@@ -98,39 +98,6 @@ RSpec.describe 'Accepting an invitations', type: :request do
         end
       end
 
-      context 'when user already has teacher role for the same school' do
-        before do
-          Role.teacher.create!(user_id: user.id, school:)
-        end
-
-        it 'responds 422 Unprocessable entity' do
-          put("/api/teacher_invitations/#{token}/accept", headers:)
-
-          expect(response).to have_http_status(:unprocessable_entity)
-        end
-
-        it 'leaves the user with the teacher role for that school' do
-          put("/api/teacher_invitations/#{token}/accept", headers:)
-
-          expect(user).to be_school_teacher(school)
-        end
-
-        it 'includes validation errors in response' do
-          put("/api/teacher_invitations/#{token}/accept", headers:)
-
-          json = JSON.parse(response.body)
-          expect(json['error']).to eq({ 'role' => ['has already been taken'] })
-        end
-
-        it 'does not set the accepted_at timestamp on the invitation' do
-          freeze_time(with_usec: false) do
-            put("/api/teacher_invitations/#{token}/accept", headers:)
-
-            expect(invitation.reload.accepted_at).to be_blank
-          end
-        end
-      end
-
       context 'when user already has a role for another school' do
         let(:another_shool) { create(:school) }
 
@@ -205,6 +172,32 @@ RSpec.describe 'Accepting an invitations', type: :request do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
           expect(invitation.reload.accepted_at).to eq(original_accepted_at)
+        end
+      end
+
+      context 'when user already has teacher role for the same school' do
+        before do
+          Role.teacher.create!(user_id: user.id, school:)
+        end
+
+        it 'responds 200 OK' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'leaves the user with the teacher role for that school' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(user).to be_school_teacher(school)
+        end
+
+        it 'sets the accepted_at timestamp on the invitation' do
+          freeze_time(with_usec: false) do
+            put("/api/teacher_invitations/#{token}/accept", headers:)
+
+            expect(invitation.reload.accepted_at).to eq(Time.current)
+          end
         end
       end
 
