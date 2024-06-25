@@ -38,6 +38,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     name
     reference
     country_code
+    created_at
     verified_at
     rejected_at
   ].freeze
@@ -94,5 +95,13 @@ class SchoolDashboard < Administrate::BaseDashboard
   #
   def display_resource(school)
     school.name.to_s
+  end
+
+  def default_sorting_attribute
+    :created_at
+  end
+
+  def default_sorting_direction
+    :desc
   end
 end
