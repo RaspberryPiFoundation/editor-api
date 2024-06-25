@@ -96,12 +96,4 @@ class SchoolDashboard < Administrate::BaseDashboard
   def display_resource(school)
     school.name.to_s
   end
-
-  def default_sorting_attribute
-    :created_at
-  end
-
-  def default_sorting_direction
-    :desc
-  end
 end
