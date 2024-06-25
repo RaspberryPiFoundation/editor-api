@@ -54,7 +54,7 @@ RSpec.describe Project::Create, type: :unit do
       end
 
       it 'returns error message' do
-        expect(create_project[:error]).to eq('Error creating project')
+        expect(create_project[:error]).to eq('Error creating project: Some error')
       end
 
       it 'sent the exception to Sentry' do

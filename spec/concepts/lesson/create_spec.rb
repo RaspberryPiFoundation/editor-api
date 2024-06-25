@@ -6,7 +6,17 @@ RSpec.describe Lesson::Create, type: :unit do
   let(:teacher_id) { SecureRandom.uuid }
 
   let(:lesson_params) do
-    { name: 'Test Lesson', user_id: teacher_id }
+    {
+      name: 'Test Lesson',
+      user_id: teacher_id,
+      project_attributes: {
+        name: 'Hello world project',
+        project_type: 'python',
+        components: [
+          { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
+        ]
+      }
+    }
   end
 
   it 'returns a successful operation response' do
@@ -26,6 +36,15 @@ RSpec.describe Lesson::Create, type: :unit do
   it 'assigns the name' do
     response = described_class.call(lesson_params:)
     expect(response[:lesson].name).to eq('Test Lesson')
+  end
+
+  it 'creates a project for the lesson' do
+    expect { described_class.call(lesson_params: ) }.to change(Project, :count).by(1)
+  end
+
+  it 'associates the project to the lesson' do
+    response = described_class.call(lesson_params:)
+    expect(response[:lesson].project).to be_a(Project)
   end
 
   it 'assigns the user_id' do
