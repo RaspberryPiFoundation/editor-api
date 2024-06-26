@@ -22,6 +22,11 @@ RSpec.describe SchoolVerificationService do
         expect(school.reload.verified_at).to be_a(ActiveSupport::TimeWithZone)
       end
 
+      it 'generates school code' do
+        service.verify
+        expect(school.reload.code).to be_present
+      end
+
       it 'grants the creator the owner role for the school' do
         service.verify
         expect(school_creator).to be_school_owner(school)

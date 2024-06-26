@@ -20,7 +20,8 @@ RSpec.describe 'Schools', type: :request do
     let(:creator) { create(:user) }
     let(:verified_at) { nil }
     let(:rejected_at) { nil }
-    let(:school) { create(:school, creator_id: creator.id, verified_at:, rejected_at:) }
+    let(:code) { nil }
+    let(:school) { create(:school, creator_id: creator.id, verified_at:, rejected_at:, code:) }
 
     before do
       stub_user_info_api_for(creator)
@@ -41,6 +42,7 @@ RSpec.describe 'Schools', type: :request do
 
     describe 'when the school is verified' do
       let(:verified_at) { Time.zone.now }
+      let(:code) { '00-00-00' }
 
       it 'does not include a link to verify school' do
         expect(response.body).not_to include(I18n.t('administrate.actions.verify_school'))
