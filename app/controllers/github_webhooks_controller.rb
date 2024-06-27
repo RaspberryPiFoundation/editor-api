@@ -10,7 +10,7 @@ class GithubWebhooksController < ActionController::API
   private
 
   def webhook_secret(_payload)
-    ENV.fetch('GITHUB_WEBHOOK_SECRET')
+    Rails.configuration.x.github_webhook.secret
   end
 
   def edited_code?(payload)

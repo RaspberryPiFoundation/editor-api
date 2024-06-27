@@ -4,11 +4,12 @@ require 'rails_helper'
 
 RSpec.describe GithubWebhooksController do
   around do |example|
-    ClimateControl.modify GITHUB_WEBHOOK_SECRET: 'secret', GITHUB_WEBHOOK_REF: 'branches/whatever' do
+    ClimateControl.modify GITHUB_WEBHOOK_REF: 'branches/whatever' do
       example.run
     end
   end
 
+  let(:github_webhook_secret) { 'secret' }
   let(:params) do
     {
       ref:,
@@ -18,13 +19,14 @@ RSpec.describe GithubWebhooksController do
 
   let(:headers) do
     {
-      'X-Hub-Signature-256': "sha256=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), ENV.fetch('GITHUB_WEBHOOK_SECRET'), params.to_json)}",
+      'X-Hub-Signature-256': "sha256=#{OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha256'), github_webhook_secret, params.to_json)}",
       'X-GitHub-Event': 'push',
       'Content-Type': 'application/json'
     }
   end
 
   before do
+    allow(Rails.configuration.x.github_webhook).to receive(:secret).and_return(github_webhook_secret)
     allow(UploadJob).to receive(:perform_later)
     post '/github_webhooks', env: { RAW_POST_DATA: params.to_json }, headers:
   end

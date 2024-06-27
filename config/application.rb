@@ -60,5 +60,7 @@ module App
 
     config.bypass_oauth = ENV.fetch('BYPASS_OAUTH', nil) == 'true'
     config.identity_url = ENV.fetch('IDENTITY_URL')
+
+    config.x.github_webhook.secret = ENV.fetch('GITHUB_WEBHOOK_SECRET')
   end
 end
