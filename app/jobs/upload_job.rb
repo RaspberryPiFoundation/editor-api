@@ -55,7 +55,7 @@ class UploadJob < ApplicationJob
   def load_projects_data(locale, repository, owner)
     GithubApi::Client.query(
       ProjectContentQuery,
-      variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:#{locale}/code" }
+      variables: { repository:, owner:, expression: "#{Rails.configuration.x.github_webhook.ref}:#{locale}/code" }
     )
   end
 
@@ -85,7 +85,7 @@ class UploadJob < ApplicationJob
   def image(file, project_dir, locale, repository, owner)
     filename = file.name
     directory = project_dir.name
-    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
+    url = "https://github.com/#{owner}/#{repository}/raw/#{Rails.configuration.x.github_webhook.ref}/#{locale}/code/#{directory}/#{filename}"
     { filename:, io: URI.parse(url).open }
   end
 

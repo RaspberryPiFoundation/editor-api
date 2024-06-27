@@ -3,12 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe GithubWebhooksController do
-  around do |example|
-    ClimateControl.modify GITHUB_WEBHOOK_REF: 'branches/whatever' do
-      example.run
-    end
-  end
-
   let(:github_webhook_secret) { 'secret' }
   let(:params) do
     {
@@ -27,6 +21,7 @@ RSpec.describe GithubWebhooksController do
 
   before do
     allow(Rails.configuration.x.github_webhook).to receive(:secret).and_return(github_webhook_secret)
+    allow(Rails.configuration.x.github_webhook).to receive(:ref).and_return('branches/whatever')
     allow(UploadJob).to receive(:perform_later)
     post '/github_webhooks', env: { RAW_POST_DATA: params.to_json }, headers:
   end

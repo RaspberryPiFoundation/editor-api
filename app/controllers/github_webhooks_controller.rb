@@ -14,7 +14,7 @@ class GithubWebhooksController < ActionController::API
   end
 
   def webhook_ref
-    ENV.fetch('GITHUB_WEBHOOK_REF')
+    Rails.configuration.x.github_webhook.ref
   end
 
   def edited_code?(payload)
