@@ -18,4 +18,10 @@ json.call(
   :updated_at
 )
 
+json.project(
+  lesson.project,
+  :identifier,
+  :project_type
+)
+
 json.user_name(user&.name)
