@@ -80,6 +80,7 @@ class User
 
     args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
     args['id'] = auth.uid
+    args['token'] = auth.credentials&.token
 
     new(args)
   end
