@@ -57,5 +57,7 @@ module App
 
     config.middleware.insert_before 0, CorpMiddleware
     config.generators.system_tests = nil
+
+    config.bypass_oauth = ENV.fetch('BYPASS_OAUTH', nil) == 'true'
   end
 end

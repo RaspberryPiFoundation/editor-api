@@ -22,7 +22,7 @@ class AuthController < ApplicationController
     reset_session
 
     # Prevent redirect loops etc.
-    if ENV.fetch('BYPASS_OAUTH', nil) == 'true'
+    if Rails.configuration.bypass_oauth
       redirect_to root_path
       return
     end

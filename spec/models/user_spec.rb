@@ -85,11 +85,9 @@ RSpec.describe User do
       end
     end
 
-    context 'when BYPASS_OAUTH is true' do
-      around do |example|
-        ClimateControl.modify(BYPASS_OAUTH: 'true') do
-          example.run
-        end
+    context 'when the app is configured to bypass oauth' do
+      before do
+        allow(Rails.configuration).to receive(:bypass_oauth).and_return(true)
       end
 
       it 'does not call the API' do
@@ -297,14 +295,12 @@ RSpec.describe User do
       expect(user.email).to eq 'school-owner@example.com'
     end
 
-    context 'when BYPASS_OAUTH is true' do
-      around do |example|
-        ClimateControl.modify(BYPASS_OAUTH: 'true') do
-          example.run
-        end
-      end
-
+    context 'when the app is configured to bypass oauth' do
       let(:owner) { create(:owner, school:, id: '00000000-0000-0000-0000-000000000000') }
+
+      before do
+        allow(Rails.configuration).to receive(:bypass_oauth).and_return(true)
+      end
 
       it 'does not call the API' do
         user
