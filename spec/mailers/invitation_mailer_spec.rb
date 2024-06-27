@@ -9,7 +9,7 @@ RSpec.describe InvitationMailer do
     let(:invitation) { create(:teacher_invitation) }
 
     before do
-      allow(ENV).to receive(:fetch).with('EDITOR_PUBLIC_URL').and_return('http://example.com')
+      allow(Rails.configuration).to receive(:editor_public_url).and_return('http://example.com')
     end
 
     it 'includes the school name in the body' do
