@@ -12,11 +12,7 @@ class HydraPublicApiClient
   end
 
   def fetch_oauth_user(token:)
-    if bypass_oauth?
-      users = stubbed_data['users']
-      user = users.detect { |attr| attr['id'] == '00000000-0000-0000-0000-000000000000' }
-      return user
-    end
+    return stubbed_user if bypass_oauth?
 
     response = get('userinfo', {}, { Authorization: "Bearer #{token}" })
     response.body.to_h
@@ -31,11 +27,25 @@ class HydraPublicApiClient
     ENV.fetch('BYPASS_OAUTH', nil) == 'true'
   end
 
-  def stubbed_data
-    path = Rails.root.join('spec/fixtures/users.json')
-    json = File.read(path)
-
-    JSON.parse(json)
+  def stubbed_user
+    {
+      id: '00000000-0000-0000-0000-000000000000',
+      email: 'school-owner@example.com',
+      username: nil,
+      parentalEmail: nil,
+      name: 'School Owner',
+      nickname: 'Owner',
+      country: 'United Kingdom',
+      country_code: 'GB',
+      postcode: nil,
+      dateOfBirth: nil,
+      verifiedAt: '2024-01-01T12:00:00.000Z',
+      createdAt: '2024-01-01T12:00:00.000Z',
+      updatedAt: '2024-01-01T12:00:00.000Z',
+      discardedAt: nil,
+      lastLoggedInAt: '2024-01-01T12:00:00.000Z',
+      roles: ''
+    }
   end
 
   def conn
