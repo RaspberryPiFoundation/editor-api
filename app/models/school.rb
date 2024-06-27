@@ -19,8 +19,14 @@ class School < ApplicationRecord
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
   validates :rejected_at, absence: { if: proc { |school| school.verified? } }
   validates :verified_at, absence: { if: proc { |school| school.rejected? } }
+  validates :code,
+            uniqueness: { allow_nil: true },
+            presence: { if: proc { |school| school.verified? } },
+            absence: { unless: proc { |school| school.verified? } },
+            format: { with: /\d\d-\d\d-\d\d/, allow_nil: true }
   validate :verified_at_cannot_be_changed
   validate :rejected_at_cannot_be_changed
+  validate :code_cannot_be_changed
 
   before_validation :normalize_reference
 
@@ -44,7 +50,15 @@ class School < ApplicationRecord
   end
 
   def verify!
-    update!(verified_at: Time.zone.now)
+    attempts = 0
+    begin
+      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate)
+    rescue ActiveRecord::RecordInvalid => e
+      raise unless e.record.errors[:code].include?('has already been taken') && attempts <= 5
+
+      attempts += 1
+      retry
+    end
   end
 
   def reject
@@ -64,5 +78,9 @@ class School < ApplicationRecord
 
   def rejected_at_cannot_be_changed
     errors.add(:rejected_at, 'cannot be changed after rejection') if rejected_at_was.present? && rejected_at_changed?
+  end
+
+  def code_cannot_be_changed
+    errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
   end
 end

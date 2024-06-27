@@ -5,7 +5,7 @@ module Admin
     def verify
       service = SchoolVerificationService.new(requested_resource)
 
-      if service.verify
+      if service.verify(token: current_user.token)
         flash[:notice] = t('administrate.controller.verify_school.success')
       else
         flash[:error] = t('administrate.controller.verify_school.error')

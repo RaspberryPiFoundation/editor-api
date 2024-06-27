@@ -242,6 +242,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_06_24_122250) do
     t.string "creator_department"
     t.boolean "creator_agree_authority"
     t.boolean "creator_agree_terms_and_conditions"
+    t.string "code"
+    t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true
   end

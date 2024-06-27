@@ -14,5 +14,6 @@ FactoryBot.define do
 
   factory :verified_school, parent: :school do
     verified_at { Time.current }
+    code { SchoolCodeGenerator.generate }
   end
 end

@@ -4,6 +4,22 @@ class ProfileApiClient
   class << self
     # TODO: Replace with HTTP requests once the profile API has been built.
 
+    def create_school(token:, school:)
+      return { 'id' => school.id, 'schoolCode' => school.code } if ENV['BYPASS_OAUTH'].present?
+
+      response = connection.post('/api/v1/schools') do |request|
+        apply_default_headers(request, token)
+        request.body = {
+          id: school.id,
+          schoolCode: school.code
+        }.to_json
+      end
+
+      raise "School not created in Profile API. HTTP response code: #{response.status}" unless response.status == 201
+
+      JSON.parse(response.body)
+    end
+
     # The API should enforce these constraints:
     # - The token has the school-owner or school-teacher role for the given organisation ID
     # - The token user or given user should not be under 13
@@ -180,6 +196,20 @@ class ProfileApiClient
       # code so that SchoolOwner::Remove propagates the error in the response.
       response = {}
       response.deep_symbolize_keys
+    end
+
+    private
+
+    def connection
+      Faraday.new(ENV.fetch('IDENTITY_URL'))
+    end
+
+    def apply_default_headers(request, token)
+      request.headers['Accept'] = 'application/json'
+      request.headers['Authorization'] = "Bearer #{token}"
+      request.headers['Content-Type'] = 'application/json'
+      request.headers['X-API-KEY'] = ENV.fetch('PROFILE_API_KEY')
+      request
     end
   end
 end
