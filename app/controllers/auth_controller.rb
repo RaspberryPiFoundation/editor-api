@@ -22,7 +22,7 @@ class AuthController < ApplicationController
     reset_session
 
     # Prevent redirect loops etc.
-    if ENV['BYPASS_OAUTH'].present?
+    if ENV.fetch('BYPASS_OAUTH', nil) == 'true'
       redirect_to root_path
       return
     end
