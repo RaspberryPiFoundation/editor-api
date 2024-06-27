@@ -27,7 +27,7 @@ class AuthController < ApplicationController
       return
     end
 
-    redirect_to "#{ENV.fetch('IDENTITY_URL')}/logout?returnTo=#{ENV.fetch('HOST_URL')}",
+    redirect_to "#{Rails.configuration.identity_url}/logout?returnTo=#{ENV.fetch('HOST_URL', nil)}",
                 allow_other_host: true
   end
 

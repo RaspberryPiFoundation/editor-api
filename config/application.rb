@@ -59,5 +59,6 @@ module App
     config.generators.system_tests = nil
 
     config.bypass_oauth = ENV.fetch('BYPASS_OAUTH', nil) == 'true'
+    config.identity_url = ENV.fetch('IDENTITY_URL')
   end
 end
