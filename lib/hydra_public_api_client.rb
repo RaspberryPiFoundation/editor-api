@@ -24,7 +24,7 @@ class HydraPublicApiClient
   private
 
   def bypass_oauth?
-    ENV.fetch('BYPASS_OAUTH', nil) == 'true'
+    Rails.configuration.bypass_oauth
   end
 
   def stubbed_user

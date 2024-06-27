@@ -4,12 +4,13 @@ require 'rails_helper'
 
 RSpec.describe UploadJob do
   around do |example|
-    ClimateControl.modify GITHUB_AUTH_TOKEN: 'secret', GITHUB_WEBHOOK_REF: 'branches/whatever' do
+    ClimateControl.modify GITHUB_AUTH_TOKEN: 'secret' do
       example.run
     end
   end
 
   ActiveJob::Base.queue_adapter = :test
+  let(:github_webhook_ref) { 'branches/whatever' }
   let(:graphql_response) do
     GraphQL::Client::Response.new(raw_response, data: UploadJob::ProjectContentQuery.new(raw_response['data'], GraphQL::Client::Errors.new))
   end
@@ -17,7 +18,7 @@ RSpec.describe UploadJob do
     { repository: { name: 'my-amazing-repo', owner: { name: 'me' } }, commits: [{ added: ['ja-JP/code/dont-collide-starter/main.py'], modified: [], removed: [] }] }
   end
   let(:variables) do
-    { repository: 'my-amazing-repo', owner: 'me', expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:ja-JP/code" }
+    { repository: 'my-amazing-repo', owner: 'me', expression: "#{github_webhook_ref}:ja-JP/code" }
   end
 
   let(:raw_response) do
@@ -93,6 +94,7 @@ RSpec.describe UploadJob do
   end
 
   before do
+    allow(Rails.configuration.x.github_webhook).to receive(:ref).and_return(github_webhook_ref)
     allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
     stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
     allow(ProjectImporter).to receive(:new).and_call_original
