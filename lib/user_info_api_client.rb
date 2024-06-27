@@ -5,20 +5,9 @@ class UserInfoApiClient
   API_KEY = ENV.fetch('USERINFO_API_KEY', '1234')
 
   class << self
-    def fetch_by_email(user_email)
-      return if user_email.blank?
-
-      return stubbed_by_email(user_email) if bypass_oauth?
-
-      response = conn.get { |r| r.url "/users/#{user_email}" }
-      return if response.body.blank?
-
-      transform_result(response.body.fetch('user', []))
-    end
-
     def fetch_by_ids(user_ids)
       return [] if user_ids.blank?
-      return stubbed_by_ids(user_ids) if bypass_oauth?
+      return stubbed_users(user_ids) if bypass_oauth?
 
       response = conn.get do |r|
         r.url '/users'
@@ -51,21 +40,27 @@ class UserInfoApiClient
       end
     end
 
-    def stubbed_data
-      path = Rails.root.join('spec/fixtures/users.json')
-      json = File.read(path)
-
-      JSON.parse(json)
-    end
-
-    def stubbed_by_email(user_email)
-      data = stubbed_data.fetch('users', nil).find { |d| d['email'] == user_email }
-      transform_result(data)
-    end
-
-    def stubbed_by_ids(user_ids)
-      data = stubbed_data.fetch('users', nil).find_all { |d| user_ids.include?(d['id']) }
-      transform_result(data)
+    def stubbed_users(user_ids)
+      user_ids.map do |user_id|
+        {
+          id: user_id,
+          email: "user-#{user_id}@example.com",
+          username: nil,
+          parentalEmail: nil,
+          name: 'School Owner',
+          nickname: 'Owner',
+          country: 'United Kingdom',
+          country_code: 'GB',
+          postcode: nil,
+          dateOfBirth: nil,
+          verifiedAt: '2024-01-01T12:00:00.000Z',
+          createdAt: '2024-01-01T12:00:00.000Z',
+          updatedAt: '2024-01-01T12:00:00.000Z',
+          discardedAt: nil,
+          lastLoggedInAt: '2024-01-01T12:00:00.000Z',
+          roles: ''
+        }
+      end
     end
   end
 end
