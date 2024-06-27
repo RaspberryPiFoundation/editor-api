@@ -4,13 +4,17 @@ class GithubWebhooksController < ActionController::API
   include GithubWebhook::Processor
 
   def github_push(payload)
-    UploadJob.perform_later(payload) if payload[:ref] == ENV.fetch('GITHUB_WEBHOOK_REF') && edited_code?(payload)
+    UploadJob.perform_later(payload) if payload[:ref] == webhook_ref && edited_code?(payload)
   end
 
   private
 
   def webhook_secret(_payload)
     Rails.configuration.x.github_webhook.secret
+  end
+
+  def webhook_ref
+    ENV.fetch('GITHUB_WEBHOOK_REF')
   end
 
   def edited_code?(payload)
