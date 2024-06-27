@@ -30,7 +30,7 @@ module SchoolStudent
       def validate(school:, sheet:)
         expected_header = ['Student Name', 'Username', 'Password']
 
-        raise ArgumentError, 'school is not verified' unless school.verified_at
+        raise ArgumentError, 'school is not verified' unless school.verified?
         raise ArgumentError, 'the spreadsheet header row is invalid' unless sheet.row(1) == expected_header
 
         @errors = []

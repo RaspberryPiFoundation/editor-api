@@ -13,9 +13,8 @@ module Api
     end
 
     def accept
-      role = Role.teacher.build(user_id: current_user.id, school: @invitation.school)
-      if role.valid?
-        role.save
+      role = Role.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school)
+      if role.save
         @invitation.update!(accepted_at: Time.current) if @invitation.accepted_at.blank?
         head :ok
       else

@@ -9,7 +9,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school, verified_at: Time.zone.now) }
+  let(:school) { create(:verified_school) }
   let(:student_id) { SecureRandom.uuid }
   let(:owner) { create(:owner, school:) }
 

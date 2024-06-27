@@ -17,6 +17,10 @@ class School < ApplicationRecord
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
+  validates :rejected_at, absence: { if: proc { |school| school.verified? } }
+  validates :verified_at, absence: { if: proc { |school| school.rejected? } }
+  validate :verified_at_cannot_be_changed
+  validate :rejected_at_cannot_be_changed
 
   before_validation :normalize_reference
 
@@ -31,10 +35,34 @@ class School < ApplicationRecord
     User.from_userinfo(ids: creator_id).first
   end
 
+  def verified?
+    verified_at.present?
+  end
+
+  def rejected?
+    rejected_at.present?
+  end
+
+  def verify!
+    update!(verified_at: Time.zone.now)
+  end
+
+  def reject
+    update(rejected_at: Time.zone.now)
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string
   def normalize_reference
     self.reference = nil if reference.blank?
+  end
+
+  def verified_at_cannot_be_changed
+    errors.add(:verified_at, 'cannot be changed after verification') if verified_at_was.present? && verified_at_changed?
+  end
+
+  def rejected_at_cannot_be_changed
+    errors.add(:rejected_at, 'cannot be changed after rejection') if rejected_at_was.present? && rejected_at_changed?
   end
 end

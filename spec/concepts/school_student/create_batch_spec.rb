@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolStudent::CreateBatch, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
-  let(:school) { create(:school, verified_at: Time.zone.now) }
+  let(:school) { create(:verified_school) }
   let(:file) { fixture_file_upload('students.csv') }
 
   before do

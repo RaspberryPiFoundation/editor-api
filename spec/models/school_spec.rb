@@ -177,6 +177,30 @@ RSpec.describe School do
       school.creator_agree_terms_and_conditions = false
       expect(school).to be_invalid
     end
+
+    it 'cannot have #rejected_at set when #verified_at is present' do
+      school.verify!
+      school.reject
+      expect(school.errors[:rejected_at]).to include('must be blank')
+    end
+
+    it 'cannot have #verified_at set when #rejected_at is present' do
+      school.reject
+      school.update(verified_at: Time.zone.now)
+      expect(school.errors[:verified_at]).to include('must be blank')
+    end
+
+    it "cannot change #verified_at once it's been set" do
+      school.verify!
+      school.update(verified_at: nil)
+      expect(school.errors[:verified_at]).to include('cannot be changed after verification')
+    end
+
+    it "cannot change #rejected_at once it's been set" do
+      school.reject
+      school.update(rejected_at: nil)
+      expect(school.errors[:rejected_at]).to include('cannot be changed after rejection')
+    end
   end
 
   describe '#creator' do
@@ -215,6 +239,62 @@ RSpec.describe School do
     it "raises ActiveRecord::RecordNotFound if the user doesn't have a role in a school" do
       user = build(:user)
       expect { described_class.find_for_user!(user) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe '#verified?' do
+    it 'returns true when verified_at is present' do
+      school.verified_at = Time.zone.now
+      expect(school).to be_verified
+    end
+
+    it 'returns false when verified_at is blank' do
+      school.verified_at = nil
+      expect(school).not_to be_verified
+    end
+  end
+
+  describe '#rejected?' do
+    it 'returns true when rejected_at is present' do
+      school.rejected_at = Time.zone.now
+      expect(school).to be_rejected
+    end
+
+    it 'returns false when rejected_at is blank' do
+      school.rejected_at = nil
+      expect(school).not_to be_rejected
+    end
+  end
+
+  describe '#verify!' do
+    it 'sets verified_at to the current time' do
+      school.verify!
+      expect(school.verified_at).to be_within(1.second).of(Time.zone.now)
+    end
+
+    it 'returns true on successful verification' do
+      expect(school.verify!).to be(true)
+    end
+
+    it 'raises ActiveRecord::RecordInvalid if verification fails' do
+      school.rejected_at = Time.zone.now
+      expect { school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe '#reject' do
+    it 'sets rejected_at to the current time' do
+      school.reject
+      expect(school.rejected_at).to be_within(1.second).of(Time.zone.now)
+    end
+
+    it 'returns true on successful rejection' do
+      expect(school.reject).to be(true)
+    end
+
+    it 'returns false on unsuccessful rejection' do
+      school.verified_at = Time.zone.now
+      expect(school.reject).to be(false)
     end
   end
 end

@@ -16,7 +16,7 @@ class TeacherInvitation < ApplicationRecord
   private
 
   def school_is_verified
-    return if school.verified_at
+    return if school.verified?
 
     errors.add(:school, 'is not verified')
   end
