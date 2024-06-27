@@ -5,17 +5,6 @@ class UserInfoApiClient
   API_KEY = ENV.fetch('USERINFO_API_KEY', '1234')
 
   class << self
-    def fetch_by_email(user_email)
-      return if user_email.blank?
-
-      return stubbed_by_email(user_email) if bypass_oauth?
-
-      response = conn.get { |r| r.url "/users/#{user_email}" }
-      return if response.body.blank?
-
-      transform_result(response.body.fetch('user', []))
-    end
-
     def fetch_by_ids(user_ids)
       return [] if user_ids.blank?
       return stubbed_by_ids(user_ids) if bypass_oauth?
@@ -56,11 +45,6 @@ class UserInfoApiClient
       json = File.read(path)
 
       JSON.parse(json)
-    end
-
-    def stubbed_by_email(user_email)
-      data = stubbed_data.fetch('users', nil).find { |d| d['email'] == user_email }
-      transform_result(data)
     end
 
     def stubbed_by_ids(user_ids)
