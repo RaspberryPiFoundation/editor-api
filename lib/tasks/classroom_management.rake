@@ -27,7 +27,8 @@ namespace :classroom_management do
         exit
       end
 
-      Project.where(school_id:).destroy_all
+      lesson_id = Lesson.where(school_id:).pluck(:id)
+      Project.where(lesson_id:).destroy_all
       # The `before_destroy` prevents us using destroy, but as we've removed projects already we can safely delete
       Lesson.where(school_id:).delete_all
       SchoolClass.where(school_id:).destroy_all

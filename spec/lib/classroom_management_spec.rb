@@ -16,7 +16,6 @@ RSpec.describe 'classroom_management', type: :task do
       create(:teacher_role, user_id: creator_id, school:)
       create(:school_class, school_id: school.id, teacher_id: creator_id)
       create(:lesson, school_id: school.id, user_id: creator_id)
-      create(:project, school_id: school.id, user_id: creator_id)
     end
 
     # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
