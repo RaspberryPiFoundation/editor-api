@@ -9,7 +9,6 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  # let(:project) { create(:project, user_id: owner.id) }
   let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
   let(:owner) { create(:owner, school:, name: 'School Owner') }
   let(:teacher) { create(:teacher, school:) }
