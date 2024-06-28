@@ -18,7 +18,7 @@ class Lesson
 
       def build_lesson(lesson_hash)
         new_lesson = Lesson.new(lesson_hash.except(:project_attributes))
-        project_params = lesson_hash[:project_attributes].merge({ user_id: lesson_hash[:user_id] })
+        project_params = lesson_hash[:project_attributes].merge({ user_id: lesson_hash[:user_id], school_id: lesson_hash[:school_id] })
         project_creation_response = Project::Create.call(project_hash: project_params)
         new_lesson.project = project_creation_response[:project]
         new_lesson

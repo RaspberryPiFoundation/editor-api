@@ -6,5 +6,6 @@ FactoryBot.define do
     sequence(:name) { |n| "Lesson #{n}" }
     description { 'Description' }
     visibility { 'private' }
+    project { create(:project) }
   end
 end
