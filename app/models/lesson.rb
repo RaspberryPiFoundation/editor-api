@@ -5,7 +5,8 @@ class Lesson < ApplicationRecord
   belongs_to :school_class, optional: true
   belongs_to :parent, optional: true, class_name: :Lesson, foreign_key: :copied_from_id, inverse_of: :copies
   has_many :copies, dependent: :nullify, class_name: :Lesson, foreign_key: :copied_from_id, inverse_of: :parent
-  has_many :projects, dependent: :nullify
+  has_one :project, dependent: :nullify
+  accepts_nested_attributes_for :project
 
   before_validation :assign_school_from_school_class
   before_destroy -> { throw :abort }

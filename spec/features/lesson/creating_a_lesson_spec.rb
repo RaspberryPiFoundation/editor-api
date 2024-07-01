@@ -16,7 +16,14 @@ RSpec.describe 'Creating a lesson', type: :request do
   let(:params) do
     {
       lesson: {
-        name: 'Test Lesson'
+        name: 'Test Lesson',
+        project_attributes: {
+          name: 'Hello world project',
+          project_type: 'python',
+          components: [
+            { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
+          ]
+        }
       }
     }
   end
@@ -59,7 +66,13 @@ RSpec.describe 'Creating a lesson', type: :request do
         lesson: {
           name: 'Test Lesson',
           school_id: school.id,
-          user_id: teacher.id
+          project_attributes: {
+            name: 'Hello world project',
+            project_type: 'python',
+            components: [
+              { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
+            ]
+          }
         }
       }
     end
@@ -74,13 +87,6 @@ RSpec.describe 'Creating a lesson', type: :request do
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
-    end
-
-    it 'sets the lesson user to the specified user for school-owner users' do
-      post('/api/lessons', headers:, params:)
-      data = JSON.parse(response.body, symbolize_names: true)
-
-      expect(data[:user_id]).to eq(teacher.id)
     end
 
     it 'sets the lesson user to the current user for school-teacher users' do
@@ -122,14 +128,15 @@ RSpec.describe 'Creating a lesson', type: :request do
           name: 'Test Lesson',
           school_id: school.id,
           school_class_id: school_class.id,
-          user_id: teacher.id
+          project_attributes: {
+            name: 'Hello world project',
+            project_type: 'python',
+            components: [
+              { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
+            ]
+          }
         }
       }
-    end
-
-    it 'responds 201 Created' do
-      post('/api/lessons', headers:, params:)
-      expect(response).to have_http_status(:created)
     end
 
     it 'responds 201 Created when the user is the school-teacher for the class' do

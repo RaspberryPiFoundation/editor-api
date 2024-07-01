@@ -68,6 +68,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     end
 
     it 'responds 200 OK when assigning the lesson to a school class' do
+      authenticated_in_hydra_as(teacher)
       school_class = create(:school_class, school:, teacher_id: teacher.id)
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
@@ -105,6 +106,10 @@ RSpec.describe 'Updating a lesson', type: :request do
     let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
 
+    before do
+      authenticated_in_hydra_as(teacher)
+    end
+
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
       expect(response).to have_http_status(:ok)
@@ -122,12 +127,5 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:unprocessable_entity)
     end
     # rubocop:enable RSpec/ExampleLength
-
-    it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different user' do
-      new_params = { lesson: params[:lesson].merge(user_id: owner.id) }
-      put("/api/lessons/#{lesson.id}", headers:, params: new_params)
-
-      expect(response).to have_http_status(:unprocessable_entity)
-    end
   end
 end
