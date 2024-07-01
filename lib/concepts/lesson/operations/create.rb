@@ -10,7 +10,12 @@ class Lesson
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = "Error creating lesson: #{e}"
+        if response[:lesson].nil?
+          response[:error] = "Error creating lesson #{e}"
+        else
+          errors = response[:lesson].errors.full_messages.join(',')
+          response[:error] = "Error creating lesson: #{errors}"
+        end
         response
       end
 

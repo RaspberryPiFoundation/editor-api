@@ -123,7 +123,6 @@ RSpec.describe Lesson::Create, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(lesson_params:)
-      pp response[:error]
       expect(response[:error]).to match(/Error creating lesson/)
     end
 
