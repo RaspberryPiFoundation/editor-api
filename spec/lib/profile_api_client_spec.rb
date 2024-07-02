@@ -229,4 +229,57 @@ RSpec.describe ProfileApiClient do
       described_class.create_safeguarding_flag(token:, flag:)
     end
   end
+
+  describe '.delete_safeguarding_flag' do
+    let(:flag) { 'school:owner' }
+    let(:delete_safeguarding_flag_url) { "#{api_url}/api/v1/safeguarding-flags/#{flag}" }
+
+    before do
+      stub_request(:delete, delete_safeguarding_flag_url).to_return(status: 204, body: '')
+    end
+
+    it 'makes a request to the profile api host' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets accept header to json' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'returns empty body if successful' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 204, body: '')
+      expect(delete_safeguarding_flag).to be_nil
+    end
+
+    it 'raises exception if anything other than a 204 status code is returned' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 200)
+
+      expect { delete_safeguarding_flag }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 401)
+
+      expect { delete_safeguarding_flag }.to raise_error('Safeguarding flag not deleted from Profile API (status code 401)')
+    end
+
+    def delete_safeguarding_flag
+      described_class.delete_safeguarding_flag(token:, flag:)
+    end
+  end
 end

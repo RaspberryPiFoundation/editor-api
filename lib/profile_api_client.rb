@@ -222,6 +222,14 @@ class ProfileApiClient
       raise "Safeguarding flag not created in Profile API (status code #{response.status})"
     end
 
+    def delete_safeguarding_flag(token:, flag:)
+      response = connection(token).delete("/api/v1/safeguarding-flags/#{flag}")
+
+      return if response.status == 204
+
+      raise "Safeguarding flag not deleted from Profile API (status code #{response.status})"
+    end
+
     private
 
     def connection(token)
