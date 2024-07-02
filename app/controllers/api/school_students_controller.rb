@@ -5,6 +5,7 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource :school
     authorize_resource :school_student, class: false
+    before_action :create_safeguarding_flags
 
     def index
       result = SchoolStudent::List.call(school: @school, token: current_user.token)
@@ -61,6 +62,29 @@ module Api
 
     def school_student_params
       params.require(:school_student).permit(:username, :password, :name)
+    end
+
+    def create_safeguarding_flags
+      create_teacher_safeguarding_flag
+      create_owner_safeguarding_flag
+    end
+
+    def create_teacher_safeguarding_flag
+      return unless current_user.school_teacher?(@school)
+
+      ProfileApiClient.create_safeguarding_flag(
+        token: current_user.token,
+        flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher]
+      )
+    end
+
+    def create_owner_safeguarding_flag
+      return unless current_user.school_owner?(@school)
+
+      ProfileApiClient.create_safeguarding_flag(
+        token: current_user.token,
+        flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner]
+      )
     end
   end
 end
