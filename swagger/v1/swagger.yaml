@@ -1,0 +1,1251 @@
+# This document can be generated with the following command: 
+#   appmap openapi
+#
+# Some helpful options:
+#   --output-file        output file name
+#   --openapi-title      title field of the OpenAPI document
+#   --openapi-version    version field of the OpenAPI document
+#
+# For more info, run:
+#   appmap openapi --help
+#
+# Visit our docs: https://appmap.io/docs/openapi.html
+#
+openapi: 3.0.1
+info:
+  title: My project
+  version: v1
+paths:
+  /:
+    get:
+      responses:
+        '200':
+          content:
+            text/html: {}
+          description: OK
+  /admin:
+    get:
+      responses:
+        '200':
+          content:
+            text/html: {}
+          description: OK
+        '302':
+          content:
+            text/html: {}
+          description: Found
+  /admin/schools:
+    get:
+      responses:
+        '200':
+          content:
+            text/html: {}
+          description: OK
+  /api-docs/favicon-32x32.png:
+    get:
+      responses:
+        '304':
+          content: {}
+          description: Not Modified
+  /api-docs/index.html:
+    get:
+      responses:
+        '304':
+          content: {}
+          description: Not Modified
+  /api-docs/swagger-ui-bundle.js:
+    get:
+      responses:
+        '304':
+          content: {}
+          description: Not Modified
+  /api-docs/swagger-ui-standalone-preset.js:
+    get:
+      responses:
+        '304':
+          content: {}
+          description: Not Modified
+  /api-docs/swagger-ui.css:
+    get:
+      responses:
+        '304':
+          content: {}
+          description: Not Modified
+  /api-docs/v1/swagger.yaml:
+    get:
+      responses:
+        '200':
+          content:
+            text/yaml: {}
+          description: OK
+  /api/lessons:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+      security:
+        - api_key: []
+      parameters:
+        - name: include_archived
+          in: query
+          schema:
+            type: string
+        - name: school_class_id
+          in: query
+          schema:
+            type: string
+    post:
+      responses:
+        '201':
+          content:
+            application/json: {}
+          description: Created
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+            text/html: {}
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                lesson:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+  /api/lessons/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+      parameters:
+        - name: undo
+          in: query
+          schema:
+            type: string
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+    put:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                lesson:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+  /api/lessons/{id}/copy:
+    post:
+      responses:
+        '201':
+          content:
+            application/json: {}
+          description: Created
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                lesson:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    visibility:
+                      type: string
+  /api/projects:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+      security:
+        - api_key: []
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: string
+    post:
+      responses:
+        '201':
+          content:
+            application/json: {}
+          description: Created
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+            text/html: {}
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                project:
+                  type: object
+                  properties:
+                    components:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          content:
+                            type: string
+                          extension:
+                            type: string
+                          name:
+                            type: string
+                    name:
+                      type: string
+  /api/projects/{id}:
+    delete:
+      responses:
+        '200':
+          content:
+            text/html: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+      parameters:
+        - name: locale
+          in: query
+          schema:
+            type: string
+    put:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                project:
+                  type: object
+                  properties:
+                    components:
+                      type: array
+                      items:
+                        type: string
+  /api/projects/{project_id}/images:
+    post:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                images:
+                  type: array
+                  items:
+                    type: object
+  /api/projects/{project_id}/remix:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+    post:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                project:
+                  type: object
+                  properties:
+                    components:
+                      type: array
+                      items:
+                        type: string
+                    identifier:
+                      type: string
+                    name:
+                      type: string
+  /api/school:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+  /api/schools:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+      security:
+        - api_key: []
+    post:
+      responses:
+        '201':
+          content:
+            application/json: {}
+          description: Created
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      address_line_1:
+                        type: array
+                        items:
+                          type: string
+                      country_code:
+                        type: array
+                        items:
+                          type: string
+                      creator_agree_authority:
+                        type: array
+                        items:
+                          type: string
+                      creator_agree_terms_and_conditions:
+                        type: array
+                        items:
+                          type: string
+                      municipality:
+                        type: array
+                        items:
+                          type: string
+                      name:
+                        type: array
+                        items:
+                          type: string
+                      website:
+                        type: array
+                        items:
+                          type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school:
+                  type: object
+                  properties:
+                    address_line_1:
+                      type: string
+                    country_code:
+                      type: string
+                    creator_agree_authority:
+                      type: string
+                    creator_agree_terms_and_conditions:
+                      type: string
+                    municipality:
+                      type: string
+                    name:
+                      type: string
+                    website:
+                      type: string
+  /api/schools/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+    put:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+  /api/schools/{school_id}/classes:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+      security:
+        - api_key: []
+    post:
+      responses:
+        '201':
+          content:
+            application/json: {}
+          description: Created
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_class:
+                  type: object
+                  properties:
+                    description:
+                      type: string
+                    name:
+                      type: string
+  /api/schools/{school_id}/classes/{class_id}/members:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    post:
+      responses:
+        '201':
+          content:
+            application/json: {}
+          description: Created
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                class_member:
+                  type: object
+                  properties:
+                    student_id:
+                      type: string
+  /api/schools/{school_id}/classes/{class_id}/members/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+  /api/schools/{school_id}/classes/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+    put:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_class:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+  /api/schools/{school_id}/owners:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    post:
+      responses:
+        '201':
+          content:
+            text/html: {}
+          description: Created
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_owner:
+                  type: object
+                  properties:
+                    email_address:
+                      type: string
+  /api/schools/{school_id}/owners/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+  /api/schools/{school_id}/students:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    post:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_student:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    password:
+                      type: string
+                    username:
+                      type: string
+  /api/schools/{school_id}/students/batch:
+    post:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: object
+  /api/schools/{school_id}/students/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    put:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_student:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    password:
+                      type: string
+                    username:
+                      type: string
+  /api/schools/{school_id}/teachers:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+    post:
+      responses:
+        '201':
+          content:
+            text/html: {}
+          description: Created
+        '400':
+          content:
+            text/html: {}
+          description: Bad Request
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_teacher:
+                  type: object
+                  properties:
+                    email_address:
+                      type: string
+  /api/schools/{school_id}/teachers/{id}:
+    delete:
+      responses:
+        '204':
+          content: {}
+          description: No Content
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            text/html: {}
+          description: Forbidden
+      security:
+        - api_key: []
+  /api/teacher_invitations/{token}:
+    get:
+      responses:
+        '200':
+          content:
+            application/json: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+      security:
+        - api_key: []
+  /api/teacher_invitations/{token}/accept:
+    put:
+      responses:
+        '200':
+          content:
+            text/html: {}
+          description: OK
+        '401':
+          content:
+            text/html: {}
+          description: Unauthorized
+        '403':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+            text/html: {}
+          description: Forbidden
+        '404':
+          content:
+            text/html: {}
+          description: Not Found
+        '422':
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: object
+                    properties:
+                      base:
+                        type: array
+                        items:
+                          type: string
+          description: Unprocessable Entity
+      security:
+        - api_key: []
+  /graphql:
+    post:
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: object
+          description: OK
+      security:
+        - api_key: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operationName:
+                  type: string
+                query:
+                  type: string
+                variables:
+                  type: object
+                  properties:
+                    key:
+                      type: string
+components: {}
+
