@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class ProfileApiClient
+  SAFEGUARDING_FLAGS = {
+    teacher: 'school:teacher',
+    owner: 'school:owner'
+  }.freeze
+
   class << self
     # TODO: Replace with HTTP requests once the profile API has been built.
 
@@ -142,18 +147,22 @@ class ProfileApiClient
     # The API should respond:
     # - 404 Not Found if the user doesn't exist
     # - 422 Unprocessable if the constraints are not met
-    def create_school_student(token:, username:, password:, name:, organisation_id:)
+    def create_school_student(token:, username:, password:, name:, school:)
       return nil if token.blank?
 
-      _ = username
-      _ = password
-      _ = name
-      _ = organisation_id
+      response = connection.post("/api/v1/schools/#{school.id}/students") do |request|
+        apply_default_headers(request, token)
+        request.body = [{
+          name:,
+          username:,
+          password:
+        }].to_json
+      end
 
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolStudent::Create propagates the error in the response.
-      response = {}
-      response.deep_symbolize_keys
+      raise "Student not created in Profile API. #{JSON.parse(response.body)}" if response.status == 422
+      raise "Student not created in Profile API. HTTP response code: #{response.status}" unless response.status == 201
+
+      JSON.parse(response.body)
     end
 
     # The API should enforce these constraints:
@@ -198,10 +207,45 @@ class ProfileApiClient
       response.deep_symbolize_keys
     end
 
+    def safeguarding_flags(token:)
+      response = connection.get('/api/v1/safeguarding-flags') do |request|
+        apply_default_headers(request, token)
+      end
+
+      unless response.status == 200
+        raise "Safeguarding flags cannot be retrieved from Profile API. HTTP response code: #{response.status}"
+      end
+
+      JSON.parse(response.body)
+    end
+
+    def create_safeguarding_flag(token:, flag:)
+      response = connection.post('/api/v1/safeguarding-flags') do |request|
+        apply_default_headers(request, token)
+        request.body = { flag: }.to_json
+      end
+
+      return if response.status == 201 || response.status == 303
+
+      raise "Safeguarding flag not created in Profile API. HTTP response code: #{response.status}"
+    end
+
+    def delete_safeguarding_flag(token:, flag:)
+      response = connection.delete("/api/v1/safeguarding-flags/#{flag}") do |request|
+        apply_default_headers(request, token)
+      end
+
+      return if response.status == 204
+
+      raise "Safeguarding flag not deleted from Profile API. HTTP response code: #{response.status}"
+    end
+
     private
 
     def connection
-      Faraday.new(ENV.fetch('IDENTITY_URL'))
+      Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
+        faraday.response :logger
+      end
     end
 
     def apply_default_headers(request, token)

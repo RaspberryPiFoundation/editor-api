@@ -28,7 +28,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'student-to-create', password: 'at-least-8-characters', name: 'School Student', organisation_id: school.id)
+      .with(token:, username: 'student-to-create', password: 'at-least-8-characters', name: 'School Student', school:)
   end
 
   context 'when creation fails' do

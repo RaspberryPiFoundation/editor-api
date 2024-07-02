@@ -16,14 +16,13 @@ module SchoolStudent
       private
 
       def create_student(school, school_student_params, token)
-        organisation_id = school.id
         username = school_student_params.fetch(:username)
         password = school_student_params.fetch(:password)
         name = school_student_params.fetch(:name)
 
         validate(school:, username:, password:, name:)
 
-        ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id:)
+        ProfileApiClient.create_school_student(token:, username:, password:, name:, school:)
       end
 
       def validate(school:, username:, password:, name:)

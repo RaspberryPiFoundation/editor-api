@@ -3,68 +3,73 @@
 require 'rails_helper'
 
 RSpec.describe ProfileApiClient do
+  let(:api_url) { 'http://example.com' }
+  let(:api_key) { 'api-key' }
+  let(:token) { SecureRandom.uuid }
+
+  before do
+    allow(ENV).to receive(:fetch).with('IDENTITY_URL').and_return(api_url)
+    allow(ENV).to receive(:fetch).with('PROFILE_API_KEY').and_return(api_key)
+  end
+
   describe '.create_school' do
-    let(:api_url) { 'http://example.com' }
-    let(:api_key) { 'api-key' }
-    let(:token) { SecureRandom.uuid }
+    let(:create_school_url) { "#{api_url}/api/v1/schools" }
     let(:school) { build(:school, id: SecureRandom.uuid, code: SecureRandom.uuid) }
 
     before do
-      stub_request(:post, "#{api_url}/api/v1/schools").to_return(status: 201, body: '{}')
-      allow(ENV).to receive(:fetch).with('IDENTITY_URL').and_return(api_url)
-      allow(ENV).to receive(:fetch).with('PROFILE_API_KEY').and_return(api_key)
+      stub_request(:post, create_school_url).to_return(status: 201, body: '{}')
     end
 
     it 'makes a request to the profile api host' do
-      described_class.create_school(token:, school:)
-      expect(WebMock).to have_requested(:post, "#{api_url}/api/v1/schools")
+      create_school
+      expect(WebMock).to have_requested(:post, create_school_url)
     end
 
     it 'includes token in the authorization request header' do
-      described_class.create_school(token:, school:)
-      expect(WebMock).to have_requested(:post, "#{api_url}/api/v1/schools").with(headers: { authorization: "Bearer #{token}" })
+      create_school
+      expect(WebMock).to have_requested(:post, create_school_url).with(headers: { authorization: "Bearer #{token}" })
     end
 
     it 'includes the profile api key in the x-api-key request header' do
-      described_class.create_school(token:, school:)
-      expect(WebMock).to have_requested(:post, "#{api_url}/api/v1/schools").with(headers: { 'x-api-key' => api_key })
+      create_school
+      expect(WebMock).to have_requested(:post, create_school_url).with(headers: { 'x-api-key' => api_key })
     end
 
     it 'sets content-type of request to json' do
-      described_class.create_school(token:, school:)
-      expect(WebMock).to have_requested(:post, "#{api_url}/api/v1/schools").with(headers: { 'content-type' => 'application/json' })
+      create_school
+      expect(WebMock).to have_requested(:post, create_school_url).with(headers: { 'content-type' => 'application/json' })
     end
 
     it 'sets accept header to json' do
-      described_class.create_school(token:, school:)
-      expect(WebMock).to have_requested(:post, "#{api_url}/api/v1/schools").with(headers: { 'accept' => 'application/json' })
+      create_school
+      expect(WebMock).to have_requested(:post, create_school_url).with(headers: { 'accept' => 'application/json' })
     end
 
     it 'sends the school id and code in the request body as json' do
-      described_class.create_school(token:, school:)
+      create_school
       expected_body = { id: school.id, schoolCode: school.code }.to_json
-      expect(WebMock).to have_requested(:post, "#{api_url}/api/v1/schools").with(body: expected_body)
+      expect(WebMock).to have_requested(:post, create_school_url).with(body: expected_body)
     end
 
     it 'returns the created school if successful' do
       data = { 'id' => 'school-id', 'schoolCode' => 'school-code' }
-      stub_request(:post, "#{api_url}/api/v1/schools")
+      stub_request(:post, create_school_url)
         .to_return(status: 201, body: data.to_json)
-      expect(described_class.create_school(token:, school:)).to eq(data)
+      expect(create_school).to eq(data)
     end
 
     it 'raises exception if anything other than a 201 status code is returned' do
-      stub_request(:post, "#{api_url}/api/v1/schools")
+      stub_request(:post, create_school_url)
         .to_return(status: 200)
 
-      expect { described_class.create_school(token:, school:) }.to raise_error(RuntimeError)
+      expect { create_school }.to raise_error(RuntimeError)
     end
 
     it 'includes details of underlying response when exception is raised' do
-      stub_request(:post, "#{api_url}/api/v1/schools")
+      stub_request(:post, create_school_url)
         .to_return(status: 401)
 
-      expect { described_class.create_school(token:, school:) }.to raise_error('School not created in Profile API. HTTP response code: 401')
+      expect { create_school }.to raise_error('School not created in Profile API. HTTP response code: 401')
     end
 
     describe 'when BYPASS_OAUTH is true' do
@@ -73,14 +78,269 @@ RSpec.describe ProfileApiClient do
       end
 
       it 'does not make a request to Profile API' do
-        described_class.create_school(token:, school:)
-        expect(WebMock).not_to have_requested(:post, "#{api_url}/api/v1/schools")
+        create_school
+        expect(WebMock).not_to have_requested(:post, create_school_url)
       end
 
       it 'returns the id and code of the school supplied' do
         expected = { 'id' => school.id, 'schoolCode' => school.code }
-        expect(described_class.create_school(token:, school:)).to eq(expected)
+        expect(create_school).to eq(expected)
       end
+    end
+
+    private
+
+    def create_school
+      described_class.create_school(token:, school:)
+    end
+  end
+
+  describe '.safeguarding_flags' do
+    let(:list_safeguarding_flags_url) { "#{api_url}/api/v1/safeguarding-flags" }
+
+    before do
+      stub_request(:get, list_safeguarding_flags_url).to_return(status: 200, body: '[]')
+    end
+
+    it 'makes a request to the profile api host' do
+      list_safeguarding_flags
+      expect(WebMock).to have_requested(:get, list_safeguarding_flags_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      list_safeguarding_flags
+      expect(WebMock).to have_requested(:get, list_safeguarding_flags_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      list_safeguarding_flags
+      expect(WebMock).to have_requested(:get, list_safeguarding_flags_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      list_safeguarding_flags
+      expect(WebMock).to have_requested(:get, list_safeguarding_flags_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      list_safeguarding_flags
+      expect(WebMock).to have_requested(:get, list_safeguarding_flags_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    # rubocop:disable RSpec/ExampleLength
+    it 'returns list of safeguarding flags if successful' do
+      flags = [
+        {
+          'id' => '7ac79585-e187-4d2f-bf0c-a1cbe72ecc9a',
+          'userId' => '583ba872-b16e-46e1-9f7d-df89d267550d',
+          'flag' => 'school:owner',
+          'isActive' => 'true',
+          'createdAt' => '2024-07-01T12:49:18.926Z',
+          'updatedAt' => '2024-07-01T12:49:18.926Z'
+        }
+      ]
+      stub_request(:get, list_safeguarding_flags_url)
+        .to_return(status: 200, body: flags.to_json)
+      expect(list_safeguarding_flags).to eq(flags)
+    end
+    # rubocop:enable RSpec/ExampleLength
+
+    it 'raises exception if anything other than a 200 status code is returned' do
+      stub_request(:get, list_safeguarding_flags_url)
+        .to_return(status: 201)
+
+      expect { list_safeguarding_flags }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:get, list_safeguarding_flags_url)
+        .to_return(status: 401)
+
+      expect { list_safeguarding_flags }.to raise_error('Safeguarding flags cannot be retrieved from Profile API. HTTP response code: 401')
+    end
+
+    private
+
+    def list_safeguarding_flags
+      described_class.safeguarding_flags(token:)
+    end
+  end
+
+  describe '.create_safeguarding_flag' do
+    let(:flag) { 'school:owner' }
+    let(:create_safeguarding_flag_url) { "#{api_url}/api/v1/safeguarding-flags" }
+
+    before do
+      stub_request(:post, create_safeguarding_flag_url).to_return(status: 201, body: '{}')
+    end
+
+    it 'makes a request to the profile api host' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'returns empty body if successful' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 201, body: '')
+      expect(create_safeguarding_flag).to be_nil
+    end
+
+    it 'raises exception if anything other than a 201 status code is returned' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 200)
+
+      expect { create_safeguarding_flag }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 401)
+
+      expect { create_safeguarding_flag }.to raise_error('Safeguarding flag not created in Profile API. HTTP response code: 401')
+    end
+
+    def create_safeguarding_flag
+      described_class.create_safeguarding_flag(token:, flag:)
+    end
+  end
+
+  describe '.delete_safeguarding_flag' do
+    let(:flag) { 'school:owner' }
+    let(:delete_safeguarding_flag_url) { "#{api_url}/api/v1/safeguarding-flags/#{flag}" }
+
+    before do
+      stub_request(:delete, delete_safeguarding_flag_url).to_return(status: 204, body: '')
+    end
+
+    it 'makes a request to the profile api host' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      delete_safeguarding_flag
+      expect(WebMock).to have_requested(:delete, delete_safeguarding_flag_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'returns empty body if successful' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 204, body: '')
+      expect(delete_safeguarding_flag).to be_nil
+    end
+
+    it 'raises exception if anything other than a 201 status code is returned' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 200)
+
+      expect { delete_safeguarding_flag }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 401)
+
+      expect { delete_safeguarding_flag }.to raise_error('Safeguarding flag not deleted from Profile API. HTTP response code: 401')
+    end
+
+    def delete_safeguarding_flag
+      described_class.delete_safeguarding_flag(token:, flag:)
+    end
+  end
+
+  describe '.create_school_student' do
+    let(:username) { 'username' }
+    let(:password) { 'password' }
+    let(:name) { 'name' }
+    let(:school) { build(:school, id: SecureRandom.uuid) }
+    let(:create_students_url) { "#{api_url}/api/v1/schools/#{school.id}/students" }
+
+    before do
+      stub_request(:post, create_students_url).to_return(status: 201, body: '{}')
+    end
+
+    it 'makes a request to the profile api host' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'returns the id of the created student(s) if successful' do
+      data = { 'created' => ['student-id'] }
+      stub_request(:post, create_students_url)
+        .to_return(status: 201, body: data.to_json)
+      expect(create_school_student).to eq(data)
+    end
+
+    it 'raises exception if anything other than a 201 status code is returned' do
+      stub_request(:post, create_students_url)
+        .to_return(status: 200)
+
+      expect { create_school_student }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:post, create_students_url)
+        .to_return(status: 401)
+
+      expect { create_school_student }.to raise_error('Student not created in Profile API. HTTP response code: 401')
+    end
+
+    def create_school_student
+      described_class.create_school_student(token:, username:, password:, name:, school:)
     end
   end
 end
