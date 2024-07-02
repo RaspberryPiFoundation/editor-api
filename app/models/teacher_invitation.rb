@@ -8,6 +8,7 @@ class TeacherInvitation < ApplicationRecord
             format: { with: EmailValidator.regexp, message: I18n.t('validations.invitation.email_address') }
   validate :school_is_verified
   after_create_commit :send_invitation_email
+  encrypts :email_address
 
   generates_token_for :teacher_invitation, expires_in: 30.days do
     email_address
