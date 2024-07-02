@@ -1,6 +1,11 @@
 # frozen_string_literal: true
 
 class ProfileApiClient
+  SAFEGUARDING_FLAGS = {
+    teacher: 'school:teacher',
+    owner: 'school:owner'
+  }.freeze
+
   class << self
     # TODO: Replace with HTTP requests once the profile API has been built.
 
@@ -205,6 +210,16 @@ class ProfileApiClient
       end
 
       response.body.map(&:deep_symbolize_keys)
+    end
+
+    def create_safeguarding_flag(token:, flag:)
+      response = connection(token).post('/api/v1/safeguarding-flags') do |request|
+        request.body = { flag: }
+      end
+
+      return if response.status == 201 || response.status == 303
+
+      raise "Safeguarding flag not created in Profile API (status code #{response.status})"
     end
 
     private

@@ -160,4 +160,73 @@ RSpec.describe ProfileApiClient do
       described_class.safeguarding_flags(token:)
     end
   end
+
+  describe '.create_safeguarding_flag' do
+    let(:flag) { 'school:owner' }
+    let(:create_safeguarding_flag_url) { "#{api_url}/api/v1/safeguarding-flags" }
+
+    before do
+      stub_request(:post, create_safeguarding_flag_url).to_return(status: 201, body: '{}', headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'makes a request to the profile api host' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'sends the safeguarding flag in the request body' do
+      create_safeguarding_flag
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(body: { flag: }.to_json)
+    end
+
+    it 'returns empty body if created successfully' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 201)
+      expect(create_safeguarding_flag).to be_nil
+    end
+
+    it 'returns empty body if 303 response returned to indicate that the flag already exists' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 303)
+      expect(create_safeguarding_flag).to be_nil
+    end
+
+    it 'raises exception if anything other than a 201 or 303 status code is returned' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 200)
+
+      expect { create_safeguarding_flag }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 401)
+
+      expect { create_safeguarding_flag }.to raise_error('Safeguarding flag not created in Profile API (status code 401)')
+    end
+
+    def create_safeguarding_flag
+      described_class.create_safeguarding_flag(token:, flag:)
+    end
+  end
 end
