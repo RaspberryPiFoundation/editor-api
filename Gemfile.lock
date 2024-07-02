@@ -98,6 +98,11 @@ GEM
     administrate-field-active_storage (1.0.1)
       administrate (>= 0.2.2)
       rails (>= 7.0)
+    appmap (1.1.0)
+      activesupport
+      method_source
+      rack
+      reverse_markdown
     ast (2.4.2)
     aws-eventstream (1.2.0)
     aws-partitions (1.718.0)
@@ -218,6 +223,8 @@ GEM
       railties (>= 4.2.0)
       thor (>= 0.14, < 2.0)
     json (2.6.3)
+    json-schema (4.3.0)
+      addressable (>= 2.8)
     jwt (2.2.3)
     kaminari (1.2.2)
       activesupport (>= 4.1.0)
@@ -358,6 +365,8 @@ GEM
     regexp_parser (2.7.0)
     reline (0.5.9)
       io-console (~> 0.5)
+    reverse_markdown (2.1.1)
+      nokogiri
     rexml (3.3.0)
       strscan
     roo (2.10.1)
@@ -386,6 +395,17 @@ GEM
     rspec-support (3.12.0)
     rspec_junit_formatter (0.6.0)
       rspec-core (>= 2, < 4, != 2.12.0)
+    rswag-api (2.13.0)
+      activesupport (>= 3.1, < 7.2)
+      railties (>= 3.1, < 7.2)
+    rswag-specs (2.13.0)
+      activesupport (>= 3.1, < 7.2)
+      json-schema (>= 2.2, < 5.0)
+      railties (>= 3.1, < 7.2)
+      rspec-core (>= 2.14)
+    rswag-ui (2.13.0)
+      actionpack (>= 3.1, < 7.2)
+      railties (>= 3.1, < 7.2)
     rubocop (1.47.0)
       json (~> 2.3)
       parallel (~> 1.10)
@@ -503,6 +523,7 @@ PLATFORMS
 DEPENDENCIES
   administrate (~> 0.20.1)
   administrate-field-active_storage
+  appmap
   aws-sdk-s3
   bootsnap
   bullet
@@ -539,6 +560,9 @@ DEPENDENCIES
   rspec
   rspec-rails
   rspec_junit_formatter
+  rswag-api
+  rswag-specs
+  rswag-ui
   rubocop
   rubocop-graphql
   rubocop-rails

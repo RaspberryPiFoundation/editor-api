@@ -33,10 +33,13 @@ gem 'puma', '~> 6'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
 gem 'roo'
+gem 'rswag-api'
+gem 'rswag-ui'
 gem 'scout_apm'
 gem 'sentry-rails'
 
 group :development, :test do
+  gem 'appmap'
   gem 'bullet'
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
@@ -46,6 +49,7 @@ group :development, :test do
   gem 'rspec'
   gem 'rspec_junit_formatter'
   gem 'rspec-rails'
+  gem 'rswag-specs'
   gem 'rubocop', require: false
   gem 'rubocop-graphql', require: false
   gem 'rubocop-rails', require: false

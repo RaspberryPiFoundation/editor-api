@@ -2,6 +2,8 @@
 
 # rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
+  mount Rswag::Api::Engine => '/api-docs'
+  mount Rswag::Ui::Engine => '/api-docs'
   namespace :admin do
     mount GoodJob::Engine => 'good_job'
     resources :components
