@@ -197,6 +197,16 @@ class ProfileApiClient
       response.deep_symbolize_keys
     end
 
+    def safeguarding_flags(token:)
+      response = connection(token).get('/api/v1/safeguarding-flags')
+
+      unless response.status == 200
+        raise "Safeguarding flags cannot be retrieved from Profile API (status code #{response.status})"
+      end
+
+      response.body.map(&:deep_symbolize_keys)
+    end
+
     private
 
     def connection(token)
