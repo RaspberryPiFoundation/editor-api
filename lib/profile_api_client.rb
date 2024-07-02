@@ -198,6 +198,18 @@ class ProfileApiClient
       response.deep_symbolize_keys
     end
 
+    def safeguarding_flags(token:)
+      response = connection.get('/api/v1/safeguarding-flags') do |request|
+        apply_default_headers(request, token)
+      end
+
+      unless response.status == 200
+        raise "Safeguarding flags cannot be retrieved from Profile API. HTTP response code: #{response.status}"
+      end
+
+      JSON.parse(response.body)
+    end
+
     private
 
     def connection
