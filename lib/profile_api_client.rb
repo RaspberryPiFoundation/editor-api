@@ -6,6 +6,27 @@ class ProfileApiClient
     owner: 'school:owner'
   }.freeze
 
+  class Error < StandardError; end
+
+  class CreateStudent422Error < Error
+    DEFAULT_ERROR = 'unknown error'
+    ERRORS = {
+      'ERR_USER_EXISTS' => 'username has already been taken',
+      'ERR_INVALID' => 'unknown validation error',
+      'ERR_INVALID_PASSWORD' => 'password is invalid',
+      'ERR_UNKNOWN' => DEFAULT_ERROR
+    }.freeze
+
+    attr_reader :username, :error
+
+    def initialize(error)
+      @username = error['username']
+      @error = ERRORS.fetch(error['error'], DEFAULT_ERROR)
+
+      super "Student not created in Profile API (status code 422, username '#{@username}', error '#{@error}')"
+    end
+  end
+
   class << self
     # TODO: Replace with HTTP requests once the profile API has been built.
 
@@ -146,19 +167,24 @@ class ProfileApiClient
     # The API should respond:
     # - 404 Not Found if the user doesn't exist
     # - 422 Unprocessable if the constraints are not met
-    def create_school_student(token:, username:, password:, name:, organisation_id:)
+    # rubocop:disable Metrics/AbcSize
+    def create_school_student(token:, username:, password:, name:, school_id:)
       return nil if token.blank?
 
-      _ = username
-      _ = password
-      _ = name
-      _ = organisation_id
+      response = connection(token).post("/api/v1/schools/#{school_id}/students") do |request|
+        request.body = [{
+          name: name.strip,
+          username: username.strip,
+          password: password.strip
+        }]
+      end
 
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolStudent::Create propagates the error in the response.
-      response = {}
-      response.deep_symbolize_keys
+      raise CreateStudent422Error, response.body['errors'].first if response.status == 422
+      raise "Student not created in Profile API (status code #{response.status})" unless response.status == 201
+
+      response.body.deep_symbolize_keys
     end
+    # rubocop:enable Metrics/AbcSize
 
     # The API should enforce these constraints:
     # - The token has the school-owner or school-teacher role for the given organisation ID
