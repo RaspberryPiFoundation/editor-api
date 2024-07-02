@@ -147,18 +147,21 @@ class ProfileApiClient
     # The API should respond:
     # - 404 Not Found if the user doesn't exist
     # - 422 Unprocessable if the constraints are not met
-    def create_school_student(token:, username:, password:, name:, organisation_id:)
+    def create_school_student(token:, username:, password:, name:, school:)
       return nil if token.blank?
 
-      _ = username
-      _ = password
-      _ = name
-      _ = organisation_id
+      response = connection.post("/api/v1/schools/#{school.id}/students") do |request|
+        apply_default_headers(request, token)
+        request.body = [{
+          name:,
+          username:,
+          password:
+        }].to_json
+      end
 
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolStudent::Create propagates the error in the response.
-      response = {}
-      response.deep_symbolize_keys
+      raise "Student not created in Profile API. HTTP response code: #{response.status}" unless response.status == 201
+
+      JSON.parse(response.body)
     end
 
     # The API should enforce these constraints:

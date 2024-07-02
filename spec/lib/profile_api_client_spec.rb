@@ -281,4 +281,66 @@ RSpec.describe ProfileApiClient do
       described_class.delete_safeguarding_flag(token:, flag:)
     end
   end
+
+  describe '.create_school_student' do
+    let(:username) { 'username' }
+    let(:password) { 'password' }
+    let(:name) { 'name' }
+    let(:school) { build(:school, id: SecureRandom.uuid) }
+    let(:create_students_url) { "#{api_url}/api/v1/schools/#{school.id}/students" }
+
+    before do
+      stub_request(:post, create_students_url).to_return(status: 201, body: '{}')
+    end
+
+    it 'makes a request to the profile api host' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      create_school_student
+      expect(WebMock).to have_requested(:post, create_students_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'returns the id of the created student(s) if successful' do
+      data = { 'created' => ['student-id'] }
+      stub_request(:post, create_students_url)
+        .to_return(status: 201, body: data.to_json)
+      expect(create_school_student).to eq(data)
+    end
+
+    it 'raises exception if anything other than a 201 status code is returned' do
+      stub_request(:post, create_students_url)
+        .to_return(status: 200)
+
+      expect { create_school_student }.to raise_error(RuntimeError)
+    end
+
+    it 'includes details of underlying response when exception is raised' do
+      stub_request(:post, create_students_url)
+        .to_return(status: 401)
+
+      expect { create_school_student }.to raise_error('Student not created in Profile API. HTTP response code: 401')
+    end
+
+    def create_school_student
+      described_class.create_school_student(token:, username:, password:, name:, school:)
+    end
+  end
 end
