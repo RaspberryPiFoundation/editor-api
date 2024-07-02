@@ -38,4 +38,8 @@ module ProfileApiMock
   def stub_profile_api_delete_school_student
     allow(ProfileApiClient).to receive(:delete_school_student)
   end
+
+  def stub_profile_api_create_safeguarding_flag
+    allow(ProfileApiClient).to receive(:create_safeguarding_flag)
+  end
 end
