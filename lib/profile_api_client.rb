@@ -159,6 +159,7 @@ class ProfileApiClient
         }].to_json
       end
 
+      raise "Student not created in Profile API. #{JSON.parse(response.body)}" if response.status == 422
       raise "Student not created in Profile API. HTTP response code: #{response.status}" unless response.status == 201
 
       JSON.parse(response.body)
@@ -224,7 +225,7 @@ class ProfileApiClient
         request.body = { flag: }.to_json
       end
 
-      return if response.status == 201
+      return if response.status == 201 || response.status == 303
 
       raise "Safeguarding flag not created in Profile API. HTTP response code: #{response.status}"
     end
@@ -242,7 +243,9 @@ class ProfileApiClient
     private
 
     def connection
-      Faraday.new(ENV.fetch('IDENTITY_URL'))
+      Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
+        faraday.response :logger
+      end
     end
 
     def apply_default_headers(request, token)
