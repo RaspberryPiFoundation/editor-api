@@ -419,4 +419,80 @@ RSpec.describe ProfileApiClient do
       described_class.create_school_student(token:, username:, password:, name:, school_id: school.id)
     end
   end
+
+  describe '.list_school_student' do
+    let(:school) { build(:school, id: SecureRandom.uuid) }
+    let(:list_students_url) { "#{api_url}/api/v1/schools/#{school.id}/students/list" }
+    let(:student_ids) { [SecureRandom.uuid] }
+
+    before do
+      stub_request(:post, list_students_url).to_return(status: 200, body: '[]', headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'makes a request to the profile api host' do
+      list_school_students
+      expect(WebMock).to have_requested(:post, list_students_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      list_school_students
+      expect(WebMock).to have_requested(:post, list_students_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      list_school_students
+      expect(WebMock).to have_requested(:post, list_students_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      list_school_students
+      expect(WebMock).to have_requested(:post, list_students_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      list_school_students
+      expect(WebMock).to have_requested(:post, list_students_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'sets body to the student IDs' do
+      list_school_students
+      expect(WebMock).to have_requested(:post, list_students_url).with(body: student_ids)
+    end
+
+    # rubocop:disable RSpec/ExampleLength
+    it 'returns the student(s) if successful' do
+      student = {
+        id: '549e4674-6ffd-4ac6-9a97-b4d7e5c0e5c5',
+        schoolId: '132383f1-702a-46a0-9eb2-a40dd4f212e3',
+        name: 'student-name',
+        username: 'student-username',
+        createdAt: '2024-07-03T13:00:40.041Z',
+        updatedAt: '2024-07-03T13:00:40.041Z',
+        discardedAt: nil
+      }
+      expected = ProfileApiClient::Student.new(**student)
+      stub_request(:post, list_students_url)
+        .to_return(status: 200, body: [student].to_json, headers: { 'content-type' => 'application/json' })
+      expect(list_school_students).to eq([expected])
+    end
+    # rubocop:enable RSpec/ExampleLength
+
+    it 'raises exception if anything other that 200 status code is returned' do
+      stub_request(:post, list_students_url)
+        .to_return(status: 201)
+
+      expect { list_school_students }.to raise_error(ProfileApiClient::UnexpectedResponse)
+    end
+
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:post, list_students_url)
+        .to_return(status: 401)
+
+      expect { list_school_students }.to raise_error(Faraday::Error)
+    end
+
+    def list_school_students
+      described_class.list_school_students(token:, school_id: school.id, student_ids:)
+    end
+  end
 end

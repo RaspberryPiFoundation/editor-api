@@ -8,6 +8,7 @@ class ProfileApiClient
 
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
+  Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt)
 
   class Error < StandardError; end
 
@@ -78,12 +79,16 @@ class ProfileApiClient
       {}
     end
 
-    def list_school_students(token:, organisation_id:)
+    def list_school_students(token:, school_id:, student_ids:)
       return [] if token.blank?
 
-      _ = organisation_id
+      response = connection(token).post("/api/v1/schools/#{school_id}/students/list") do |request|
+        request.body = student_ids
+      end
 
-      {}
+      raise UnexpectedResponse, response unless response.status == 200
+
+      response.body.map { |attrs| Student.new(**attrs.symbolize_keys) }
     end
 
     def create_school_student(token:, username:, password:, name:, school_id:)
