@@ -4,14 +4,14 @@ class ProfileApiClient
   class << self
     # TODO: Replace with HTTP requests once the profile API has been built.
 
-    def create_school(token:, school:)
-      return { 'id' => school.id, 'schoolCode' => school.code } if ENV['BYPASS_OAUTH'].present?
+    def create_school(token:, id:, code:)
+      return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?
 
       response = connection.post('/api/v1/schools') do |request|
         apply_default_headers(request, token)
         request.body = {
-          id: school.id,
-          schoolCode: school.code
+          id:,
+          schoolCode: code
         }.to_json
       end
 

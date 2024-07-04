@@ -87,7 +87,7 @@ RSpec.describe ProfileApiClient do
     private
 
     def create_school
-      described_class.create_school(token:, school:)
+      described_class.create_school(token:, id: school.id, code: school.code)
     end
   end
 end
