@@ -82,9 +82,12 @@ RSpec.describe 'classroom_management', type: :task do
 
     # rubocop:disable RSpec/MultipleExpectations
     it 'assigns students' do
-      school = School.find_by(creator_id:)
-      expect(Role.student.where(user_id: student_1, school_id: school.id)).to exist
-      expect(Role.student.where(user_id: student_2, school_id: school.id)).to exist
+      school_id = School.find_by(creator_id:).id
+      school_class_id = SchoolClass.find_by(school_id:).id
+      expect(Role.student.where(user_id: student_1, school_id:)).to exist
+      expect(ClassMember.where(student_id: student_1, school_class_id:)).to exist
+      expect(Role.student.where(user_id: student_2, school_id:)).to exist
+      expect(ClassMember.where(student_id: student_2, school_class_id:)).to exist
     end
     # rubocop:enable RSpec/MultipleExpectations
   end
