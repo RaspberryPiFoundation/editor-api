@@ -7,8 +7,7 @@ class ProfileApiClient
     def create_school(token:, id:, code:)
       return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?
 
-      response = connection.post('/api/v1/schools') do |request|
-        apply_default_headers(request, token)
+      response = connection(token).post('/api/v1/schools') do |request|
         request.body = {
           id:,
           schoolCode: code
@@ -200,18 +199,16 @@ class ProfileApiClient
 
     private
 
-    def connection
+    def connection(token)
       Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
         faraday.request :json
         faraday.response :json
+        faraday.headers = {
+          'Accept' => 'application/json',
+          'Authorization' => "Bearer #{token}",
+          'X-API-KEY' => ENV.fetch('PROFILE_API_KEY')
+        }
       end
-    end
-
-    def apply_default_headers(request, token)
-      request.headers['Accept'] = 'application/json'
-      request.headers['Authorization'] = "Bearer #{token}"
-      request.headers['X-API-KEY'] = ENV.fetch('PROFILE_API_KEY')
-      request
     end
   end
 end
