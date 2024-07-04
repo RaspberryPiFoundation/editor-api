@@ -12,7 +12,7 @@ class ProfileApiClient
         request.body = {
           id:,
           schoolCode: code
-        }.to_json
+        }
       end
 
       raise "School not created in Profile API (status code #{response.status})" unless response.status == 201
@@ -201,13 +201,14 @@ class ProfileApiClient
     private
 
     def connection
-      Faraday.new(ENV.fetch('IDENTITY_URL'))
+      Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
+        faraday.request :json
+      end
     end
 
     def apply_default_headers(request, token)
       request.headers['Accept'] = 'application/json'
       request.headers['Authorization'] = "Bearer #{token}"
-      request.headers['Content-Type'] = 'application/json'
       request.headers['X-API-KEY'] = ENV.fetch('PROFILE_API_KEY')
       request
     end
