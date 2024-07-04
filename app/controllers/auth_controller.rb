@@ -22,12 +22,12 @@ class AuthController < ApplicationController
     reset_session
 
     # Prevent redirect loops etc.
-    if ENV['BYPASS_OAUTH'].present?
+    if Rails.configuration.bypass_oauth
       redirect_to root_path
       return
     end
 
-    redirect_to "#{ENV.fetch('IDENTITY_URL', nil)}/logout?returnTo=#{ENV.fetch('HOST_URL', nil)}",
+    redirect_to "#{Rails.configuration.identity_url}/logout?returnTo=#{ENV.fetch('HOST_URL', nil)}",
                 allow_other_host: true
   end
 

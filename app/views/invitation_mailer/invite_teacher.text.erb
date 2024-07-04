@@ -6,7 +6,7 @@ Being part of this school account will allow you to access the school dashboard 
 
 Join school:
 
-<%= "#{ENV.fetch('EDITOR_PUBLIC_URL')}/en/invitations/#{@token}" %>
+<%= "#{Rails.configuration.editor_public_url}/en/invitations/#{@token}" %>
 
 --
 Raspberry Pi Foundation

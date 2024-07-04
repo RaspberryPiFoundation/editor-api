@@ -2,7 +2,7 @@
 
 OmniAuth.config.logger = Rails.logger
 
-if ENV['BYPASS_OAUTH'].present?
+if Rails.configuration.bypass_oauth
   using RpiAuthBypass
 
   extra = RpiAuthBypass::DEFAULT_EXTRA.deep_merge(raw_info: { roles: 'editor-admin' })

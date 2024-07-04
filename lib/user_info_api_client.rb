@@ -21,7 +21,7 @@ class UserInfoApiClient
     private
 
     def bypass_oauth?
-      ENV.fetch('BYPASS_OAUTH', nil) == 'true'
+      Rails.configuration.bypass_oauth
     end
 
     def transform_result(result)
