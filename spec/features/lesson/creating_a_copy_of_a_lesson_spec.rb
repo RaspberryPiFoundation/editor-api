@@ -40,7 +40,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
     values = data.slice(:copied_from_id, :name, :visibility).values
 
-    expect(values).to eq [lesson.id, 'Test Lesson', 'private']
+    expect(values).to eq [lesson.id, 'Test Lesson', 'teachers']
   end
 
   it 'can override fields from the request params' do
