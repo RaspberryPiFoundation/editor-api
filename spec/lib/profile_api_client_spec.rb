@@ -50,7 +50,7 @@ RSpec.describe ProfileApiClient do
     it 'returns the created school if successful' do
       data = { 'id' => 'school-id', 'schoolCode' => 'school-code' }
       stub_request(:post, create_school_url)
-        .to_return(status: 201, body: data.to_json)
+        .to_return(status: 201, body: data.to_json, headers: { 'Content-Type' => 'application/json' })
       expect(create_school).to eq(data)
     end
 

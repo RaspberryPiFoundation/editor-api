@@ -17,7 +17,7 @@ class ProfileApiClient
 
       raise "School not created in Profile API (status code #{response.status})" unless response.status == 201
 
-      JSON.parse(response.body)
+      response.body
     end
 
     # The API should enforce these constraints:
@@ -203,6 +203,7 @@ class ProfileApiClient
     def connection
       Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
         faraday.request :json
+        faraday.response :json
       end
     end
 
