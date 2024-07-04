@@ -15,7 +15,7 @@ class ProfileApiClient
         }.to_json
       end
 
-      raise "School not created in Profile API. HTTP response code: #{response.status}" unless response.status == 201
+      raise "School not created in Profile API (status code #{response.status})" unless response.status == 201
 
       JSON.parse(response.body)
     end

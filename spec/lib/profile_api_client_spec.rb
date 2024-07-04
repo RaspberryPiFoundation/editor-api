@@ -65,7 +65,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:post, create_school_url)
         .to_return(status: 401)
 
-      expect { create_school }.to raise_error('School not created in Profile API. HTTP response code: 401')
+      expect { create_school }.to raise_error('School not created in Profile API (status code 401)')
     end
 
     describe 'when BYPASS_OAUTH is true' do
