@@ -75,7 +75,7 @@ For classroom management the following scenarios modelled by the tasks:
 
 `rails classroom_management:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
 `rails classroom_management:seed_a_verified_school` - seeds only a verified school
-`rails classroom_management:seed_a_school_with_lessons` - seeds a school with a class, two lessons, and a project in each
+`rails classroom_management:seed_a_school_with_lessons_and_students` - seeds a school with a class, two lessons, a project in each, and two students
 
 To clear classroom management data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
 
@@ -85,7 +85,9 @@ To override values, you can prefix the tasks with environment variables, for exa
 
 `SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_a_verified_school`
 
-Also avilable to override are: `SEEDING_TEACHER_ID`, `SEEDING_SCHOOL_ID`
+Also avilable to override are: `SEEDING_TEACHER_ID`.
+
+> NOTE: The student ids and school id in the CM seeds are hard coded to match profile seed data.
 
 #### Syncing the database from Production / Staging
 

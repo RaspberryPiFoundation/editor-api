@@ -8,6 +8,8 @@ Rails.logger = Logger.new($stdout) unless Rails.env.test?
 # `SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_an_unverified_school`
 # `SEEDING_TEACHER_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_a_school_with_lessons`
 
+# For students to match up the school needs to match with the school defined in profile (hard coded in the helper)
+
 # rubocop:disable Metrics/BlockLength
 namespace :classroom_management do
   include ClassroomManagementHelper
@@ -16,23 +18,29 @@ namespace :classroom_management do
   task destroy_seed_data: :environment do
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Destroying existing seeds...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane])
-      teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john])
-      school_id = ENV.fetch('SEEDING_SCHOOL_ID', School.find_by(creator_id:)&.id)
+      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
-      Role.where(user_id: [creator_id, teacher_id]).destroy_all
+      # Hard coded as the student's school needs to match
+      student_ids = [TEST_USERS[:jane_smith], TEST_USERS[:john_smith]]
+      school_id = TEST_SCHOOL
 
-      if school_id.nil? || creator_id.nil?
-        Rails.logger.info 'No school found for creator, exiting...'
-        exit
-      end
+      # Remove the roles first
+      Role.where(user_id: [creator_id, teacher_id] + student_ids).destroy_all
 
-      lesson_id = Lesson.where(school_id:).pluck(:id)
-      Project.where(lesson_id:).destroy_all
-      # The `before_destroy` prevents us using destroy, but as we've removed projects already we can safely delete
-      Lesson.where(school_id:).delete_all
-      SchoolClass.where(school_id:).destroy_all
-      School.where(creator_id:).destroy_all
+      # Destroy the project and then the lesson itself (The lesson's `before_destroy` prevents us using destroy)
+      lesson_ids = Lesson.where(school_id:).pluck(:id)
+      Project.where(lesson_id: [lesson_ids]).destroy_all
+      Lesson.where(id: [lesson_ids]).delete_all
+
+      # Destroy the class members and then the class itself
+      school_class_ids = SchoolClass.where(school_id:).pluck(:id)
+      ClassMember.where(school_class_id: [school_class_ids]).destroy_all
+      SchoolClass.where(id: [school_class_ids]).destroy_all
+
+      # Destroy the school
+      School.find(school_id).destroy
+
       Rails.logger.info 'Done...'
     rescue StandardError => e
       Rails.logger.error "Failed: #{e.message}"
@@ -44,8 +52,9 @@ namespace :classroom_management do
   task seed_an_unverified_school: :environment do
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane])
-      create_school(creator_id)
+      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      create_school(creator_id, TEST_SCHOOL)
+
       Rails.logger.info 'Done...'
     rescue StandardError => e
       Rails.logger.error "Failed: #{e.message}"
@@ -57,9 +66,9 @@ namespace :classroom_management do
   task seed_a_verified_school: :environment do
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane])
-      school_id = ENV.fetch('SEEDING_SCHOOL_ID', nil)
-      school = create_school(creator_id, school_id)
+      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+
+      school = create_school(creator_id, TEST_SCHOOL)
       verify_school(school)
       Rails.logger.info 'Done...'
     rescue StandardError => e
@@ -68,19 +77,20 @@ namespace :classroom_management do
     end
   end
 
-  desc 'Create a school with lessons'
-  task seed_a_school_with_lessons: :environment do
+  desc 'Create a school with lessons and students'
+  task seed_a_school_with_lessons_and_students: :environment do
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane])
-      teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john])
-      school_id = ENV.fetch('SEEDING_SCHOOL_ID', nil)
+      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
-      school = create_school(creator_id, school_id)
+      school = create_school(creator_id, TEST_SCHOOL)
       verify_school(school)
       assign_a_teacher(teacher_id, school)
 
       school_class = create_school_class(creator_id, school)
+      assign_students(school_class, school)
+
       lessons = create_lessons(creator_id, school, school_class)
       lessons.each do |lesson|
         create_project(creator_id, school, lesson)
