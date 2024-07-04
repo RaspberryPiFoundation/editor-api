@@ -6,23 +6,29 @@ require 'rake'
 RSpec.describe 'classroom_management', type: :task do
   let(:creator_id) { '583ba872-b16e-46e1-9f7d-df89d267550d' } # jane.doe@example.com
   let(:teacher_id) { 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' } # john.doe@example.com
+  let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # student
+  let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # student
+  let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' }
 
   describe ':destroy_seed_data' do
     let(:task) { Rake::Task['classroom_management:destroy_seed_data'] }
-    let(:school) { create(:school, creator_id:) }
+    let(:school) { create(:school, creator_id:, id: school_id) }
 
     before do
       create(:role, user_id: creator_id, school:)
+      create(:student_role, user_id: student_1, school:)
       create(:teacher_role, user_id: creator_id, school:)
-      create(:school_class, school_id: school.id, teacher_id: creator_id)
+      school_class = create(:school_class, school_id: school.id, teacher_id: creator_id)
+      create(:class_member, student_id: student_1, school_class_id: school_class.id)
       create(:lesson, school_id: school.id, user_id: creator_id)
     end
 
     # rubocop:disable RSpec/ExampleLength, RSpec/MultipleExpectations
     it 'destroys all seed data' do
       task.invoke
-      expect(Role.where(user_id: creator_id)).not_to exist
+      expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
       expect(School.where(creator_id:)).not_to exist
+      expect(ClassMember.where(student_id: student_1)).not_to exist
       expect(SchoolClass.where(school_id: school.id)).not_to exist
       expect(Lesson.where(school_id: school.id)).not_to exist
       expect(Project.where(school_id: school.id)).not_to exist
@@ -48,8 +54,8 @@ RSpec.describe 'classroom_management', type: :task do
     end
   end
 
-  describe ':seed_a_school_with_lessons' do
-    let(:task) { Rake::Task['classroom_management:seed_a_school_with_lessons'] }
+  describe ':seed_a_school_with_lessons_and_students' do
+    let(:task) { Rake::Task['classroom_management:seed_a_school_with_lessons_and_students'] }
 
     before do
       task.invoke
@@ -73,5 +79,13 @@ RSpec.describe 'classroom_management', type: :task do
       school = School.find_by(creator_id:)
       expect(Role.teacher.where(user_id: teacher_id, school_id: school.id)).to exist
     end
+
+    # rubocop:disable RSpec/MultipleExpectations
+    it 'assigns students' do
+      school = School.find_by(creator_id:)
+      expect(Role.student.where(user_id: student_1, school_id: school.id)).to exist
+      expect(Role.student.where(user_id: student_2, school_id: school.id)).to exist
+    end
+    # rubocop:enable RSpec/MultipleExpectations
   end
 end
