@@ -48,7 +48,6 @@ RSpec.describe 'projects { }' do
     let(:current_user) { authenticated_user }
     let(:project) { create(:project, user_id: authenticated_user.id) }
     let(:school) { create(:school) }
-    # let(:lesson) {create(:lesson, school:)}
     let(:owner) { create(:owner, school:) }
 
     before do
@@ -81,32 +80,19 @@ RSpec.describe 'projects { }' do
         expect(result.dig('data', 'projects', 'edges')).to be_empty
       end
     end
-
-    context 'with an existing project owned by the user that belongs to a school' do
-      # puts 'the school id is...'
-      # puts school.id
-      let(:project) { create(:project, user_id: authenticated_user.id, school:) }
-
-      it 'returns an empty array' do
-        puts school.id
-        puts project.school_id
-        puts project.id
-        project
-        expect(result.dig('data', 'projects', 'edges')).to be_empty
-      end
-    end
   end
 
   context 'when fetching projects by user ID when logged in' do
     let(:query) { 'query ($userId: String) { projects(userId: $userId) { edges { node { id } } } }' }
     let(:current_user) { authenticated_user }
+    let(:teacher) { create(:teacher, school:) }
     let(:variables) { { userId: authenticated_user.id } }
     let(:project) { create(:project, user_id: authenticated_user.id) }
     let(:school) { create(:school) }
-    let(:owner) { create(:owner, school:) }
+    let(:lesson) { create(:lesson, user_id: teacher.id, school:) }
 
     before do
-      authenticated_in_hydra_as(owner)
+      authenticated_in_hydra_as(teacher)
     end
 
     it { expect(query).to be_a_valid_graphql_query }
@@ -115,6 +101,24 @@ RSpec.describe 'projects { }' do
       it 'returns the project global id' do
         project
         expect(result.dig('data', 'projects', 'edges', 0, 'node', 'id')).to eq project.to_gid_param
+      end
+    end
+
+    context 'with an existing project owned by the user that belongs to a school' do
+      let(:project) { create(:project, user_id: teacher.id, school:) }
+
+      it 'returns an empty array' do
+        project
+        expect(result.dig('data', 'projects', 'edges')).to be_empty
+      end
+    end
+
+    context 'with an existing project owned by the user that belongs to a lesson' do
+      let(:project) { create(:project, user_id: teacher.id, lesson:) }
+
+      it 'returns an empty array' do
+        project
+        expect(result.dig('data', 'projects', 'edges')).to be_empty
       end
     end
 
