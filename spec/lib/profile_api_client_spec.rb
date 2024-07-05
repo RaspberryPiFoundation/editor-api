@@ -495,4 +495,111 @@ RSpec.describe ProfileApiClient do
       described_class.list_school_students(token:, school_id: school.id, student_ids:)
     end
   end
+
+  # rubocop:disable RSpec/MultipleMemoizedHelpers
+  describe '.update_school_student' do
+    let(:username) { 'username' }
+    let(:password) { 'password' }
+    let(:name) { 'name' }
+    let(:school) { build(:school, id: SecureRandom.uuid) }
+    let(:student) { create(:student, school:) }
+    let(:update_student_url) { "#{api_url}/api/v1/schools/#{school.id}/students/#{student.id}" }
+
+    before do
+      stub_request(:patch, update_student_url)
+        .to_return(
+          status: 200,
+          body: '{"id":"","schoolId":"","name":"","username":"","createdAt":"","updatedAt":"","discardedAt":""}',
+          headers: { 'content-type' => 'application/json' }
+        )
+    end
+
+    it 'makes a request to the profile api host' do
+      update_school_student
+      expect(WebMock).to have_requested(:patch, update_student_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      update_school_student
+      expect(WebMock).to have_requested(:patch, update_student_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      update_school_student
+      expect(WebMock).to have_requested(:patch, update_student_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets content-type of request to json' do
+      update_school_student
+      expect(WebMock).to have_requested(:patch, update_student_url).with(headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'sets accept header to json' do
+      update_school_student
+      expect(WebMock).to have_requested(:patch, update_student_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'sends the student details in the request body' do
+      update_school_student
+      expect(WebMock).to have_requested(:patch, update_student_url).with(body: { name:, username:, password: }.to_json)
+    end
+
+    it 'returns the updated student if successful' do
+      response = { id: 'id', schoolId: 'school-id', name: 'new-name', username: 'new-username', createdAt: '', updatedAt: '', discardedAt: '' }
+      expected = ProfileApiClient::Student.new(**response)
+      stub_request(:patch, update_student_url)
+        .to_return(status: 200, body: response.to_json, headers: { 'content-type' => 'application/json' })
+      expect(update_school_student).to eq(expected)
+    end
+
+    it 'raises 422 exception if 422 status code is returned' do
+      response = { errors: [username: 'username', error: 'ERR_USER_EXISTS'] }
+      stub_request(:patch, update_student_url)
+        .to_return(status: 422, body: response.to_json, headers: { 'content-type' => 'application/json' })
+
+      expect { update_school_student }.to raise_error(ProfileApiClient::Student422Error)
+        .with_message("Student not saved in Profile API (status code 422, username 'username', error 'username has already been taken')")
+    end
+
+    it 'raises exception if anything other that 200 status code is returned' do
+      stub_request(:patch, update_student_url)
+        .to_return(status: 201)
+
+      expect { update_school_student }.to raise_error(ProfileApiClient::UnexpectedResponse)
+    end
+
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:patch, update_student_url)
+        .to_return(status: 401)
+
+      expect { update_school_student }.to raise_error(Faraday::Error)
+    end
+
+    context 'when there are extraneous leading and trailing spaces in the student params' do
+      let(:username) { '  username  ' }
+      let(:password) { '  password  ' }
+      let(:name) { '  name  ' }
+
+      it 'strips the extraneous spaces' do
+        update_school_student
+        expect(WebMock).to have_requested(:patch, update_student_url).with(body: { name: 'name', username: 'username', password: 'password' }.to_json)
+      end
+    end
+
+    context 'when optional values are nil' do
+      let(:username) { nil }
+      let(:password) { nil }
+      let(:name) { nil }
+
+      it 'does not send empty values' do
+        update_school_student
+        expect(WebMock).to have_requested(:patch, update_student_url).with(body: {}.to_json)
+      end
+    end
+
+    def update_school_student
+      described_class.update_school_student(token:, username:, password:, name:, school_id: school.id, student_id: student.id)
+    end
+  end
+  # rubocop:enable RSpec/MultipleMemoizedHelpers
 end

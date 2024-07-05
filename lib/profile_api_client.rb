@@ -109,14 +109,25 @@ class ProfileApiClient
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
-    def update_school_student(token:, attributes_to_update:, organisation_id:)
+    # rubocop:disable Metrics/AbcSize
+    def update_school_student(token:, school_id:, student_id:, name: nil, username: nil, password: nil) # rubocop:disable Metrics/ParameterLists
       return nil if token.blank?
 
-      _ = attributes_to_update
-      _ = organisation_id
+      response = connection(token).patch("/api/v1/schools/#{school_id}/students/#{student_id}") do |request|
+        request.body = {
+          name: name&.strip,
+          username: username&.strip,
+          password: password&.strip
+        }.compact
+      end
 
-      {}
+      raise UnexpectedResponse, response unless response.status == 200
+
+      Student.new(**response.body)
+    rescue Faraday::UnprocessableEntityError => e
+      raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
+    # rubocop:enable Metrics/AbcSize
 
     def delete_school_student(token:, student_id:, organisation_id:)
       return nil if token.blank?

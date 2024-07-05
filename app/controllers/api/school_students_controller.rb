@@ -39,7 +39,9 @@ module Api
     end
 
     def update
-      result = SchoolStudent::Update.call(school: @school, school_student_params:, token: current_user.token)
+      result = SchoolStudent::Update.call(
+        school: @school, student_id: params[:id], school_student_params:, token: current_user.token
+      )
 
       if result.success?
         head :no_content
