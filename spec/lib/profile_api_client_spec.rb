@@ -602,4 +602,77 @@ RSpec.describe ProfileApiClient do
     end
   end
   # rubocop:enable RSpec/MultipleMemoizedHelpers
+
+  describe '.school_student' do
+    let(:school) { build(:school, id: SecureRandom.uuid) }
+    let(:student_url) { "#{api_url}/api/v1/schools/#{school.id}/students/#{student_id}" }
+    let(:student_id) { SecureRandom.uuid }
+
+    before do
+      stub_request(:get, student_url)
+        .to_return(
+          status: 200,
+          body: '{"id":"","schoolId":"","name":"","username":"","createdAt":"","updatedAt":"","discardedAt":""}',
+          headers: { 'content-type' => 'application/json' }
+        )
+    end
+
+    it 'makes a request to the profile api host' do
+      school_student
+      expect(WebMock).to have_requested(:get, student_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      school_student
+      expect(WebMock).to have_requested(:get, student_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      school_student
+      expect(WebMock).to have_requested(:get, student_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets accept header to json' do
+      school_student
+      expect(WebMock).to have_requested(:get, student_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    # rubocop:disable RSpec/ExampleLength
+    it 'returns the student(s) if successful' do
+      student = {
+        id: '549e4674-6ffd-4ac6-9a97-b4d7e5c0e5c5',
+        schoolId: '132383f1-702a-46a0-9eb2-a40dd4f212e3',
+        name: 'student-name',
+        username: 'student-username',
+        createdAt: '2024-07-03T13:00:40.041Z',
+        updatedAt: '2024-07-03T13:00:40.041Z',
+        discardedAt: nil
+      }
+      expected = ProfileApiClient::Student.new(**student)
+      stub_request(:get, student_url)
+        .to_return(status: 200, body: student.to_json, headers: { 'content-type' => 'application/json' })
+      expect(school_student).to eq(expected)
+    end
+    # rubocop:enable RSpec/ExampleLength
+
+    it 'raises exception if anything other than a 200 status code is returned' do
+      stub_request(:get, student_url)
+        .to_return(status: 201)
+
+      expect { school_student }.to raise_error(ProfileApiClient::UnexpectedResponse)
+    end
+
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:get, student_url)
+        .to_return(status: 401)
+
+      expect { school_student }.to raise_error(Faraday::Error)
+    end
+
+    private
+
+    def school_student
+      described_class.school_student(token:, school_id: school.id, student_id:)
+    end
+  end
 end

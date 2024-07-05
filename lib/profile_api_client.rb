@@ -79,6 +79,14 @@ class ProfileApiClient
       {}
     end
 
+    def school_student(token:, school_id:, student_id:)
+      response = connection(token).get("/api/v1/schools/#{school_id}/students/#{student_id}")
+
+      raise UnexpectedResponse, response unless response.status == 200
+
+      Student.new(**response.body)
+    end
+
     def list_school_students(token:, school_id:, student_ids:)
       return [] if token.blank?
 
