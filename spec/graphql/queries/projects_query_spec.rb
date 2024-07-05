@@ -48,6 +48,7 @@ RSpec.describe 'projects { }' do
     let(:current_user) { authenticated_user }
     let(:project) { create(:project, user_id: authenticated_user.id) }
     let(:school) { create(:school) }
+    # let(:lesson) {create(:lesson, school:)}
     let(:owner) { create(:owner, school:) }
 
     before do
@@ -76,6 +77,20 @@ RSpec.describe 'projects { }' do
       let(:project) { create(:project, user_id: SecureRandom.uuid) }
 
       it 'returns an empty array' do
+        project
+        expect(result.dig('data', 'projects', 'edges')).to be_empty
+      end
+    end
+
+    context 'with an existing project owned by the user that belongs to a school' do
+      # puts 'the school id is...'
+      # puts school.id
+      let(:project) { create(:project, user_id: authenticated_user.id, school:) }
+
+      it 'returns an empty array' do
+        puts school.id
+        puts project.school_id
+        puts project.id
         project
         expect(result.dig('data', 'projects', 'edges')).to be_empty
       end

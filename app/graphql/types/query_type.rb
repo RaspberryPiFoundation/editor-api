@@ -15,7 +15,7 @@ module Types
                                              description: 'List of preferred project locales, defaults to ["en"]'
     end
 
-    field :projects, Types::ProjectType.connection_type, 'All viewable projects' do
+    field :projects, Types::ProjectType.connection_type, 'All viewable personal projects' do
       argument :user_id, String, required: false, description: 'Filter by user ID'
     end
 
@@ -26,7 +26,7 @@ module Types
 
     def projects(user_id: nil)
       results = Project.accessible_by(context[:current_ability], :show).order(updated_at: :desc)
-      results = results.where(user_id:) if user_id
+      results = results.where(user_id:, school_id: nil, lesson_id: nil) if user_id
 
       results
     end

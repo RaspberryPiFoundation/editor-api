@@ -567,7 +567,7 @@ type Query {
   ): Project
 
   """
-  All viewable projects
+  All viewable personal projects
   """
   projects(
     """
