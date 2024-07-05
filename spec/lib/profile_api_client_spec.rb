@@ -675,4 +675,60 @@ RSpec.describe ProfileApiClient do
       described_class.school_student(token:, school_id: school.id, student_id:)
     end
   end
+
+  describe '.delete_school_student' do
+    let(:school) { build(:school, id: SecureRandom.uuid) }
+    let(:delete_student_url) { "#{api_url}/api/v1/schools/#{school.id}/students/#{student_id}" }
+    let(:student_id) { SecureRandom.uuid }
+
+    before do
+      stub_request(:delete, delete_student_url).to_return(status: 204, body: '', headers: { 'content-type' => 'application/json' })
+    end
+
+    it 'makes a request to the profile api host' do
+      delete_school_student
+      expect(WebMock).to have_requested(:delete, delete_student_url)
+    end
+
+    it 'includes token in the authorization request header' do
+      delete_school_student
+      expect(WebMock).to have_requested(:delete, delete_student_url).with(headers: { authorization: "Bearer #{token}" })
+    end
+
+    it 'includes the profile api key in the x-api-key request header' do
+      delete_school_student
+      expect(WebMock).to have_requested(:delete, delete_student_url).with(headers: { 'x-api-key' => api_key })
+    end
+
+    it 'sets accept header to json' do
+      delete_school_student
+      expect(WebMock).to have_requested(:delete, delete_student_url).with(headers: { 'accept' => 'application/json' })
+    end
+
+    it 'returns nil if successful' do
+      stub_request(:delete, delete_student_url)
+        .to_return(status: 204, body: '', headers: { 'content-type' => 'application/json' })
+      expect(delete_school_student).to be_nil
+    end
+
+    it 'raises exception if anything other than a 200 status code is returned' do
+      stub_request(:delete, delete_student_url)
+        .to_return(status: 201)
+
+      expect { delete_school_student }.to raise_error(ProfileApiClient::UnexpectedResponse)
+    end
+
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:delete, delete_student_url)
+        .to_return(status: 401)
+
+      expect { delete_school_student }.to raise_error(Faraday::Error)
+    end
+
+    private
+
+    def delete_school_student
+      described_class.delete_school_student(token:, school_id: school.id, student_id:)
+    end
+  end
 end

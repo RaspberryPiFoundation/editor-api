@@ -137,13 +137,12 @@ class ProfileApiClient
     end
     # rubocop:enable Metrics/AbcSize
 
-    def delete_school_student(token:, student_id:, organisation_id:)
+    def delete_school_student(token:, school_id:, student_id:)
       return nil if token.blank?
 
-      _ = student_id
-      _ = organisation_id
+      response = connection(token).delete("/api/v1/schools/#{school_id}/students/#{student_id}")
 
-      {}
+      raise UnexpectedResponse, response unless response.status == 204
     end
 
     def safeguarding_flags(token:)
