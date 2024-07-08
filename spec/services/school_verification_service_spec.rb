@@ -44,7 +44,7 @@ RSpec.describe SchoolVerificationService do
 
       it 'creates the school in Profile API' do
         service.verify(token:)
-        expect(ProfileApiClient).to have_received(:create_school).with(token:, school:)
+        expect(ProfileApiClient).to have_received(:create_school).with(token:, id: school.id, code: school.code)
       end
 
       it 'returns true' do

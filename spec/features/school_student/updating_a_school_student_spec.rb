@@ -6,6 +6,7 @@ RSpec.describe 'Updating a school student', type: :request do
   before do
     authenticated_in_hydra_as(owner)
     stub_profile_api_update_school_student
+    stub_profile_api_create_safeguarding_flag
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -23,6 +24,16 @@ RSpec.describe 'Updating a school student', type: :request do
     }
   end
 
+  it 'creates the school owner safeguarding flag' do
+    put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+  end
+
+  it 'does not create the school teacher safeguarding flag' do
+    put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
+  end
+
   it 'responds 204 No Content' do
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
     expect(response).to have_http_status(:no_content)
@@ -34,6 +45,22 @@ RSpec.describe 'Updating a school student', type: :request do
 
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
     expect(response).to have_http_status(:no_content)
+  end
+
+  it 'does not create the school owner safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+  end
+
+  it 'creates the school teacher safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
   end
 
   it 'responds 401 Unauthorized when no token is given' do

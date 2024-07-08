@@ -5,7 +5,7 @@ FactoryBot.define do
     user_id { SecureRandom.uuid }
     sequence(:name) { |n| "Lesson #{n}" }
     description { 'Description' }
-    visibility { 'private' }
+    visibility { 'teachers' }
     project { create(:project) }
   end
 end

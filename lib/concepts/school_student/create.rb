@@ -5,7 +5,11 @@ module SchoolStudent
     class << self
       def call(school:, school_student_params:, token:)
         response = OperationResponse.new
-        create_student(school, school_student_params, token)
+        response[:student_id] = create_student(school, school_student_params, token)
+        response
+      rescue ProfileApiClient::CreateStudent422Error => e
+        Sentry.capture_exception(e)
+        response[:error] = "Error creating school student: #{e.error}"
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -16,14 +20,17 @@ module SchoolStudent
       private
 
       def create_student(school, school_student_params, token)
-        organisation_id = school.id
+        school_id = school.id
         username = school_student_params.fetch(:username)
         password = school_student_params.fetch(:password)
         name = school_student_params.fetch(:name)
 
         validate(school:, username:, password:, name:)
 
-        ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id:)
+        response = ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id:)
+        user_id = response[:created].first
+        Role.student.create!(school:, user_id:)
+        user_id
       end
 
       def validate(school:, username:, password:, name:)
