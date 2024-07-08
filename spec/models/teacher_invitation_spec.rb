@@ -64,4 +64,11 @@ RSpec.describe TeacherInvitation do
 
     expect(invitation.school_name).to eq('school-name')
   end
+
+  it 'non-deterministically encrypts the email_address' do
+    school = create(:verified_school)
+    described_class.create!(email_address: 'teacher@example.com', school:)
+
+    expect(described_class.find_by(email_address: 'teacher@example.com')).to be_nil
+  end
 end
