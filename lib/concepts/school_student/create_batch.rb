@@ -23,7 +23,7 @@ module SchoolStudent
         validate(school:, sheet:)
 
         non_header_rows_with_content(sheet:).each do |name, username, password|
-          ProfileApiClient.create_school_student(token:, username:, password:, name:, organisation_id: school.id)
+          ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id: school.id)
         end
       end
 

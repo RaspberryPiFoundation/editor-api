@@ -21,7 +21,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'jane123', password: 'secret123', name: 'Jane Doe', organisation_id: school.id)
+      .with(token:, username: 'jane123', password: 'secret123', name: 'Jane Doe', school_id: school.id)
   end
 
   it "makes a profile API call to create John Doe's account" do
@@ -29,7 +29,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'john123', password: 'secret456', name: 'John Doe', organisation_id: school.id)
+      .with(token:, username: 'john123', password: 'secret456', name: 'John Doe', school_id: school.id)
   end
 
   context 'when an .xlsx file is provided' do
