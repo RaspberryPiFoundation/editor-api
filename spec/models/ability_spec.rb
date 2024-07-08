@@ -57,6 +57,29 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:destroy, another_project) }
       end
     end
+
+    context 'when the project belongs to a school and the associated lesson is not private' do
+      let(:user) { build(:user) }
+      let(:school) { build(:school) }
+      let(:lesson) { build(:lesson, school:, visibility: 'teachers') }
+      let(:school_project) { build(:project, school:, lesson:) }
+
+      context 'when user is a school owner' do
+        before do
+          create(:owner_role, user_id: user.id, school:)
+        end
+
+        it { is_expected.to be_able_to(:read, school_project) }
+      end
+
+      context 'when user is a school teacher' do
+        before do
+          create(:teacher_role, user_id: user.id, school:)
+        end
+
+        it { is_expected.to be_able_to(:read, school_project) }
+      end
+    end
   end
 
   describe 'Component' do
