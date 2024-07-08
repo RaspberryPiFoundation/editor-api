@@ -70,6 +70,8 @@ RSpec.describe Ability do
         end
 
         it { is_expected.to be_able_to(:read, school_project) }
+        it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
 
       context 'when user is a school teacher' do
@@ -78,6 +80,8 @@ RSpec.describe Ability do
         end
 
         it { is_expected.to be_able_to(:read, school_project) }
+        it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
     end
   end
