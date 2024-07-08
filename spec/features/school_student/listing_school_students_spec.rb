@@ -7,6 +7,7 @@ RSpec.describe 'Listing school students', type: :request do
     authenticated_in_hydra_as(owner)
     stub_profile_api_list_school_students(user_id: student.id)
     stub_user_info_api_for(student)
+    stub_profile_api_create_safeguarding_flag
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -19,12 +20,38 @@ RSpec.describe 'Listing school students', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
+  it 'creates the school owner safeguarding flag' do
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+  end
+
+  it 'does not create the school teacher safeguarding flag' do
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
+  end
+
   it 'responds 200 OK when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:ok)
+  end
+
+  it 'does not create the school owner safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+  end
+
+  it 'creates the school teacher safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
   end
 
   it 'responds with the school students JSON' do
