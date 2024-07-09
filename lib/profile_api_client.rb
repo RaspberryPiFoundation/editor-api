@@ -28,8 +28,6 @@ class ProfileApiClient
   end
 
   class << self
-    # TODO: Replace with HTTP requests once the profile API has been built.
-
     def create_school(token:, id:, code:)
       return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?
 
