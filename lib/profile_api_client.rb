@@ -43,22 +43,8 @@ class ProfileApiClient
       response.body
     end
 
-    # The API should enforce these constraints:
-    # - The token has the school-owner or school-teacher role for the given organisation ID
-    # - The token user or given user should not be under 13
-    # - The email must be verified
-    #
-    # The API should respond:
-    # - 422 Unprocessable if the constraints are not met
-    def list_school_owners(token:, organisation_id:)
-      return [] if token.blank?
-
-      _ = organisation_id
-
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolOwner::Invite propagates the error in the response.
-      response = { 'ids' => ['99999999-9999-9999-9999-999999999999'] }
-      response.deep_symbolize_keys
+    def list_school_owners(*)
+      {}
     end
 
     # The API should enforce these constraints:
