@@ -36,7 +36,12 @@ RSpec.describe ProfileApiClient do
     let(:create_school_url) { "#{api_url}/api/v1/schools" }
 
     before do
-      stub_request(:post, create_school_url).to_return(status: 201, body: '{}')
+      stub_request(:post, create_school_url)
+        .to_return(
+          status: 201,
+          body: '{"id":"","schoolCode":"","updatedAt":"","createdAt":"","discardedAt":""}',
+          headers: { 'content-type' => 'application/json' }
+        )
     end
 
     it 'makes a request to the profile api host' do
@@ -71,10 +76,11 @@ RSpec.describe ProfileApiClient do
     end
 
     it 'returns the created school if successful' do
-      data = { 'id' => 'school-id', 'schoolCode' => 'school-code' }
+      data = { id: 'id', schoolCode: 'code', updatedAt: '2024-07-09T10:31:13.196Z', createdAt: '2024-07-09T10:31:13.196Z', discardedAt: nil }
+      expected = ProfileApiClient::School.new(**data)
       stub_request(:post, create_school_url)
         .to_return(status: 201, body: data.to_json, headers: { 'Content-Type' => 'application/json' })
-      expect(create_school).to eq(data)
+      expect(create_school).to eq(expected)
     end
 
     it 'raises exception if anything other than a 201 status code is returned' do

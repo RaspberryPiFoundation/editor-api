@@ -6,6 +6,8 @@ class ProfileApiClient
     owner: 'school:owner'
   }.freeze
 
+  School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
+
   class Error < StandardError; end
 
   class CreateStudent422Error < Error
@@ -40,7 +42,7 @@ class ProfileApiClient
 
       raise "School not created in Profile API (status code #{response.status})" unless response.status == 201
 
-      response.body
+      School.new(**response.body)
     end
 
     def list_school_owners(*)
