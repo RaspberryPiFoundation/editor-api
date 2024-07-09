@@ -7,6 +7,7 @@ class ProfileApiClient
   }.freeze
 
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
+  SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
 
   class Error < StandardError; end
 
@@ -117,7 +118,7 @@ class ProfileApiClient
         raise "Safeguarding flags cannot be retrieved from Profile API (status code #{response.status})"
       end
 
-      response.body.map(&:deep_symbolize_keys)
+      response.body.map { |flag| SafeguardingFlag.new(**flag.symbolize_keys) }
     end
 
     def create_safeguarding_flag(token:, flag:)

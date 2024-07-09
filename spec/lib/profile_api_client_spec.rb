@@ -149,19 +149,19 @@ RSpec.describe ProfileApiClient do
 
     # rubocop:disable RSpec/ExampleLength
     it 'returns list of safeguarding flags if successful' do
-      flags = [
-        {
-          id: '7ac79585-e187-4d2f-bf0c-a1cbe72ecc9a',
-          userId: '583ba872-b16e-46e1-9f7d-df89d267550d',
-          flag: 'school:owner',
-          isActive: 'true',
-          createdAt: '2024-07-01T12:49:18.926Z',
-          updatedAt: '2024-07-01T12:49:18.926Z'
-        }
-      ]
+      flag = {
+        id: '7ac79585-e187-4d2f-bf0c-a1cbe72ecc9a',
+        userId: '583ba872-b16e-46e1-9f7d-df89d267550d',
+        flag: 'school:owner',
+        email: 'user@example.com',
+        createdAt: '2024-07-01T12:49:18.926Z',
+        updatedAt: '2024-07-01T12:49:18.926Z',
+        discardedAt: nil
+      }
+      expected = ProfileApiClient::SafeguardingFlag.new(**flag)
       stub_request(:get, list_safeguarding_flags_url)
-        .to_return(status: 200, body: flags.to_json, headers: { 'content-type' => 'application/json' })
-      expect(list_safeguarding_flags).to eq(flags)
+        .to_return(status: 200, body: [flag].to_json, headers: { 'content-type' => 'application/json' })
+      expect(list_safeguarding_flags).to eq([expected])
     end
     # rubocop:enable RSpec/ExampleLength
 
