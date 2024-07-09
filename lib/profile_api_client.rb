@@ -71,14 +71,6 @@ class ProfileApiClient
       {}
     end
 
-    # The API should enforce these constraints:
-    # - The token has the school-owner or school-teacher role for the given organisation ID
-    # - The token user should not be under 13
-    # - The email must be verified
-    #
-    # The API should respond:
-    # - 404 Not Found if the user doesn't exist
-    # - 422 Unprocessable if the constraints are not met
     # rubocop:disable Metrics/AbcSize
     def create_school_student(token:, username:, password:, name:, school_id:)
       return nil if token.blank?
