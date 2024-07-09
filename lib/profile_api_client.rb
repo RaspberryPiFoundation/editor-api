@@ -47,24 +47,8 @@ class ProfileApiClient
       {}
     end
 
-    # The API should enforce these constraints:
-    # - The token has the school-owner role for the given organisation ID
-    # - The token user or given user should not be under 13
-    # - The email must be verified
-    #
-    # The API should respond:
-    # - 404 Not Found if the user doesn't exist
-    # - 422 Unprocessable if the constraints are not met
-    def invite_school_owner(token:, email_address:, organisation_id:)
-      return nil if token.blank?
-
-      _ = email_address
-      _ = organisation_id
-
-      # TODO: We should make Faraday raise a Ruby error for a non-2xx status
-      # code so that SchoolOwner::Invite propagates the error in the response.
-      response = {}
-      response.deep_symbolize_keys
+    def invite_school_owner(*)
+      {}
     end
 
     # The API should enforce these constraints:
