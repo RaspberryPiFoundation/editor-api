@@ -11,7 +11,7 @@ class ProfileApiClient
 
   class Error < StandardError; end
 
-  class CreateStudent422Error < Error
+  class Student422Error < Error
     DEFAULT_ERROR = 'unknown error'
     ERRORS = {
       'ERR_USER_EXISTS' => 'username has already been taken',
@@ -26,7 +26,7 @@ class ProfileApiClient
       @username = error['username']
       @error = ERRORS.fetch(error['error'], DEFAULT_ERROR)
 
-      super "Student not created in Profile API (status code 422, username '#{@username}', error '#{@error}')"
+      super "Student not saved in Profile API (status code 422, username '#{@username}', error '#{@error}')"
     end
   end
 
@@ -86,7 +86,7 @@ class ProfileApiClient
         }]
       end
 
-      raise CreateStudent422Error, response.body['errors'].first if response.status == 422
+      raise Student422Error, response.body['errors'].first if response.status == 422
       raise "Student not created in Profile API (status code #{response.status})" unless response.status == 201
 
       response.body.deep_symbolize_keys

@@ -12,14 +12,14 @@ RSpec.describe ProfileApiClient do
     allow(ENV).to receive(:fetch).with('PROFILE_API_KEY').and_return(api_key)
   end
 
-  describe ProfileApiClient::CreateStudent422Error do
+  describe ProfileApiClient::Student422Error do
     subject(:exception) { described_class.new(error) }
 
     let(:error_code) { 'ERR_USER_EXISTS' }
     let(:error) { { 'username' => 'username', 'error' => error_code } }
 
     it 'includes status code, username and translated error code in the message' do
-      expect(exception.message).to eq("Student not created in Profile API (status code 422, username 'username', error 'username has already been taken')")
+      expect(exception.message).to eq("Student not saved in Profile API (status code 422, username 'username', error 'username has already been taken')")
     end
 
     context "when the error isn't recognised" do
@@ -361,8 +361,8 @@ RSpec.describe ProfileApiClient do
       stub_request(:post, create_students_url)
         .to_return(status: 422, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
-      expect { create_school_student }.to raise_error(ProfileApiClient::CreateStudent422Error)
-        .with_message("Student not created in Profile API (status code 422, username 'username', error 'username has already been taken')")
+      expect { create_school_student }.to raise_error(ProfileApiClient::Student422Error)
+        .with_message("Student not saved in Profile API (status code 422, username 'username', error 'username has already been taken')")
     end
 
     it 'raises exception if anything other that 201 status code is returned' do
