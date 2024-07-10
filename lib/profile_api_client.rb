@@ -53,7 +53,7 @@ class ProfileApiClient
         }
       end
 
-      raise "School not created in Profile API (status code #{response.status})" unless response.status == 201
+      raise UnexpectedResponse, response unless response.status == 201
 
       School.new(**response.body)
     end
@@ -86,7 +86,6 @@ class ProfileApiClient
       {}
     end
 
-    # rubocop:disable Metrics/AbcSize
     def create_school_student(token:, username:, password:, name:, school_id:)
       return nil if token.blank?
 
@@ -98,13 +97,12 @@ class ProfileApiClient
         }]
       end
 
-      raise "Student not created in Profile API (status code #{response.status})" unless response.status == 201
+      raise UnexpectedResponse, response unless response.status == 201
 
       response.body.deep_symbolize_keys
     rescue Faraday::UnprocessableEntityError => e
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
-    # rubocop:enable Metrics/AbcSize
 
     def update_school_student(token:, attributes_to_update:, organisation_id:)
       return nil if token.blank?
@@ -127,9 +125,7 @@ class ProfileApiClient
     def safeguarding_flags(token:)
       response = connection(token).get('/api/v1/safeguarding-flags')
 
-      unless response.status == 200
-        raise "Safeguarding flags cannot be retrieved from Profile API (status code #{response.status})"
-      end
+      raise UnexpectedResponse, response unless response.status == 200
 
       response.body.map { |flag| SafeguardingFlag.new(**flag.symbolize_keys) }
     end
@@ -141,7 +137,7 @@ class ProfileApiClient
 
       return if response.status == 201 || response.status == 303
 
-      raise "Safeguarding flag not created in Profile API (status code #{response.status})"
+      raise UnexpectedResponse, response
     end
 
     def delete_safeguarding_flag(token:, flag:)
@@ -149,7 +145,7 @@ class ProfileApiClient
 
       return if response.status == 204
 
-      raise "Safeguarding flag not deleted from Profile API (status code #{response.status})"
+      raise UnexpectedResponse, response
     end
 
     private

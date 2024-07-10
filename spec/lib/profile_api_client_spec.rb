@@ -112,7 +112,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:post, create_school_url)
         .to_return(status: 200)
 
-      expect { create_school }.to raise_error(RuntimeError, 'School not created in Profile API (status code 200)')
+      expect { create_school }.to raise_error(ProfileApiClient::UnexpectedResponse)
     end
 
     it 'raises faraday exception for 4xx and 5xx responses' do
@@ -194,7 +194,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:get, list_safeguarding_flags_url)
         .to_return(status: 201)
 
-      expect { list_safeguarding_flags }.to raise_error(RuntimeError, 'Safeguarding flags cannot be retrieved from Profile API (status code 201)')
+      expect { list_safeguarding_flags }.to raise_error(ProfileApiClient::UnexpectedResponse)
     end
 
     it 'raises faraday exception for 4xx and 5xx responses' do
@@ -265,7 +265,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:post, create_safeguarding_flag_url)
         .to_return(status: 200)
 
-      expect { create_safeguarding_flag }.to raise_error(RuntimeError, 'Safeguarding flag not created in Profile API (status code 200)')
+      expect { create_safeguarding_flag }.to raise_error(ProfileApiClient::UnexpectedResponse)
     end
 
     it 'raises faraday exception for 4xx and 5xx responses' do
@@ -318,7 +318,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:delete, delete_safeguarding_flag_url)
         .to_return(status: 200)
 
-      expect { delete_safeguarding_flag }.to raise_error(RuntimeError, 'Safeguarding flag not deleted from Profile API (status code 200)')
+      expect { delete_safeguarding_flag }.to raise_error(ProfileApiClient::UnexpectedResponse)
     end
 
     it 'raises faraday exception for 4xx and 5xx responses' do
@@ -394,7 +394,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:post, create_students_url)
         .to_return(status: 200)
 
-      expect { create_school_student }.to raise_error(RuntimeError, 'Student not created in Profile API (status code 200)')
+      expect { create_school_student }.to raise_error(ProfileApiClient::UnexpectedResponse)
     end
 
     it 'raises faraday exception for 4xx and 5xx responses' do
