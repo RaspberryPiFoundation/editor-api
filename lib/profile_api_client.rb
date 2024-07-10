@@ -86,10 +86,11 @@ class ProfileApiClient
         }]
       end
 
-      raise Student422Error, response.body['errors'].first if response.status == 422
       raise "Student not created in Profile API (status code #{response.status})" unless response.status == 201
 
       response.body.deep_symbolize_keys
+    rescue Faraday::UnprocessableEntityError => e
+      raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
     # rubocop:enable Metrics/AbcSize
 
@@ -145,6 +146,7 @@ class ProfileApiClient
       Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
         faraday.request :json
         faraday.response :json
+        faraday.response :raise_error
         faraday.headers = {
           'Accept' => 'application/json',
           'Authorization' => "Bearer #{token}",

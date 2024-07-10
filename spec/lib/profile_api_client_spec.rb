@@ -90,6 +90,13 @@ RSpec.describe ProfileApiClient do
       expect { create_school }.to raise_error(RuntimeError, 'School not created in Profile API (status code 200)')
     end
 
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:post, create_school_url)
+        .to_return(status: 401)
+
+      expect { create_school }.to raise_error(Faraday::Error)
+    end
+
     describe 'when BYPASS_OAUTH is true' do
       before do
         allow(ENV).to receive(:[]).with('BYPASS_OAUTH').and_return(true)
@@ -165,6 +172,13 @@ RSpec.describe ProfileApiClient do
       expect { list_safeguarding_flags }.to raise_error(RuntimeError, 'Safeguarding flags cannot be retrieved from Profile API (status code 201)')
     end
 
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:get, list_safeguarding_flags_url)
+        .to_return(status: 401)
+
+      expect { list_safeguarding_flags }.to raise_error(Faraday::Error)
+    end
+
     private
 
     def list_safeguarding_flags
@@ -229,6 +243,13 @@ RSpec.describe ProfileApiClient do
       expect { create_safeguarding_flag }.to raise_error(RuntimeError, 'Safeguarding flag not created in Profile API (status code 200)')
     end
 
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:post, create_safeguarding_flag_url)
+        .to_return(status: 401)
+
+      expect { create_safeguarding_flag }.to raise_error(Faraday::Error)
+    end
+
     def create_safeguarding_flag
       described_class.create_safeguarding_flag(token:, flag:)
     end
@@ -273,6 +294,13 @@ RSpec.describe ProfileApiClient do
         .to_return(status: 200)
 
       expect { delete_safeguarding_flag }.to raise_error(RuntimeError, 'Safeguarding flag not deleted from Profile API (status code 200)')
+    end
+
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:delete, delete_safeguarding_flag_url)
+        .to_return(status: 401)
+
+      expect { delete_safeguarding_flag }.to raise_error(Faraday::Error)
     end
 
     def delete_safeguarding_flag
@@ -342,6 +370,13 @@ RSpec.describe ProfileApiClient do
         .to_return(status: 200)
 
       expect { create_school_student }.to raise_error(RuntimeError, 'Student not created in Profile API (status code 200)')
+    end
+
+    it 'raises faraday exception for 4xx and 5xx responses' do
+      stub_request(:post, create_students_url)
+        .to_return(status: 401)
+
+      expect { create_school_student }.to raise_error(Faraday::Error)
     end
 
     context 'when there are extraneous leading and trailing spaces in the student params' do
