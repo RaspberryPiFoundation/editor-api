@@ -135,17 +135,13 @@ class ProfileApiClient
         request.body = { flag: }
       end
 
-      return if response.status == 201 || response.status == 303
-
-      raise UnexpectedResponse, response
+      raise UnexpectedResponse, response unless [201, 303].include?(response.status)
     end
 
     def delete_safeguarding_flag(token:, flag:)
       response = connection(token).delete("/api/v1/safeguarding-flags/#{flag}")
 
-      return if response.status == 204
-
-      raise UnexpectedResponse, response
+      raise UnexpectedResponse, response unless response.status == 204
     end
 
     private
