@@ -30,6 +30,18 @@ class ProfileApiClient
     end
   end
 
+  class UnexpectedResponse < Error
+    attr_reader :response_status, :response_headers, :response_body
+
+    def initialize(response)
+      @response_status = response.status
+      @response_headers = response.headers
+      @response_body = response.body
+
+      super "Unexpected response from Profile API (status code #{response.status})"
+    end
+  end
+
   class << self
     def create_school(token:, id:, code:)
       return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?

@@ -31,6 +31,31 @@ RSpec.describe ProfileApiClient do
     end
   end
 
+  describe ProfileApiClient::UnexpectedResponse do
+    subject(:exception) { described_class.new(response) }
+
+    let(:response) { instance_double(Faraday::Response, status:, headers:, body:) }
+    let(:status) { 'response-status' }
+    let(:headers) { 'response-headers' }
+    let(:body) { 'response-body' }
+
+    it 'includes expected and actual status code in the message' do
+      expect(exception.message).to eq('Unexpected response from Profile API (status code response-status)')
+    end
+
+    it 'makes response status available' do
+      expect(exception.response_status).to eq('response-status')
+    end
+
+    it 'makes response headers available' do
+      expect(exception.response_headers).to eq('response-headers')
+    end
+
+    it 'makes response body available' do
+      expect(exception.response_body).to eq('response-body')
+    end
+  end
+
   describe '.create_school' do
     let(:school) { build(:school, id: SecureRandom.uuid, code: SecureRandom.uuid) }
     let(:create_school_url) { "#{api_url}/api/v1/schools" }
