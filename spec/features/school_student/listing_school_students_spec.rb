@@ -5,14 +5,13 @@ require 'rails_helper'
 RSpec.describe 'Listing school students', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_profile_api_list_school_students(user_id: student.id)
-    stub_user_info_api_for(student)
+    stub_profile_api_list_school_students(school:, id: student.id, name: 'School Student')
     stub_profile_api_create_safeguarding_flag
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student) { create(:student, school:, name: 'School Student') }
+  let(:student) { create(:student, school:) }
   let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do

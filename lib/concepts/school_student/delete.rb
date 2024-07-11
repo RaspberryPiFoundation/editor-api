@@ -16,7 +16,7 @@ module SchoolStudent
       private
 
       def delete_student(school, student_id, token)
-        ProfileApiClient.delete_school_student(token:, student_id:, organisation_id: school.id)
+        ProfileApiClient.delete_school_student(token:, student_id:, school_id: school.id)
       end
     end
   end

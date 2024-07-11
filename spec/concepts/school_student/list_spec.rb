@@ -8,7 +8,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
   let(:student) { create(:student, school:) }
 
   before do
-    stub_profile_api_list_school_students(user_id: student.id)
+    stub_profile_api_list_school_students(school:, id: student.id, name: 'name', username: 'username')
     stub_user_info_api_for(student)
   end
 
@@ -21,12 +21,13 @@ RSpec.describe SchoolStudent::List, type: :unit do
     described_class.call(school:, token:)
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
-    expect(ProfileApiClient).to have_received(:list_school_students).with(token:, organisation_id: school.id)
+    expect(ProfileApiClient).to have_received(:list_school_students).with(token:, school_id: school.id, student_ids: [student.id])
   end
 
   it 'returns the school students in the operation response' do
     response = described_class.call(school:, token:)
-    expect(response[:school_students].first).to be_a(User)
+    expected_user = User.new(id: student.id, name: 'name', username: 'username')
+    expect(response[:school_students].first).to eq(expected_user)
   end
 
   context 'when listing fails' do
