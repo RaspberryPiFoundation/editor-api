@@ -96,9 +96,7 @@ RSpec.describe User do
       let(:student) { create(:student, school:, name: 'School Student') }
 
       before do
-        allow(HydraPublicApiClient).to receive(:fetch_oauth_user).with(token: UserProfileMock::TOKEN)
-                                                                 .and_return({ 'sub' => "student:#{student.id}" })
-        authenticated_in_hydra_as(student)
+        authenticated_in_hydra_as(student, :student)
       end
 
       it 'returns an instance of the described class' do
@@ -106,7 +104,7 @@ RSpec.describe User do
       end
 
       it 'returns a user with the correct ID' do
-        expect(user.id).to eq student.id
+        expect(user.id).to eq "student:#{student.id}"
       end
 
       it 'returns a user with the correct name' do
