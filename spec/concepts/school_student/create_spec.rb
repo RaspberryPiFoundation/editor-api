@@ -87,7 +87,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
   context 'when the student cannot be created in profile api because of a 422 response' do
     let(:error) { { 'username' => 'username', 'error' => 'ERR_USER_EXISTS' } }
-    let(:exception) { ProfileApiClient::CreateStudent422Error.new(error) }
+    let(:exception) { ProfileApiClient::Student422Error.new(error) }
 
     before do
       allow(ProfileApiClient).to receive(:create_school_student).and_raise(exception)
