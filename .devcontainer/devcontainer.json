@@ -47,7 +47,6 @@
       "extensions": [
         "ms-azuretools.vscode-docker",
         "ninoseki.vscode-gem-lens",
-        "rebornix.ruby",
         "eamodio.gitlens",
         "github.vscode-pull-request-github",
         "wmaurer.change-case",
