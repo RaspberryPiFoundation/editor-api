@@ -9,7 +9,6 @@
     "m-bowley",
     "sra405",
     "magdalenajadach",
-    "tessyraspberrypi",
     "danhalson",
     "conorriches",
     "PetarSimonovic",
@@ -21,6 +20,7 @@
     "james.mead+rpf@gofreerange.com",
     "chrisroos",
     "chris.lowis@gofreerange.com",
+    "lpmi-13",
     "dependabot[bot]"
   ],
   "message": "We require contributors to sign our Contributor License Agreement, and we don't have you on file. In order for us to review and merge your code, please complete [this form](https://form.raspberrypi.org/4873530) and we'll get you added and review your contribution as soon as possible."
