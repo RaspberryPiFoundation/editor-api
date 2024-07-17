@@ -104,7 +104,7 @@ RSpec.describe User do
       end
 
       it 'returns a user with the correct ID' do
-        expect(user.id).to eq "student:#{student.id}"
+        expect(user.id).to eq student.id
       end
 
       it 'returns a user with the correct name' do
