@@ -12,6 +12,9 @@ class SchoolDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::String,
     creator: Field::BelongsTo.with_options(class_name: 'User'),
+    postal_code: Field::String,
+    creator_role: Field::String,
+    creator_department: Field::String,
     name: Field::String,
     website: Field::String,
     address_line_1: Field::String,
@@ -47,21 +50,24 @@ class SchoolDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     name
-    verified_at
-    rejected_at
     creator
+    creator_role
+    creator_department
     reference
     website
     address_line_1
     address_line_2
     municipality
     administrative_area
+    postal_code
     country_code
     classes
     lessons
     projects
     created_at
     updated_at
+    verified_at
+    rejected_at
   ].freeze
 
   # FORM_ATTRIBUTES
