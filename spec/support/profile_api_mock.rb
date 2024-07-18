@@ -23,14 +23,20 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:remove_school_teacher)
   end
 
-  def stub_profile_api_list_school_students(school:, id:, username: '', name: '')
+  def stub_profile_api_list_school_students(school:, student_attributes:)
     now = Time.current.to_fs(:iso8601) # rubocop:disable Naming/VariableNumber
-    student = ProfileApiClient::Student.new(
-      schoolId: school.id,
-      id:, username:, name:,
-      createdAt: now, updatedAt: now, discardedAt: nil
-    )
-    allow(ProfileApiClient).to receive(:list_school_students).and_return([student])
+
+    students = student_attributes.map do |student_attrs|
+      ProfileApiClient::Student.new(
+        schoolId: school.id,
+        id: student_attrs[:id],
+        username: student_attrs[:username],
+        name: student_attrs[:name],
+        createdAt: now, updatedAt: now, discardedAt: nil
+      )
+    end
+
+    allow(ProfileApiClient).to receive(:list_school_students).and_return(students)
   end
 
   def stub_profile_api_create_school_student(user_id: SecureRandom.uuid)
