@@ -37,7 +37,7 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    student_ids_from_response = data.map { |member| member[:student_id] }
+    student_ids_from_response = data.pluck(:student_id)
     expected_student_ids = students.map(&:id)
 
     expect(student_ids_from_response).to match_array(expected_student_ids)
