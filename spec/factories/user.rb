@@ -11,6 +11,8 @@ FactoryBot.define do
     end
 
     factory :student do
+      email { nil }
+      username { Faker::Internet.username }
       transient do
         school { nil }
       end
