@@ -51,7 +51,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
       end
       stub_profile_api_list_school_students(school:, student_attributes:)
     end
-  
+
     it 'returns a successful operation response' do
       response = described_class.call(school:, token:, student_ids:)
       expect(response.success?).to be(true)

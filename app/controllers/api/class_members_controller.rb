@@ -11,7 +11,7 @@ module Api
       @class_members = @school_class.members.accessible_by(current_ability)
       student_ids = @class_members.pluck(:student_id)
 
-      result = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: student_ids)
+      result = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
 
       if result.success?
         @school_students = result[:school_students]

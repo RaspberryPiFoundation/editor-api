@@ -10,7 +10,7 @@ RSpec.describe 'Listing class members', type: :request do
     end
     stub_profile_api_list_school_students(school:, student_attributes:)
     students.each do |student|
-      create(:class_member, student_id: student.id, school_class: school_class)
+      create(:class_member, student_id: student.id, school_class:)
     end
   end
 
