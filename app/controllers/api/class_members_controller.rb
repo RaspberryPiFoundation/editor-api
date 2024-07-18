@@ -45,7 +45,7 @@ module Api
     private
 
     def class_member_params
-      params.require(:class_member).permit(student_ids: [])
+      params.require(:class_member).permit(:student_id, student_ids: [])
     end
   end
 end
