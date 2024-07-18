@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-json.array!(@class_members_with_students) do |class_member, student|
+json.array!(@class_members, @school_students) do |class_member|
   json.call(
     class_member,
     :id,
@@ -10,6 +10,16 @@ json.array!(@class_members_with_students) do |class_member, student|
     :updated_at
   )
 
-  json.student_username(student&.username)
-  json.student_name(student&.name)
+  school_student = @school_students.find { |student| student.id == class_member.student_id }
+
+  if school_student.present?
+    json.set! :student do
+      json.call(
+        school_student,
+        :id,
+        :username,
+        :name
+      )
+    end
+  end
 end
