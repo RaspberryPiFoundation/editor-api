@@ -5,7 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Listing school students', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_profile_api_list_school_students(school:, id: student.id, name: 'School Student')
+    student_attributes = [{ id: student.id, name: 'School Student' }]
+    stub_profile_api_list_school_students(school:, student_attributes:)
     stub_profile_api_create_safeguarding_flag
   end
 

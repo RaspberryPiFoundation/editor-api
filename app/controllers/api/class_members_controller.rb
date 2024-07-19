@@ -8,8 +8,17 @@ module Api
     load_and_authorize_resource :class_member, through: :school_class, through_association: :members
 
     def index
-      @class_members_with_students = @school_class.members.accessible_by(current_ability).with_students
-      render :index, formats: [:json], status: :ok
+      @class_members = @school_class.members.accessible_by(current_ability)
+      student_ids = @class_members.pluck(:student_id)
+
+      result = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
+
+      if result.success?
+        @school_students = result[:school_students]
+        render :index, formats: [:json], status: :ok
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
     end
 
     def create
@@ -36,7 +45,7 @@ module Api
     private
 
     def class_member_params
-      params.require(:class_member).permit(:student_id)
+      params.require(:class_member).permit(:student_id, student_ids: [])
     end
   end
 end
