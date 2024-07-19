@@ -61,9 +61,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with invalid params' do
-    let(:invalid_student_id) { SecureRandom.uuid }
-
-    let(:invalid_params) { { class_member: { student_id: invalid_student_id } } }
+    let(:invalid_params) { { class_member: { student_id: SecureRandom.uuid } } }
 
     before do
       stub_profile_api_list_school_students(school:, student_attributes: [])

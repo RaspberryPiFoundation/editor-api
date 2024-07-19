@@ -69,11 +69,10 @@ RSpec.describe ClassMember::Create, type: :unit do
 
     context 'with a student from a different school' do
       let(:different_school) { create(:school) }
-      let(:new_student) { create(:student, school: different_school) }
-      let(:failed_student_id) { new_student.id }
+      let(:different_school_student) { create(:student, school: different_school) }
 
       context 'with non existent students' do
-        let(:students) { [new_student] }
+        let(:students) { [different_school_student] }
 
         it 'does not create a class member' do
           expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
@@ -84,14 +83,14 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect(response.success?).to be(true)
         end
 
-        it 'returns a successful operation response' do
+        it 'returns an empty class members array' do
           response = described_class.call(school_class:, students:)
           expect(response[:class_members]).to eq([])
         end
 
         it 'returns the error messages in the operation response' do
           response = described_class.call(school_class:, students:)
-          expect(response[:errors][new_student.id]).to include("Error creating class member for student_id #{new_student.id}: Student '#{new_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
+          expect(response[:errors][different_school_student.id]).to include("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
         it 'sent the exception to Sentry' do
@@ -101,8 +100,7 @@ RSpec.describe ClassMember::Create, type: :unit do
       end
 
       context 'when one creation fails' do
-        let(:new_students) { students + [new_student] }
-        let(:student_ids) { students.map(&:id) << failed_student_id }
+        let(:new_students) { students + [different_school_student] }
 
         it 'returns a successful operation response' do
           response = described_class.call(school_class:, students: new_students)
@@ -126,13 +124,12 @@ RSpec.describe ClassMember::Create, type: :unit do
 
         it 'assigns the successful students' do
           response = described_class.call(school_class:, students: new_students)
-          expected_student_ids = student_ids - [failed_student_id]
-          expect(response[:class_members].map(&:student_id)).to match_array(expected_student_ids)
+          expect(response[:class_members].map(&:student_id)).to match_array(student_ids)
         end
 
         it 'returns the error messages in the operation response' do
           response = described_class.call(school_class:, students: new_students)
-          expect(response[:errors][failed_student_id]).to eq("Error creating class member for student_id #{new_student.id}: Student '#{new_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
+          expect(response[:errors][different_school_student.id]).to eq("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
         it 'sent the exception to Sentry' do
