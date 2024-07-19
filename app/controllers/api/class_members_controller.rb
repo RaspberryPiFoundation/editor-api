@@ -22,10 +22,24 @@ module Api
     end
 
     def create
-      result = ClassMember::Create.call(school_class: @school_class, class_member_params:)
+      student_ids = [class_member_params[:student_id]]
+      students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
+      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students])
 
       if result.success?
-        @class_member_with_student = result[:class_member].with_student
+        @class_members = result[:class_members]
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def create_batch
+      students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: create_batch_params)
+      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students])
+
+      if result.success?
+        @class_members = result[:class_members]
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -45,7 +59,11 @@ module Api
     private
 
     def class_member_params
-      params.require(:class_member).permit(:student_id, student_ids: [])
+      params.require(:class_member).permit(:student_id)
+    end
+
+    def create_batch_params
+      params.permit(student_ids: [])
     end
   end
 end

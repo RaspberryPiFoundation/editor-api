@@ -1,15 +1,23 @@
 # frozen_string_literal: true
 
-class_member, student = @class_member_with_student
+json.array!(@class_members) do |class_member|
+  json.call(
+    class_member,
+    :id,
+    :school_class_id,
+    :student_id,
+    :created_at,
+    :updated_at
+  )
 
-json.call(
-  class_member,
-  :id,
-  :school_class_id,
-  :student_id,
-  :created_at,
-  :updated_at
-)
-
-json.student_username(student&.username)
-json.student_name(student&.name)
+  if class_member.student.present?
+    json.set! :student do
+      json.call(
+        class_member.student,
+        :id,
+        :username,
+        :name
+      )
+    end
+  end
+end
