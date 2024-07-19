@@ -6,7 +6,8 @@ class ClassMember
       def call(school_class:, students:)
         response = OperationResponse.new
         response[:class_members] = []
-        raise ArgumentError, 'No valid students provided' if !students || students.empty?
+        raise ArgumentError, 'No valid students provided' if students.blank?
+
         students.each do |student|
           params = { student_id: student.id }
           class_member = school_class.members.build(params)
@@ -22,7 +23,7 @@ class ClassMember
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = e.message || "Error creating class members"
+        response[:error] = e.message || 'Error creating class members'
         response
       end
     end

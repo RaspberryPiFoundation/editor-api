@@ -17,9 +17,8 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with valid params' do
-
     let(:student_attributes) do
-       students.map do |student|
+      students.map do |student|
         { id: student.id, name: student.name, username: student.username }
       end
     end
@@ -51,7 +50,7 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      student_ids = data.map { |class_member| class_member[:student_id] }
+      student_ids = data.pluck(:student_id)
       expect(student_ids).to eq(params[:student_ids])
     end
 
@@ -59,12 +58,11 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      response_students = data.map { |class_member| class_member[:student] }
+      response_students = data.pluck(:student)
 
       expect(response_students).to eq(student_attributes)
     end
   end
-
 
   context 'with invalid params' do
     let(:invalid_params) { { class_member: { student_ids: ' ' } } }

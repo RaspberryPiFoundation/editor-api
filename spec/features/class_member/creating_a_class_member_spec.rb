@@ -46,7 +46,7 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      student_ids = data.map { |class_member| class_member[:student_id] }
+      student_ids = data.pluck(:student_id)
       expect(student_ids).to eq([student.id])
     end
 
@@ -54,7 +54,7 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      response_students = data.map { |class_member| class_member[:student] }
+      response_students = data.pluck(:student)
 
       expect(response_students).to eq(student_attributes)
     end

@@ -31,7 +31,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
   it 'assigns the school_class' do
     response = described_class.call(school_class:, students:)
-    expect(response[:class_members]).to all(have_attributes(school_class: school_class))
+    expect(response[:class_members]).to all(have_attributes(school_class:))
   end
 
   it 'assigns the student_id' do
@@ -46,7 +46,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
     context 'with malformed students' do
       let(:students) { nil }
-      
+
       it 'does not create a class member' do
         expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
       end
@@ -74,7 +74,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
       context 'with non existent students' do
         let(:students) { [new_student] }
-        
+
         it 'does not create a class member' do
           expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
         end
@@ -121,7 +121,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
         it 'assigns the school_class' do
           response = described_class.call(school_class:, students: new_students)
-          expect(response[:class_members]).to all(have_attributes(school_class: school_class))
+          expect(response[:class_members]).to all(have_attributes(school_class:))
         end
 
         it 'assigns the successful students' do
