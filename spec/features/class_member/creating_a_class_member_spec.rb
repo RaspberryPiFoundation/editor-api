@@ -24,10 +24,10 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with valid params' do
-    let(:student_attributes) { [{ id: student.id, name: student.name, username: student.username }] }
+    let(:student_attributes) { { id: student.id, name: student.name, username: student.username } }
 
     before do
-      stub_profile_api_list_school_students(school:, student_attributes:)
+      stub_profile_api_list_school_students(school:, student_attributes: [student_attributes])
     end
 
     it 'responds 201 Created' do
@@ -46,17 +46,16 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      student_ids = data.pluck(:student_id)
-      expect(student_ids).to eq([student.id])
+      expect(data[:class_member][:student_id]).to eq(student.id)
     end
 
     it 'responds with the student JSON' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      response_students = data.pluck(:student)
+      response_student = data[:class_member][:student]
 
-      expect(response_students).to eq(student_attributes)
+      expect(response_student).to eq(student_attributes)
     end
   end
 
