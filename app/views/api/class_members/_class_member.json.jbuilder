@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 json.call(
   class_member,
   :id,
