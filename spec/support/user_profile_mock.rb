@@ -7,13 +7,13 @@ module UserProfileMock
     stub_user_info_api(user_id:, users: [])
   end
 
-  def stub_user_info_api_for(user)
-    stub_user_info_api(user_id: user.id, users: [user_to_hash(user)])
+  def stub_user_info_api_for(user, user_type = nil)
+    stub_user_info_api(user_id: user.id, users: [user_to_hash(user, user_type)])
   end
 
-  def authenticated_in_hydra_as(user)
-    stub_hydra_public_api(user_to_hash(user))
-    stub_user_info_api_for(user)
+  def authenticated_in_hydra_as(user, user_type = nil)
+    stub_hydra_public_api(user_to_hash(user, user_type, :sub))
+    stub_user_info_api_for(user, user_type)
   end
 
   def unauthenticated_in_hydra
@@ -26,11 +26,12 @@ module UserProfileMock
 
   private
 
-  def user_to_hash(user)
+  def user_to_hash(user, user_type, id_field = :id)
     {
-      id: user.id,
+      id_field => user_type ? "#{user_type}:#{user.id}" : user.id,
       name: user.name,
-      email: user.email
+      email: user.email,
+      username: user.username
     }
   end
 
