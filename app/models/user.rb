@@ -94,7 +94,7 @@ class User
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)
 
-    args['id'] ||= auth['sub']
+    args['id'] ||= auth['sub'].sub('student:', '')
     args['token'] = token
 
     new(args)

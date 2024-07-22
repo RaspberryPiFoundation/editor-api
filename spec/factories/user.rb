@@ -5,6 +5,7 @@ FactoryBot.define do
     id { SecureRandom.uuid }
     name { Faker::Name.name }
     email { Faker::Internet.email }
+    username { nil }
 
     factory :admin_user do
       roles { 'editor-admin' }
@@ -13,6 +14,7 @@ FactoryBot.define do
     factory :student do
       email { nil }
       username { Faker::Internet.username }
+
       transient do
         school { nil }
       end

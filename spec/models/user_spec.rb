@@ -47,26 +47,77 @@ RSpec.describe User do
   describe '.from_token' do
     subject(:user) { described_class.from_token(token: UserProfileMock::TOKEN) }
 
-    let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
+    context 'when logged into a full account' do
+      let(:owner) { create(:owner, school:, name: 'School Owner', email: 'school-owner@example.com') }
 
-    before do
-      authenticated_in_hydra_as(owner)
+      before do
+        authenticated_in_hydra_as(owner)
+      end
+
+      it 'returns an instance of the described class' do
+        expect(user).to be_a described_class
+      end
+
+      it 'returns a user with the correct ID' do
+        expect(user.id).to eq owner.id
+      end
+
+      it 'returns a user with the correct name' do
+        expect(user.name).to eq owner.name
+      end
+
+      it 'returns a user with the correct email' do
+        expect(user.email).to eq 'school-owner@example.com'
+      end
+
+      it 'returns a user without a username' do
+        expect(user.username).to be_nil
+      end
+
+      context 'when BYPASS_OAUTH is true' do
+        around do |example|
+          ClimateControl.modify(BYPASS_OAUTH: 'true') do
+            example.run
+          end
+        end
+
+        it 'does not call the API' do
+          user
+          expect(WebMock).not_to have_requested(:get, /.*/)
+        end
+
+        it 'returns a stubbed user' do
+          expect(user.name).to eq('School Owner')
+        end
+      end
     end
 
-    it 'returns an instance of the described class' do
-      expect(user).to be_a described_class
-    end
+    context 'when logged into a student account' do
+      let(:student) { create(:student, school:, name: 'School Student') }
 
-    it 'returns a user with the correct ID' do
-      expect(user.id).to eq owner.id
-    end
+      before do
+        authenticated_in_hydra_as(student, :student)
+      end
 
-    it 'returns a user with the correct name' do
-      expect(user.name).to eq 'School Owner'
-    end
+      it 'returns an instance of the described class' do
+        expect(user).to be_a described_class
+      end
 
-    it 'returns a user with the correct email' do
-      expect(user.email).to eq 'school-owner@example.com'
+      it 'returns a user with the correct ID' do
+        expect(user.id).to eq student.id
+      end
+
+      it 'returns a user with the correct name' do
+        expect(user.name).to eq student.name
+      end
+
+      it 'returns a user with the correct username' do
+        expect(user.username).to eq student.username
+      end
+
+      it 'returns a user without an email' do
+        expect(user.email).to be_nil
+      end
     end
 
     context 'when the access token is invalid' do
@@ -82,23 +133,6 @@ RSpec.describe User do
       it 'reports the Faraday::UnauthorizedError exception to Sentry' do
         user
         expect(Sentry).to have_received(:capture_exception).with(instance_of(Faraday::UnauthorizedError))
-      end
-    end
-
-    context 'when BYPASS_OAUTH is true' do
-      around do |example|
-        ClimateControl.modify(BYPASS_OAUTH: 'true') do
-          example.run
-        end
-      end
-
-      it 'does not call the API' do
-        user
-        expect(WebMock).not_to have_requested(:get, /.*/)
-      end
-
-      it 'returns a stubbed user' do
-        expect(user.name).to eq('School Owner')
       end
     end
   end
