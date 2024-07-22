@@ -72,7 +72,7 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_profile_api_list_school_students(school:, student_attributes: [])
     end
 
-    it 'responds 400 Bad Request when params are missing' do
+    it 'responds 422 Unprocessable Entity when params are missing' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:)
       expect(response).to have_http_status(:unprocessable_entity)
     end
