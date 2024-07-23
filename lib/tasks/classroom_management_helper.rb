@@ -4,9 +4,13 @@ module ClassroomManagementHelper
   TEST_USERS = {
     # Use this in conjunction with BYPASS_OAUTH=true to generate data for the bypass user
     bypass_oauth: '00000000-0000-0000-0000-000000000000',
-    jane: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
-    john: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' # john.doe@example.com
+    jane_doe: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
+    john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com
+    jane_smith: 'e52de409-9210-4e94-b08c-dd11439e07d9', # student
+    john_smith: '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' # student
   }.freeze
+
+  TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9'
 
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
@@ -25,7 +29,9 @@ module ClassroomManagementHelper
 
   def verify_school(school)
     Rails.logger.info 'Verifying the school...'
-    SchoolVerificationService.new(school).verify
+    school.verify!
+    Role.owner.create!(user_id: school.creator_id, school:)
+    Role.teacher.create!(user_id: school.creator_id, school:)
   end
 
   def create_school_class(teacher_id, school)
@@ -40,6 +46,19 @@ module ClassroomManagementHelper
   def assign_a_teacher(user_id, school)
     Rails.logger.info 'Adding a teacher...'
     Role.teacher.find_or_create_by!(user_id:, school:)
+  end
+
+  def assign_students(school_class, school)
+    [TEST_USERS[:jane_smith], TEST_USERS[:john_smith]].map do |student_id|
+      Rails.logger.info 'Assigning student role...'
+      Role.student.find_or_create_by!(user_id: student_id, school:)
+
+      ClassMember.find_or_create_by!(student_id:, school_class:) do |class_member|
+        Rails.logger.info 'Adding student...'
+        class_member.student_id = student_id
+        class_member.school_class = school_class
+      end
+    end
   end
 
   # rubocop:disable Metrics/AbcSize

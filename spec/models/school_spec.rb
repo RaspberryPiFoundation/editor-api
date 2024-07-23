@@ -201,6 +201,34 @@ RSpec.describe School do
       school.update(rejected_at: nil)
       expect(school.errors[:rejected_at]).to include('cannot be changed after rejection')
     end
+
+    it 'requires #code to be unique' do
+      school.update!(code: '00-00-00', verified_at: Time.current)
+      another_school = build(:school, code: '00-00-00')
+      another_school.valid?
+      expect(another_school.errors[:code]).to include('has already been taken')
+    end
+
+    it 'requires #code to be set when the school is verified' do
+      school.update(verified_at: Time.current)
+      expect(school.errors[:code]).to include("can't be blank")
+    end
+
+    it 'requires code to be blank until the school is verified' do
+      school.update(code: 'school-code')
+      expect(school.errors[:code]).to include('must be blank')
+    end
+
+    it 'requires code to be formatted as 3 pairs of digits separated by hyphens' do
+      school.update(code: 'invalid', verified_at: Time.current)
+      expect(school.errors[:code]).to include('is invalid')
+    end
+
+    it "cannot change #code once it's been set" do
+      school.verify!
+      school.update(code: '00-00-00')
+      expect(school.errors[:code]).to include('cannot be changed after verification')
+    end
   end
 
   describe '#creator' do
@@ -270,6 +298,27 @@ RSpec.describe School do
     it 'sets verified_at to the current time' do
       school.verify!
       expect(school.verified_at).to be_within(1.second).of(Time.zone.now)
+    end
+
+    it 'uses the school code generator to generates and set the code' do
+      allow(SchoolCodeGenerator).to receive(:generate).and_return('00-00-00')
+      school.verify!
+      expect(school.code).to eq('00-00-00')
+    end
+
+    it 'retries 5 times if the school code is not unique' do
+      school.verify!
+      allow(SchoolCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
+      another_school = create(:school)
+      another_school.verify!
+      expect(another_school.code).to eq('00-00-00')
+    end
+
+    it 'raises exception if unique code cannot be generated in 5 retries' do
+      school.verify!
+      allow(SchoolCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
+      another_school = create(:school)
+      expect { another_school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
     end
 
     it 'returns true on successful verification' do

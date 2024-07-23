@@ -10,7 +10,7 @@ class Project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = 'Error creating project'
+        response[:error] = "Error creating project: #{e}"
         response
       end
 

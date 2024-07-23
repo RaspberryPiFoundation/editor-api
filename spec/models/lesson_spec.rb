@@ -33,10 +33,10 @@ RSpec.describe Lesson do
       expect(lesson.copies.size).to eq(2)
     end
 
-    it 'has many projects' do
+    it 'has one project' do
       user_id = SecureRandom.uuid
-      lesson = create(:lesson, user_id:, projects: [build(:project, user_id:)])
-      expect(lesson.projects.size).to eq(1)
+      lesson = create(:lesson, user_id:, project: build(:project, user_id:))
+      expect(lesson.project).to be_a(Project)
     end
   end
 

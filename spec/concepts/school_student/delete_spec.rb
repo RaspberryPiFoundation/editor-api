@@ -21,7 +21,7 @@ RSpec.describe SchoolStudent::Delete, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:delete_school_student)
-      .with(token:, student_id:, organisation_id: school.id)
+      .with(token:, student_id:, school_id: school.id)
   end
 
   context 'when removal fails' do

@@ -9,31 +9,46 @@ RSpec.describe SchoolVerificationService do
   let(:school_creator) { create(:user) }
   let(:service) { described_class.new(school) }
   let(:organisation_id) { SecureRandom.uuid }
+  let(:token) { 'token' }
+
+  before do
+    allow(ProfileApiClient).to receive(:create_school)
+  end
 
   describe '#verify' do
     describe 'when school can be saved' do
       it 'saves the school' do
-        service.verify
+        service.verify(token:)
         expect(school).to be_persisted
       end
 
       it 'sets verified_at to a date' do
-        service.verify
+        service.verify(token:)
         expect(school.reload.verified_at).to be_a(ActiveSupport::TimeWithZone)
       end
 
+      it 'generates school code' do
+        service.verify(token:)
+        expect(school.reload.code).to be_present
+      end
+
       it 'grants the creator the owner role for the school' do
-        service.verify
+        service.verify(token:)
         expect(school_creator).to be_school_owner(school)
       end
 
       it 'grants the creator the teacher role for the school' do
-        service.verify
+        service.verify(token:)
         expect(school_creator).to be_school_teacher(school)
       end
 
+      it 'creates the school in Profile API' do
+        service.verify(token:)
+        expect(ProfileApiClient).to have_received(:create_school).with(token:, id: school.id, code: school.code)
+      end
+
       it 'returns true' do
-        expect(service.verify).to be(true)
+        expect(service.verify(token:)).to be(true)
       end
     end
 
@@ -41,22 +56,86 @@ RSpec.describe SchoolVerificationService do
       let(:website) { 'invalid' }
 
       it 'does not save the school' do
-        service.verify
+        service.verify(token:)
         expect(school).not_to be_persisted
       end
 
       it 'does not create owner role' do
-        service.verify
+        service.verify(token:)
         expect(school_creator).not_to be_school_owner(school)
       end
 
       it 'does not create teacher role' do
-        service.verify
+        service.verify(token:)
         expect(school_creator).not_to be_school_teacher(school)
       end
 
+      it 'does not create school in Profile API' do
+        expect(ProfileApiClient).not_to have_received(:create_school)
+      end
+
       it 'returns false' do
-        expect(service.verify).to be(false)
+        expect(service.verify(token:)).to be(false)
+      end
+    end
+
+    describe 'when the school cannot be created in Profile API' do
+      before do
+        allow(ProfileApiClient).to receive(:create_school).and_raise(RuntimeError)
+      end
+
+      it 'does not save the school' do
+        service.verify(token:)
+        expect { school.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it 'does not create owner role' do
+        service.verify(token:)
+        expect(school_creator).not_to be_school_owner(school)
+      end
+
+      it 'does not create teacher role' do
+        service.verify(token:)
+        expect(school_creator).not_to be_school_teacher(school)
+      end
+
+      it 'does not create school in Profile API' do
+        expect(ProfileApiClient).not_to have_received(:create_school)
+      end
+
+      it 'returns false' do
+        expect(service.verify(token:)).to be(false)
+      end
+    end
+
+    describe 'when teacher and owner roles cannot be created because they already have a role in another school' do
+      let(:another_school) { create(:school) }
+
+      before do
+        create(:role, user_id: school.creator_id, school: another_school)
+      end
+
+      it 'does not save the school' do
+        service.verify(token:)
+        expect { school.reload }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      it 'does not create owner role' do
+        service.verify(token:)
+        expect(school_creator).not_to be_school_owner(school)
+      end
+
+      it 'does not create teacher role' do
+        service.verify(token:)
+        expect(school_creator).not_to be_school_teacher(school)
+      end
+
+      it 'does not create school in Profile API' do
+        expect(ProfileApiClient).not_to have_received(:create_school)
+      end
+
+      it 'returns false' do
+        expect(service.verify(token:)).to be(false)
       end
     end
   end
@@ -78,7 +157,7 @@ RSpec.describe SchoolVerificationService do
 
   describe 'when the school was previously verified' do
     before do
-      service.verify
+      service.verify(token:)
       service.reject
       school.reload
     end

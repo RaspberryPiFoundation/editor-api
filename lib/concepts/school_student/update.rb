@@ -3,9 +3,9 @@
 module SchoolStudent
   class Update
     class << self
-      def call(school:, school_student_params:, token:)
+      def call(school:, student_id:, school_student_params:, token:)
         response = OperationResponse.new
-        update_student(school, school_student_params, token)
+        update_student(school, student_id, school_student_params, token)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -15,17 +15,16 @@ module SchoolStudent
 
       private
 
-      def update_student(school, school_student_params, token)
+      def update_student(school, student_id, school_student_params, token)
         username = school_student_params.fetch(:username, nil)
         password = school_student_params.fetch(:password, nil)
         name = school_student_params.fetch(:name, nil)
 
         validate(username:, password:, name:)
 
-        attributes_to_update = { username:, password:, name: }.compact
-        return if attributes_to_update.empty?
-
-        ProfileApiClient.update_school_student(token:, attributes_to_update:, organisation_id: school.id)
+        ProfileApiClient.update_school_student(
+          token:, school_id: school.id, student_id:, username:, password:, name:
+        )
       end
 
       def validate(username:, password:, name:)

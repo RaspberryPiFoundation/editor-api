@@ -5,18 +5,29 @@ require 'rails_helper'
 RSpec.describe 'Listing school students', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_profile_api_list_school_students(user_id: student.id)
-    stub_user_info_api_for(student)
+    student_attributes = [{ id: student.id, name: 'School Student' }]
+    stub_profile_api_list_school_students(school:, student_attributes:)
+    stub_profile_api_create_safeguarding_flag
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:student) { create(:student, school:, name: 'School Student') }
+  let(:student) { create(:student, school:) }
   let(:owner) { create(:owner, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:ok)
+  end
+
+  it 'creates the school owner safeguarding flag' do
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+  end
+
+  it 'does not create the school teacher safeguarding flag' do
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
   end
 
   it 'responds 200 OK when the user is a school-teacher' do
@@ -25,6 +36,22 @@ RSpec.describe 'Listing school students', type: :request do
 
     get("/api/schools/#{school.id}/students", headers:)
     expect(response).to have_http_status(:ok)
+  end
+
+  it 'does not create the school owner safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+  end
+
+  it 'creates the school teacher safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
   end
 
   it 'responds with the school students JSON' do
