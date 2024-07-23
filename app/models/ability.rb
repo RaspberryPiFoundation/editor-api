@@ -51,7 +51,7 @@ class Ability
     can(%i[read update destroy], School, id: school.id)
     can(%i[read create update destroy], SchoolClass, school: { id: school.id })
     can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id } })
+    can(%i[read create create_batch destroy], ClassMember, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
@@ -66,7 +66,8 @@ class Ability
     can(%i[create], SchoolClass, school: { id: school.id })
     can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
     can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id }, teacher_id: user.id })
+    can(%i[read create create_batch destroy], ClassMember,
+        school_class: { school: { id: school.id }, teacher_id: user.id })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
