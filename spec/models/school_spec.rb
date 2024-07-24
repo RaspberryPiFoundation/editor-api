@@ -342,37 +342,37 @@ RSpec.describe School do
     it 'corrects incorrectly formatted UK postal_code' do
       school.country_code = 'GB'
       school.postal_code = 'SW1 A1AA'
-      expect { school.save }.to change(user, :postal_code).to('SW1A 1AA')
+      expect { school.save }.to change(school, :postal_code).to('SW1A 1AA')
     end
 
     it 'formats UK postal_code with 4 char outcode' do
       school.country_code = 'GB'
       school.postal_code = 'SW1A1AA'
-      expect { school.save }.to change(user, :postal_code).to('SW1A 1AA')
+      expect { school.save }.to change(school, :postal_code).to('SW1A 1AA')
     end
 
     it 'formats UK postal_code with 3 char outcode' do
       school.country_code = 'GB'
       school.postal_code = 'SW11AA'
-      expect { school.save }.to change(user, :postal_code).to('SW1 1AA')
+      expect { school.save }.to change(school, :postal_code).to('SW1 1AA')
     end
 
     it 'formats UK postal_code with 2 char outcode' do
       school.country_code = 'GB'
       school.postal_code = 'SW1AA'
-      expect { school.save }.to change(user, :postal_code).to('SW 1AA')
+      expect { school.save }.to change(school, :postal_code).to('SW 1AA')
     end
 
     it 'does not format UK postal_code for short / invalid codes' do
       school.country_code = 'GB'
       school.postal_code = 'SW1A'
-      expect { school.save }.not_to change(user, :postal_code)
+      expect { school.save }.not_to change(school, :postal_code)
     end
 
     it 'does not format postal_code for non-UK countries' do
       school.country_code = 'FR'
       school.postal_code = '123456'
-      expect { school.save }.not_to change(user, :postal_code)
+      expect { school.save }.not_to change(school, :postal_code)
     end
   end
 
