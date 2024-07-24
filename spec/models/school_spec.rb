@@ -254,7 +254,7 @@ RSpec.describe School do
     end
 
     it 'returns the school that the user has a role in' do
-      user = school.where(id: teacher.id).first
+      user = User.where(id: teacher.id).first
       expect(described_class.find_for_user!(user)).to eq(school)
     end
 
