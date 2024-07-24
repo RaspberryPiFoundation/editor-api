@@ -91,7 +91,7 @@ class School < ApplicationRecord
   end
 
   def should_format_uk_postal_code?
-    country_code == 'GB' && postal_code.length >= 5
+    country_code == 'GB' && postal_code.to_s.length >= 5
   end
 
   def format_uk_postal_code
