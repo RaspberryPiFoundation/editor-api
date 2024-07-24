@@ -254,7 +254,7 @@ RSpec.describe School do
     end
 
     it 'returns the school that the user has a role in' do
-      user = User.where(id: teacher.id).first
+      user = school.where(id: teacher.id).first
       expect(described_class.find_for_user!(user)).to eq(school)
     end
 
@@ -328,6 +328,51 @@ RSpec.describe School do
     it 'raises ActiveRecord::RecordInvalid if verification fails' do
       school.rejected_at = Time.zone.now
       expect { school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe '#format_uk_postal_code' do
+    it 'retains correctly formatted UK postal_code' do
+      school.country_code = 'GB'
+      school.postal_code = 'SW1A 1AA'
+      school.save
+      expect(school.postal_code).to eq('SW1A 1AA')
+    end
+
+    it 'corrects incorrectly formatted UK postal_code' do
+      school.country_code = 'GB'
+      school.postal_code = 'SW1 A1AA'
+      expect { school.save }.to change(user, :postal_code).to('SW1A 1AA')
+    end
+
+    it 'formats UK postal_code with 4 char outcode' do
+      school.country_code = 'GB'
+      school.postal_code = 'SW1A1AA'
+      expect { school.save }.to change(user, :postal_code).to('SW1A 1AA')
+    end
+
+    it 'formats UK postal_code with 3 char outcode' do
+      school.country_code = 'GB'
+      school.postal_code = 'SW11AA'
+      expect { school.save }.to change(user, :postal_code).to('SW1 1AA')
+    end
+
+    it 'formats UK postal_code with 2 char outcode' do
+      school.country_code = 'GB'
+      school.postal_code = 'SW1AA'
+      expect { school.save }.to change(user, :postal_code).to('SW 1AA')
+    end
+
+    it 'does not format UK postal_code for short / invalid codes' do
+      school.country_code = 'GB'
+      school.postal_code = 'SW1A'
+      expect { school.save }.not_to change(user, :postal_code)
+    end
+
+    it 'does not format postal_code for non-UK countries' do
+      school.country_code = 'FR'
+      school.postal_code = '123456'
+      expect { school.save }.not_to change(user, :postal_code)
     end
   end
 
