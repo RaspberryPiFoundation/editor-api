@@ -12,6 +12,7 @@ json.call(
   :administrative_area,
   :postal_code,
   :country_code,
+  :code,
   :verified_at,
   :created_at,
   :updated_at

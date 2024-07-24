@@ -17,7 +17,7 @@ RSpec.describe 'Showing my school', type: :request do
   end
 
   it "includes the school details and user's roles in the JSON" do
-    school_json = school.to_json(only: %i[id name website reference address_line_1 address_line_2 municipality administrative_area postal_code country_code verified_at created_at updated_at])
+    school_json = school.to_json(only: %i[id name website reference address_line_1 address_line_2 municipality administrative_area postal_code country_code code verified_at created_at updated_at])
     expected_data = JSON.parse(school_json, symbolize_names: true).merge(roles: ['owner'])
 
     get('/api/school', headers:)
