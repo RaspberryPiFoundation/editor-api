@@ -30,6 +30,8 @@ class School < ApplicationRecord
 
   before_validation :normalize_reference
 
+  before_save :format_uk_postal_code, if: :should_format_uk_postal_code?
+
   def self.find_for_user!(user)
     school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id)
     raise ActiveRecord::RecordNotFound unless school
@@ -65,6 +67,10 @@ class School < ApplicationRecord
     update(rejected_at: Time.zone.now)
   end
 
+  def postal_code=(str)
+    super(str.to_s.upcase)
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string
@@ -82,5 +88,16 @@ class School < ApplicationRecord
 
   def code_cannot_be_changed
     errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
+  end
+
+  def should_format_uk_postal_code?
+    country_code == 'GB' && postal_code.to_s.length >= 5
+  end
+
+  def format_uk_postal_code
+    cleaned_postal_code = postal_code.delete(' ')
+    # insert a space as the third-from-last character in the postcode, eg. SW1A1AA -> SW1A 1AA
+    # ensures UK postcodes are always formatted correctly (as the inward code is always 3 chars long)
+    self.postal_code = "#{cleaned_postal_code[0..-4]} #{cleaned_postal_code[-3..]}"
   end
 end

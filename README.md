@@ -111,6 +111,20 @@ Also avilable to override are: `SEEDING_TEACHER_ID`.
 
 The `*-to-local.sh` scripts will backup the database in your local terminal, then run an instance of the Docker container and run commands to populate your development DB with that data - see [./bin/db-sync/load-local-db.sh](./bin/db-sync/load-local-db.sh)
 
+### Testing
+
+Run the entire test suite using:
+
+```
+docker-compose run api rspec
+```
+
+Or individual specs using:
+
+```
+docker-compose run api rspec spec/path/to/spec.rb
+```
+
 ### CORS Allowed Origins
 
 Add a comma separated list to the relevant enviroment settings. E.g for development in the `.env` file:
