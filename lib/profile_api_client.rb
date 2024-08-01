@@ -153,9 +153,9 @@ class ProfileApiClient
       response.body.map { |flag| SafeguardingFlag.new(**flag.symbolize_keys) }
     end
 
-    def create_safeguarding_flag(token:, flag:)
+    def create_safeguarding_flag(token:, flag:, email:)
       response = connection(token).post('/api/v1/safeguarding-flags') do |request|
-        request.body = { flag: }
+        request.body = { flag:, email: }
       end
 
       raise UnexpectedResponse, response unless [201, 303].include?(response.status)

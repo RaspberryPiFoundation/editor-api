@@ -246,7 +246,7 @@ RSpec.describe ProfileApiClient do
 
     it 'sends the safeguarding flag in the request body' do
       create_safeguarding_flag
-      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(body: { flag: }.to_json)
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(body: { flag:, email: 'user@example.com' }.to_json)
     end
 
     it 'returns empty body if created successfully' do
@@ -276,7 +276,7 @@ RSpec.describe ProfileApiClient do
     end
 
     def create_safeguarding_flag
-      described_class.create_safeguarding_flag(token:, flag:)
+      described_class.create_safeguarding_flag(token:, flag:, email: 'user@example.com')
     end
   end
 
