@@ -4,5 +4,5 @@ require 'rake'
 
 if Rails.env.development?
   Rake::Task['projects:create_all'].invoke
-  Rake::Task['classroom_management:seed_a_school_with_lessons'].invoke
+  Rake::Task['classroom_management:seed_a_school_with_lessons_and_students'].invoke
 end

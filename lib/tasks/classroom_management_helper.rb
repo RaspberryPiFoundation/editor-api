@@ -2,15 +2,15 @@
 
 module ClassroomManagementHelper
   TEST_USERS = {
-    # Use this in conjunction with BYPASS_OAUTH=true to generate data for the bypass user
-    bypass_oauth: '00000000-0000-0000-0000-000000000000',
     jane_doe: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
     john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com
     jane_smith: 'e52de409-9210-4e94-b08c-dd11439e07d9', # student
     john_smith: '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' # student
   }.freeze
 
-  TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9'
+  # Match the school in profile...
+  TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9' # e52de409-9210-4e94-b08c-dd11439e07d9
+  SCHOOL_CODE = '12-12-12-12'
 
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
@@ -30,6 +30,11 @@ module ClassroomManagementHelper
   def verify_school(school)
     Rails.logger.info 'Verifying the school...'
     school.verify!
+
+    # rubocop:disable Rails/SkipsModelValidations
+    school.update_column(:code, SCHOOL_CODE) # The code needs to match the one in the profile
+    # rubocop:enable Rails/SkipsModelValidations
+
     Role.owner.create!(user_id: school.creator_id, school:)
     Role.teacher.create!(user_id: school.creator_id, school:)
   end
