@@ -3,7 +3,7 @@ services:
     build:
       context: .
       target: dev-container
-    command: bash bin/dev-container-entrypoint.sh
+    command: bash bin/docker-debug-entrypoint.sh
     volumes:
       # - ${HOME}/.bashrc:/root/.bashrc:ro # Map a ~/.bashrc in your home directory for customising bash
       - ${HOME}/.ssh:/root/.ssh:ro # To share any ssh keys with the container
@@ -12,4 +12,3 @@ services:
 
 volumes:
   node_modules: null
-

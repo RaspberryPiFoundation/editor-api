@@ -38,6 +38,7 @@ gem 'sentry-rails'
 
 group :development, :test do
   gem 'bullet'
+  gem 'debug'
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
   gem 'faker'
