@@ -67,7 +67,8 @@
         "syler.sass-indented",
         "codezombiech.gitignore",
         "shopify.ruby-lsp",
-        "koichisasada.vscode-rdbg"
+        "koichisasada.vscode-rdbg",
+        "rangav.vscode-thunder-client"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh"
