@@ -39,11 +39,8 @@ services:
       - POSTGRES_USER
   smee:
     image: deltaprojects/smee-client
+    platform: linux/amd64
     command: -u $SMEE_TUNNEL -t http://api:3009/github_webhooks
 
 volumes:
   postgres-data:
-
-networks:
-  default:
-    name: shared-development
