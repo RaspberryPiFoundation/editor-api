@@ -50,6 +50,7 @@ class Project
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
           proj.remix_origin = remix_origin
+          proj.lesson_id = nil # Only the original can have a lesson id
         end
       end
     end

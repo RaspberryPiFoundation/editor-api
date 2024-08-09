@@ -87,6 +87,11 @@ RSpec.describe Project::CreateRemix, type: :unit do
       expect { create_remix }.not_to change(ActiveStorage::Blob, :count)
     end
 
+    it 'does not copy the lesson id' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.lesson_id).to be_nil
+    end
+
     it 'creates new components' do
       expect { create_remix }.to change(Component, :count).by(1)
     end

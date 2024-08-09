@@ -81,13 +81,37 @@ RSpec.describe Project do
     end
 
     context 'when the project has a lesson' do
+      let(:school) { create(:school) }
+      let(:teacher) { create(:teacher, school:) }
+      let(:student) { create(:student, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+
       before do
-        lesson = create(:lesson)
-        project.update!(lesson:, user_id: lesson.user_id, identifier: 'something')
+        lesson = create(:lesson, school:, school_class:, user_id: teacher.id)
+
+        project.update!(lesson:, school:, user_id: lesson.user_id, identifier: 'something')
       end
 
-      it 'requires that the user be the owner of the lesson' do
+      it 'fails if the user is the owner of the lesson' do
         project.user_id = SecureRandom.uuid
+        expect(project).to be_invalid
+      end
+
+      it 'succeeds if the user is the owner of the lesson' do
+        expect(project).to be_valid
+      end
+
+      it 'fails if the user is not a member of the lesson' do
+        create(:class_member, school_class:, student_id: teacher.id)
+
+        project.user_id = student.id
+        expect(project).to be_invalid
+      end
+
+      it 'suceeds if the user is a member of the lesson' do
+        create(:class_member, school_class:, student_id: student.id)
+
+        project.user_id = student.id
         expect(project).to be_invalid
       end
     end
