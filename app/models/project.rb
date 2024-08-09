@@ -17,7 +17,7 @@ class Project < ApplicationRecord
   validate :identifier_cannot_be_taken_by_another_user
   validates :locale, presence: true, unless: :user_id
   validate :user_has_a_role_within_the_school
-  validate :user_is_the_owner_of_the_lesson
+  validate :user_is_a_member_or_the_owner_of_the_lesson
 
   scope :internal_projects, -> { where(user_id: nil) }
 
@@ -62,9 +62,9 @@ class Project < ApplicationRecord
     errors.add(:user, msg)
   end
 
-  def user_is_the_owner_of_the_lesson
-    return if !lesson || user_id == lesson.user_id
+  def user_is_a_member_or_the_owner_of_the_lesson
+    return if !lesson || user_id == lesson.user_id || lesson.school_class.members.exists?(student_id: user_id)
 
-    errors.add(:user, "'#{user_id}' is not the owner for lesson '#{lesson_id}'")
+    errors.add(:user, "'#{user_id}' is not the owner or a member of the lesson '#{lesson_id}'")
   end
 end

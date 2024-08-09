@@ -58,11 +58,14 @@ RSpec.describe Ability do
       end
     end
 
+    # rubocop:disable RSpec/MultipleMemoizedHelpers
     context 'when the project belongs to a school and the associated lesson is not private' do
-      let(:user) { build(:user) }
-      let(:school) { build(:school) }
-      let(:lesson) { build(:lesson, school:, visibility: 'teachers') }
-      let(:school_project) { build(:project, school:, lesson:) }
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+      let(:teacher) { create(:teacher, school:) }
+      let(:school_class) { build(:school_class, school:, teacher_id: teacher.id) }
+      let(:lesson) { build(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
+      let(:school_project) { build(:project, school:, lesson:, user_id: teacher.id) }
 
       context 'when user is a school owner' do
         before do
@@ -83,8 +86,56 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
+
+      context 'when user is a school student and belongs to a class' do
+        before do
+          create(:student_role, user_id: user.id, school:)
+          create(:class_member, school_class:, student_id: user.id)
+        end
+
+        it { is_expected.to be_able_to(:read, school_project) }
+        it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:destroy, school_project) }
+      end
+
+      context 'when user is a school student and does not belong to a class' do
+        before do
+          create(:student_role, user_id: user.id, school:)
+        end
+
+        it { is_expected.not_to be_able_to(:read, school_project) }
+        it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:destroy, school_project) }
+      end
+    end
+
+    context 'when the project belongs to a student' do
+      let(:school) { create(:school) }
+      let(:student) { create(:student, school:) }
+      let(:teacher) { create(:teacher, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
+      let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
+      let!(:school_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
+
+      context 'when user is teacher that does not own the orginal project' do
+        let(:user) { create(:teacher, school:) }
+
+        it { is_expected.not_to be_able_to(:read, school_project) }
+        it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:destroy, school_project) }
+      end
+
+      context 'when user is teacher that owns the orginal project' do
+        let(:user) { teacher }
+
+        it { is_expected.to be_able_to(:read, school_project) }
+        it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:destroy, school_project) }
+      end
     end
   end
+  # rubocop:enable RSpec/MultipleMemoizedHelpers
 
   describe 'Component' do
     let(:starter_project_component) { build(:component, project: starter_project) }

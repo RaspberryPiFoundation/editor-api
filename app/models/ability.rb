@@ -65,7 +65,6 @@ class Ability
     can(%i[read], School, id: school.id)
     can(%i[create], SchoolClass, school: { id: school.id })
     can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
-    can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read create create_batch destroy], ClassMember,
         school_class: { school: { id: school.id }, teacher_id: user.id })
     can(%i[read], :school_owner)
@@ -78,6 +77,9 @@ class Ability
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
+    can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read], Project,
+        remixed_from_id: Project.where(user_id: user.id, school_id: school.id, remixed_from_id: nil).pluck(:id))
   end
   # rubocop:enable Metrics/AbcSize
 
@@ -87,6 +89,7 @@ class Ability
     can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
     can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
+    can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
   end
   # rubocop:enable Layout/LineLength
 
