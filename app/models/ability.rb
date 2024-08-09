@@ -89,9 +89,7 @@ class Ability
     can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
     can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
-    can(%i[read], Project) do |project|
-      school_student_can_read_project?(user:, lesson: project.lesson, school:)
-    end
+    can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
   end
   # rubocop:enable Layout/LineLength
 
