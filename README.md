@@ -39,7 +39,7 @@ docker-compose build
 Set up the database:
 
 ```
-docker compose run api rails db:setup
+docker compose run --rm api rails db:setup
 ```
 
 ### Running the app
@@ -64,18 +64,18 @@ which should update the Gems in the container, without the need for rebuilding.
 
 By default in development only, two tasks are called to seed data:
 
-`rails projects:create_all`
-`rails classroom_management:seed_a_school_with_lessons`
+`docker compose run --rm api rails projects:create_all`
+`docker compose run --rm api rails classroom_management:seed_a_school_with_lessons_and_students`
 
 If needed manually the following task will create all projects:
 
-`rails projects:create_all`
+`docker compose run --rm api rails projects:create_all`
 
 For classroom management the following scenarios modelled by the tasks:
 
-`rails classroom_management:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
-`rails classroom_management:seed_a_verified_school` - seeds only a verified school
-`rails classroom_management:seed_a_school_with_lessons_and_students` - seeds a school with a class, two lessons, a project in each, and two students
+`docker compose run --rm api rails classroom_management:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
+`docker compose run --rm api rails classroom_management:seed_a_verified_school` - seeds only a verified school
+`docker compose run --rm api rails classroom_management:seed_a_school_with_lessons_and_students` - seeds a school with a class, two lessons, a project in each, and two students
 
 To clear classroom management data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
 
