@@ -91,6 +91,9 @@ module ClassroomManagementHelper
       project.school = school
       project.lesson = lesson
       project.locale = 'en'
+      project.project_type = 'python'
+      project.components << Component.new({ extension: 'py', name: 'main',
+                                            content: '' })
     end
   end
 end
