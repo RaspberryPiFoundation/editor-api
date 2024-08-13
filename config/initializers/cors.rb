@@ -24,7 +24,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     standard_cors_options
   end
 
-  # all raspberrypi.org subdomains
+  # all raspberrypi.org subdomains (*.raspberry.org)
   allow do
     origins(%r{https?://.+\.raspberrypi\.org$})
 
@@ -38,7 +38,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     standard_cors_options
   end
 
-  # Cloudflare Pages dynamic
+  # Cloudflare Pages dynamic (*.editor-standalone-eyq.pages.dev and *.projects-ui.pages.dev)
   allow do
     origins(%r{https?://.+\.editor-standalone-eyq\.pages\.dev$}, %r{https?://.+\.projects-ui\.pages\.dev$})
 
