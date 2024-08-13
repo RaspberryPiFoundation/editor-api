@@ -21,12 +21,19 @@ class Project < ApplicationRecord
 
   scope :internal_projects, -> { where(user_id: nil) }
 
-  def self.users
-    User.from_userinfo(ids: pluck(:user_id))
+  def self.users(current_user)
+    result = User.from_userinfo(ids: pluck(:user_id))
+
+    if result.empty? && !pluck(:school_id).nil?
+      school = School.find_by(id: pluck(:school_id))
+      result = SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id))[:school_students]
+    end
+
+    result
   end
 
-  def self.with_users
-    by_id = users.index_by(&:id)
+  def self.with_users(current_user)
+    by_id = users(current_user).index_by(&:id)
     all.map { |instance| [instance, by_id[instance.user_id]] }
   end
 
