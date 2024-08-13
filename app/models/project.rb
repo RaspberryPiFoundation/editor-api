@@ -27,7 +27,7 @@ class Project < ApplicationRecord
     if result.empty? && !pluck(:school_id).nil?
       school = School.find_by(id: pluck(:school_id))
       result = SchoolStudent::List.call(school:, token: current_user.token,
-                                        student_ids: pluck(:user_id))[:school_students]
+                                        student_ids: pluck(:user_id))[:school_students] || []
     end
 
     result
