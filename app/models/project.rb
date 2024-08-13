@@ -47,6 +47,11 @@ class Project < ApplicationRecord
     super(array.map { |o| o.is_a?(Hash) ? Component.new(o) : o })
   end
 
+  def last_edited_at
+    # datetime that the project or one of its components was last updated
+    [updated_at, components.maximum(:updated_at)].compact.max
+  end
+
   private
 
   def check_unique_not_null
