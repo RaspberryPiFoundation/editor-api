@@ -127,11 +127,7 @@ docker-compose run api rspec spec/path/to/spec.rb
 
 ### CORS Allowed Origins
 
-Add a comma separated list to the relevant enviroment settings. E.g for development in the `.env` file:
-
-```
-ALLOWED_ORIGINS=localhost:3002,localhost:3000
-```
+Handled in `config/initializers/cors.rb`.
 
 ### Webhooks
 
