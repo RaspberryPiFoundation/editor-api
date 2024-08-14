@@ -226,4 +226,18 @@ RSpec.describe Project do
       expect(pair).to eq([project, nil])
     end
   end
+
+  describe '#last_edited_at' do
+    let(:project) { create(:project, updated_at: 1.day.ago) }
+    let(:component) { create(:component, project:, updated_at: 2.days.ago) }
+
+    it 'returns the project updated_at if most recent' do
+      expect(project.last_edited_at).to eq(project.updated_at)
+    end
+
+    it 'returns the latest component updated_at if most recent' do
+      latest_component = create(:component, project:, updated_at: 1.hour.ago)
+      expect(project.last_edited_at).to eq(latest_component.updated_at)
+    end
+  end
 end
