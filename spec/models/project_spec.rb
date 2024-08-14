@@ -127,13 +127,11 @@ RSpec.describe Project do
   end
 
   describe '.users' do
-    let(:students) { create_list(:student, 3, school:) }
+    let(:student) { create(:student, school:, name: 'School Student') }
     let(:teacher) { create(:teacher, school:) }
 
     let(:student_attributes) do
-      students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
-      end
+      [{ id: student.id, name: student.name, username: student.username }]
     end
 
     before do
@@ -141,17 +139,13 @@ RSpec.describe Project do
     end
 
     it 'returns User instances for the current scope' do
-      student = create(:student, school:, name: 'School Student')
-      stub_user_info_api_for(student)
-      create(:project, user_id: student.id)
-
+      create(:project, user_id: student.id, school_id: school.id)
       user = described_class.all.users(teacher).first
       expect(user.name).to eq('School Student')
     end
 
     it 'ignores members where no profile account exists' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       create(:project, user_id:)
 
       user = described_class.all.users(teacher).first
@@ -167,23 +161,18 @@ RSpec.describe Project do
   end
 
   describe '.with_users' do
-    let(:students) { create_list(:student, 3, school:) }
+    let(:student) { create(:student, school:) }
     let(:teacher) { create(:teacher, school:) }
 
     let(:student_attributes) do
-      students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
-      end
+      [{ id: student.id, name: student.name, username: student.username }]
     end
 
     before do
       stub_profile_api_list_school_students(school:, student_attributes:)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'returns an array of class members paired with their User instance' do
-      student = create(:student, school:)
-      stub_user_info_api_for(student)
       project = create(:project, user_id: student.id)
 
       pair = described_class.all.with_users(teacher).first
@@ -191,11 +180,9 @@ RSpec.describe Project do
 
       expect(pair).to eq([project, user])
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'returns nil values for members where no profile account exists' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       project = create(:project, user_id:)
 
       pair = described_class.all.with_users(teacher).first
@@ -211,27 +198,31 @@ RSpec.describe Project do
   end
 
   describe '#with_user' do
+    let(:student) { create(:student, school:) }
     let(:teacher) { create(:teacher, school:) }
 
-    # rubocop:disable RSpec/ExampleLength
+    let(:student_attributes) do
+      [{ id: student.id, name: student.name, username: student.username }]
+    end
+
+    before do
+      stub_profile_api_list_school_students(school:, student_attributes:)
+    end
+
     it 'returns the class member paired with their User instance' do
-      student = create(:student, school:)
-      stub_user_info_api_for(student)
       project = create(:project, user_id: student.id)
 
-      pair = project.with_user
+      pair = project.with_user(teacher)
       user = described_class.all.users(teacher).first
 
       expect(pair).to eq([project, user])
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'returns a nil value if the member has no profile account' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       project = create(:project, user_id:)
 
-      pair = project.with_user
+      pair = project.with_user(teacher)
       expect(pair).to eq([project, nil])
     end
   end

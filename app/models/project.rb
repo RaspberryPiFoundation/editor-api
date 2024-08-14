@@ -22,15 +22,8 @@ class Project < ApplicationRecord
   scope :internal_projects, -> { where(user_id: nil) }
 
   def self.users(current_user)
-    result = User.from_userinfo(ids: pluck(:user_id))
-
-    if result.empty? && !pluck(:school_id).nil?
-      school = School.find_by(id: pluck(:school_id))
-      result = SchoolStudent::List.call(school:, token: current_user.token,
-                                        student_ids: pluck(:user_id))[:school_students] || []
-    end
-
-    result
+    school = School.find_by(id: pluck(:school_id))
+    SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id))[:school_students] || []
   end
 
   def self.with_users(current_user)
@@ -38,8 +31,11 @@ class Project < ApplicationRecord
     all.map { |instance| [instance, by_id[instance.user_id]] }
   end
 
-  def with_user
-    [self, User.from_userinfo(ids: user_id).first]
+  def with_user(current_user)
+    school = School.find_by(id: :school_id)
+    students = SchoolStudent::List.call(school:, token: current_user.token,
+                                        student_ids: [:user_id])[:school_students] || []
+    [self, students.first]
   end
 
   # Work around a CanCanCan issue with accepts_nested_attributes_for.
