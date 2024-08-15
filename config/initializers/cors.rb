@@ -7,14 +7,20 @@
 
 # Read more: https://github.com/cyu/rack-cors
 
-# Note the use of the $ at the end of the regexes below, this ensures
-# that the origins are matched exactly and not just a substring eg.
-# match: https://www.example.com
-# don't match: https://www.example.com.anotherdomain.com
+# fetch origins from the environment, these can be literal strings or regexes
+origins_array = ENV['ALLOWED_ORIGINS']&.split(',')&.map do |origin|
+  stripped_origin = origin.strip
+  if stripped_origin.start_with?('/') && stripped_origin.end_with?('/')
+    # convert to Regexp if the origin is wrapped in forward slashes eg. /https?:\/\/localhost(:[0-9]*)?$/
+    Regexp.new(stripped_origin[1..-2])
+  else
+    stripped_origin
+  end
+end || []
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
-    # localhost and test domain
+    # localhost and test domains
     if Rails.env.development?
       origins(%r{https?://localhost([:0-9]*)$})
     elsif Rails.env.test?
@@ -24,30 +30,9 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
     standard_cors_options
   end
 
-  # all raspberrypi.org subdomains (*.raspberry.org)
   allow do
-    origins(%r{https?://.+\.raspberrypi\.org$})
-
-    standard_cors_options
-  end
-
-  # Cloudflare Pages static
-  allow do
-    origins('https://editor-standalone-eyq.pages.dev', 'https://block-to-text-alpha.pages.dev', 'https://projects-ui.pages.dev')
-
-    standard_cors_options
-  end
-
-  # Cloudflare Pages dynamic (*.editor-standalone-eyq.pages.dev and *.projects-ui.pages.dev)
-  allow do
-    origins(%r{https?://.+\.editor-standalone-eyq\.pages\.dev$}, %r{https?://.+\.projects-ui\.pages\.dev$})
-
-    standard_cors_options
-  end
-
-  # Oak
-  allow do
-    origins('https://preview.courses.edx.org', 'https://studio.edx.org')
+    # fetch allowed origins from the environment
+    origins origins_array
 
     standard_cors_options
   end
