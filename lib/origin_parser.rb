@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# fetch origins from the environment, these can be literal strings or regexes
+# fetch origins from the environment in a comma-separated string
+# these can be literal strings or regexes
 # regexes must be wrapped in forward slashes eg. /https?:\/\/localhost(:[0-9]*)?$/
 module OriginParser
   def self.parse_origins
