@@ -12,7 +12,15 @@ describe CorpMiddleware do
     allow(ENV).to receive(:[]).with('ALLOWED_ORIGINS').and_return('test.com')
   end
 
-  it 'sets the Cross-Origin-Resource-Policy header for allowed origins' do
+  it 'sets the Cross-Origin-Resource-Policy header for a literal origin' do
+    _status, headers, _response = middleware.call(env)
+
+    expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
+  end
+
+  it 'sets the Cross-Origin-Resource-Policy header for regex origin' do
+    allow(ENV).to receive(:[]).with('ALLOWED_ORIGINS').and_return('/test\.com/')
+
     _status, headers, _response = middleware.call(env)
 
     expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
