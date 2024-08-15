@@ -4,6 +4,13 @@ module Api
   module Projects
     class RemixesController < ApiController
       before_action :authorize_user
+      load_and_authorize_resource :school, only: :index
+
+      def index
+        projects = Project.where(remixed_from_id: project.id).accessible_by(current_ability)
+        @projects_with_users = projects.with_users(@current_user)
+        render index: @projects_with_users, formats: [:json]
+      end
 
       def show
         @project = Project.find_by!(remixed_from_id: project.id, user_id: current_user&.id)

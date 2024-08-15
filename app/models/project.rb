@@ -21,23 +21,32 @@ class Project < ApplicationRecord
 
   scope :internal_projects, -> { where(user_id: nil) }
 
-  def self.users
-    User.from_userinfo(ids: pluck(:user_id))
+  def self.users(current_user)
+    school = School.find_by(id: pluck(:school_id))
+    SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id))[:school_students] || []
   end
 
-  def self.with_users
-    by_id = users.index_by(&:id)
+  def self.with_users(current_user)
+    by_id = users(current_user).index_by(&:id)
     all.map { |instance| [instance, by_id[instance.user_id]] }
   end
 
-  def with_user
-    [self, User.from_userinfo(ids: user_id).first]
+  def with_user(current_user)
+    school = School.find_by(id: :school_id)
+    students = SchoolStudent::List.call(school:, token: current_user.token,
+                                        student_ids: [:user_id])[:school_students] || []
+    [self, students.first]
   end
 
   # Work around a CanCanCan issue with accepts_nested_attributes_for.
   # https://github.com/CanCanCommunity/cancancan/issues/774
   def components=(array)
     super(array.map { |o| o.is_a?(Hash) ? Component.new(o) : o })
+  end
+
+  def last_edited_at
+    # datetime that the project or one of its components was last updated
+    [updated_at, components.maximum(:updated_at)].compact.max
   end
 
   private

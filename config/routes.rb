@@ -34,6 +34,7 @@ Rails.application.routes.draw do
 
     resources :projects, only: %i[index show update destroy create] do
       resource :remix, only: %i[show create], controller: 'projects/remixes'
+      resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
     end
 

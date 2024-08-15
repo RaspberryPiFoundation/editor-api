@@ -127,84 +127,117 @@ RSpec.describe Project do
   end
 
   describe '.users' do
-    it 'returns User instances for the current scope' do
-      student = create(:student, school:, name: 'School Student')
-      stub_user_info_api_for(student)
-      create(:project, user_id: student.id)
+    let(:student) { create(:student, school:, name: 'School Student') }
+    let(:teacher) { create(:teacher, school:) }
 
-      user = described_class.all.users.first
+    let(:student_attributes) do
+      [{ id: student.id, name: student.name, username: student.username }]
+    end
+
+    before do
+      stub_profile_api_list_school_students(school:, student_attributes:)
+    end
+
+    it 'returns User instances for the current scope' do
+      create(:project, user_id: student.id, school_id: school.id)
+      user = described_class.all.users(teacher).first
       expect(user.name).to eq('School Student')
     end
 
     it 'ignores members where no profile account exists' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       create(:project, user_id:)
 
-      user = described_class.all.users.first
+      user = described_class.all.users(teacher).first
       expect(user).to be_nil
     end
 
     it 'ignores members not included in the current scope' do
       create(:project)
 
-      user = described_class.none.users.first
+      user = described_class.none.users(teacher).first
       expect(user).to be_nil
     end
   end
 
   describe '.with_users' do
-    # rubocop:disable RSpec/ExampleLength
+    let(:student) { create(:student, school:) }
+    let(:teacher) { create(:teacher, school:) }
+
+    let(:student_attributes) do
+      [{ id: student.id, name: student.name, username: student.username }]
+    end
+
+    before do
+      stub_profile_api_list_school_students(school:, student_attributes:)
+    end
+
     it 'returns an array of class members paired with their User instance' do
-      student = create(:student, school:)
-      stub_user_info_api_for(student)
       project = create(:project, user_id: student.id)
 
-      pair = described_class.all.with_users.first
-      user = described_class.all.users.first
+      pair = described_class.all.with_users(teacher).first
+      user = described_class.all.users(teacher).first
 
       expect(pair).to eq([project, user])
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'returns nil values for members where no profile account exists' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       project = create(:project, user_id:)
 
-      pair = described_class.all.with_users.first
+      pair = described_class.all.with_users(teacher).first
       expect(pair).to eq([project, nil])
     end
 
     it 'ignores members not included in the current scope' do
       create(:project)
 
-      pair = described_class.none.with_users.first
+      pair = described_class.none.with_users(teacher).first
       expect(pair).to be_nil
     end
   end
 
   describe '#with_user' do
-    # rubocop:disable RSpec/ExampleLength
+    let(:student) { create(:student, school:) }
+    let(:teacher) { create(:teacher, school:) }
+
+    let(:student_attributes) do
+      [{ id: student.id, name: student.name, username: student.username }]
+    end
+
+    before do
+      stub_profile_api_list_school_students(school:, student_attributes:)
+    end
+
     it 'returns the class member paired with their User instance' do
-      student = create(:student, school:)
-      stub_user_info_api_for(student)
       project = create(:project, user_id: student.id)
 
-      pair = project.with_user
-      user = described_class.all.users.first
+      pair = project.with_user(teacher)
+      user = described_class.all.users(teacher).first
 
       expect(pair).to eq([project, user])
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'returns a nil value if the member has no profile account' do
       user_id = SecureRandom.uuid
-      stub_user_info_api_for_unknown_users(user_id:)
       project = create(:project, user_id:)
 
-      pair = project.with_user
+      pair = project.with_user(teacher)
       expect(pair).to eq([project, nil])
+    end
+  end
+
+  describe '#last_edited_at' do
+    let(:project) { create(:project, updated_at: 1.day.ago) }
+    let(:component) { create(:component, project:, updated_at: 2.days.ago) }
+
+    it 'returns the project updated_at if most recent' do
+      expect(project.last_edited_at).to eq(project.updated_at)
+    end
+
+    it 'returns the latest component updated_at if most recent' do
+      latest_component = create(:component, project:, updated_at: 1.hour.ago)
+      expect(project.last_edited_at).to eq(latest_component.updated_at)
     end
   end
 end

@@ -30,6 +30,28 @@ RSpec.describe 'Remix requests' do
       authenticated_in_hydra_as(owner)
     end
 
+    describe '#index' do
+      before do
+        create_list(:project, 2, remixed_from_id: original_project.id, user_id: authenticated_user.id)
+      end
+
+      it 'returns success response' do
+        get("/api/projects/#{original_project.identifier}/remixes", headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the list of projects' do
+        get("/api/projects/#{original_project.identifier}/remixes", headers:)
+        expect(response.parsed_body.length).to eq(2)
+      end
+
+      it 'returns 404 response if invalid project' do
+        get('/api/projects/no-such-project/remixes', headers:)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     describe '#show' do
       before do
         create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id)
