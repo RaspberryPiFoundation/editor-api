@@ -32,9 +32,9 @@ class Project < ApplicationRecord
   end
 
   def with_user(current_user)
-    school = School.find_by(id: :school_id)
+    school = School.find_by(id: school_id)
     students = SchoolStudent::List.call(school:, token: current_user.token,
-                                        student_ids: [:user_id])[:school_students] || []
+                                        student_ids: [user_id])[:school_students] || []
     [self, students.first]
   end
 
