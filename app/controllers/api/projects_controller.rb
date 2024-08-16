@@ -18,12 +18,7 @@ module Api
 
     def show
       if !@project.school_id.nil? && @project.lesson_id.nil?
-        puts "\n\n\n"
-        puts 'user is a student'
-        puts "\n\n\n"
         @project_with_user = @project.with_user(@current_user)
-        pp @project_with_user
-
         render :show_with_user, formats: [:json]
       else
         render :show, formats: [:json]
