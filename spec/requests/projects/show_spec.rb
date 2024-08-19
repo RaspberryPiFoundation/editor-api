@@ -3,30 +3,32 @@
 require 'rails_helper'
 
 RSpec.describe 'Project show requests' do
-  let!(:project) { create(:project, user_id: owner.id, locale: nil) }
-  let(:project_json) do
-    {
-      identifier: project.identifier,
-      project_type: 'python',
-      locale: project.locale,
-      name: project.name,
-      user_id: project.user_id,
-      components: [],
-      image_list: []
-    }.to_json
-  end
   let(:headers) { {} }
-  let(:owner) { create(:owner, school:) }
+  let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
 
   context 'when user is logged in' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      authenticated_in_hydra_as(owner)
+      authenticated_in_hydra_as(teacher)
+      stub_profile_api_list_school_students(school:, student_attributes: [{ name: 'Joe Bloggs' }])
     end
 
     context 'when loading own project' do
+      let!(:project) { create(:project, user_id: teacher.id, locale: nil) }
+      let(:project_json) do
+        {
+          identifier: project.identifier,
+          project_type: 'python',
+          locale: project.locale,
+          name: project.name,
+          user_id: project.user_id,
+          components: [],
+          image_list: []
+        }.to_json
+      end
+
       it 'returns success response' do
         get("/api/projects/#{project.identifier}", headers:)
 
@@ -41,6 +43,39 @@ RSpec.describe 'Project show requests' do
       it 'returns the project json' do
         get("/api/projects/#{project.identifier}", headers:)
         expect(response.body).to eq(project_json)
+      end
+    end
+
+    context 'when loading a student\'s project' do
+      let(:student) { create(:student, school:) }
+      let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
+      let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
+      let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil) }
+      let(:student_project_json) do
+        {
+          identifier: student_project.identifier,
+          project_type: 'python',
+          locale: student_project.locale,
+          name: student_project.name,
+          user_id: student_project.user_id,
+          parent: {
+            name: teacher_project.name,
+            identifier: teacher_project.identifier,
+          },
+          components: [],
+          image_list: [],
+          user_name: 'Joe Bloggs'
+        }.to_json
+      end
+
+      it 'returns success response' do
+        get("/api/projects/#{student_project.identifier}", headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'includes the student\'s name in the project json' do
+        get("/api/projects/#{student_project.identifier}", headers:)
+        expect(response.body).to eq(student_project_json)
       end
     end
 
@@ -115,6 +150,19 @@ RSpec.describe 'Project show requests' do
     end
 
     context 'when loading an owned project' do
+      let!(:project) { create(:project, user_id: teacher.id, locale: nil) }
+      let(:project_json) do
+        {
+          identifier: project.identifier,
+          project_type: 'python',
+          locale: project.locale,
+          name: project.name,
+          user_id: project.user_id,
+          components: [],
+          image_list: []
+        }.to_json
+      end
+
       it 'returns forbidden response' do
         get("/api/projects/#{project.identifier}", headers:)
 
