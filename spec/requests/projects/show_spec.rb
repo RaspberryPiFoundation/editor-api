@@ -60,7 +60,7 @@ RSpec.describe 'Project show requests' do
           user_id: student_project.user_id,
           parent: {
             name: teacher_project.name,
-            identifier: teacher_project.identifier,
+            identifier: teacher_project.identifier
           },
           components: [],
           image_list: [],
