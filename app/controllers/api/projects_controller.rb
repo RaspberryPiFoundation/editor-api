@@ -17,6 +17,11 @@ module Api
     end
 
     def show
+      if !@project.school_id.nil? && @project.lesson_id.nil?
+        project_with_user = @project.with_user(@current_user)
+        @user = project_with_user[1]
+      end
+
       render :show, formats: [:json]
     end
 
