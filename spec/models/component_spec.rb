@@ -45,13 +45,13 @@ RSpec.describe Component, versioning: true do
 
       it 'enables auditing for a component that belongs to a project with a school_id' do
         project_with_school = create(:project, user_id: student.id, school_id: school.id)
-        component = create(:component, project: project_with_school)
+        create(:component, project: project_with_school)
         expect(component.versions.length).to(eq(1))
       end
 
       it 'does not enable auditing for a component that belongs to a project without a school_id' do
         project_without_school = create(:project, school_id: nil)
-        component = create(:component, project: project_without_school)
+        create(:component, project: project_without_school)
         expect(project_without_school.versions.length).to(eq(0))
       end
     end
