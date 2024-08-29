@@ -10,6 +10,8 @@ class ApiController < ActionController::API
   rescue_from CanCan::AccessDenied, with: -> { denied }
   rescue_from ParameterError, with: -> { unprocessable }
 
+  before_action :set_paper_trail_whodunnit
+
   private
 
   def bad_request

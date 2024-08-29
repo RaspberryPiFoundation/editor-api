@@ -6,6 +6,14 @@ class Component < ApplicationRecord
   validates :extension, presence: true
   validate :default_component_protected_properties, on: :update
 
+  has_paper_trail(
+    if: ->(c) { c.project&.school_id },
+    meta: {
+      meta_project_id: ->(c) { c.project&.id },
+      meta_school_id: ->(c) { c.project&.school_id }
+    }
+  )
+
   private
 
   def default_component_protected_properties

@@ -21,6 +21,14 @@ class Project < ApplicationRecord
 
   scope :internal_projects, -> { where(user_id: nil) }
 
+  has_paper_trail(
+    if: ->(p) { p&.school_id },
+    meta: {
+      meta_remixed_from_id: ->(p) { p&.remixed_from_id },
+      meta_school_id: ->(p) { p&.school_id }
+    }
+  )
+
   def self.users(current_user)
     school = School.find_by(id: pluck(:school_id))
     SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id))[:school_students] || []

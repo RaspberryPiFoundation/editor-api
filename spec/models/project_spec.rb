@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Project do
+RSpec.describe Project, versioning: true do
   let(:school) { create(:school) }
 
   describe 'associations' do
@@ -238,6 +238,22 @@ RSpec.describe Project do
     it 'returns the latest component updated_at if most recent' do
       latest_component = create(:component, project:, updated_at: 1.hour.ago)
       expect(project.last_edited_at).to eq(latest_component.updated_at)
+    end
+  end
+
+  describe 'auditing' do
+    let(:school) { create(:school) }
+    let(:teacher) { create(:teacher, school:) }
+    let(:student) { create(:student, school:) }
+
+    it 'enables auditing for projects with a school_id' do
+      project_with_school = create(:project, user_id: student.id, school_id: school.id)
+      expect(project_with_school.versions.length).to(eq(1))
+    end
+
+    it 'does not enable auditing for projects without a school_id' do
+      project_without_school = create(:project, school_id: nil)
+      expect(project_without_school.versions.length).to(eq(0))
     end
   end
 end
