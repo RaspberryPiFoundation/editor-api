@@ -50,6 +50,11 @@ namespace :classroom_management do
 
   desc 'Create an unverified school'
   task seed_an_unverified_school: :environment do
+    if (School.find_by(code: TEST_SCHOOL))
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
+      return
+    end
+
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
@@ -64,6 +69,11 @@ namespace :classroom_management do
 
   desc 'Create a verified school'
   task seed_a_verified_school: :environment do
+    if (School.find_by(code: TEST_SCHOOL))
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
+      return
+    end
+
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
@@ -79,6 +89,11 @@ namespace :classroom_management do
 
   desc 'Create a school with lessons and students'
   task seed_a_school_with_lessons_and_students: :environment do
+    if (School.find_by(code: TEST_SCHOOL))
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
+      return
+    end
+
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])

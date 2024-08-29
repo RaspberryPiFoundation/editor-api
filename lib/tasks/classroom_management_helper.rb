@@ -23,20 +23,26 @@ module ClassroomManagementHelper
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
-      school.id = school_id if school_id
     end
   end
 
   def verify_school(school)
+    if school.verified?
+      Rails.logger.info "School #{school.code} is already verified."
+      return
+    end
+
     Rails.logger.info 'Verifying the school...'
-    school.verify!
+
+    School.transaction do
+      school.verify!
+      Role.owner.create!(user_id: school.creator_id, school:)
+      Role.teacher.create!(user_id: school.creator_id, school:)
+    end
 
     # rubocop:disable Rails/SkipsModelValidations
     school.update_column(:code, SCHOOL_CODE) # The code needs to match the one in the profile
     # rubocop:enable Rails/SkipsModelValidations
-
-    Role.owner.create!(user_id: school.creator_id, school:)
-    Role.teacher.create!(user_id: school.creator_id, school:)
   end
 
   def create_school_class(teacher_id, school)
