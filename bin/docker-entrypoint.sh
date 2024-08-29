@@ -1,3 +1,4 @@
-rails db:prepare --trace
-rails db:seed --trace
+#!/bin/bash
+
+rails db:prepare
 rails server --port 3009 --binding 0.0.0.0
