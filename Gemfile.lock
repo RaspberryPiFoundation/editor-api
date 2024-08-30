@@ -290,6 +290,9 @@ GEM
       stringio
       time
       uri
+    paper_trail (15.1.0)
+      activerecord (>= 6.1)
+      request_store (~> 1.4)
     parallel (1.22.1)
     parser (3.2.1.0)
       ast (~> 2.4.1)
@@ -364,6 +367,8 @@ GEM
     regexp_parser (2.7.0)
     reline (0.5.9)
       io-console (~> 0.5)
+    request_store (1.7.0)
+      rack (>= 1.4)
     rexml (3.3.0)
       strscan
     roo (2.10.1)
@@ -537,6 +542,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection (~> 1.0.1)
   omniauth-rpi!
   open-uri
+  paper_trail
   pg (~> 1.1)
   postmark-rails
   pry-byebug
