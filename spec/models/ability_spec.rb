@@ -74,6 +74,7 @@ RSpec.describe Ability do
 
         it { is_expected.to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
 
@@ -84,7 +85,16 @@ RSpec.describe Ability do
 
         it { is_expected.to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
+
+        context 'with a remixed project belonging to one of their students' do
+          let(:student) { create(:student, school:) }
+          let(:original_project) { create(:project, user_id: user.id, school_id: school.id, lesson_id: lesson.id) }
+          let!(:remixed_project) { create(:project, user_id: student.id, school_id: school.id, remixed_from_id: original_project.id, lesson_id: nil) }
+
+          it { is_expected.to be_able_to(:toggle_finished, remixed_project) }
+        end
       end
 
       context 'when user is a school student and belongs to a class' do
@@ -95,6 +105,7 @@ RSpec.describe Ability do
 
         it { is_expected.to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
 

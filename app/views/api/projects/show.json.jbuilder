@@ -31,3 +31,5 @@ json.image_list(@project.images) do |image|
 end
 
 json.user_name(@user&.name) if @user.present?
+
+json.finished(@project.finished) if @project.school.present?
