@@ -30,6 +30,6 @@ json.image_list(@project.images) do |image|
   json.url(rails_blob_url(image))
 end
 
-json.user_name(@user&.name) if @user.present?
+json.user_name(@user&.name) if @user.present? && @project.parent
 
 json.finished(@project.finished) if @project.school.present?
