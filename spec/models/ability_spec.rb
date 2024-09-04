@@ -88,6 +88,7 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
 
+        # rubocop:disable RSpec/NestedGroups
         context 'with a remixed project belonging to one of their students' do
           let(:student) { create(:student, school:) }
           let(:original_project) { create(:project, user_id: user.id, school_id: school.id, lesson_id: lesson.id) }
@@ -95,6 +96,7 @@ RSpec.describe Ability do
 
           it { is_expected.to be_able_to(:toggle_finished, remixed_project) }
         end
+        # rubocop:enable RSpec/NestedGroups
       end
 
       context 'when user is a school student and belongs to a class' do

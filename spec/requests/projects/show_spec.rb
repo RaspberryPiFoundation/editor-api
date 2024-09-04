@@ -47,7 +47,7 @@ RSpec.describe 'Project show requests' do
 
       it 'does not include the finished boolean in the project json' do
         get("/api/projects/#{project.identifier}", headers:)
-        expect(JSON.parse(response.body)).not_to have_key('finished')
+        expect(response.parsed_body).not_to have_key('finished')
       end
     end
 
@@ -73,7 +73,6 @@ RSpec.describe 'Project show requests' do
           finished: student_project.finished
         }.to_json
       end
-
 
       it 'returns success response' do
         get("/api/projects/#{student_project.identifier}", headers:)
