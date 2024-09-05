@@ -6,8 +6,8 @@ class Ability
   # rubocop:disable Metrics/AbcSize
   def initialize(user)
     # Anyone can view projects not owner by a user or a school.
-    can :show, Project, user_id: nil, school_id: nil
-    can :show, Component, project: { user_id: nil, school_id: nil }
+    can :show, Project, user_id: nil, school_id: nil unless user&.student?
+    can :show, Component, project: { user_id: nil, school_id: nil } unless user&.student?
 
     # Anyone can read publicly shared lessons.
     can :read, Lesson, visibility: 'public'
@@ -15,12 +15,12 @@ class Ability
     return unless user
 
     # Any authenticated user can create projects not owned by a school.
-    can :create, Project, user_id: user.id, school_id: nil
-    can :create, Component, project: { user_id: user.id, school_id: nil }
+    can :create, Project, user_id: user.id, school_id: nil unless user.student?
+    can :create, Component, project: { user_id: user.id, school_id: nil } unless user.student?
 
     # Any authenticated user can manage their own projects.
-    can %i[read update destroy], Project, user_id: user.id
-    can %i[read update destroy], Component, project: { user_id: user.id }
+    can %i[read update destroy], Project, user_id: user.id unless user.student?
+    can %i[read update destroy], Component, project: { user_id: user.id } unless user.student?
 
     # Any authenticated user can create a school. They agree to become the school-owner.
     can :create, School
