@@ -44,7 +44,6 @@ module Api
       )
 
       if result.success?
-        update_student_details(@school)
         head :no_content
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -92,15 +91,6 @@ module Api
         email: current_user.email
       )
     end
-    
-    def update_student_details(@school)
-      ProfileApiClient.update_school_student(
-        token: current_user.token,
-        school_id: school.id,
-        student_id: school_student.id,
-        name: school_student.name,
-        username: school_student.username
-      )
-    end
+
   end
 end
