@@ -3,24 +3,35 @@
 class Ability
   include CanCan::Ability
 
-  # rubocop:disable Metrics/AbcSize
   def initialize(user)
-    # Anyone can view projects not owner by a user or a school.
-    can :show, Project, user_id: nil, school_id: nil unless user&.student?
-    can :show, Component, project: { user_id: nil, school_id: nil } unless user&.student?
-
-    # Anyone can read publicly shared lessons.
-    can :read, Lesson, visibility: 'public'
+    define_common_non_student_abilities(user)
 
     return unless user
 
-    # Any authenticated user can create projects not owned by a school.
-    can :create, Project, user_id: user.id, school_id: nil unless user.student?
-    can :create, Component, project: { user_id: user.id, school_id: nil } unless user.student?
+    define_authenticated_non_student_abilities(user)
 
-    # Any authenticated user can manage their own projects.
-    can %i[read update destroy], Project, user_id: user.id unless user.student?
-    can %i[read update destroy], Component, project: { user_id: user.id } unless user.student?
+    user.schools.each do |school|
+      define_school_student_abilities(user:, school:) if user.school_student?(school)
+      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
+      define_school_owner_abilities(school:) if user.school_owner?(school)
+    end
+  end
+
+  private
+
+  def define_common_non_student_abilities(user)
+    return if user&.student?
+
+    # Anyone can view projects not owned by a user or a school.
+    can :show, Project, user_id: nil, school_id: nil
+    can :show, Component, project: { user_id: nil, school_id: nil }
+
+    # Anyone can read publicly shared lessons.
+    can :read, Lesson, visibility: 'public'
+  end
+
+  def define_authenticated_non_student_abilities(user)
+    return if user&.student?
 
     # Any authenticated user can create a school. They agree to become the school-owner.
     can :create, School
@@ -37,15 +48,14 @@ class Ability
     # Any authenticated user can manage their own lessons.
     can %i[read create_copy update destroy], Lesson, user_id: user.id
 
-    user.schools.each do |school|
-      define_school_student_abilities(user:, school:) if user.school_student?(school)
-      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
-      define_school_owner_abilities(school:) if user.school_owner?(school)
-    end
-  end
-  # rubocop:enable Metrics/AbcSize
+    # Any authenticated user can create projects not owned by a school.
+    can :create, Project, user_id: user.id, school_id: nil
+    can :create, Component, project: { user_id: user.id, school_id: nil }
 
-  private
+    # Any authenticated user can manage their own projects.
+    can %i[read update destroy], Project, user_id: user.id
+    can %i[read update destroy], Component, project: { user_id: user.id }
+  end
 
   def define_school_owner_abilities(school:)
     can(%i[read update destroy], School, id: school.id)

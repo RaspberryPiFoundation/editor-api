@@ -268,12 +268,12 @@ RSpec.describe User do
 
     it 'returns true when the user has a student role' do
       create(:student_role, school:, user_id: user.id)
-      expect(user).to be_student()
+      expect(user).to be_student
     end
 
     it 'returns false when the user does not have a student role' do
       create(:owner_role, school:, user_id: user.id)
-      expect(user).not_to be_student()
+      expect(user).not_to be_student
     end
   end
 
