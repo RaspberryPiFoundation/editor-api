@@ -44,13 +44,18 @@ RSpec.describe 'Project show requests' do
         get("/api/projects/#{project.identifier}", headers:)
         expect(response.body).to eq(project_json)
       end
+
+      it 'does not include the finished boolean in the project json' do
+        get("/api/projects/#{project.identifier}", headers:)
+        expect(response.parsed_body).not_to have_key('finished')
+      end
     end
 
     context 'when loading a student\'s project' do
       let(:student) { create(:student, school:) }
       let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
       let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-      let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil) }
+      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
       let(:student_project_json) do
         {
           identifier: student_project.identifier,
@@ -64,7 +69,8 @@ RSpec.describe 'Project show requests' do
           },
           components: [],
           image_list: [],
-          user_name: 'Joe Bloggs'
+          user_name: 'Joe Bloggs',
+          finished: student_project.finished
         }.to_json
       end
 
@@ -73,7 +79,7 @@ RSpec.describe 'Project show requests' do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'includes the student\'s name in the project json' do
+      it 'includes the expected parameters in the project json' do
         get("/api/projects/#{student_project.identifier}", headers:)
         expect(response.body).to eq(student_project_json)
       end
