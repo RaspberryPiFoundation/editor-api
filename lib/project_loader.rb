@@ -9,7 +9,7 @@ class ProjectLoader
   end
 
   def load
-    projects = Project.where(identifier:, locale: @locales)
+    projects = Project.where(identifier:, locale: @locales).includes(images_attachments: :blob)
     projects.min_by { |project| @locales.find_index(project.locale) }
   end
 end
