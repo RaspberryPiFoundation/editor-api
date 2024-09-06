@@ -11,7 +11,7 @@ RSpec.describe 'Project toggle_finished requests' do
   let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
 
   before do
-    authenticated_in_hydra_as(teacher)
+    authenticated_in_hydra_as(student)
     stub_profile_api_list_school_students(school:, student_attributes: [{ name: 'Joe Bloggs' }])
   end
 
