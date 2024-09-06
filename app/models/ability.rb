@@ -91,7 +91,7 @@ class Ability
     can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
     can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
     can(%i[toggle_finished], Project) do |project|
-      school_student_can_toggle_finished?(user: user, school: school, project: project)
+      school_student_can_toggle_finished?(user:, school:, project:)
     end
   end
   # rubocop:enable Layout/LineLength

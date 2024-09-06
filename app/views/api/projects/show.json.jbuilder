@@ -32,6 +32,4 @@ end
 
 json.user_name(@user&.name) if @user.present? && @project.parent
 
-if @project.school.present? && @project.remixed_from_id.present?
-  json.finished(@project.finished)
-end
+json.finished(@project.finished) if @project.school.present? && @project.remixed_from_id.present?

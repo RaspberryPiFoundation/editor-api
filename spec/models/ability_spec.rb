@@ -118,7 +118,7 @@ RSpec.describe Ability do
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
       let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
-      let!(:class_member) { create(:class_member, school_class:, student_id: student.id) }
+      let(:class_member) { create(:class_member, school_class:, student_id: student.id) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
       let!(:remixed_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
