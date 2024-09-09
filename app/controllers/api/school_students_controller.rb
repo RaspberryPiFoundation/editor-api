@@ -59,6 +59,7 @@ module Api
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
+  
 
     private
 
@@ -90,5 +91,6 @@ module Api
         email: current_user.email
       )
     end
+
   end
 end
