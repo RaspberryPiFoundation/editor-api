@@ -7,7 +7,6 @@ module Mutations
 
     field :project, Types::ProjectType, description: 'The project that has been created'
 
-    # rubocop:disable Metrics/AbcSize
     def resolve(**input)
       original_project = GlobalID.find(input[:id])
       raise GraphQL::ExecutionError, 'Project not found' unless original_project
@@ -30,7 +29,6 @@ module Mutations
 
       { project: response[:project] }
     end
-    # rubocop:enable Metrics/AbcSize
 
     def ready?(**_args)
       return true if can_create_project?

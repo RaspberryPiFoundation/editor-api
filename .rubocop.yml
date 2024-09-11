@@ -34,8 +34,7 @@ RSpec/ExampleLength:
   Enabled: false
 
 Metrics/BlockLength:
-  Exclude:
-    - "config/routes.rb"
+  Enabled: false
 
 Metrics/AbcSize:
   Enabled: false

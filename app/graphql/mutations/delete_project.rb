@@ -13,9 +13,7 @@ module Mutations
 
       raise GraphQL::ExecutionError, 'Project not found' unless project
 
-      unless context[:current_ability].can?(:destroy, project)
-        raise GraphQL::ExecutionError, 'You are not permitted to delete that project'
-      end
+      raise GraphQL::ExecutionError, 'You are not permitted to delete that project' unless context[:current_ability].can?(:destroy, project)
 
       return { id: project.id } if project.destroy
 

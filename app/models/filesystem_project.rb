@@ -7,7 +7,7 @@ class FilesystemProject
   IMAGE_FORMATS = ['.png', '.jpg', '.jpeg', '.webp'].freeze
   PROJECTS_ROOT = Rails.root.join('lib/tasks/project_components')
 
-  def self.import_all! # rubocop:disable Metrics/AbcSize
+  def self.import_all!
     PROJECTS_ROOT.each_child do |dir|
       proj_config = YAML.safe_load_file(dir.join('project_config.yml').to_s)
       files = dir.children

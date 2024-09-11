@@ -10,7 +10,6 @@ Rails.logger = Logger.new($stdout) unless Rails.env.test?
 
 # For students to match up the school needs to match with the school defined in profile (hard coded in the helper)
 
-# rubocop:disable Metrics/BlockLength
 namespace :classroom_management do
   include ClassroomManagementHelper
 
@@ -117,4 +116,3 @@ namespace :classroom_management do
     end
   end
 end
-# rubocop:enable Metrics/BlockLength

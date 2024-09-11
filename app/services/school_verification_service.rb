@@ -7,7 +7,6 @@ class SchoolVerificationService
     @school = school
   end
 
-  # rubocop:disable Metrics/AbcSize
   def verify(token:)
     School.transaction do
       school.verify!
@@ -22,7 +21,6 @@ class SchoolVerificationService
   else
     true
   end
-  # rubocop:enable Metrics/AbcSize
 
   delegate :reject, to: :school
 end

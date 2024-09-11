@@ -4,19 +4,21 @@ require 'rails_helper'
 
 RSpec.describe SchoolTeacher::List, type: :unit do
   let(:school) { create(:school) }
-  let(:teachers) { create_list(:teacher, 3, school: school) }
+  let(:teachers) { create_list(:teacher, 3, school:) }
   let(:teacher_ids) { teachers.map(&:id) }
-  let(:response) { described_class.call(teacher_ids: teacher_ids) }
+  let(:response) { described_class.call(teacher_ids:) }
 
   context 'when successful' do
     before do
       allow(User).to receive(:from_userinfo).with(ids: teacher_ids).and_return(teachers)
     end
 
+    # rubocop:disable RSpec/MultipleExpectations
     it 'returns a successful response with school teachers' do
       expect(response[:school_teachers]).to eq(teachers)
       expect(response[:error]).to be_nil
     end
+    # rubocop:enable RSpec/MultipleExpectations
   end
 
   context 'when an error occurs' do
@@ -27,6 +29,7 @@ RSpec.describe SchoolTeacher::List, type: :unit do
       allow(Sentry).to receive(:capture_exception)
     end
 
+    # rubocop:disable RSpec/MultipleExpectations
     it 'captures the exception and returns an error response' do
       # Call the method to ensure the error is raised and captured
       response
@@ -34,5 +37,6 @@ RSpec.describe SchoolTeacher::List, type: :unit do
       expect(response[:school_teachers]).to be_nil
       expect(response[:error]).to eq(error_message)
     end
+    # rubocop:enable RSpec/MultipleExpectations
   end
 end

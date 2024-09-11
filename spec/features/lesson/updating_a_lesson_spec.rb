@@ -115,7 +115,6 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
       school = create(:school, id: SecureRandom.uuid)
       teacher = create(:teacher, school:)
@@ -126,6 +125,5 @@ RSpec.describe 'Updating a lesson', type: :request do
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
-    # rubocop:enable RSpec/ExampleLength
   end
 end
