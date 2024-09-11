@@ -72,7 +72,6 @@ RSpec.describe 'Listing class members', type: :request do
     expect(data.first[:student_name]).to be_nil
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it 'does not include class members that belong to a different class' do
     student = create(:student, school:)
     different_class = create(:school_class, school:, teacher_id: teacher.id)
@@ -83,7 +82,6 @@ RSpec.describe 'Listing class members', type: :request do
 
     expect(data.size).to eq(3)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 401 Unauthorized when no token is given' do
     get "/api/schools/#{school.id}/classes/#{school_class.id}/members"

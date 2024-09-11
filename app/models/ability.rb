@@ -3,7 +3,6 @@
 class Ability
   include CanCan::Ability
 
-  # rubocop:disable Metrics/AbcSize
   def initialize(user)
     # Anyone can view projects not owner by a user or a school.
     can :show, Project, user_id: nil, school_id: nil
@@ -43,7 +42,6 @@ class Ability
       define_school_owner_abilities(school:) if user.school_owner?(school)
     end
   end
-  # rubocop:enable Metrics/AbcSize
 
   private
 
@@ -60,7 +58,6 @@ class Ability
     can(%i[create], Project, school_id: school.id)
   end
 
-  # rubocop:disable Metrics/AbcSize
   def define_school_teacher_abilities(user:, school:)
     can(%i[read], School, id: school.id)
     can(%i[create], SchoolClass, school: { id: school.id })
@@ -81,9 +78,7 @@ class Ability
     can(%i[read], Project,
         remixed_from_id: Project.where(user_id: user.id, school_id: school.id, remixed_from_id: nil).pluck(:id))
   end
-  # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Layout/LineLength
   def define_school_student_abilities(user:, school:)
     can(%i[read], School, id: school.id)
     can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
@@ -94,7 +89,6 @@ class Ability
       school_student_can_toggle_finished?(user:, school:, project:)
     end
   end
-  # rubocop:enable Layout/LineLength
 
   def school_student_can_toggle_finished?(user:, school:, project:)
     is_my_project = project.user_id == user.id && project.school_id == school.id
