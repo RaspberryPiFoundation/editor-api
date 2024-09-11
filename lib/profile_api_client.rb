@@ -71,10 +71,6 @@ class ProfileApiClient
       {}
     end
 
-    def list_school_teachers(*)
-      {}
-    end
-
     def remove_school_teacher(*)
       {}
     end

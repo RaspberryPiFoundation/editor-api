@@ -51,4 +51,11 @@ module UserProfileMock
       .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: /#{user_id}/)
       .to_return({ body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } })
   end
+
+  # Stubs the api to accept multiple user ids and return multiple users
+  def stub_user_info_api_for_users(user_ids, users:)
+    stub_request(:get, "#{UserInfoApiClient::API_URL}/users")
+      .with(headers: { Authorization: "Bearer #{UserInfoApiClient::API_KEY}" }, body: { userIds: user_ids }.to_json)
+      .to_return({ body: { users: }.to_json, headers: { 'Content-Type' => 'application/json' } })
+  end
 end

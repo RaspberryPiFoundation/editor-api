@@ -3,35 +3,20 @@
 require 'rails_helper'
 
 RSpec.describe 'Listing school teachers', type: :request do
-  before do
-    authenticated_in_hydra_as(owner)
-    stub_profile_api_list_school_teachers(user_id: teacher.id)
-    stub_user_info_api_for(teacher)
-  end
-
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
-  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
+  let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
+  let(:teacher_2) { create(:teacher, school:) }
+
+  before do
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
+  end
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/teachers", headers:)
     expect(response).to have_http_status(:ok)
-  end
-
-  it 'responds 200 OK when the user is a school-teacher' do
-    teacher = create(:teacher, school:)
-    authenticated_in_hydra_as(teacher)
-
-    get("/api/schools/#{school.id}/teachers", headers:)
-    expect(response).to have_http_status(:ok)
-  end
-
-  it 'responds with the school teachers JSON' do
-    get("/api/schools/#{school.id}/teachers", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.first[:name]).to eq('School Teacher')
   end
 
   it 'responds 401 Unauthorized when no token is given' do
@@ -54,5 +39,23 @@ RSpec.describe 'Listing school teachers', type: :request do
 
     get("/api/schools/#{school.id}/teachers", headers:)
     expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'responds 200 OK when the user is a school-teacher' do
+    stub_user_info_api_for_users([teacher.id, teacher_2.id], users: [teacher, teacher_2])
+    authenticated_in_hydra_as(teacher_2)
+
+    get("/api/schools/#{school.id}/teachers", headers:)
+    expect(response).to have_http_status(:ok)
+  end
+
+  it 'responds with the school teachers JSON' do
+    stub_user_info_api_for_users([teacher.id, teacher_2.id], users: [teacher, teacher_2])
+    authenticated_in_hydra_as(teacher_2)
+
+    get("/api/schools/#{school.id}/teachers", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.pluck(:name)).to include(teacher_2.name)
   end
 end

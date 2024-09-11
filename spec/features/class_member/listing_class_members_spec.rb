@@ -3,23 +3,27 @@
 require 'rails_helper'
 
 RSpec.describe 'Listing class members', type: :request do
+  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:school) { create(:school) }
+  let(:owner) { create(:owner, school:) }
+  let(:teacher) { create(:teacher, school:) }
+  let(:students) { create_list(:student, 3, school:) }
+  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+
   before do
     authenticated_in_hydra_as(owner)
+
     student_attributes = students.map do |student|
       { id: student.id, name: student.name, username: student.username }
     end
     stub_profile_api_list_school_students(school:, student_attributes:)
+
     students.each do |student|
       create(:class_member, student_id: student.id, school_class:)
     end
-  end
 
-  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
-  let(:school) { create(:school) }
-  let(:students) { create_list(:student, 3, school:) }
-  let(:teacher) { create(:teacher, school:) }
-  let(:owner) { create(:owner, school:) }
+    stub_user_info_api_for(teacher)
+  end
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
@@ -30,37 +34,62 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.size).to eq(3)
+    expect(data.size).to eq(4)
   end
 
-  it 'responds with the correct student_ids' do
+  it 'responds with the correct member ids, where applicable' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    student_ids_from_response = data.pluck(:student_id)
-    expected_student_ids = students.map(&:id)
-
-    expect(student_ids_from_response).to match_array(expected_student_ids)
+    school_class.members.each do |class_member|
+      expect(data.pluck(:id)).to include(class_member.id)
+    end
   end
 
-  it 'responds with the correct nested student ids' do
+  it 'responds with the correct student ids' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
+    student_ids = data.pluck(:student).compact.pluck(:id)
 
-    student_ids_from_response = data.map { |member| member[:student][:id] }
-    expected_student_ids = students.map(&:id)
-
-    expect(student_ids_from_response).to match_array(expected_student_ids)
+    school_class.members.each do |class_member|
+      expect(student_ids).to include(class_member.student_id)
+    end
   end
 
-  it 'responds with the students JSON' do
+  it 'responds with the expected student parameters' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
+    student_data = data.find { |member| member[:student][:id] == students[0].id }
 
-    student_names_from_response = data.map { |member| member[:student][:name] }
-    expected_student_names = students.map(&:name)
+    expect(student_data[:student]).to eq(
+      {
+        id: students[0].id,
+        username: students[0].username,
+        name: students[0].name
+      }
+    )
+  end
 
-    expect(student_names_from_response).to match_array(expected_student_names)
+  it 'responds with the correct teacher id' do
+    get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+    teacher_id = data.pluck(:teacher).compact.pick(:id)
+
+    expect(teacher_id).to eq(teacher.id)
+  end
+
+  it 'responds with the expected teacher parameters' do
+    get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+    teacher_data = data.pluck(:teacher).compact
+
+    expect(teacher_data.first).to eq(
+      {
+        id: teacher.id,
+        name: teacher.name,
+        email: teacher.email
+      }
+    )
   end
 
   it "responds with nil attributes for students if the user profile doesn't exist" do
@@ -80,7 +109,7 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.size).to eq(3)
+    expect(data.size).to eq(4)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
