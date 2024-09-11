@@ -59,9 +59,9 @@ RSpec.describe 'Listing class members', type: :request do
   it 'responds with the expected student parameters' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
-    student_data = data.find { |member| member[:student][:id] == students[0].id }
+    student_data = data.pluck(:student).compact.find { |member| member[:id] == students[0].id }
 
-    expect(student_data[:student]).to eq(
+    expect(student_data).to eq(
       {
         id: students[0].id,
         username: students[0].username,
@@ -90,6 +90,23 @@ RSpec.describe 'Listing class members', type: :request do
         email: teacher.email
       }
     )
+  end
+
+  it 'responds with teachers at the top' do
+    get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[0][:teacher]).to be_truthy
+  end
+
+  it 'responds with students in alphabetical order by name ascending' do
+    get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    student_names = data.pluck(:student).compact.pluck(:name)
+    sorted_student_names = student_names.sort_by { |name| name.split.last }
+
+    expect(student_names).to eq(sorted_student_names)
   end
 
   it "responds with nil attributes for students if the user profile doesn't exist" do
