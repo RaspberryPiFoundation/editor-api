@@ -6,22 +6,43 @@ RSpec.describe SchoolTeacher::List, type: :unit do
   let(:school) { create(:school) }
   let(:teachers) { create_list(:teacher, 3, school:) }
   let(:teacher_ids) { teachers.map(&:id) }
-  let(:response) { described_class.call(teacher_ids:) }
 
   context 'when successful' do
-    before do
-      allow(User).to receive(:from_userinfo).with(ids: teacher_ids).and_return(teachers)
+    context 'when not passing teacher_ids' do
+      let(:response) { described_class.call(school:) }
+
+      before do
+        stub_user_info_api_for_users(teacher_ids, users: teachers)
+      end
+
+      # rubocop:disable RSpec/MultipleExpectations
+      it 'returns a successful response with school teachers' do
+        expect(response[:school_teachers]).to eq(teachers)
+        expect(response[:error]).to be_nil
+      end
+      # rubocop:enable RSpec/MultipleExpectations
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
-    it 'returns a successful response with school teachers' do
-      expect(response[:school_teachers]).to eq(teachers)
-      expect(response[:error]).to be_nil
+    context 'when passing teacher_ids' do
+      let(:response) { described_class.call(school:, teacher_ids:) }
+
+      before do
+        stub_user_info_api_for(teachers[1])
+      end
+
+      # rubocop:disable RSpec/MultipleExpectations
+      it 'returns a successful response with school teachers' do
+        puts response.inspect
+        expect(response[:school_teachers].first.id).to eq(teachers[1].id)
+        expect(response[:error]).to be_nil
+      end
+      # rubocop:enable RSpec/MultipleExpectations
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 
   context 'when an error occurs' do
+    let(:response) { described_class.call(school:, teacher_ids:) }
+
     let(:error_message) { 'Error listing school teachers: some error' }
 
     before do
