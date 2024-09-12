@@ -24,7 +24,7 @@ class ClassMember
         end
 
         response[:class_members] = teachers + class_members.sort do |a, b|
-          a.student.name.split.last <=> b.student.name.split.last
+          a.student.name <=> b.student.name
         end
 
         response

@@ -104,7 +104,7 @@ RSpec.describe 'Listing class members', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
 
     student_names = data.pluck(:student).compact.pluck(:name)
-    sorted_student_names = student_names.sort_by { |name| name.split.last }
+    sorted_student_names = student_names.sort
 
     expect(student_names).to eq(sorted_student_names)
   end
