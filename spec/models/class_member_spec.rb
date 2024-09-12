@@ -69,5 +69,4 @@ RSpec.describe ClassMember, versioning: true do
       expect(class_member.versions.length).to(eq(1))
     end
   end
-
 end
