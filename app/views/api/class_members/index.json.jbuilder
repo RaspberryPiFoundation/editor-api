@@ -1,24 +1,16 @@
 # frozen_string_literal: true
 
-json.array!(@class_members, @school_students) do |class_member|
-  json.call(
-    class_member,
-    :id,
-    :school_class_id,
-    :student_id,
-    :created_at,
-    :updated_at
-  )
-
-  school_student = @school_students.find { |student| student.id == class_member.student_id }
-
-  if school_student.present?
-    json.set! :student do
+json.array!(@class_members) do |class_member|
+  if class_member.respond_to?(:student_id)
+    json.partial! 'class_member', class_member:
+  else
+    # Teachers are not modelled as ClassMembers
+    json.set! :teacher do
       json.call(
-        school_student,
+        class_member,
         :id,
-        :username,
-        :name
+        :name,
+        :email
       )
     end
   end

@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# rubocop:disable Metrics/BlockLength
 Rails.application.routes.draw do
   namespace :admin do
     mount GoodJob::Engine => 'good_job'
@@ -73,4 +72,3 @@ Rails.application.routes.draw do
   get '/auth/callback', to: 'auth#callback', as: 'callback'
   get '/logout', to: 'auth#destroy', as: 'logout'
 end
-# rubocop:enable Metrics/BlockLength

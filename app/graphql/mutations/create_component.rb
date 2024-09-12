@@ -26,9 +26,7 @@ module Mutations
     end
 
     def ready?(**_args)
-      if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user]&.id))
-        return true
-      end
+      return true if context[:current_ability]&.can?(:create, Component, Project.new(user_id: context[:current_user]&.id))
 
       raise GraphQL::ExecutionError, 'You are not permitted to create a component'
     end

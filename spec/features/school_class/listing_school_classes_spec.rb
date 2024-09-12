@@ -45,7 +45,6 @@ RSpec.describe 'Listing school classes', type: :request do
     expect(data.first[:teacher_name]).to be_nil
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-teacher doesn't teach" do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
@@ -56,9 +55,7 @@ RSpec.describe 'Listing school classes', type: :request do
 
     expect(data.size).to eq(1)
   end
-  # rubocop:enable RSpec/ExampleLength
 
-  # rubocop:disable RSpec/ExampleLength
   it "does not include school classes that the school-student isn't a member of" do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(student)
@@ -69,7 +66,6 @@ RSpec.describe 'Listing school classes', type: :request do
 
     expect(data.size).to eq(1)
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 401 Unauthorized when no token is given' do
     get "/api/schools/#{school.id}/classes"

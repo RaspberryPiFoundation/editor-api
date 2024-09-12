@@ -71,10 +71,6 @@ class ProfileApiClient
       {}
     end
 
-    def list_school_teachers(*)
-      {}
-    end
-
     def remove_school_teacher(*)
       {}
     end
@@ -117,7 +113,6 @@ class ProfileApiClient
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
-    # rubocop:disable Metrics/AbcSize
     def update_school_student(token:, school_id:, student_id:, name: nil, username: nil, password: nil) # rubocop:disable Metrics/ParameterLists
       return nil if token.blank?
 
@@ -135,7 +130,6 @@ class ProfileApiClient
     rescue Faraday::UnprocessableEntityError => e
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
-    # rubocop:enable Metrics/AbcSize
 
     def delete_school_student(token:, school_id:, student_id:)
       return nil if token.blank?

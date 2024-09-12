@@ -172,7 +172,6 @@ RSpec.describe ProfileApiClient do
       expect(WebMock).to have_requested(:get, list_safeguarding_flags_url).with(headers: { 'accept' => 'application/json' })
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'returns list of safeguarding flags if successful' do
       flag = {
         id: '7ac79585-e187-4d2f-bf0c-a1cbe72ecc9a',
@@ -188,7 +187,6 @@ RSpec.describe ProfileApiClient do
         .to_return(status: 200, body: [flag].to_json, headers: { 'content-type' => 'application/json' })
       expect(list_safeguarding_flags).to eq([expected])
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'raises exception if anything other than a 200 status code is returned' do
       stub_request(:get, list_safeguarding_flags_url)
@@ -459,7 +457,6 @@ RSpec.describe ProfileApiClient do
       expect(WebMock).to have_requested(:post, list_students_url).with(body: student_ids)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'returns the student(s) if successful' do
       student = {
         id: '549e4674-6ffd-4ac6-9a97-b4d7e5c0e5c5',
@@ -475,7 +472,6 @@ RSpec.describe ProfileApiClient do
         .to_return(status: 200, body: [student].to_json, headers: { 'content-type' => 'application/json' })
       expect(list_school_students).to eq([expected])
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'raises exception if anything other that 200 status code is returned' do
       stub_request(:post, list_students_url)
@@ -637,7 +633,6 @@ RSpec.describe ProfileApiClient do
       expect(WebMock).to have_requested(:get, student_url).with(headers: { 'accept' => 'application/json' })
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'returns the student(s) if successful' do
       student = {
         id: '549e4674-6ffd-4ac6-9a97-b4d7e5c0e5c5',
@@ -653,7 +648,6 @@ RSpec.describe ProfileApiClient do
         .to_return(status: 200, body: student.to_json, headers: { 'content-type' => 'application/json' })
       expect(school_student).to eq(expected)
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it 'raises exception if anything other than a 200 status code is returned' do
       stub_request(:get, student_url)

@@ -7,7 +7,8 @@ module Api
     authorize_resource :school_teacher, class: false
 
     def index
-      result = SchoolTeacher::List.call(school: @school, token: current_user.token)
+      teacher_ids = @school.roles.where(role: :teacher).pluck(:user_id)
+      result = SchoolTeacher::List.call(teacher_ids:)
 
       if result.success?
         @school_teachers = result[:school_teachers]
