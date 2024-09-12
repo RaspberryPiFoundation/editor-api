@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ClassMember do
+RSpec.describe ClassMember, versioning: true do
   before do
     stub_user_info_api_for(student)
   end
@@ -59,6 +59,14 @@ RSpec.describe ClassMember do
       class_member.save!
       duplicate = build(:class_member, student_id: class_member.student_id, school_class: class_member.school_class)
       expect(duplicate).to be_invalid
+    end
+  end
+
+  describe 'auditing' do
+    subject(:class_member) { create(:class_member, student_id: student.id, school_class:) }
+
+    it 'enables auditing' do
+      expect(class_member.versions.length).to(eq(1))
     end
   end
 end
