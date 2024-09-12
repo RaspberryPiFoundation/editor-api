@@ -63,9 +63,8 @@ RSpec.describe ClassMember do
   end
 
   describe 'auditing' do
-    subject(:class_member) { create(:class_member, student_id: student.id, school_class:) }
-
     it 'enables auditing' do
+      class_member = create(:class_member, student_id: student.id, school_class:)
       expect(class_member.versions.length).to(eq(1))
     end
   end
