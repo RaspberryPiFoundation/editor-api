@@ -65,7 +65,7 @@ RSpec.describe Ability do
       let(:teacher) { create(:teacher, school:) }
       let(:school_class) { build(:school_class, school:, teacher_id: teacher.id) }
       let(:lesson) { build(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
-      let(:school_project) { build(:project, school:, lesson:, user_id: teacher.id) }
+      let!(:school_project) { build(:project, school:, lesson:, user_id: teacher.id) }
 
       context 'when user is a school owner' do
         before do
@@ -74,6 +74,7 @@ RSpec.describe Ability do
 
         it { is_expected.to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
 
@@ -84,6 +85,7 @@ RSpec.describe Ability do
 
         it { is_expected.to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
 
@@ -95,6 +97,7 @@ RSpec.describe Ability do
 
         it { is_expected.to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
 
@@ -105,6 +108,7 @@ RSpec.describe Ability do
 
         it { is_expected.not_to be_able_to(:read, school_project) }
         it { is_expected.not_to be_able_to(:update, school_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
         it { is_expected.not_to be_able_to(:destroy, school_project) }
       end
     end
@@ -114,24 +118,33 @@ RSpec.describe Ability do
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
       let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let(:class_member) { create(:class_member, school_class:, student_id: student.id) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
-      let!(:school_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
+      let!(:remixed_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
+
+      context 'when user is the student' do
+        let(:user) { student }
+
+        it { is_expected.to be_able_to(:toggle_finished, remixed_project) }
+      end
 
       context 'when user is teacher that does not own the orginal project' do
         let(:user) { create(:teacher, school:) }
 
-        it { is_expected.not_to be_able_to(:read, school_project) }
-        it { is_expected.not_to be_able_to(:update, school_project) }
-        it { is_expected.not_to be_able_to(:destroy, school_project) }
+        it { is_expected.not_to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:update, remixed_project) }
+        it { is_expected.not_to be_able_to(:destroy, remixed_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, remixed_project) }
       end
 
       context 'when user is teacher that owns the orginal project' do
         let(:user) { teacher }
 
-        it { is_expected.to be_able_to(:read, school_project) }
-        it { is_expected.not_to be_able_to(:update, school_project) }
-        it { is_expected.not_to be_able_to(:destroy, school_project) }
+        it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:update, remixed_project) }
+        it { is_expected.not_to be_able_to(:destroy, remixed_project) }
+        it { is_expected.not_to be_able_to(:toggle_finished, remixed_project) }
       end
     end
   end
