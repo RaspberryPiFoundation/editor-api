@@ -12,8 +12,6 @@ module Api
       result = ClassMember::List.call(school_class: @school_class, class_members: @class_members, token: current_user.token)
 
       if result.success?
-        @school_students = result[:school_students]
-        @school_teachers = result[:school_teachers]
         @class_members = result[:class_members]
         render :index, formats: [:json], status: :ok
       else
