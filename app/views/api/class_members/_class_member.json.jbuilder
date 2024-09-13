@@ -11,11 +11,6 @@ json.call(
 
 if class_member.student.present?
   json.set! :student do
-    json.call(
-      class_member.student,
-      :id,
-      :username,
-      :name
-    )
+    json.partial! '/api/school_students/school_student', student: class_member.student
   end
 end

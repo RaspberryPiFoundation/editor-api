@@ -32,7 +32,6 @@ RSpec.describe SchoolTeacher::List, type: :unit do
 
       # rubocop:disable RSpec/MultipleExpectations
       it 'returns a successful response with school teachers' do
-        puts response.inspect
         expect(response[:school_teachers].first.id).to eq(teachers[1].id)
         expect(response[:error]).to be_nil
       end

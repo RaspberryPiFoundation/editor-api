@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SchoolMember
+module SchoolMember
   class List
     class << self
       def call(school:, token:)
@@ -12,11 +12,13 @@ class SchoolMember
           teachers = SchoolTeacher::List.call(school:).fetch(:school_teachers, [])
         rescue StandardError => e
           Sentry.capture_exception(e)
-          response[:error] = "Error listing class members: #{e}"
+          response[:error] = "Error listing school members: #{e}"
           return response
         end
 
-        response[:school_members] = students + teachers
+        response[:school_members] = teachers + students.sort do |a, b|
+          a.name <=> b.name
+        end
         response
       end
     end

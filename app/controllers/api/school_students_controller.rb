@@ -5,6 +5,7 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource :school
     authorize_resource :school_student, class: false
+
     before_action :create_safeguarding_flags
 
     def index

@@ -247,4 +247,35 @@ RSpec.describe Ability do
       it { is_expected.not_to be_able_to(:destroy, school) }
     end
   end
+
+  describe 'SchoolMembers' do
+    let(:school) { create(:school) }
+    let(:owner) { create(:owner, school:) }
+    let(:teacher) { create(:teacher, school:) }
+    let(:student) { create(:student, school:) }
+
+    context 'when user is a school owner' do
+      let(:user) { owner }
+
+      it { is_expected.to be_able_to(:read, :school_member) }
+    end
+
+    context 'when user is a school teacher' do
+      let(:user) { teacher }
+
+      it { is_expected.to be_able_to(:read, :school_member) }
+    end
+
+    context 'when user is a school student' do
+      let(:user) { student }
+
+      it { is_expected.not_to be_able_to(:read, :school_member) }
+    end
+
+    context 'when user is not authenticated' do
+      let(:user) { nil }
+
+      it { is_expected.not_to be_able_to(:read, :school_member) }
+    end
+  end
 end
