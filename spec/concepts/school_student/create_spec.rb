@@ -86,7 +86,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
   end
 
   context 'when the student cannot be created in profile api because of a 422 response' do
-    let(:error) { { 'username' => 'username', 'error' => 'ERR_USER_EXISTS' } }
+    let(:error) { { 'message' => "something's up with the username" } }
     let(:exception) { ProfileApiClient::Student422Error.new(error) }
 
     before do
@@ -95,7 +95,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     it 'adds a useful error message' do
       response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to eq('Error creating school student: username has already been taken')
+      expect(response[:error]).to eq("Error creating school student: something's up with the username")
     end
   end
 
