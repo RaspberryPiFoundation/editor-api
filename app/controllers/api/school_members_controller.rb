@@ -7,8 +7,6 @@ module Api
     authorize_resource :school_member, class: false
 
     def index
-      # authorize! :read, :school_member
-
       result = SchoolMember::List.call(school: @school, token: current_user.token)
 
       if result.success?
