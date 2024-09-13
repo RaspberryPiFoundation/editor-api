@@ -25,7 +25,7 @@ RSpec.describe 'Listing school members', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
-  it 'responds with the class members JSON array' do
+  it 'responds with the school members JSON array' do
     get("/api/schools/#{school.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
@@ -102,17 +102,6 @@ RSpec.describe 'Listing school members', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.first[:student_name]).to be_nil
-  end
-
-  it 'does not include class members that belong to a different class' do
-    student = create(:student, school:)
-    different_class = create(:school_class, school:, teacher_id: teacher.id)
-    create(:class_member, school_class: different_class, student_id: student.id)
-
-    get("/api/schools/#{school.id}/members", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.size).to eq(4)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
