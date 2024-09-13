@@ -16,7 +16,7 @@ class ClassMember
           end
 
           teacher_ids = [school_class.teacher_id]
-          teachers = SchoolTeacher::List.call(teacher_ids:).fetch(:school_teachers, [])
+          teachers = SchoolTeacher::List.call(school:, teacher_ids:).fetch(:school_teachers, [])
         rescue StandardError => e
           Sentry.capture_exception(e)
           response[:error] = "Error listing class members: #{e}"
