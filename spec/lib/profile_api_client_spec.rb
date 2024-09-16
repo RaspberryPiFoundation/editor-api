@@ -16,18 +16,10 @@ RSpec.describe ProfileApiClient do
     subject(:exception) { described_class.new(error) }
 
     let(:error_code) { 'ERR_USER_EXISTS' }
-    let(:error) { { 'username' => 'username', 'error' => error_code } }
+    let(:error) { { 'message' => "Something's wrong with the password" } }
 
-    it 'includes status code, username and translated error code in the message' do
-      expect(exception.message).to eq("Student not saved in Profile API (status code 422, username 'username', error 'username has already been taken')")
-    end
-
-    context "when the error isn't recognised" do
-      let(:error_code) { 'unrecognised-code' }
-
-      it 'includes a default error message' do
-        expect(exception.message).to match(/error 'unknown error'/)
-      end
+    it 'includes the message from the error' do
+      expect(exception.message).to eq("Something's wrong with the password")
     end
   end
 
@@ -379,13 +371,13 @@ RSpec.describe ProfileApiClient do
       expect(create_school_student).to eq(response)
     end
 
-    it 'raises 422 exception if 422 status code is returned' do
-      response = { errors: [username: 'username', error: 'ERR_USER_EXISTS'] }
+    it 'raises 422 exception with the relevant message if 400 status code is returned' do
+      response = { errors: [message: 'The password is well dodgy'] }
       stub_request(:post, create_students_url)
-        .to_return(status: 422, body: response.to_json, headers: { 'content-type' => 'application/json' })
+        .to_return(status: 400, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
       expect { create_school_student }.to raise_error(ProfileApiClient::Student422Error)
-        .with_message("Student not saved in Profile API (status code 422, username 'username', error 'username has already been taken')")
+        .with_message('The password is well dodgy')
     end
 
     it 'raises exception if anything other that 201 status code is returned' do
@@ -548,13 +540,13 @@ RSpec.describe ProfileApiClient do
       expect(update_school_student).to eq(expected)
     end
 
-    it 'raises 422 exception if 422 status code is returned' do
-      response = { errors: [username: 'username', error: 'ERR_USER_EXISTS'] }
+    it 'raises 422 exception with the relevant message if 400 status code is returned' do
+      response = { errors: [message: 'The username is well dodgy'] }
       stub_request(:patch, update_student_url)
-        .to_return(status: 422, body: response.to_json, headers: { 'content-type' => 'application/json' })
+        .to_return(status: 400, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
       expect { update_school_student }.to raise_error(ProfileApiClient::Student422Error)
-        .with_message("Student not saved in Profile API (status code 422, username 'username', error 'username has already been taken')")
+        .with_message('The username is well dodgy')
     end
 
     it 'raises exception if anything other that 200 status code is returned' do

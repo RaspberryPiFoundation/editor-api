@@ -13,21 +13,9 @@ class ProfileApiClient
   class Error < StandardError; end
 
   class Student422Error < Error
-    DEFAULT_ERROR = 'unknown error'
-    ERRORS = {
-      'ERR_USER_EXISTS' => 'username has already been taken',
-      'ERR_INVALID' => 'unknown validation error',
-      'ERR_INVALID_PASSWORD' => 'password is invalid',
-      'ERR_UNKNOWN' => DEFAULT_ERROR
-    }.freeze
-
-    attr_reader :username, :error
-
     def initialize(error)
-      @username = error['username']
-      @error = ERRORS.fetch(error['error'], DEFAULT_ERROR)
-
-      super "Student not saved in Profile API (status code 422, username '#{@username}', error '#{@error}')"
+      @message = error['message']
+      super @message
     end
   end
 
@@ -109,7 +97,7 @@ class ProfileApiClient
       raise UnexpectedResponse, response unless response.status == 201
 
       response.body.deep_symbolize_keys
-    rescue Faraday::UnprocessableEntityError => e
+    rescue Faraday::BadRequestError => e
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
@@ -127,7 +115,7 @@ class ProfileApiClient
       raise UnexpectedResponse, response unless response.status == 200
 
       Student.new(**response.body)
-    rescue Faraday::UnprocessableEntityError => e
+    rescue Faraday::BadRequestError => e
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
