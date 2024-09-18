@@ -9,12 +9,10 @@ module Api
 
     def index
       @class_members = @school_class.members.accessible_by(current_ability)
-      student_ids = @class_members.pluck(:student_id)
-
-      result = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
+      result = ClassMember::List.call(school_class: @school_class, class_members: @class_members, token: current_user.token)
 
       if result.success?
-        @school_students = result[:school_students]
+        @class_members = result[:class_members]
         render :index, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity

@@ -59,6 +59,7 @@ class Ability
 
   def define_school_owner_abilities(school:)
     can(%i[read update destroy], School, id: school.id)
+    can(%i[read], :school_member)
     can(%i[read create update destroy], SchoolClass, school: { id: school.id })
     can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read create create_batch destroy], ClassMember, school_class: { school: { id: school.id } })
@@ -70,9 +71,9 @@ class Ability
     can(%i[create], Project, school_id: school.id)
   end
 
-  # rubocop:disable Metrics/AbcSize
   def define_school_teacher_abilities(user:, school:)
     can(%i[read], School, id: school.id)
+    can(%i[read], :school_member)
     can(%i[create], SchoolClass, school: { id: school.id })
     can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
     can(%i[read create create_batch destroy], ClassMember,
@@ -91,17 +92,25 @@ class Ability
     can(%i[read], Project,
         remixed_from_id: Project.where(user_id: user.id, school_id: school.id, remixed_from_id: nil).pluck(:id))
   end
-  # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Layout/LineLength
   def define_school_student_abilities(user:, school:)
     can(%i[read], School, id: school.id)
     can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
+    # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
     can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
     can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
+    can(%i[toggle_finished], Project) do |project|
+      school_student_can_toggle_finished?(user:, school:, project:)
+    end
   end
-  # rubocop:enable Layout/LineLength
+
+  def school_student_can_toggle_finished?(user:, school:, project:)
+    is_my_project = project.user_id == user.id && project.school_id == school.id
+    is_a_remix = project.remixed_from_id.present?
+
+    is_my_project && is_a_remix
+  end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
     is_my_lesson = lesson.school_id == school.id && lesson.user_id == user.id

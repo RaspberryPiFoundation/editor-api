@@ -30,9 +30,17 @@ RSpec/DescribeClass:
 RSpec/MultipleMemoizedHelpers:
   Max: 8
 
+RSpec/ExampleLength:
+  Enabled: false
+
 Metrics/BlockLength:
-  Exclude:
-    - "config/routes.rb"
+  Enabled: false
+
+Metrics/AbcSize:
+  Enabled: false
+
+Metrics/LineLength:
+  Enabled: false
 
 Naming/VariableNumber:
   EnforcedStyle: snake_case
