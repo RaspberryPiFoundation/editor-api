@@ -16,8 +16,8 @@ RSpec.describe 'Listing school members', type: :request do
       { id: student.id, name: student.name, username: student.username }
     end
     stub_profile_api_list_school_students(school:, student_attributes:)
-
     stub_user_info_api_for(teacher)
+    stub_profile_api_create_safeguarding_flag
   end
 
   it 'responds 200 OK' do
@@ -95,6 +95,16 @@ RSpec.describe 'Listing school members', type: :request do
     expect(student_names).to eq(sorted_student_names)
   end
 
+  it 'creates the school owner safeguarding flag' do
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
+  end
+
+  it 'does not create the school teacher safeguarding flag' do
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email)
+  end
+
   it "responds with nil attributes for students if the user profile doesn't exist" do
     stub_user_info_api_for_unknown_users(user_id: students.first.id)
 
@@ -122,5 +132,21 @@ RSpec.describe 'Listing school members', type: :request do
 
     get("/api/schools/#{school.id}/members", headers:)
     expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'does not create the school owner safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
+  end
+
+  it 'creates the school teacher safeguarding flag when the user is a school teacher' do
+    teacher = create(:teacher, school:)
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/students", headers:)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email)
   end
 end
