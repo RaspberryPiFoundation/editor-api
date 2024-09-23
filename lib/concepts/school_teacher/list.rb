@@ -3,9 +3,10 @@
 module SchoolTeacher
   class List
     class << self
-      def call(school:, token:)
+      def call(school:, teacher_ids: nil)
         response = OperationResponse.new
-        response[:school_teachers] = list_teachers(school, token)
+        teacher_ids = school.roles.where(role: :teacher)&.pluck(:user_id) if teacher_ids.blank?
+        response[:school_teachers] = list_teachers(teacher_ids)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -15,11 +16,8 @@ module SchoolTeacher
 
       private
 
-      def list_teachers(school, token)
-        response = ProfileApiClient.list_school_teachers(token:, organisation_id: school.id)
-        user_ids = response.fetch(:ids)
-
-        User.from_userinfo(ids: user_ids)
+      def list_teachers(ids)
+        User.from_userinfo(ids:)
       end
     end
   end

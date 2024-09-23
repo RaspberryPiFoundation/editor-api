@@ -72,7 +72,6 @@ module ClassroomManagementHelper
     end
   end
 
-  # rubocop:disable Metrics/AbcSize
   def create_lessons(user_id, school, school_class, visibility = 'students')
     2.times.map do |i|
       Lesson.find_or_create_by!(school:, school_class:,
@@ -87,7 +86,6 @@ module ClassroomManagementHelper
       end
     end
   end
-  # rubocop:enable Metrics/AbcSize
 
   def create_project(user_id, school, lesson)
     Project.find_or_create_by!(user_id:, school:, lesson:) do |project|

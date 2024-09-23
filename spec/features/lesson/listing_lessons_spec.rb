@@ -48,7 +48,6 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.first[:project]).to eq(expected_project)
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the user if their user profile doesn't exist" do
     user_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id:)
@@ -59,7 +58,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
     expect(data.first[:user_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'does not include archived lessons' do
     lesson.archive!
@@ -190,7 +188,6 @@ RSpec.describe 'Listing lessons', type: :request do
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
-    # rubocop:disable RSpec/ExampleLength
     it 'includes the lesson when the user owns the lesson' do
       another_teacher = create(:teacher, school:)
       authenticated_in_hydra_as(another_teacher)
@@ -201,9 +198,7 @@ RSpec.describe 'Listing lessons', type: :request do
 
       expect(data.size).to eq(1)
     end
-    # rubocop:enable RSpec/ExampleLength
 
-    # rubocop:disable RSpec/ExampleLength
     it "includes the lesson when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
@@ -214,7 +209,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
       expect(data.size).to eq(1)
     end
-    # rubocop:enable RSpec/ExampleLength
 
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
       student = create(:student, school:)

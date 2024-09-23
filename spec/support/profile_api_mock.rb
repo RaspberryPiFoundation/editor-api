@@ -15,10 +15,6 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:remove_school_owner)
   end
 
-  def stub_profile_api_list_school_teachers(user_id:)
-    allow(ProfileApiClient).to receive(:list_school_teachers).and_return(ids: [user_id])
-  end
-
   def stub_profile_api_remove_school_teacher
     allow(ProfileApiClient).to receive(:remove_school_teacher)
   end

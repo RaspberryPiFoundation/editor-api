@@ -16,6 +16,7 @@ module SchoolTeacher
       private
 
       def remove_teacher(school, teacher_id, token)
+        # TODO: This has not been implemented yet
         ProfileApiClient.remove_school_teacher(token:, teacher_id:, organisation_id: school.id)
       end
     end
