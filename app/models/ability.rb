@@ -39,6 +39,12 @@ class Ability
     # An unverified school owner can read their own school.
     can :read, School, creator_id: user.id, verified_at: nil
 
+    # Any authenticated user can create a lesson, to support a RPF library of public lessons.
+    can :create, Lesson, school_id: nil, school_class_id: nil
+
+    # Any authenticated user can create a copy of a publicly shared lesson.
+    can :create_copy, Lesson, visibility: 'public'
+
     # Any authenticated user can manage their own lessons.
     can %i[read create_copy update destroy], Lesson, user_id: user.id
 
