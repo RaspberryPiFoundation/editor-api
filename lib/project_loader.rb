@@ -8,8 +8,9 @@ class ProjectLoader
     @locales = [*locales, 'en', nil]
   end
 
-  def load
-    projects = Project.where(identifier:, locale: @locales)
-    projects.min_by { |project| @locales.find_index(project.locale) }
+  def load(include_images: false)
+    query = Project.where(identifier:, locale: @locales)
+    query = query.includes(images_attachments: :blob) if include_images
+    query.min_by { |project| @locales.find_index(project.locale) }
   end
 end
