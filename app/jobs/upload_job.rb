@@ -4,6 +4,8 @@ require 'open-uri'
 require 'github_api'
 
 class UploadJob < ApplicationJob
+  @skip_job = false
+
   ProjectContentQuery = GithubApi::Client.parse <<-GRAPHQL
     query($owner: String!, $repository: String!, $expression: String!) {
       repository(owner: $owner, name: $repository) {
@@ -38,9 +40,17 @@ class UploadJob < ApplicationJob
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
+        if @skip_job
+          Rails.logger.warn "Build skipped for #{project[:name]}"
+          next
+        end
+
         project_importer = ProjectImporter.new(**project)
         project_importer.import!
       end
+    rescue StandardError => e
+      Sentry.capture_exception(e)
+      raise e # Re-raise the error to make the job fail
     end
   end
 
@@ -53,25 +63,45 @@ class UploadJob < ApplicationJob
   end
 
   def load_projects_data(locale, repository, owner)
-    GithubApi::Client.query(
+    response = GithubApi::Client.query(
       ProjectContentQuery,
       variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:#{locale}/code" }
     )
+
+    if response.data.errors.any?
+      error_messages = response.data.errors.messages.map { |error| error }
+      error_details = response.data.errors.details.map { |error| error }
+      raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}"
+    end
+
+    response
   end
 
   def format_project(project_dir, locale, repository, owner)
     components = []
     images = []
-    project_dir.object.entries.each do |file|
+    proj_config = {}
+
+    data = project_dir.object
+    raise InvalidDirectoryStructureError, "The directory structure is incorrect and the job can't be processed." unless data.respond_to?(:entries)
+
+    data.entries.each do |file|
       if file.name == 'project_config.yml'
-        @proj_config = YAML.safe_load(file.object.text, symbolize_names: true)
+        proj_config = YAML.safe_load(file.object.text, symbolize_names: true)
+
+        # Skip if build is set to false (for backwards compatibility the build must happen if the key is not present)
+        if proj_config[:build] == false
+          @skip_job = true
+          break
+        end
       elsif file.object.text
         components << component(file)
       else
         images << image(file, project_dir, locale, repository, owner)
       end
     end
-    { **@proj_config, locale:, components:, images: }
+
+    { **proj_config, locale:, components:, images: }
   end
 
   def component(file)
@@ -97,3 +127,5 @@ class UploadJob < ApplicationJob
     payload[:repository][:owner][:name]
   end
 end
+
+class InvalidDirectoryStructureError < StandardError; end
