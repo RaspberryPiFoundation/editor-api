@@ -46,7 +46,7 @@ class Ability
     can :create_copy, Lesson, visibility: 'public'
 
     # Any authenticated user can manage their own lessons.
-    can %i[read create_copy update destroy], Lesson, user_id: user.id
+    can %i[read create_copy update destroy], Lesson, user_id: user.id, school_id: nil
 
     # Any authenticated user can create projects not owned by a school.
     can :create, Project, user_id: user.id, school_id: nil
@@ -81,7 +81,7 @@ class Ability
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
-    can(%i[create destroy], Lesson) do |lesson|
+    can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
