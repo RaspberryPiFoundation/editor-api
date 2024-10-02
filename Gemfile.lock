@@ -99,6 +99,7 @@ GEM
       administrate (>= 0.2.2)
       rails (>= 7.0)
     ast (2.4.2)
+    awesome_print (1.9.2)
     aws-eventstream (1.2.0)
     aws-partitions (1.718.0)
     aws-sdk-core (3.170.0)
@@ -515,6 +516,7 @@ PLATFORMS
 DEPENDENCIES
   administrate (~> 0.20.1)
   administrate-field-active_storage
+  awesome_print
   aws-sdk-s3
   bootsnap
   bullet
