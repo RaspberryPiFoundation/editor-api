@@ -38,6 +38,11 @@ class UploadJob < ApplicationJob
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
+      if projects_data.data.repository.object.nil?
+        Rails.logger.warn 'Build skipped, does the repo exist?'
+        break
+      end
+
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
         if @skip_job
