@@ -46,6 +46,10 @@ class User
     Role.student.find_by(school:, user_id: id)
   end
 
+  def student?
+    Role.student.exists?(user_id: id)
+  end
+
   def admin?
     (roles&.to_s&.split(',')&.map(&:strip) || []).include?('editor-admin')
   end
