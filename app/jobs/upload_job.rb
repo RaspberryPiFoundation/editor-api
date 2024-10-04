@@ -38,7 +38,7 @@ class UploadJob < ApplicationJob
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
-      if projects_data.data.repository.object.nil?
+      if projects_data.data.repository&.object.nil?
         Rails.logger.warn 'Build skipped, does the repo exist?'
         break
       end
@@ -76,7 +76,10 @@ class UploadJob < ApplicationJob
     if response.data.errors.any?
       error_messages = response.data.errors.messages.map { |error| error }
       error_details = response.data.errors.details.map { |error| error }
-      raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}"
+      error_type = error_details.dig(0, 1, 0, 'type')
+
+      # Handle NOT_FOUND errors as a special case, as this can happen when the repo is first created
+      raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}" unless error_type == 'NOT_FOUND'
     end
 
     response
