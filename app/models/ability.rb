@@ -4,22 +4,34 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    # Anyone can view projects not owner by a user or a school.
+    define_common_non_student_abilities(user)
+
+    return unless user
+
+    define_authenticated_non_student_abilities(user)
+
+    user.schools.each do |school|
+      define_school_student_abilities(user:, school:) if user.school_student?(school)
+      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
+      define_school_owner_abilities(school:) if user.school_owner?(school)
+    end
+  end
+
+  private
+
+  def define_common_non_student_abilities(user)
+    return if user&.student?
+
+    # Anyone can view projects not owned by a user or a school.
     can :show, Project, user_id: nil, school_id: nil
     can :show, Component, project: { user_id: nil, school_id: nil }
 
     # Anyone can read publicly shared lessons.
     can :read, Lesson, visibility: 'public'
+  end
 
-    return unless user
-
-    # Any authenticated user can create projects not owned by a school.
-    can :create, Project, user_id: user.id, school_id: nil
-    can :create, Component, project: { user_id: user.id, school_id: nil }
-
-    # Any authenticated user can manage their own projects.
-    can %i[read update destroy], Project, user_id: user.id
-    can %i[read update destroy], Component, project: { user_id: user.id }
+  def define_authenticated_non_student_abilities(user)
+    return if user&.student?
 
     # Any authenticated user can create a school. They agree to become the school-owner.
     can :create, School
@@ -34,16 +46,16 @@ class Ability
     can :create_copy, Lesson, visibility: 'public'
 
     # Any authenticated user can manage their own lessons.
-    can %i[read create_copy update destroy], Lesson, user_id: user.id
+    can %i[read create_copy update destroy], Lesson, user_id: user.id, school_id: nil
 
-    user.schools.each do |school|
-      define_school_student_abilities(user:, school:) if user.school_student?(school)
-      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
-      define_school_owner_abilities(school:) if user.school_owner?(school)
-    end
+    # Any authenticated user can create projects not owned by a school.
+    can :create, Project, user_id: user.id, school_id: nil
+    can :create, Component, project: { user_id: user.id, school_id: nil }
+
+    # Any authenticated user can manage their own projects.
+    can %i[read update destroy], Project, user_id: user.id
+    can %i[read update destroy], Component, project: { user_id: user.id }
   end
-
-  private
 
   def define_school_owner_abilities(school:)
     can(%i[read update destroy], School, id: school.id)
@@ -69,7 +81,7 @@ class Ability
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
-    can(%i[create destroy], Lesson) do |lesson|
+    can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])

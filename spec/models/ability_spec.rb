@@ -245,6 +245,22 @@ RSpec.describe Ability do
       it { is_expected.to be_able_to(:read, school) }
       it { is_expected.not_to be_able_to(:update, school) }
       it { is_expected.not_to be_able_to(:destroy, school) }
+
+      context 'with a starter project' do
+        it { is_expected.not_to be_able_to(:index, starter_project) }
+        it { is_expected.not_to be_able_to(:show, starter_project) }
+        it { is_expected.not_to be_able_to(:create, starter_project) }
+        it { is_expected.not_to be_able_to(:update, starter_project) }
+        it { is_expected.not_to be_able_to(:destroy, starter_project) }
+      end
+
+      context 'with an owned project' do
+        it { is_expected.not_to be_able_to(:index, project) }
+        it { is_expected.not_to be_able_to(:show, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
+      end
     end
   end
 
