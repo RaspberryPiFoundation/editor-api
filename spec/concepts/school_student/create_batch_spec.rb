@@ -8,7 +8,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
   let(:user_id) { SecureRandom.uuid }
   let(:user_id_2) { SecureRandom.uuid }
 
-  let(:school_student_params) do
+  let(:school_students_params) do
     [
       {
         username: 'student-to-create',
@@ -29,18 +29,18 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
   end
 
   it 'returns a successful operation response' do
-    response = described_class.call(school:, school_student_params:, token:)
+    response = described_class.call(school:, school_students_params:, token:)
     expect(response.success?).to be(true)
   end
 
   it 'queues CreateStudentsJob' do
     expect do
-      described_class.call(school:, school_student_params:, token:)
-    end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_student_params, token:)
+      described_class.call(school:, school_students_params:, token:)
+    end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_students_params, token:)
   end
 
   context 'when validation fails' do
-    let(:school_student_params) do
+    let(:school_students_params) do
       [
         {
           username: '',
@@ -61,23 +61,23 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
     it 'does not queue a new job' do
       expect do
-        described_class.call(school:, school_student_params:, token:)
+        described_class.call(school:, school_students_params:, token:)
       end.not_to have_enqueued_job(CreateStudentsJob)
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(school:, school_student_params:, token:)
+      response = described_class.call(school:, school_students_params:, token:)
       expect(response.failure?).to be(true)
     end
 
     it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_student_params:, token:)
+      response = described_class.call(school:, school_students_params:, token:)
       error_message = response[:error].message
       expect(error_message).to match(/Error creating student 1: username '' is invalid/)
     end
 
     it 'sent the exception to Sentry' do
-      described_class.call(school:, school_student_params:, token:)
+      described_class.call(school:, school_students_params:, token:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end
