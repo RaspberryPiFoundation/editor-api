@@ -39,7 +39,7 @@ Metrics/BlockLength:
 Metrics/AbcSize:
   Enabled: false
 
-Metrics/LineLength:
+Layout/LineLength:
   Enabled: false
 
 Naming/VariableNumber:

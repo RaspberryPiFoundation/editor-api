@@ -30,7 +30,7 @@ module Api
     end
 
     def create_batch
-      result = SchoolStudent::CreateBatch.call(school: @school, uploaded_file: params[:file], token: current_user.token)
+      result = SchoolStudent::CreateBatch.call(school: @school, school_students_params:, token: current_user.token)
 
       if result.success?
         head :no_content
@@ -65,6 +65,14 @@ module Api
 
     def school_student_params
       params.require(:school_student).permit(:username, :password, :name)
+    end
+
+    def school_students_params
+      school_students = params.require(:school_students)
+
+      school_students.map do |student|
+        student.permit(:username, :password, :name).to_h.with_indifferent_access
+      end
     end
 
     def create_safeguarding_flags
