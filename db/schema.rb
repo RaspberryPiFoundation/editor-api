@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_09_02_151414) do
+ActiveRecord::Schema[7.1].define(version: 2024_10_09_082132) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -77,6 +77,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_02_151414) do
     t.datetime "enqueued_at"
     t.datetime "discarded_at"
     t.datetime "finished_at"
+    t.datetime "jobs_finished_at"
   end
 
   create_table "good_job_executions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -92,7 +93,10 @@ ActiveRecord::Schema[7.1].define(version: 2024_09_02_151414) do
     t.integer "error_event", limit: 2
     t.text "error_backtrace", array: true
     t.uuid "process_id"
+    t.interval "duration"
+    t.string "concurrency_key"
     t.index ["active_job_id", "created_at"], name: "index_good_job_executions_on_active_job_id_and_created_at"
+    t.index ["concurrency_key"], name: "index_good_job_executions_on_concurrency_key"
     t.index ["process_id", "created_at"], name: "index_good_job_executions_on_process_id_and_created_at"
   end
 

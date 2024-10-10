@@ -39,6 +39,10 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:create_school_student).and_return(created: [user_id])
   end
 
+  def stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid])
+    allow(ProfileApiClient).to receive(:create_school_students).and_return(created: [user_ids.join(', ')])
+  end
+
   def stub_profile_api_update_school_student
     allow(ProfileApiClient).to receive(:update_school_student)
   end
