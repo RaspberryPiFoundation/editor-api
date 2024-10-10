@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
   before do
-    authenticated_in_hydra_as(owner)
+    authenticated_in_hydra_as(teacher)
     mock_phrase_generation
   end
 
@@ -118,6 +118,7 @@ RSpec.describe 'Creating a project', type: :request do
   context 'when the project is associated with a lesson' do
     let(:school) { create(:school) }
     let(:lesson) { create(:lesson, school:, user_id: teacher.id) }
+    let(:lesson_created_by_owner) { create(:lesson, school:, user_id: owner.id) }
     let(:teacher) { create(:teacher, school:) }
 
     let(:params) do
@@ -147,7 +148,16 @@ RSpec.describe 'Creating a project', type: :request do
 
     it 'responds 422 Unprocessable when when the user_id is not the owner of the lesson' do
       user_id = SecureRandom.uuid
-      new_params = { project: params[:project].merge(user_id:) }
+      project = {
+        project: {
+          name: 'Test Project',
+          components: [],
+          school_id: school.id,
+          lesson_id: lesson_created_by_owner.id,
+          user_id: teacher.id
+        }
+      }
+      new_params = { project: project.merge(user_id:) }
 
       post('/api/projects', headers:, params: new_params)
       expect(response).to have_http_status(:unprocessable_entity)
