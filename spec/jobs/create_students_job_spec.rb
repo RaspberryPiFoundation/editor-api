@@ -41,14 +41,6 @@ RSpec.describe CreateStudentsJob do
     expect(Role.student.where(school:, user_id:)).to exist
   end
 
-  # it 'raises ActiveRecord::RecordInvalid if the role cannot be created' do
-  #   allow(Role.student).to receive(:create!).and_raise(ActiveRecord::RecordInvalid.new(Role.new))
-
-  #   expect do
-  #     described_class.perform_now(school_id: school.id, students:, token:)
-  #   end.to raise_error(ActiveRecord::RecordInvalid)
-  # end
-
   it 'does not enqueue a job if one is already running for that school' do
     # Enqueue the job
     GoodJob::Job.enqueue(described_class.new(school_id: school.id, students:, token:))
