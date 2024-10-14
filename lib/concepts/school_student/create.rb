@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'awesome_print'
-
 module SchoolStudent
   class Create
     class << self
