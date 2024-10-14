@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'awesome_print'
-
 class ConcurrencyExceededForSchool < StandardError; end
 
 class CreateStudentsJob < ApplicationJob
