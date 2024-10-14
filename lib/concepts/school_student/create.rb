@@ -5,7 +5,7 @@ module SchoolStudent
     class << self
       def call(school:, school_student_params:, token:)
         response = OperationResponse.new
-        create_student(school, school_student_params, token)
+        response[:student_id] = create_student(school, school_student_params, token)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -16,22 +16,23 @@ module SchoolStudent
       private
 
       def create_student(school, school_student_params, token)
+        school_id = school.id
         username = school_student_params.fetch(:username)
         password = school_student_params.fetch(:password)
         name = school_student_params.fetch(:name)
 
-        validate(username:, password:, name:)
-        # TODO: Do the preflight checks here
+        validate(school:, username:, password:, name:)
 
-        students = [{ username:, password:, name: }]
-
-        CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:)
+        response = ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id:)
+        user_id = response[:created].first
+        Role.student.create!(school:, user_id:)
+        user_id
       end
 
-      def validate(username:, password:, name:)
-        # Just ensure we have values, otherwise leave validation to the API
+      def validate(school:, username:, password:, name:)
+        raise ArgumentError, 'school is not verified' unless school.verified?
         raise ArgumentError, "username '#{username}' is invalid" if username.blank?
-        raise ArgumentError, "password '#{password}' is invalid" if password.blank?
+        raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
         raise ArgumentError, "name '#{name}' is invalid" if name.blank?
       end
     end
