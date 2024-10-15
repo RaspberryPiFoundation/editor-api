@@ -20,7 +20,9 @@ module Api
     end
 
     def create
-      result = SchoolStudent::Create.call(school: @school, school_student_params:, token: current_user.token)
+      result = SchoolStudent::Create.call(
+        school: @school, school_student_params:, token: current_user.token
+      )
 
       if result.success?
         head :no_content
@@ -30,7 +32,9 @@ module Api
     end
 
     def create_batch
-      result = SchoolStudent::CreateBatch.call(school: @school, school_students_params:, token: current_user.token)
+      result = SchoolStudent::CreateBatch.call(
+        school: @school, school_students_params:, token: current_user.token, user_id: current_user.id
+      )
 
       if result.success?
         head :no_content

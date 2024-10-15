@@ -47,7 +47,7 @@ RSpec.describe CreateStudentsJob do
     GoodJob::Job.enqueue(described_class.new(school_id: school.id, students:, token:))
 
     expect do
-      described_class.attempt_perform_later(school_id: school.id, students:, token:)
+      described_class.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
     end.to raise_error(ConcurrencyExceededForSchool)
   end
 end

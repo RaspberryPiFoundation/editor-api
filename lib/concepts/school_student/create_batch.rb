@@ -5,9 +5,9 @@ require 'roo'
 module SchoolStudent
   class CreateBatch
     class << self
-      def call(school:, school_students_params:, token:)
+      def call(school:, school_students_params:, token:, user_id:)
         response = OperationResponse.new
-        create_batch(school, school_students_params, token)
+        response[:job_id] = create_batch(school, school_students_params, token, user_id)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -17,11 +17,12 @@ module SchoolStudent
 
       private
 
-      def create_batch(school, students, token)
+      def create_batch(school, students, token, user_id)
         validate(students:)
         # TODO: Do the preflight checks here
 
-        CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:)
+        job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
+        job&.job_id
       end
 
       def validate(students:)

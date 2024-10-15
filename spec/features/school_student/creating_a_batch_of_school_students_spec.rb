@@ -7,6 +7,11 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     authenticated_in_hydra_as(owner)
     stub_profile_api_create_school_students
     stub_profile_api_create_safeguarding_flag
+
+    # UserJob will fail validation as it won't find our test job, so we need to double it
+    allow(CreateStudentsJob).to receive(:attempt_perform_later).and_return(
+      instance_double(CreateStudentsJob, job_id: SecureRandom.uuid)
+    )
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

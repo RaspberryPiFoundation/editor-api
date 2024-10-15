@@ -13,19 +13,26 @@ class CreateStudentsJob < ApplicationJob
     total_limit: 1
   )
 
-  # We need to raise an error if there is already a job running for the school
-  def self.attempt_perform_later(school_id:, students:, token:)
+  def self.attempt_perform_later(school_id:, students:, token:, user_id:)
     concurrency_key = "create_students_job_#{school_id}"
     existing_jobs = GoodJob::Job.where(concurrency_key:, finished_at: nil)
 
     raise ConcurrencyExceededForSchool, 'Only one job per school can be enqueued at a time.' if existing_jobs.exists?
 
-    perform_later(school_id:, students:, token:)
+    ActiveRecord::Base.transaction do
+      job = perform_later(school_id:, students:, token:)
+      UserJob.create!(user_id:, good_job_id: job.job_id) unless job.nil?
+
+      job
+    end
   end
 
   def perform(school_id:, students:, token:)
     students = Array(students)
+
     responses = ProfileApiClient.create_school_students(token:, students:, school_id:)
+    return if responses[:created].blank?
+
     responses[:created].each do |user_id|
       Role.student.create!(school_id:, user_id:)
     end

@@ -63,6 +63,8 @@ Rails.application.routes.draw do
     resources :teacher_invitations, param: :token, only: :show do
       put :accept, on: :member
     end
+
+    resources :user_jobs, only: %i[index show]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
