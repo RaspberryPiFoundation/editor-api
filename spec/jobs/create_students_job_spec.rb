@@ -25,6 +25,8 @@ RSpec.describe CreateStudentsJob do
 
   after do
     GoodJob::Job.delete_all
+
+    ActiveJob::Base.queue_adapter = :test
   end
 
   it 'calls ProfileApiClient' do
