@@ -101,6 +101,21 @@ class ProfileApiClient
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
+    def create_school_students(token:, students:, school_id:)
+      return nil if token.blank?
+
+      students = Array(students)
+      response = connection(token).post("/api/v1/schools/#{school_id}/students") do |request|
+        request.body = students
+      end
+
+      raise UnexpectedResponse, response unless response.status == 201
+
+      response.body.deep_symbolize_keys
+    rescue Faraday::BadRequestError => e
+      raise Student422Error, JSON.parse(e.response_body)['errors'].first
+    end
+
     def update_school_student(token:, school_id:, student_id:, name: nil, username: nil, password: nil) # rubocop:disable Metrics/ParameterLists
       return nil if token.blank?
 

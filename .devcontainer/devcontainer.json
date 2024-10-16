@@ -46,7 +46,6 @@
     "vscode": {
       "extensions": [
         "ms-azuretools.vscode-docker",
-        "ninoseki.vscode-gem-lens",
         "eamodio.gitlens",
         "github.vscode-pull-request-github",
         "wmaurer.change-case",
@@ -57,7 +56,6 @@
         "hashicorp.terraform",
         "yzhang.markdown-all-in-one",
         "mikestead.dotenv",
-        "wingrunr21.vscode-ruby",
         "ms-vscode.remote-repositories",
         "github.remotehub",
         "circleci.circleci",
@@ -68,7 +66,8 @@
         "codezombiech.gitignore",
         "shopify.ruby-lsp",
         "koichisasada.vscode-rdbg",
-        "rangav.vscode-thunder-client"
+        "rangav.vscode-thunder-client",
+        "ninoseki.vscode-mogami"
       ],
       "settings": {
         "terminal.integrated.defaultProfile.linux": "zsh"

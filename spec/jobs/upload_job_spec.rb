@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 require 'rails_helper'
-require 'awesome_print'
 
 RSpec.describe UploadJob do
   around do |example|

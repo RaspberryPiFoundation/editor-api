@@ -5,59 +5,36 @@ require 'roo'
 module SchoolStudent
   class CreateBatch
     class << self
-      def call(school:, uploaded_file:, token:)
+      def call(school:, school_students_params:, token:, user_id:)
         response = OperationResponse.new
-        create_batch(school, uploaded_file, token)
+        response[:job_id] = create_batch(school, school_students_params, token, user_id)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = "Error creating school students: #{e}"
+        response[:error] = e
         response
       end
 
       private
 
-      def create_batch(school, uploaded_file, token)
-        sheet = Roo::Spreadsheet.open(uploaded_file.tempfile).sheet(0)
+      def create_batch(school, students, token, user_id)
+        validate(students:)
+        # TODO: Do the preflight checks here
 
-        validate(school:, sheet:)
-
-        non_header_rows_with_content(sheet:).each do |name, username, password|
-          ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id: school.id)
-        end
+        job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
+        job&.job_id
       end
 
-      def validate(school:, sheet:)
-        expected_header = ['Student Name', 'Username', 'Password']
-
-        raise ArgumentError, 'school is not verified' unless school.verified?
-        raise ArgumentError, 'the spreadsheet header row is invalid' unless sheet.row(1) == expected_header
-
-        @errors = []
-
-        non_header_rows_with_content(sheet:).each do |name, username, password|
-          validate_row(name:, username:, password:)
+      def validate(students:)
+        errors = []
+        students.each_with_index do |student, n|
+          student_errors = []
+          student_errors << "username '#{student[:username]}' is invalid" if student[:username].blank?
+          student_errors << "password '#{student[:password]}' is invalid" if student[:password].blank?
+          student_errors << "name '#{student[:name]}' is invalid" if student[:name].blank?
+          errors << "Error creating student #{n + 1}: #{student_errors.join(', ')}" unless student_errors.empty?
         end
-
-        raise ArgumentError, @errors.join(', ') if @errors.any?
-      end
-
-      def validate_row(name:, username:, password:)
-        @errors.push("name '#{name}' is invalid") if name.blank?
-        @errors.push("username '#{username}' is invalid") if username.blank?
-        @errors.push("password '#{password}' is invalid") if password.blank? || password.size < 8
-      end
-
-      def non_header_rows_with_content(sheet:)
-        Enumerator.new do |yielder|
-          (2..sheet.last_row).each do |i|
-            name, username, password = sheet.row(i)
-
-            next if name.blank? && username.blank? && password.blank?
-
-            yielder.yield [name, username, password]
-          end
-        end
+        raise ArgumentError, errors.join(', ') unless errors.empty?
       end
     end
   end
