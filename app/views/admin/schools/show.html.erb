@@ -35,7 +35,7 @@ as well as a link to its edit page.
       method: :post,
       style: "background-color: green; margin: 5px;",
       data: { confirm: t("administrate.actions.confirm_verify_school") }
-    ) unless page.resource.verified? || page.resource.rejected? %>
+    ) unless page.resource.verified? %>
 
     <%= link_to(
       t("administrate.actions.reject_school"),

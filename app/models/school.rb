@@ -25,7 +25,6 @@ class School < ApplicationRecord
             absence: { unless: proc { |school| school.verified? } },
             format: { with: /\d\d-\d\d-\d\d/, allow_nil: true }
   validate :verified_at_cannot_be_changed
-  validate :rejected_at_cannot_be_changed
   validate :code_cannot_be_changed
 
   before_validation :normalize_reference
@@ -54,7 +53,7 @@ class School < ApplicationRecord
   def verify!
     attempts = 0
     begin
-      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate)
+      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate, rejected_at: nil)
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors[:code].include?('has already been taken') && attempts <= 5
 
@@ -64,7 +63,7 @@ class School < ApplicationRecord
   end
 
   def reject
-    update(rejected_at: Time.zone.now)
+    update!(rejected_at: Time.zone.now)
   end
 
   def postal_code=(str)
@@ -80,10 +79,6 @@ class School < ApplicationRecord
 
   def verified_at_cannot_be_changed
     errors.add(:verified_at, 'cannot be changed after verification') if verified_at_was.present? && verified_at_changed?
-  end
-
-  def rejected_at_cannot_be_changed
-    errors.add(:rejected_at, 'cannot be changed after rejection') if rejected_at_was.present? && rejected_at_changed?
   end
 
   def code_cannot_be_changed

@@ -17,7 +17,7 @@ class SchoolVerificationService
   rescue StandardError => e
     Sentry.capture_exception(e)
     Rails.logger.error { "Failed to verify school #{@school_id}: #{e.message}" }
-    false
+    raise
   else
     true
   end
