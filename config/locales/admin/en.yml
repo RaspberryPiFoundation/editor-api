@@ -11,7 +11,7 @@ en:
     controller:
       verify_school:
         success: "Successfully verified."
-        error: "There was an error verifying the school."
+        error: "There was an error verifying the school"
       reject_school:
         success: "Successfully rejected."
-        error: "There was an error rejecting the school."
+        error: "There was an error rejecting the school"

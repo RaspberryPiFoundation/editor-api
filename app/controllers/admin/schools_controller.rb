@@ -5,10 +5,11 @@ module Admin
     def verify
       service = SchoolVerificationService.new(requested_resource)
 
-      if service.verify(token: current_user.token)
+      begin
+        service.verify(token: current_user.token)
         flash[:notice] = t('administrate.controller.verify_school.success')
-      else
-        flash[:error] = t('administrate.controller.verify_school.error')
+      rescue StandardError => e
+        flash[:error] = "#{t('administrate.controller.verify_school.error')}: #{e.message}"
       end
 
       redirect_to admin_school_path(requested_resource)
@@ -17,10 +18,11 @@ module Admin
     def reject
       service = SchoolVerificationService.new(requested_resource)
 
-      if service.reject
+      begin
+        service.reject
         flash[:notice] = t('administrate.controller.reject_school.success')
-      else
-        flash[:error] = t('administrate.controller.reject_school.error')
+      rescue StandardError => e
+        flash[:error] = "#{t('administrate.controller.reject_school.error')}: #{e.message}"
       end
 
       redirect_to admin_school_path(requested_resource)
