@@ -80,6 +80,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     address_line_1
     address_line_2
     municipality
+    postal_code
     administrative_area
     country_code
   ].freeze
