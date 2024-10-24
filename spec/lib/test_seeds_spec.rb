@@ -37,7 +37,7 @@ RSpec.describe 'test_seeds', type: :task do
   end
 
   describe ':seed_a_school_with_lessons_and_students' do
-    let(:task) { Rake::Task['classroom_management:seed_a_school_with_lessons_and_students'] }
+    let(:task) { Rake::Task['test_seeds:create'] }
 
     before do
       task.invoke
@@ -52,8 +52,8 @@ RSpec.describe 'test_seeds', type: :task do
       school = School.find_by(creator_id:)
       expect(SchoolClass.where(school_id: school.id)).to exist
       lesson = Lesson.where(school_id: school.id)
-      expect(lesson.length).to eq(2)
-      expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(2)
+      expect(lesson.length).to eq(4)
+      expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(4)
     end
     # rubocop:enable RSpec/MultipleExpectations
 
