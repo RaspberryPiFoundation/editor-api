@@ -14,7 +14,7 @@ module DecryptionHelpers
       decipher.key = key
       encrypted_data = Base64.decode64(encrypted_password)
       iv = encrypted_data[0..15]
-      encrypted_password = encrypted_data[16..-1]
+      encrypted_password = encrypted_data[16..]
       decipher.iv = iv
       decipher.update(encrypted_password) + decipher.final
     rescue StandardError => e

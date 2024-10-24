@@ -2,7 +2,6 @@
 
 module SchoolStudent
   class Update
-
     class << self
       include DecryptionHelpers
 
