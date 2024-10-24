@@ -24,12 +24,12 @@ RSpec.describe 'Creating a batch of school students', type: :request do
       school_students: [
         {
           username: 'student-to-create',
-          password: 'at-least-8-characters',
+          password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
           name: 'School Student'
         },
         {
           username: 'second-student-to-create',
-          password: 'at-least-8-characters',
+          password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
           name: 'School Student 2'
         }
       ]

@@ -7,6 +7,7 @@ ruby '~> 3.2.0'
 
 gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
+gem 'attr_encrypted', '~> 4.1.1'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
@@ -33,7 +34,6 @@ gem 'postmark-rails'
 gem 'puma', '~> 6'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
-gem 'roo'
 gem 'scout_apm'
 gem 'sentry-rails'
 
