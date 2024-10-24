@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'roo'
-
 module SchoolStudent
   class CreateBatch
     class << self

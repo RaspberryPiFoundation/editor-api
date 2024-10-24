@@ -10,7 +10,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
   let(:school_student_params) do
     {
       username: 'student-to-create',
-      password: 'at-least-8-characters',
+      password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
       name: 'School Student'
     }
   end
@@ -29,7 +29,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'student-to-create', password: 'at-least-8-characters', name: 'School Student', school_id: school.id)
+      .with(token:, username: 'student-to-create', password: 'Student2024', name: 'School Student', school_id: school.id)
   end
 
   it 'creates a role associating the student with the school' do
@@ -46,7 +46,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
     let(:school_student_params) do
       {
         username: '',
-        password: 'at-least-8-characters',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'School Student'
       }
     end

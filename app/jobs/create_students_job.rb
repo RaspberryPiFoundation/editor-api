@@ -4,6 +4,7 @@ class ConcurrencyExceededForSchool < StandardError; end
 
 class CreateStudentsJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
+  include DecryptionHelpers
 
   queue_as :default
 
@@ -28,7 +29,10 @@ class CreateStudentsJob < ApplicationJob
   end
 
   def perform(school_id:, students:, token:)
-    students = Array(students)
+    students = Array(students).map do |student|
+      student[:password] = decrypt_password(student[:password])
+      student
+    end
 
     responses = ProfileApiClient.create_school_students(token:, students:, school_id:)
     return if responses[:created].blank?

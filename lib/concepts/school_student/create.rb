@@ -3,6 +3,8 @@
 module SchoolStudent
   class Create
     class << self
+      include DecryptionHelpers
+
       def call(school:, school_student_params:, token:)
         response = OperationResponse.new
         response[:student_id] = create_student(school, school_student_params, token)
@@ -18,7 +20,8 @@ module SchoolStudent
       def create_student(school, school_student_params, token)
         school_id = school.id
         username = school_student_params.fetch(:username)
-        password = school_student_params.fetch(:password)
+        encrypted_password = school_student_params.fetch(:password)
+        password = decrypt_password(encrypted_password)
         name = school_student_params.fetch(:name)
 
         validate(school:, username:, password:, name:)

@@ -12,7 +12,7 @@ RSpec.describe CreateStudentsJob do
   let(:students) do
     [{
       username: 'student-to-create',
-      password: 'at-least-8-characters',
+      password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
       name: 'School Student'
     }]
   end
@@ -33,7 +33,7 @@ RSpec.describe CreateStudentsJob do
     described_class.perform_now(school_id: school.id, students:, token:)
 
     expect(ProfileApiClient).to have_received(:create_school_students)
-      .with(token:, students: [{ username: 'student-to-create', password: 'at-least-8-characters', name: 'School Student' }], school_id: school.id)
+      .with(token:, students: [{ username: 'student-to-create', password: 'Student2024', name: 'School Student' }], school_id: school.id)
   end
 
   it 'creates a new student role' do
