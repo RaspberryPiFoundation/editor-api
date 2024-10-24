@@ -16,7 +16,7 @@ module SeedsHelper
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
       school.name = Faker::Educator.secondary_school
-      school.website = Faker::Internet.url
+      school.website = Faker::Internet.url(scheme: 'https')
       school.address_line_1 = Faker::Address.street_address
       school.municipality = Faker::Address.city
       school.country_code = Faker::Address.country_code
