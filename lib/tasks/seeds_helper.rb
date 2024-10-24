@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ClassroomManagementHelper
+module SeedsHelper
   TEST_USERS = {
     jane_doe: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
     john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com
@@ -15,11 +15,11 @@ module ClassroomManagementHelper
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
-      school.name = 'Test School'
-      school.website = 'http://example.com'
-      school.address_line_1 = 'School Address'
-      school.municipality = 'City'
-      school.country_code = 'FR'
+      school.name = Faker::Educator.secondary_school
+      school.website = Faker::Internet.url
+      school.address_line_1 = Faker::Address.street_address
+      school.municipality = Faker::Address.city
+      school.country_code = Faker::Address.country_code
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
@@ -48,7 +48,8 @@ module ClassroomManagementHelper
   def create_school_class(teacher_id, school)
     SchoolClass.find_or_create_by!(teacher_id:, school:) do |school_class|
       Rails.logger.info 'Seeding a class...'
-      school_class.name = 'Test Class'
+      school_class.name = Faker::Educator.course_name
+      school_class.description = Faker::Hacker.phrases.sample
       school_class.teacher_id = teacher_id
       school_class.school = school
     end
@@ -74,14 +75,12 @@ module ClassroomManagementHelper
 
   def create_lessons(user_id, school, school_class, visibility = 'students')
     2.times.map do |i|
-      Lesson.find_or_create_by!(school:, school_class:,
-                                description: "This is lesson #{i + 1}") do |lesson|
+      Lesson.find_or_create_by!(school:, school_class:) do |lesson|
         Rails.logger.info "Seeding Lesson #{i + 1}..."
         lesson.user_id = user_id
         lesson.school = school
         lesson.school_class = school_class
-        lesson.name = "Test Lesson #{i + 1}"
-        lesson.description = "This is lesson #{i + 1}"
+        lesson.name = "Lesson #{i + 1}: #{Faker::ProgrammingLanguage.name}"
         lesson.visibility = visibility
       end
     end
@@ -90,7 +89,7 @@ module ClassroomManagementHelper
   def create_project(user_id, school, lesson)
     Project.find_or_create_by!(user_id:, school:, lesson:) do |project|
       Rails.logger.info "Seeding a project for #{lesson.name}..."
-      project.name = "Test Project for #{lesson.name}"
+      project.name = lesson.name
       project.user_id = user_id
       project.school = school
       project.lesson = lesson
