@@ -63,6 +63,26 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     # rubocop:disable RSpec/MultipleExpectations
+    it 'creates class with lessons for the owner' do
+      school_id = School.find_by(creator_id:).id
+      school_class = SchoolClass.where(school_id:, teacher_id: creator_id)
+      expect(school_class).to exist
+      school_class_id = SchoolClass.find_by(school_id:, teacher_id: creator_id).id
+      expect(Lesson.where(school_id:, school_class_id:).length).to eq(2)
+    end
+    # rubocop:enable RSpec/MultipleExpectations
+
+    # rubocop:disable RSpec/MultipleExpectations
+    it 'creates class with lessons for the teacher' do
+      school_id = School.find_by(creator_id:).id
+      school_class = SchoolClass.where(school_id:, teacher_id:)
+      expect(school_class).to exist
+      school_class_id = SchoolClass.find_by(school_id:, teacher_id:).id
+      expect(Lesson.where(school_id:, school_class_id:).length).to eq(2)
+    end
+    # rubocop:enable RSpec/MultipleExpectations
+
+    # rubocop:disable RSpec/MultipleExpectations
     it 'assigns students' do
       school_id = School.find_by(creator_id:).id
       school_class_id = SchoolClass.find_by(school_id:).id
