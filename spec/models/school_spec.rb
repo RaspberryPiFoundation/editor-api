@@ -123,6 +123,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'accepts a url with a multi-part TLD' do
+      school.website = 'https://example.co.uk'
+      expect(school).to be_valid
+    end
+
     it 'does not require a reference' do
       create(:school, id: SecureRandom.uuid, reference: nil)
 
