@@ -10,7 +10,7 @@ module SeedsHelper
 
   # Match the school in profile...
   TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9' # e52de409-9210-4e94-b08c-dd11439e07d9
-  SCHOOL_CODE = '12-12-12-12'
+  SCHOOL_CODE = '12-34-56'
 
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
