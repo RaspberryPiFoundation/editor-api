@@ -4,7 +4,6 @@ class ConcurrencyExceededForSchool < StandardError; end
 
 class CreateStudentsJob < ApplicationJob
   include GoodJob::ActiveJobExtensions::Concurrency
-  include DecryptionHelpers
 
   queue_as :default
 
@@ -30,7 +29,7 @@ class CreateStudentsJob < ApplicationJob
 
   def perform(school_id:, students:, token:)
     students = Array(students).map do |student|
-      student[:password] = decrypt_password(student[:password])
+      student[:password] = DecryptionHelpers.decrypt_password(student[:password])
       student
     end
 

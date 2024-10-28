@@ -7,7 +7,6 @@ ruby '~> 3.2.0'
 
 gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
-gem 'attr_encrypted', '~> 4.1.1'
 gem 'aws-sdk-s3', require: false
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'

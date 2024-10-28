@@ -99,8 +99,6 @@ GEM
       administrate (>= 0.2.2)
       rails (>= 7.0)
     ast (2.4.2)
-    attr_encrypted (4.1.1)
-      encryptor (~> 3.0.0)
     awesome_print (1.9.2)
     aws-eventstream (1.2.0)
     aws-partitions (1.718.0)
@@ -163,7 +161,6 @@ GEM
     drb (2.2.1)
     email_validator (2.2.4)
       activemodel
-    encryptor (3.0.0)
     erubi (1.13.0)
     et-orbi (1.2.11)
       tzinfo
@@ -516,7 +513,6 @@ PLATFORMS
 DEPENDENCIES
   administrate (~> 0.20.1)
   administrate-field-active_storage
-  attr_encrypted (~> 4.1.1)
   awesome_print
   aws-sdk-s3
   bootsnap
