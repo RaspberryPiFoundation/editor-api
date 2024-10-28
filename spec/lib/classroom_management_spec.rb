@@ -3,7 +3,7 @@
 require 'rails_helper'
 require 'rake'
 
-RSpec.describe 'classroom_management', type: :task do
+RSpec.describe 'for_education', type: :task do
   let(:creator_id) { '583ba872-b16e-46e1-9f7d-df89d267550d' } # jane.doe@example.com
   let(:teacher_id) { 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' } # john.doe@example.com
   let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # student
@@ -11,7 +11,7 @@ RSpec.describe 'classroom_management', type: :task do
   let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' }
 
   describe ':destroy_seed_data' do
-    let(:task) { Rake::Task['classroom_management:destroy_seed_data'] }
+    let(:task) { Rake::Task['for_education:destroy_seed_data'] }
     let(:school) { create(:school, creator_id:, id: school_id) }
 
     before do
@@ -37,7 +37,7 @@ RSpec.describe 'classroom_management', type: :task do
   end
 
   describe ':seed_an_unverified_school' do
-    let(:task) { Rake::Task['classroom_management:seed_an_unverified_school'] }
+    let(:task) { Rake::Task['for_education:seed_an_unverified_school'] }
 
     it 'creates an unverified school' do
       task.invoke
@@ -46,7 +46,7 @@ RSpec.describe 'classroom_management', type: :task do
   end
 
   describe ':seed_a_verified_school' do
-    let(:task) { Rake::Task['classroom_management:seed_a_verified_school'] }
+    let(:task) { Rake::Task['for_education:seed_a_verified_school'] }
 
     it 'creates a verified school' do
       task.invoke
@@ -55,7 +55,7 @@ RSpec.describe 'classroom_management', type: :task do
   end
 
   describe ':seed_a_school_with_lessons_and_students' do
-    let(:task) { Rake::Task['classroom_management:seed_a_school_with_lessons_and_students'] }
+    let(:task) { Rake::Task['for_education:seed_a_school_with_lessons_and_students'] }
 
     before do
       task.invoke

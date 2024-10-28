@@ -5,12 +5,12 @@ require_relative './seeds_helper'
 Rails.logger = Logger.new($stdout) unless Rails.env.test?
 
 # To override uuids call with:
-# `SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_an_unverified_school`
-# `SEEDING_TEACHER_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_a_school_with_lessons`
+# `SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails for_education:seed_an_unverified_school`
+# `SEEDING_TEACHER_ID=00000000-0000-0000-0000-000000000000 rails for_education:seed_a_school_with_lessons`
 
 # For students to match up the school needs to match with the school defined in profile (hard coded in the helper)
 
-namespace :classroom_management do
+namespace :for_education do
   include SeedsHelper
 
   desc 'Destroy existing data'
