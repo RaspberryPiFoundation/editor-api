@@ -2,19 +2,11 @@
 
 require_relative './seeds_helper'
 
-Rails.logger = Logger.new($stdout) unless Rails.env.test?
-
-# To override uuids call with:
-# `SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails for_education:seed_an_unverified_school`
-# `SEEDING_TEACHER_ID=00000000-0000-0000-0000-000000000000 rails for_education:seed_a_school_with_lessons`
-
-# For students to match up the school needs to match with the school defined in profile (hard coded in the helper)
-
-namespace :for_education do
+namespace :test_seeds do
   include SeedsHelper
 
   desc 'Destroy existing data'
-  task destroy_seed_data: :environment do
+  task destroy: :environment do
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Destroying existing seeds...'
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
@@ -47,47 +39,8 @@ namespace :for_education do
     end
   end
 
-  desc 'Create an unverified school'
-  task seed_an_unverified_school: :environment do
-    if School.find_by(code: TEST_SCHOOL)
-      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
-      return
-    end
-
-    ActiveRecord::Base.transaction do
-      Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
-      create_school(creator_id, TEST_SCHOOL)
-
-      Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
-    end
-  end
-
-  desc 'Create a verified school'
-  task seed_a_verified_school: :environment do
-    if School.find_by(code: TEST_SCHOOL)
-      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
-      return
-    end
-
-    ActiveRecord::Base.transaction do
-      Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
-
-      school = create_school(creator_id, TEST_SCHOOL)
-      verify_school(school)
-      Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
-    end
-  end
-
   desc 'Create a school with lessons and students'
-  task seed_a_school_with_lessons_and_students: :environment do
+  task create: :environment do
     if School.find_by(code: TEST_SCHOOL)
       puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
       return
@@ -102,12 +55,15 @@ namespace :for_education do
       verify_school(school)
       assign_a_teacher(teacher_id, school)
 
-      school_class = create_school_class(creator_id, school)
-      assign_students(school_class, school)
+      # for each of the owner and teacher, create a class and assign students
+      [creator_id, teacher_id].each do |user_id|
+        school_class = create_school_class(user_id, school)
+        assign_students(school_class, school)
 
-      lessons = create_lessons(creator_id, school, school_class)
-      lessons.each do |lesson|
-        create_project(creator_id, school, lesson)
+        lessons = create_lessons(user_id, school, school_class)
+        lessons.each do |lesson|
+          create_project(user_id, school, lesson)
+        end
       end
       Rails.logger.info 'Done...'
     rescue StandardError => e
