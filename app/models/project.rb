@@ -31,7 +31,7 @@ class Project < ApplicationRecord
 
   def self.users(current_user)
     school = School.find_by(id: pluck(:school_id))
-    SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id))[:school_students] || []
+    SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id).uniq)[:school_students] || []
   end
 
   def self.with_users(current_user)
