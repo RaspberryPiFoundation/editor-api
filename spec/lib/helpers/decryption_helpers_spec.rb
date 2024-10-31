@@ -7,7 +7,7 @@ require 'base64'
 RSpec.describe DecryptionHelpers do
   let(:key) { 'a1b2c3d4e5f67890123456789abcdef0123456789abcdef0123456789abcdef0' } # 256-bit key in hex
   let(:password) { 'Student2024' }
-  let(:encrypted_password) { 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=' } # Replace with a known encrypted password
+  let(:encrypted_password) { 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=' } # An encrypted password
 
   before do
     allow(ENV).to receive(:fetch).with('EDITOR_ENCRYPTION_KEY').and_return(key)
