@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ClassStudent < ApplicationRecord
+class ClassMember < ApplicationRecord
   belongs_to :school_class
   delegate :school, to: :school_class
   attr_accessor :student

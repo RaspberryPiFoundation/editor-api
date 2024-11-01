@@ -1,21 +1,16 @@
 # frozen_string_literal: true
 
-school_class, teachers = @school_class_with_teachers
+school_class, teacher = @school_class_with_teacher
 
 json.call(
   school_class,
   :id,
   :description,
   :school_id,
+  :teacher_id,
   :name,
   :created_at,
   :updated_at
 )
 
-json.teachers(teachers) do |teacher|
-  json.call(
-    teacher,
-    :id,
-    :name
-  )
-end
+json.teacher_name(teacher&.name)
