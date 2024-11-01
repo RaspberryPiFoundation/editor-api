@@ -74,12 +74,7 @@ class Ability
     can(%i[read], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[create], SchoolClass, school: { id: school.id })
-    # can(%i[read update destroy], SchoolClass) do |school_class|
-    #   school_class.school.id == school.id && school_class.teacher_ids.include?(user.id)
-    # end
-    #  can read update or destroy the class if user is one of the teachers of the class
-    # can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_ids: )
-    can(%i[read update destroy], SchoolClass, id: SchoolClass.with_class_teacher(user.id).select(:id), school: { id: school.id })
+    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
     can(%i[read create create_batch destroy], ClassMember,
         school_class: { school: { id: school.id }, teacher_id: user.id })
     can(%i[read], :school_owner)
