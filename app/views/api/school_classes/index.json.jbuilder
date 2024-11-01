@@ -19,4 +19,3 @@ json.array!(@school_classes_with_teachers) do |school_class, teachers|
     )
   end
 end
-
