@@ -13,6 +13,10 @@ module Api
 
       if result.success?
         @class_members = result[:class_members]
+        puts "the class members are:"
+        @class_members.each do |class_member|
+          pp class_member
+        end
         render :index, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
