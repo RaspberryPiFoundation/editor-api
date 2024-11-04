@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ClassMember
+module ClassMember
   class Delete
     class << self
       def call(school_class:, class_member_id:)
