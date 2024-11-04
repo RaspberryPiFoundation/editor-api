@@ -13,10 +13,6 @@ module Api
 
       if result.success?
         @class_members = result[:class_members]
-        puts "the class members are:"
-        @class_members.each do |class_member|
-          pp class_member
-        end
         render :index, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -26,8 +22,6 @@ module Api
     def create
       student_ids = [class_member_params[:student_id]]
       students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
-      puts "creating students"
-      pp students
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students])
 
       if result.success?
