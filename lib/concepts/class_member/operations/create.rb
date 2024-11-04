@@ -4,6 +4,9 @@ module ClassMember
   class Create
     class << self
       def call(school_class:, students:)
+        # puts 'Creating class members...'
+        # pp students
+        # put students.first.student?
         response = OperationResponse.new
         response[:class_members] = []
         response[:errors] = {}

@@ -16,7 +16,7 @@ module ClassMember
       private
 
       def delete_class_member(school_class, class_member_id)
-        class_member = school_class.members.find(class_member_id)
+        class_member = school_class.students.find(class_member_id)
         class_member.destroy!
       end
     end
