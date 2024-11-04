@@ -4,10 +4,11 @@ class RemoveClassTeacherId < ActiveRecord::Migration[7.1]
   end
 
   def down
-    add_column :school_classes, :teacher_id, :uuid, null: false
-    SchoolTeacher.find_each do |school_teacher|
-      school_class = school_teacher.school_classes.first
-      school_class.update!(teacher_id: school_teacher.teacher_id)
+    add_column :school_classes, :teacher_id, :uuid
+    ClassTeacher.find_each do |class_teacher|
+      school_class = class_teacher.school_class
+      school_class.update!(teacher_id: class_teacher.teacher_id)
     end
+    change_column_null :school_classes, :teacher_id, false
   end
 end
