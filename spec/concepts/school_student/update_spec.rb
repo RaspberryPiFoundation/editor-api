@@ -10,7 +10,7 @@ RSpec.describe SchoolStudent::Update, type: :unit do
   let(:school_student_params) do
     {
       username: 'new-username',
-      password: 'new-password',
+      password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
       name: 'New Name'
     }
   end
@@ -29,14 +29,14 @@ RSpec.describe SchoolStudent::Update, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:update_school_student)
-      .with(token:, username: 'new-username', password: 'new-password', name: 'New Name', school_id: school.id, student_id:)
+      .with(token:, username: 'new-username', password: 'Student2024', name: 'New Name', school_id: school.id, student_id:)
   end
 
   context 'when updating fails' do
     let(:school_student_params) do
       {
         username: ' ',
-        password: 'new-password',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'New Name'
       }
     end

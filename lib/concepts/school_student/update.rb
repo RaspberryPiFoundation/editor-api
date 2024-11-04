@@ -17,7 +17,8 @@ module SchoolStudent
 
       def update_student(school, student_id, school_student_params, token)
         username = school_student_params.fetch(:username, nil)
-        password = school_student_params.fetch(:password, nil)
+        encrypted_password = school_student_params.fetch(:password, nil)
+        password = DecryptionHelpers.decrypt_password(encrypted_password)
         name = school_student_params.fetch(:name, nil)
 
         validate(username:, password:, name:)

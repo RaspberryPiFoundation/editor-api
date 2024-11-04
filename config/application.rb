@@ -30,6 +30,9 @@ module App
 
     config.autoload_paths << "#{root}/lib/concepts"
     Rails.autoloaders.main.collapse('lib/concepts/*/operations')
+
+    config.autoload_paths << "#{root}/lib/helpers"
+
     config.autoload_lib(ignore: %w[assets tasks])
 
     # Configuration for the application, engines, and railties goes here.

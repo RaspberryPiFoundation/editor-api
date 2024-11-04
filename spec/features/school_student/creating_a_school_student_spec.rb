@@ -17,7 +17,7 @@ RSpec.describe 'Creating a school student', type: :request do
     {
       school_student: {
         username: 'student123',
-        password: 'at-least-8-characters',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'School Student'
       }
     }
