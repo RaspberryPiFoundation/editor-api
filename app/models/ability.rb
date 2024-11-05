@@ -90,7 +90,7 @@ class Ability
     end
     can(%i[read update], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read], Project,
-        remixed_from_id: Project.where(user_id: user.id, school_id: school.id, remixed_from_id: nil).pluck(:id))
+        remixed_from_id: Project.where(school_id: school.id, remixed_from_id: nil, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
   end
 
   def define_school_student_abilities(user:, school:)
