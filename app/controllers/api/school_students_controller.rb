@@ -37,7 +37,7 @@ module Api
       )
 
       if result.success?
-        head :no_content
+        head :accepted
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
