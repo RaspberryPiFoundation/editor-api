@@ -39,7 +39,7 @@ module Api
       if result.success?
         head :accepted
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { errors: result[:errors] }, status: :unprocessable_entity
       end
     end
 

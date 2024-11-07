@@ -9,30 +9,45 @@ module SchoolStudent
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = e
+        response[:errors] = JSON.parse(e.message)
         response
       end
 
       private
 
-      def create_batch(school, students, token, user_id)
-        validate(students:)
-        # TODO: Do the preflight checks here
+      def create_batch(school, students, token, _user_id)
+        students = Array(students).map do |student|
+          student[:password] = DecryptionHelpers.decrypt_password(student[:password])
+          student
+        end
+
+        validate(school:, students:, token:)
 
         job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
         job&.job_id
       end
 
-      def validate(students:)
-        errors = []
-        students.each_with_index do |student, n|
-          student_errors = []
-          student_errors << "username '#{student[:username]}' is invalid" if student[:username].blank?
-          student_errors << "password '#{student[:password]}' is invalid" if student[:password].blank?
-          student_errors << "name '#{student[:name]}' is invalid" if student[:name].blank?
-          errors << "Error creating student #{n + 1}: #{student_errors.join(', ')}" unless student_errors.empty?
+      def validate(school:, students:, token:)
+        begin
+          ProfileApiClient.create_school_students(token:, students:, school_id: school.id, preflight: true)
+        rescue ProfileApiClient::Student422Error => e
+          errors = JSON.parse(e.message).each_with_object({}) do |error, hash|
+            username = error['username'] || error['path']
+            field = error['path'].split('.').last
+
+            hash[username] ||= []
+            hash[username] << I18n.t(
+              "validations.school_student.#{error['errorCode'].underscore}",
+              field:,
+              default: error['message']
+            )
+
+            # Ensure uniqueness to avoid repeat errors with duplicate usernames
+            hash[username] = hash[username].uniq
+          end
         end
-        raise ArgumentError, errors.join(', ') unless errors.empty?
+
+        raise ArgumentError, errors.to_json unless errors&.empty?
       end
     end
   end
