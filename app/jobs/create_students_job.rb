@@ -28,7 +28,10 @@ class CreateStudentsJob < ApplicationJob
   end
 
   def perform(school_id:, students:, token:)
-    students = Array(students)
+    students = Array(students).map do |student|
+      student[:password] = DecryptionHelpers.decrypt_password(student[:password])
+      student
+    end
 
     responses = ProfileApiClient.create_school_students(token:, students:, school_id:)
     return if responses[:created].blank?
