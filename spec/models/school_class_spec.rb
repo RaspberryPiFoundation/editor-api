@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SchoolClass do
+RSpec.describe SchoolClass, versioning: true do
   before do
     stub_user_info_api_for(teacher)
   end
@@ -148,6 +148,14 @@ RSpec.describe SchoolClass do
 
       pair = school_class.with_teacher
       expect(pair).to eq([school_class, nil])
+    end
+  end
+
+  describe 'auditing' do
+    subject(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+
+    it 'enables auditing' do
+      expect(school_class.versions.length).to(eq(1))
     end
   end
 end
