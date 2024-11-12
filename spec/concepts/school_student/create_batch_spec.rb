@@ -11,12 +11,12 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     [
       {
         username: 'student-to-create',
-        password: 'at-least-8-characters',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'School Student'
       },
       {
         username: 'second-student-to-create',
-        password: 'at-least-8-characters',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'School Student 2'
       }
     ]
@@ -52,17 +52,17 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     end
   end
 
-  context 'when validation fails' do
+  context 'when a normal error occurs' do
     let(:school_students_params) do
       [
         {
           username: '',
-          password: 'at-least-8-characters',
+          password: 'Password',
           name: 'School Student'
         },
         {
           username: 'second-student-to-create',
-          password: 'at-least-8-characters',
+          password: 'Password',
           name: 'School Student 2'
         }
       ]
@@ -85,13 +85,30 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_students_params:, token:, user_id:)
-      error_message = response[:error].message
-      expect(error_message).to match(/Error creating student 1: username '' is invalid/)
+      error_message = response[:error]
+      expect(error_message).to match(/Error creating school students: Decryption failed: iv must be 16 bytes/)
     end
 
     it 'sent the exception to Sentry' do
       described_class.call(school:, school_students_params:, token:, user_id:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+    end
+  end
+
+  context 'when a validation error occurs' do
+    before do
+      allow(described_class).to receive(:validate).and_raise(ValidationError, { error: 'Good job must exist' }.to_json)
+      allow(Sentry).to receive(:capture_exception)
+    end
+
+    it 'returns only the JSON array' do
+      response = described_class.call(school:, school_students_params:, token:, user_id:)
+      expect(response[:error]).to eq({ 'error' => 'Good job must exist' })
+    end
+
+    it 'sends the exception to Sentry' do
+      described_class.call(school:, school_students_params:, token:, user_id:)
+      expect(Sentry).to have_received(:capture_exception).with(kind_of(ValidationError))
     end
   end
 end

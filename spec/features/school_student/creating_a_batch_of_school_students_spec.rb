@@ -46,17 +46,17 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email)
   end
 
-  it 'responds 204 No Content' do
+  it 'responds 202 No Content' do
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(response).to have_http_status(:no_content)
+    expect(response).to have_http_status(:accepted)
   end
 
-  it 'responds 204 No Content when the user is a school-teacher' do
+  it 'responds 202 No Content when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
 
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(response).to have_http_status(:no_content)
+    expect(response).to have_http_status(:accepted)
   end
 
   it 'does not create the school owner safeguarding flag when the user is a school-teacher' do
