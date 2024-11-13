@@ -44,19 +44,34 @@ module ProfileApiMock
   end
 
   def stub_profile_api_create_school_students_validation_error
+    # 13/11/24: Response from profile from this request:
+    # {
+    #   "school_students": [
+    #     {
+    #       "username": "student-to-create",
+    #       "password": "Password",
+    #       "name": ""
+    #     },
+    #     {
+    #       "username": "student-to-create",
+    #       "password": "Student2024",
+    #       "name": "Password"
+    #     },
+    #     {
+    #       "username": "another-student-to-create-2",
+    #       "password": "Pass",
+    #       "name": ""
+    #     }
+    #   ]
+    # }
     allow(ProfileApiClient).to receive(:create_school_students).and_raise(
-      SchoolStudent::ValidationError.new(
-        {
-          error: {
-            user_1: [
-              'Username must be unique in the batch data',
-              'You must supply a name'
-            ],
-            user_2: [
-              'Password must be at least 8 characters'
-            ]
-          }
-        }.to_json
+      ProfileApiClient::Student422Error.new(
+        [{ 'path' => '0.username', 'errorCode' => 'isUniqueInBatch', 'message' => 'Username must be unique in the batch data', 'location' => 'body', 'username' => 'student-to-create' },
+         { 'path' => '0.password', 'errorCode' => 'isComplex', 'message' => 'Password is too simple (it should not be easily guessable, <a href="https://my.raspberrypi.org/password-help">need password help?</a>)', 'location' => 'body', 'username' => 'student-to-create' },
+         { 'path' => '0.name', 'errorCode' => 'notEmpty', 'message' => 'Validation notEmpty on name failed', 'location' => 'body', 'username' => 'student-to-create' },
+         { 'path' => '1.username', 'errorCode' => 'isUniqueInBatch', 'message' => 'Username must be unique in the batch data', 'location' => 'body', 'username' => 'student-to-create' },
+         { 'path' => '2.password', 'errorCode' => 'minLength', 'message' => 'Password must be at least 8 characters', 'location' => 'body', 'username' => 'another-student-to-create-2' },
+         { 'path' => '2.name', 'errorCode' => 'notEmpty', 'message' => 'Validation notEmpty on name failed', 'location' => 'body', 'username' => 'another-student-to-create-2' }]
       )
     )
   end

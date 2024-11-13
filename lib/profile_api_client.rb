@@ -17,7 +17,7 @@ class ProfileApiClient
 
     def initialize(errors)
       @errors = errors
-      if errors.key?('message')
+      if errors.is_a?(Hash)
         super(errors['message'])
       else
         super()

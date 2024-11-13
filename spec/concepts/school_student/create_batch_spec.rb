@@ -74,6 +74,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     end
 
     before do
+      stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
       allow(Sentry).to receive(:capture_exception)
     end
 
@@ -105,12 +106,11 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
       stub_profile_api_create_school_students_validation_error
     end
 
-    it 'returns them as a JSON array' do
+    it 'returns the expected formatted errors' do
       response = described_class.call(school:, school_students_params:, token:, user_id:)
-      expect(response[:error]).to eq({ 'error' => {
-        user_1: ['Username must be unique in the batch data', 'You must supply a name'],
-        user_2: ['Password must be at least 8 characters']
-      } }.to_json)
+      expect(response[:error]).to eq(
+        { 'student-to-create' => ['Username must be unique in the batch data', 'Password is too simple (it should not be easily guessable, <a href="https://my.raspberrypi.org/password-help">need password help?</a>)', 'You must supply a name'], 'another-student-to-create-2' => ['Password must be at least 8 characters', 'You must supply a name'] }
+      )
     end
   end
 end
