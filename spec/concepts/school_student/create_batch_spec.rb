@@ -23,19 +23,24 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
   end
 
   before do
-    stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
-
     ActiveJob::Base.queue_adapter = :test
   end
 
-  it 'queues CreateStudentsJob' do
-    expect do
-      described_class.call(school:, school_students_params:, token:, user_id:)
-    end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_students_params, token:)
+  context 'when queuing a job' do
+    before do
+      stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
+    end
+
+    it 'queues CreateStudentsJob' do
+      expect do
+        described_class.call(school:, school_students_params:, token:, user_id:)
+      end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_students_params, token:)
+    end
   end
 
   context 'when a job has been queued' do
     before do
+      stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
       allow(CreateStudentsJob).to receive(:attempt_perform_later).and_return(
         instance_double(CreateStudentsJob, job_id: SecureRandom.uuid)
       )
@@ -56,7 +61,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     let(:school_students_params) do
       [
         {
-          username: '',
+          username: 'a-student',
           password: 'Password',
           name: 'School Student'
         },
@@ -97,18 +102,15 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
   context 'when a validation error occurs' do
     before do
-      allow(described_class).to receive(:validate).and_raise(ValidationError, { error: 'Good job must exist' }.to_json)
-      allow(Sentry).to receive(:capture_exception)
+      stub_profile_api_create_school_students_validation_error
     end
 
-    it 'returns only the JSON array' do
+    it 'returns them as a JSON array' do
       response = described_class.call(school:, school_students_params:, token:, user_id:)
-      expect(response[:error]).to eq({ 'error' => 'Good job must exist' })
-    end
-
-    it 'sends the exception to Sentry' do
-      described_class.call(school:, school_students_params:, token:, user_id:)
-      expect(Sentry).to have_received(:capture_exception).with(kind_of(ValidationError))
+      expect(response[:error]).to eq({ 'error' => {
+        user_1: ['Username must be unique in the batch data', 'You must supply a name'],
+        user_2: ['Password must be at least 8 characters']
+      } }.to_json)
     end
   end
 end

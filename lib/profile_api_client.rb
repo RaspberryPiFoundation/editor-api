@@ -17,8 +17,8 @@ class ProfileApiClient
 
     def initialize(errors)
       @errors = errors
-      if errors.blank?
-        super(errors.message)
+      if errors.key?('message')
+        super(errors['message'])
       else
         super()
       end
@@ -104,7 +104,7 @@ class ProfileApiClient
 
       response.body.deep_symbolize_keys
     rescue Faraday::BadRequestError => e
-      raise Student422Error, JSON.parse(e.response_body)['errors'].first.message
+      raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
     def create_school_students(token:, students:, school_id:, preflight: false)
@@ -141,7 +141,7 @@ class ProfileApiClient
 
       Student.new(**response.body)
     rescue Faraday::BadRequestError => e
-      raise Student422Error, JSON.parse(e.response_body)['errors'].first.message
+      raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
     def delete_school_student(token:, school_id:, student_id:)

@@ -43,6 +43,24 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:create_school_students).and_return(created: [user_ids.join(', ')])
   end
 
+  def stub_profile_api_create_school_students_validation_error
+    allow(ProfileApiClient).to receive(:create_school_students).and_raise(
+      SchoolStudent::ValidationError.new(
+        {
+          error: {
+            user_1: [
+              'Username must be unique in the batch data',
+              'You must supply a name'
+            ],
+            user_2: [
+              'Password must be at least 8 characters'
+            ]
+          }
+        }.to_json
+      )
+    )
+  end
+
   def stub_profile_api_update_school_student
     allow(ProfileApiClient).to receive(:update_school_student)
   end

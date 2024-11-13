@@ -19,7 +19,6 @@ module SchoolStudent
         response[:job_id] = create_batch(school, school_students_params, token, user_id)
         response
       rescue ValidationError => e
-        Sentry.capture_exception(e)
         response[:error] = e.errors
         response
       rescue StandardError => e
