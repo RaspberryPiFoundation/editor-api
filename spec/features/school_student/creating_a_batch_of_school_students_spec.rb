@@ -63,7 +63,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email)
   end
 
-  it 'responds 202 No Content' do
+  it 'responds 202 Accepted' do
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
     expect(response).to have_http_status(:accepted)
   end
