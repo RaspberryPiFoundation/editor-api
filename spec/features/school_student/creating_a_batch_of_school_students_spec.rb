@@ -68,7 +68,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(response).to have_http_status(:accepted)
   end
 
-  it 'responds 202 No Content when the user is a school-teacher' do
+  it 'responds 202 Accepted when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
 
