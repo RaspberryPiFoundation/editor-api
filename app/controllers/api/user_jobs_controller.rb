@@ -15,7 +15,7 @@ module Api
     end
 
     def show
-      user_job = UserJob.find_by(job_id: params[:id], teacher_id: current_user.id)
+      user_job = UserJob.find_by(good_job_id: params[:id], user_id: current_user.id)
       job = job_attributes(user_job.good_job)
       if job
         render json: { job: }, status: :ok
