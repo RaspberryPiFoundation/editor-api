@@ -183,6 +183,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'does not require creator_agree_to_ux_contact to be true' do
+      school.reator_agree_to_ux_contact = false
+      expect(school).to be_valid
+    end
+
     it 'cannot have #rejected_at set when #verified_at is present' do
       school.verify!
       school.reject
