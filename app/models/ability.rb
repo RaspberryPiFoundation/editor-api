@@ -62,7 +62,8 @@ class Ability
     can(%i[read], :school_member)
     can(%i[read create update destroy], SchoolClass, school: { id: school.id })
     can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    can(%i[read create create_batch destroy], ClassMember, school_class: { school: { id: school.id } })
+    can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
+    can(%i[read create create_batch destroy], ClassTeacher, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
@@ -74,9 +75,9 @@ class Ability
     can(%i[read], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[create], SchoolClass, school: { id: school.id })
-    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
-    can(%i[read create create_batch destroy], ClassMember,
-        school_class: { school: { id: school.id }, teacher_id: user.id })
+    can(%i[read update destroy], SchoolClass, school: { id: school.id }, class_teachers: { teacher_id: user.id })
+    can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id }, class_teachers: { teacher_id: user.id } })
+    can(%i[read create create_batch destroy], ClassTeacher, school_class: { school: { id: school.id }, class_teachers: { teacher_id: user.id } })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
@@ -89,16 +90,16 @@ class Ability
     end
     can(%i[read update], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read], Project,
-        remixed_from_id: Project.where(user_id: user.id, school_id: school.id, remixed_from_id: nil).pluck(:id))
+        remixed_from_id: Project.where(school_id: school.id, remixed_from_id: nil, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
   end
 
   def define_school_student_abilities(user:, school:)
     can(%i[read], School, id: school.id)
-    can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
+    can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
-    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
+    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
-    can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
+    can(%i[read], Project, lesson: { school_id: school.id, school_class: { students: { student_id: user.id } } })
     can(%i[toggle_finished], Project) do |project|
       school_student_can_toggle_finished?(user:, school:, project:)
     end

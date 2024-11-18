@@ -12,7 +12,7 @@ module Api
     end
 
     def show
-      @school_class_with_teacher = @school_class.with_teacher
+      @school_class_with_teachers = @school_class.with_teachers
       render :show, formats: [:json], status: :ok
     end
 
@@ -20,7 +20,7 @@ module Api
       result = SchoolClass::Create.call(school: @school, school_class_params:)
 
       if result.success?
-        @school_class_with_teacher = result[:school_class].with_teacher
+        @school_class_with_teachers = result[:school_class].with_teachers
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -32,7 +32,7 @@ module Api
       result = SchoolClass::Update.call(school_class:, school_class_params:)
 
       if result.success?
-        @school_class_with_teacher = result[:school_class].with_teacher
+        @school_class_with_teachers = result[:school_class].with_teachers
         render :show, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity

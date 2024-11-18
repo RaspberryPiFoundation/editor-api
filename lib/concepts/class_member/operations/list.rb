@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ClassMember
+module ClassMember
   class List
     class << self
       def call(school_class:, class_members:, token:)
@@ -15,7 +15,7 @@ class ClassMember
             member.student = students.find { |student| student.id == member.student_id }
           end
 
-          teacher_ids = [school_class.teacher_id]
+          teacher_ids = school_class.teacher_ids
           teachers = SchoolTeacher::List.call(school:, teacher_ids:).fetch(:school_teachers, [])
         rescue StandardError => e
           Sentry.capture_exception(e)
