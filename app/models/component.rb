@@ -4,6 +4,7 @@ class Component < ApplicationRecord
   belongs_to :project
   validates :name, presence: true
   validates :extension, presence: true
+  validates: :content, length: { maximum: 8500000 }
   validate :default_component_protected_properties, on: :update
 
   has_paper_trail(
