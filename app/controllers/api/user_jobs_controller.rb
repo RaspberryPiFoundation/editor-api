@@ -6,7 +6,7 @@ module Api
 
     def index
       user_jobs = UserJob.where(user_id: current_user.id).includes(:good_job)
-      jobs = user_jobs.map { |user_job| job_attributes(user_job.good_job) }
+      jobs = user_jobs&.map { |user_job| job_attributes(user_job&.good_job) }
       if jobs.any?
         render json: { jobs: }, status: :ok
       else
@@ -16,8 +16,8 @@ module Api
 
     def show
       user_job = UserJob.find_by(good_job_id: params[:id], user_id: current_user.id)
-      job = job_attributes(user_job.good_job)
-      if job
+      job = job_attributes(user_job&.good_job) unless user_job.nil?
+      if job.present?
         render json: { job: }, status: :ok
       else
         render json: { error: 'Job not found' }, status: :not_found
