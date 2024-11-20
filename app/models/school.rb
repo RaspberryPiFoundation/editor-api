@@ -17,7 +17,6 @@ class School < ApplicationRecord
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
-  validates :creator_agree_to_ux_contact, presence: true
   validates :rejected_at, absence: { if: proc { |school| school.verified? } }
   validates :verified_at, absence: { if: proc { |school| school.rejected? } }
   validates :code,
