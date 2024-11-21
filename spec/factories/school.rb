@@ -10,7 +10,6 @@ FactoryBot.define do
     creator_id { SecureRandom.uuid }
     creator_agree_authority { true }
     creator_agree_terms_and_conditions { true }
-    creator_agree_to_ux_contact { false }
   end
 
   factory :verified_school, parent: :school do
