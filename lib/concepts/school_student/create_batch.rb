@@ -30,6 +30,11 @@ module SchoolStudent
       private
 
       def create_batch(school, students, token, user_id)
+        # Ensure that nil values are empty strings, else Profile will swallow validations
+        students = students.map do |student|
+          student.transform_values { |value| value.nil? ? '' : value }
+        end
+
         validate(school:, students:, token:)
 
         job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
@@ -45,7 +50,7 @@ module SchoolStudent
 
       def decrypt_students(students)
         students.deep_dup.each do |student|
-          student[:password] = DecryptionHelpers.decrypt_password(student[:password])
+          student[:password] = DecryptionHelpers.decrypt_password(student[:password]) if student[:password].present?
         end
       end
 
