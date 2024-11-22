@@ -23,6 +23,7 @@ module SeedsHelper
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
+      school.creator_agree_to_ux_contact = true
     end
   end
 
