@@ -35,7 +35,16 @@ as well as a link to its edit page.
       method: :post,
       style: "background-color: green; margin: 5px;",
       data: { confirm: t("administrate.actions.confirm_verify_school") }
-    ) unless page.resource.verified? %>
+    ) unless page.resource.verified? || page.resource.rejected? %>
+
+    <%= link_to(
+      t("administrate.actions.blitz_reject_school"),
+      blitz_reject_admin_school_path(page.resource),
+      class: "button button--verify",
+      method: :post,
+      style: "background-color: green; margin: 5px;",
+      data: { confirm: "blitz rejection?" }
+    ) unless page.resource.verified? || !page.resource.rejected? %>
 
     <%= link_to(
       t("administrate.actions.reject_school"),

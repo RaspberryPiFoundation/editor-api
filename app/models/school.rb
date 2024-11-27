@@ -66,6 +66,10 @@ class School < ApplicationRecord
     update!(rejected_at: Time.zone.now)
   end
 
+  def blitz_reject
+    update!(rejected_at: nil)
+  end
+
   def postal_code=(str)
     super(str.to_s.upcase)
   end

@@ -13,6 +13,7 @@ Rails.application.routes.draw do
       member do
         post :verify
         patch :reject
+        post :blitz_reject
       end
     end
 
