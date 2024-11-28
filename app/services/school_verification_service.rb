@@ -23,5 +23,5 @@ class SchoolVerificationService
   end
 
   delegate :reject, to: :school
-  delegate :blitz_reject, to: :school
+  delegate :reopen, to: :school
 end

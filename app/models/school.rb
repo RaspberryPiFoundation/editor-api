@@ -66,7 +66,7 @@ class School < ApplicationRecord
     update!(rejected_at: Time.zone.now)
   end
 
-  def blitz_reject
+  def reopen
     update!(rejected_at: nil)
   end
 

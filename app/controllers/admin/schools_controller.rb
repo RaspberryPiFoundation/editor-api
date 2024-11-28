@@ -28,14 +28,14 @@ module Admin
       redirect_to admin_school_path(requested_resource)
     end
 
-    def blitz_reject
+    def reopen
       service = SchoolVerificationService.new(requested_resource)
 
       begin
-        service.blitz_reject
-        flash[:notice] = t('administrate.controller.reject_school.success')
+        service.reopen
+        flash[:notice] = t('administrate.controller.reopen_school.success')
       rescue StandardError => e
-        flash[:error] = "#{t('administrate.controller.reject_school.error')}: #{e.message}"
+        flash[:error] = "#{t('administrate.controller.reopen_school.error')}: #{e.message}"
       end
 
       redirect_to admin_school_path(requested_resource)
