@@ -53,7 +53,7 @@ class School < ApplicationRecord
   def verify!
     attempts = 0
     begin
-      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate, rejected_at: nil)
+      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate)
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors[:code].include?('has already been taken') && attempts <= 5
 
@@ -63,11 +63,11 @@ class School < ApplicationRecord
   end
 
   def reject
-    update!(rejected_at: Time.zone.now)
+    update(rejected_at: Time.zone.now)
   end
 
   def reopen
-    update!(rejected_at: nil)
+    update(rejected_at: nil)
   end
 
   def postal_code=(str)
@@ -83,6 +83,10 @@ class School < ApplicationRecord
 
   def verified_at_cannot_be_changed
     errors.add(:verified_at, 'cannot be changed after verification') if verified_at_was.present? && verified_at_changed?
+  end
+
+  def rejected_at_cannot_be_changed
+    errors.add(:rejected_at, 'cannot be changed after rejection') if rejected_at_was.present? && rejected_at_changed?
   end
 
   def code_cannot_be_changed

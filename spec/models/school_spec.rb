@@ -391,4 +391,20 @@ RSpec.describe School do
       expect(school.reject).to be(false)
     end
   end
+
+  describe '#reopen' do
+    it 'sets rejected_at to nil' do
+      school.reopen
+      expect(school.rejected_at).to be_nil
+    end
+
+    it 'returns true on successful reopening' do
+      expect(school.reopen).to be(true)
+    end
+
+    it 'returns false on unsuccessful reopening' do
+      school.verified_at = Time.zone.now
+      expect(school.reopen).to be(false)
+    end
+  end
 end
