@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module ClassroomManagementHelper
+module SeedsHelper
   TEST_USERS = {
     jane_doe: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
     john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com
@@ -10,19 +10,20 @@ module ClassroomManagementHelper
 
   # Match the school in profile...
   TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9' # e52de409-9210-4e94-b08c-dd11439e07d9
-  SCHOOL_CODE = '12-12-12-12'
+  SCHOOL_CODE = '12-34-56'
 
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
-      school.name = 'Test School'
-      school.website = 'http://example.com'
-      school.address_line_1 = 'School Address'
-      school.municipality = 'City'
-      school.country_code = 'FR'
+      school.name = Faker::Educator.secondary_school
+      school.website = Faker::Internet.url(scheme: 'https')
+      school.address_line_1 = Faker::Address.street_address
+      school.municipality = Faker::Address.city
+      school.country_code = Faker::Address.country_code
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
+      school.creator_agree_to_ux_contact = true
     end
   end
 
@@ -45,10 +46,11 @@ module ClassroomManagementHelper
     # rubocop:enable Rails/SkipsModelValidations
   end
 
-  def create_school_class(teacher_id, school)
+  def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample)
     SchoolClass.find_or_create_by!(teacher_id:, school:) do |school_class|
       Rails.logger.info 'Seeding a class...'
-      school_class.name = 'Test Class'
+      school_class.name = name
+      school_class.description = description
       school_class.teacher_id = teacher_id
       school_class.school = school
     end
@@ -74,30 +76,29 @@ module ClassroomManagementHelper
 
   def create_lessons(user_id, school, school_class, visibility = 'students')
     2.times.map do |i|
-      Lesson.find_or_create_by!(school:, school_class:,
-                                description: "This is lesson #{i + 1}") do |lesson|
+      lesson_name = "Lesson #{i + 1}: #{Faker::ProgrammingLanguage.name}"
+      Lesson.find_or_create_by!(school:, school_class:, name: lesson_name, user_id:) do |lesson|
         Rails.logger.info "Seeding Lesson #{i + 1}..."
         lesson.user_id = user_id
         lesson.school = school
         lesson.school_class = school_class
-        lesson.name = "Test Lesson #{i + 1}"
-        lesson.description = "This is lesson #{i + 1}"
+        lesson.name = lesson_name
         lesson.visibility = visibility
       end
     end
   end
 
-  def create_project(user_id, school, lesson)
+  def create_project(user_id, school, lesson, code = '')
     Project.find_or_create_by!(user_id:, school:, lesson:) do |project|
       Rails.logger.info "Seeding a project for #{lesson.name}..."
-      project.name = "Test Project for #{lesson.name}"
+      project.name = lesson.name
       project.user_id = user_id
       project.school = school
       project.lesson = lesson
       project.locale = 'en'
       project.project_type = 'python'
       project.components << Component.new({ extension: 'py', name: 'main',
-                                            content: '' })
+                                            content: code })
     end
   end
 end

@@ -12,10 +12,16 @@ class ProfileApiClient
 
   class Error < StandardError; end
 
-  class Student422Error < Error
-    def initialize(error)
-      @message = error['message']
-      super @message
+  class Student422Error < StandardError
+    attr_reader :errors
+
+    def initialize(errors)
+      @errors = errors
+      if errors.is_a?(Hash)
+        super(errors['message'])
+      else
+        super()
+      end
     end
   end
 
@@ -101,19 +107,23 @@ class ProfileApiClient
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
-    def create_school_students(token:, students:, school_id:)
+    def create_school_students(token:, students:, school_id:, preflight: false)
       return nil if token.blank?
 
       students = Array(students)
-      response = connection(token).post("/api/v1/schools/#{school_id}/students") do |request|
-        request.body = students
+      endpoint = "/api/v1/schools/#{school_id}/students"
+      endpoint += '/preflight' if preflight
+      response = connection(token).post(endpoint) do |request|
+        request.body = students.to_json
+        request.headers['Content-Type'] = 'application/json'
       end
 
-      raise UnexpectedResponse, response unless response.status == 201
+      raise UnexpectedResponse, response unless [200, 201].include?(response.status)
 
       response.body.deep_symbolize_keys
     rescue Faraday::BadRequestError => e
-      raise Student422Error, JSON.parse(e.response_body)['errors'].first
+      errors = JSON.parse(e.response_body)['errors']
+      raise Student422Error, errors
     end
 
     def update_school_student(token:, school_id:, student_id:, name: nil, username: nil, password: nil) # rubocop:disable Metrics/ParameterLists

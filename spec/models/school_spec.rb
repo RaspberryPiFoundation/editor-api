@@ -123,6 +123,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'accepts a url with a multi-part TLD' do
+      school.website = 'https://example.co.uk'
+      expect(school).to be_valid
+    end
+
     it 'does not require a reference' do
       create(:school, id: SecureRandom.uuid, reference: nil)
 
@@ -176,6 +181,11 @@ RSpec.describe School do
     it 'requires creator_agree_terms_and_conditions to be true' do
       school.creator_agree_terms_and_conditions = false
       expect(school).to be_invalid
+    end
+
+    it 'does not require creator_agree_to_ux_contact to be true' do
+      school.creator_agree_to_ux_contact = false
+      expect(school).to be_valid
     end
 
     it 'cannot have #rejected_at set when #verified_at is present' do

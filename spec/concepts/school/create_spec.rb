@@ -11,7 +11,8 @@ RSpec.describe School::Create, type: :unit do
       municipality: 'Greater London',
       country_code: 'GB',
       creator_agree_authority: true,
-      creator_agree_terms_and_conditions: true
+      creator_agree_terms_and_conditions: true,
+      creator_agree_to_ux_contact: true
     }
   end
 

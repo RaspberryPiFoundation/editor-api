@@ -63,7 +63,8 @@ module Api
         :creator_role,
         :creator_department,
         :creator_agree_authority,
-        :creator_agree_terms_and_conditions
+        :creator_agree_terms_and_conditions,
+        :creator_agree_to_ux_contact
       )
     end
   end

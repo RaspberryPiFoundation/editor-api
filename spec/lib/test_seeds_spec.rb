@@ -3,15 +3,15 @@
 require 'rails_helper'
 require 'rake'
 
-RSpec.describe 'classroom_management', type: :task do
+RSpec.describe 'test_seeds', type: :task do
   let(:creator_id) { '583ba872-b16e-46e1-9f7d-df89d267550d' } # jane.doe@example.com
   let(:teacher_id) { 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' } # john.doe@example.com
   let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # student
   let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # student
   let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' }
 
-  describe ':destroy_seed_data' do
-    let(:task) { Rake::Task['classroom_management:destroy_seed_data'] }
+  describe ':destroy' do
+    let(:task) { Rake::Task['test_seeds:destroy'] }
     let(:school) { create(:school, creator_id:, id: school_id) }
 
     before do
@@ -36,26 +36,8 @@ RSpec.describe 'classroom_management', type: :task do
     # rubocop:enable RSpec/MultipleExpectations
   end
 
-  describe ':seed_an_unverified_school' do
-    let(:task) { Rake::Task['classroom_management:seed_an_unverified_school'] }
-
-    it 'creates an unverified school' do
-      task.invoke
-      expect(School.find_by(creator_id:).verified_at).to be_nil
-    end
-  end
-
-  describe ':seed_a_verified_school' do
-    let(:task) { Rake::Task['classroom_management:seed_a_verified_school'] }
-
-    it 'creates a verified school' do
-      task.invoke
-      expect(School.find_by(creator_id:).verified_at).to be_truthy
-    end
-  end
-
   describe ':seed_a_school_with_lessons_and_students' do
-    let(:task) { Rake::Task['classroom_management:seed_a_school_with_lessons_and_students'] }
+    let(:task) { Rake::Task['test_seeds:create'] }
 
     before do
       task.invoke
@@ -70,8 +52,8 @@ RSpec.describe 'classroom_management', type: :task do
       school = School.find_by(creator_id:)
       expect(SchoolClass.where(school_id: school.id)).to exist
       lesson = Lesson.where(school_id: school.id)
-      expect(lesson.length).to eq(2)
-      expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(2)
+      expect(lesson.length).to eq(4)
+      expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(4)
     end
     # rubocop:enable RSpec/MultipleExpectations
 
@@ -79,6 +61,26 @@ RSpec.describe 'classroom_management', type: :task do
       school = School.find_by(creator_id:)
       expect(Role.teacher.where(user_id: teacher_id, school_id: school.id)).to exist
     end
+
+    # rubocop:disable RSpec/MultipleExpectations
+    it 'creates class with lessons for the owner' do
+      school_id = School.find_by(creator_id:).id
+      school_class = SchoolClass.where(school_id:, teacher_id: creator_id)
+      expect(school_class).to exist
+      school_class_id = SchoolClass.find_by(school_id:, teacher_id: creator_id).id
+      expect(Lesson.where(school_id:, school_class_id:).length).to eq(2)
+    end
+    # rubocop:enable RSpec/MultipleExpectations
+
+    # rubocop:disable RSpec/MultipleExpectations
+    it 'creates class with lessons for the teacher' do
+      school_id = School.find_by(creator_id:).id
+      school_class = SchoolClass.where(school_id:, teacher_id:)
+      expect(school_class).to exist
+      school_class_id = SchoolClass.find_by(school_id:, teacher_id:).id
+      expect(Lesson.where(school_id:, school_class_id:).length).to eq(2)
+    end
+    # rubocop:enable RSpec/MultipleExpectations
 
     # rubocop:disable RSpec/MultipleExpectations
     it 'assigns students' do

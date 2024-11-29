@@ -65,25 +65,25 @@ which should update the Gems in the container, without the need for rebuilding.
 By default in development only, two tasks are called to seed data:
 
 `docker compose run --rm api rails projects:create_all`
-`docker compose run --rm api rails classroom_management:seed_a_school_with_lessons_and_students`
+`docker compose run --rm api rails for_education:seed_a_school_with_lessons_and_students`
 
 If needed manually the following task will create all projects:
 
 `docker compose run --rm api rails projects:create_all`
 
-For classroom management the following scenarios modelled by the tasks:
+For CEfE the following scenarios are modelled by the tasks:
 
-`docker compose run --rm api rails classroom_management:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
-`docker compose run --rm api rails classroom_management:seed_a_verified_school` - seeds only a verified school
-`docker compose run --rm api rails classroom_management:seed_a_school_with_lessons_and_students` - seeds a school with a class, two lessons, a project in each, and two students
+`docker compose run --rm api rails for_education:seed_an_unverified_school` - seeds an unverified school to test the onboarding flow
+`docker compose run --rm api rails for_education:seed_a_verified_school` - seeds only a verified school
+`docker compose run --rm api rails for_education:seed_a_school_with_lessons_and_students` - seeds a school with a class, two lessons, a project in each, and two students
 
-To clear classroom management data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
+To clear CEfE data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
 
-`rails classroom_management:destroy_seed_data`
+`rails for_education:destroy_seed_data`
 
 To override values, you can prefix the tasks with environment variables, for example:
 
-`SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails classroom_management:seed_a_verified_school`
+`SEEDING_CREATOR_ID=00000000-0000-0000-0000-000000000000 rails for_education:seed_a_verified_school`
 
 Also avilable to override are: `SEEDING_TEACHER_ID`.
 

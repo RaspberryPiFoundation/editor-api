@@ -18,7 +18,7 @@ RSpec.describe 'Updating a school student', type: :request do
     {
       school_student: {
         username: 'new-username',
-        password: 'new-password',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'New Name'
       }
     }
