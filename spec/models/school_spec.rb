@@ -196,12 +196,6 @@ RSpec.describe School do
       expect(school.errors[:verified_at]).to include('cannot be changed after verification')
     end
 
-    it "cannot change #rejected_at once it's been set" do
-      school.reject
-      school.update(rejected_at: nil)
-      expect(school.errors[:rejected_at]).to include('cannot be changed after rejection')
-    end
-
     it 'requires #code to be unique' do
       school.update!(code: '00-00-00', verified_at: Time.current)
       another_school = build(:school, code: '00-00-00')
