@@ -21,13 +21,13 @@ class Lesson
       end
 
       def rename_lesson_project(lesson:, name:)
-        lesson.project.update!(name: name)
+        lesson.project.update!(name:)
       end
 
       def rename_lesson_remixes(lesson:, name:)
         lesson_remixes = Project.where(remixed_from_id: lesson.project.id)
         lesson_remixes.each do |remix|
-          remix.update!(name: name)
+          remix.update!(name:)
         end
       end
     end
