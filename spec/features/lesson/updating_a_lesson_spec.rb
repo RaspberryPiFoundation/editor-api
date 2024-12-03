@@ -11,17 +11,14 @@ RSpec.describe 'Updating a lesson', type: :request do
       }
     }
   end
-  let(:lesson) { build(:lesson, name: 'Test Lesson', user_id: owner.id) }
-  let(:owner) { create(:owner, school:, name: 'School Owner') }
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
   let(:teacher) { create(:teacher, school:) }
-  let(:school) { create(:school) }
-  let(:project) { create(:project) }
+  let(:school) { create(:verified_school) }
+  let(:owner) { create(:owner, school:, name: 'School Owner') }
 
   before do
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(teacher)
-    lesson
-    project.update!(lesson:, school:, user_id: lesson.user_id, identifier: 'something')
   end
 
   it 'responds 200 OK' do
@@ -61,8 +58,7 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school (library)' do
-    let(:school) { create(:school) }
-    let(:lesson) { build(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
+    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
 
     before do
       lesson
