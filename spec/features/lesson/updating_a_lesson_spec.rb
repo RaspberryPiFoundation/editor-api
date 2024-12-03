@@ -9,10 +9,16 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
+  let(:lesson) { build(:lesson, name: 'Test Lesson', user_id: owner.id) }
   let(:owner) { create(:owner, school:, name: 'School Owner') }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
+  let(:project) { create(:project) }
+
+  before do
+    lesson
+    project.update!(lesson:, school:, user_id: lesson.user_id, identifier: 'something')
+  end
 
   let(:params) do
     {
@@ -60,7 +66,11 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school (library)' do
     let(:school) { create(:school) }
-    let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
+    let(:lesson) { build(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
+
+    before do
+      lesson
+    end
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
