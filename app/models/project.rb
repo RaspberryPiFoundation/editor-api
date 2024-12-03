@@ -81,7 +81,7 @@ class Project < ApplicationRecord
 
   def user_is_a_member_or_the_owner_of_the_lesson
     return if !lesson || user_id == lesson.user_id || (lesson.school_class && lesson.school_class.members.exists?(student_id: user_id))
-  
+
     errors.add(:user, "'#{user_id}' is not the owner or a member of the lesson '#{lesson_id}'")
   end
 end

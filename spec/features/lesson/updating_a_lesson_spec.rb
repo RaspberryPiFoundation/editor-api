@@ -9,6 +9,13 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+  let(:params) do
+    {
+      lesson: {
+        name: 'New Name'
+      }
+    }
+  end
   let(:lesson) { build(:lesson, name: 'Test Lesson', user_id: owner.id) }
   let(:owner) { create(:owner, school:, name: 'School Owner') }
   let(:teacher) { create(:teacher, school:) }
@@ -18,14 +25,6 @@ RSpec.describe 'Updating a lesson', type: :request do
   before do
     lesson
     project.update!(lesson:, school:, user_id: lesson.user_id, identifier: 'something')
-  end
-
-  let(:params) do
-    {
-      lesson: {
-        name: 'New Name'
-      }
-    }
   end
 
   it 'responds 200 OK' do
