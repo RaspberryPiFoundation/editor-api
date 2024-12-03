@@ -3,11 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Updating a lesson', type: :request do
-  before do
-    authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
-  end
-
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:params) do
     {
@@ -23,6 +18,8 @@ RSpec.describe 'Updating a lesson', type: :request do
   let(:project) { create(:project) }
 
   before do
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
     lesson
     project.update!(lesson:, school:, user_id: lesson.user_id, identifier: 'something')
   end
