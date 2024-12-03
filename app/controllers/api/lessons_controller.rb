@@ -9,7 +9,8 @@ module Api
     def index
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
       scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
-      @lessons_with_users = scope.accessible_by(current_ability).with_users
+      ordered_scope = scope.order(created_at: :asc)
+      @lessons_with_users = ordered_scope.accessible_by(current_ability).with_users
       render :index, formats: [:json], status: :ok
     end
 
