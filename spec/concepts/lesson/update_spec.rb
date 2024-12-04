@@ -30,8 +30,7 @@ RSpec.describe Lesson::Update, type: :unit do
 
   it 'updates the student project name' do
     described_class.call(lesson:, lesson_params:)
-    student_remixes = lesson.project.remixes
-    expect(student_remixes.first.name).to eq('New Name')
+    expect(student_project.reload.name).to eq('New Name')
   end
 
   it 'returns the lesson in the operation response' do
