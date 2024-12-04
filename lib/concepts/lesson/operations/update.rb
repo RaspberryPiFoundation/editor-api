@@ -21,13 +21,17 @@ class Lesson
       end
 
       def rename_lesson_project(lesson:, name:)
-        lesson.project.update!(name:)
+        return unless lesson.project
+
+        lesson.project.assign_attributes(name:)
+        lesson.project.save!(validate: false)
       end
 
       def rename_lesson_remixes(lesson:, name:)
         lesson_remixes = Project.where(remixed_from_id: lesson.project.id)
         lesson_remixes.each do |remix|
-          remix.update!(name:)
+          remix.assign_attributes(name:)
+          remix.save!(validate: false)
         end
       end
     end
