@@ -25,7 +25,6 @@ class School < ApplicationRecord
             absence: { unless: proc { |school| school.verified? } },
             format: { with: /\d\d-\d\d-\d\d/, allow_nil: true }
   validate :verified_at_cannot_be_changed
-  validate :rejected_at_cannot_be_changed
   validate :code_cannot_be_changed
 
   before_validation :normalize_reference
@@ -65,6 +64,10 @@ class School < ApplicationRecord
 
   def reject
     update(rejected_at: Time.zone.now)
+  end
+
+  def reopen
+    update(rejected_at: nil)
   end
 
   def postal_code=(str)
