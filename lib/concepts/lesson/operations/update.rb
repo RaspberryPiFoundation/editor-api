@@ -24,6 +24,7 @@ class Lesson
         return unless lesson.project
 
         lesson.project.assign_attributes(name:)
+        # TODO: determine school owner mechanism for project model validation rather than skipping validation
         lesson.project.save!(validate: false)
       end
 
@@ -31,6 +32,7 @@ class Lesson
         lesson_remixes = Project.where(remixed_from_id: lesson.project.id)
         lesson_remixes.each do |remix|
           remix.assign_attributes(name:)
+          # TODO: determine school owner mechanism for project model validation rather than skipping validation
           remix.save!(validate: false)
         end
       end
