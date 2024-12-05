@@ -42,7 +42,7 @@ module Api
     end
 
     def update
-      result = Lesson::Update.call(lesson: @lesson, lesson_params:)
+      result = Lesson::Update.call(lesson: @lesson, lesson_params:, current_user:)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
