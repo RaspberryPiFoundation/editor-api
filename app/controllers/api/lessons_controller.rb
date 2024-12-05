@@ -9,7 +9,8 @@ module Api
     def index
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
       scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
-      @lessons_with_users = scope.accessible_by(current_ability).with_users
+      ordered_scope = scope.order(created_at: :asc)
+      @lessons_with_users = ordered_scope.accessible_by(current_ability).with_users
       render :index, formats: [:json], status: :ok
     end
 
@@ -41,6 +42,8 @@ module Api
     end
 
     def update
+      # TODO: Consider removing user_id from the lesson_params for update so users can update other users' lessons without changing ownership
+      # OR consider dropping user_id on lessons and using teacher id/ids on the class instead
       result = Lesson::Update.call(lesson: @lesson, lesson_params:)
 
       if result.success?
