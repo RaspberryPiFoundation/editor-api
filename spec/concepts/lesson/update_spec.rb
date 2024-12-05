@@ -8,33 +8,38 @@ RSpec.describe Lesson::Update, type: :unit do
   let(:student) { create(:student, school:) }
   let(:lesson) { create(:lesson, name: 'Test Lesson', user_id: teacher.id) }
   let!(:student_project) { create(:project, remixed_from_id: lesson.project.id, user_id: student.id) }
+  let(:current_user) { authenticated_user }
 
   let(:lesson_params) do
     { name: 'New Name' }
   end
 
+  before do
+    authenticated_in_hydra_as(teacher)
+  end
+
   it 'returns a successful operation response' do
-    response = described_class.call(lesson:, lesson_params:)
+    response = described_class.call(lesson:, lesson_params:, current_user:)
     expect(response.success?).to be(true)
   end
 
   it 'updates the lesson' do
-    response = described_class.call(lesson:, lesson_params:)
+    response = described_class.call(lesson:, lesson_params:, current_user:)
     expect(response[:lesson].name).to eq('New Name')
   end
 
   it 'updates the project name' do
-    described_class.call(lesson:, lesson_params:)
+    described_class.call(lesson:, lesson_params:, current_user:)
     expect(lesson.project.name).to eq('New Name')
   end
 
   it 'updates the student project name' do
-    described_class.call(lesson:, lesson_params:)
+    described_class.call(lesson:, lesson_params:, current_user:)
     expect(student_project.reload.name).to eq('New Name')
   end
 
   it 'returns the lesson in the operation response' do
-    response = described_class.call(lesson:, lesson_params:)
+    response = described_class.call(lesson:, lesson_params:, current_user:)
     expect(response[:lesson]).to be_a(Lesson)
   end
 
@@ -46,22 +51,22 @@ RSpec.describe Lesson::Update, type: :unit do
     end
 
     it 'does not update the lesson' do
-      response = described_class.call(lesson:, lesson_params:)
+      response = described_class.call(lesson:, lesson_params:, current_user:)
       expect(response[:lesson].reload.name).to eq('Test Lesson')
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(lesson:, lesson_params:)
+      response = described_class.call(lesson:, lesson_params:, current_user:)
       expect(response.failure?).to be(true)
     end
 
     it 'returns the error message in the operation response' do
-      response = described_class.call(lesson:, lesson_params:)
+      response = described_class.call(lesson:, lesson_params:, current_user:)
       expect(response[:error]).to match(/Error updating lesson/)
     end
 
     it 'sent the exception to Sentry' do
-      described_class.call(lesson:, lesson_params:)
+      described_class.call(lesson:, lesson_params:, current_user:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end

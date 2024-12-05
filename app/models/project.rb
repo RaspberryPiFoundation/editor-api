@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Project < ApplicationRecord
+  attr_accessor :current_user
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
@@ -17,7 +19,7 @@ class Project < ApplicationRecord
   validate :identifier_cannot_be_taken_by_another_user
   validates :locale, presence: true, unless: :user_id
   validate :user_has_a_role_within_the_school
-  validate :user_is_a_member_or_the_owner_of_the_lesson
+  validate :user_is_a_member_or_the_owner_of_the_lesson_or_school
 
   scope :internal_projects, -> { where(user_id: nil) }
 
@@ -79,8 +81,13 @@ class Project < ApplicationRecord
     errors.add(:user, msg)
   end
 
-  def user_is_a_member_or_the_owner_of_the_lesson
+  def user_is_a_member_or_the_owner_of_the_lesson_or_school
     return if !lesson || user_id == lesson.user_id || lesson.school_class&.members&.exists?(student_id: user_id)
+
+    # either we explicitly check the user is an owner of the school
+    return if current_user&.school_owner?(lesson.school)
+    # or we bypass if the lesson is associated with a school but not a school class
+    return if lesson.school && !lesson.school_class && !lesson.school_class&.members&.any?
 
     errors.add(:user, "'#{user_id}' is not the owner or a member of the lesson '#{lesson_id}'")
   end
