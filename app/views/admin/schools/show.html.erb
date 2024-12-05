@@ -38,6 +38,15 @@ as well as a link to its edit page.
     ) unless page.resource.verified? || page.resource.rejected? %>
 
     <%= link_to(
+      t("administrate.actions.reopen_school"),
+      reopen_admin_school_path(page.resource),
+      class: "button button--verify",
+      method: :patch,
+      style: "background-color: darkorange; margin: 5px;",
+      data: { confirm: t("administrate.actions.confirm_reopen_school") }
+    ) unless page.resource.verified? || !page.resource.rejected? %>
+
+    <%= link_to(
       t("administrate.actions.reject_school"),
       reject_admin_school_path(page.resource),
       class: "button button--danger",

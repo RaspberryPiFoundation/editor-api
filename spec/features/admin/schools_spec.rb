@@ -51,6 +51,10 @@ RSpec.describe 'Schools', type: :request do
       it 'does not include a link to reject school' do
         expect(response.body).not_to include(I18n.t('administrate.actions.reject_school'))
       end
+
+      it 'does not include a link to reopen school' do
+        expect(response.body).not_to include(I18n.t('administrate.actions.reopen_school'))
+      end
     end
 
     describe 'when the school is rejected' do
@@ -62,6 +66,10 @@ RSpec.describe 'Schools', type: :request do
 
       it 'does not include a link to reject school' do
         expect(response.body).not_to include(I18n.t('administrate.actions.reject_school'))
+      end
+
+      it 'includes link to reopen school' do
+        expect(response.body).to include(I18n.t('administrate.actions.reopen_school'))
       end
     end
   end
@@ -147,6 +155,49 @@ RSpec.describe 'Schools', type: :request do
 
       it 'displays failure message' do
         expect(response.body).to include(I18n.t('administrate.controller.reject_school.error'))
+      end
+    end
+  end
+
+  describe 'PUT #reopen' do
+    let(:creator) { create(:user) }
+    let(:school) { create(:verified_school, creator_id: creator.id) }
+    let(:reopen_result) { nil }
+    let(:verification_service) { instance_double(SchoolVerificationService, reopen: reopen_result) }
+
+    before do
+      stub_user_info_api_for(creator)
+      allow(SchoolVerificationService).to receive(:new).with(school).and_return(verification_service)
+
+      patch reopen_admin_school_path(school)
+    end
+
+    it 'redirects to school path' do
+      expect(response).to redirect_to(admin_school_path(school))
+    end
+
+    describe 'when reopen was successful' do
+      let(:reopen_result) { true }
+
+      before do
+        follow_redirect!
+      end
+
+      it 'displays success message' do
+        expect(response.body).to include(I18n.t('administrate.controller.reopen_school.success'))
+      end
+    end
+
+    describe 'when reopen was unsuccessful' do
+      let(:reopen_result) { false }
+
+      before do
+        allow(verification_service).to receive(:reopen).and_raise(StandardError)
+        follow_redirect!
+      end
+
+      it 'displays failure message' do
+        expect(response.body).to include(I18n.t('administrate.controller.reopen_school.error'))
       end
     end
   end
