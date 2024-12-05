@@ -23,17 +23,15 @@ class Lesson
       def rename_lesson_project(lesson:, name:)
         return unless lesson.project
 
-        lesson.project.assign_attributes(name:)
-        # TODO: determine school owner mechanism for project model validation rather than skipping validation
-        lesson.project.save!(validate: false)
+        lesson.project.update!(name:)
       end
 
       def rename_lesson_remixes(lesson:, name:)
+        return unless lesson.project
+
         lesson_remixes = Project.where(remixed_from_id: lesson.project.id)
         lesson_remixes.each do |remix|
-          remix.assign_attributes(name:)
-          # TODO: determine school owner mechanism for project model validation rather than skipping validation
-          remix.save!(validate: false)
+          remix.update!(name:)
         end
       end
     end
