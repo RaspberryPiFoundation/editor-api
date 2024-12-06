@@ -20,10 +20,16 @@ module SchoolStudent
         response
       rescue ValidationError => e
         response[:error] = e.errors
+        response[:error_type] = :validation_error
+        response
+      rescue ConcurrencyExceededForSchool => e
+        response[:error] = e
+        response[:error_type] = :job_concurrency_error
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
         response[:error] = "Error creating school students: #{e}"
+        response[:error_type] = :standard_error
         response
       end
 
