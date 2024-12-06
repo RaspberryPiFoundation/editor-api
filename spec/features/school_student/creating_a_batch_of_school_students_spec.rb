@@ -110,7 +110,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     stub_profile_api_create_school_students_validation_error
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(response.body).to eq('{"error":{"student-to-create":["Username must be unique in the batch data","Password is too simple (it should not be easily guessable, \\u003ca href=\"https://my.raspberrypi.org/password-help\"\\u003eneed password help?\\u003c/a\\u003e)","You must supply a name"],"another-student-to-create-2":["Password must be at least 8 characters","You must supply a name"]}}')
+    expect(response.body).to eq('{"error":{"student-to-create":["Username must be unique in the batch data","Password is too simple (it should not be easily guessable, \\u003ca href=\"https://my.raspberrypi.org/password-help\"\\u003eneed password help?\\u003c/a\\u003e)","You must supply a name"],"another-student-to-create-2":["Password must be at least 8 characters","You must supply a name"]},"error_type":"validation_error"}')
   end
   # rubocop:enable RSpec/MultipleExpectations
 
