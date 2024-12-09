@@ -17,7 +17,6 @@ class Lesson
 
       private
 
-      # TODO: copy projects
       def build_copy(lesson, lesson_params)
         lesson_copy = Lesson.new(parent: lesson, name: lesson.name, description: lesson.description)
         lesson_copy.assign_attributes(lesson_params)
