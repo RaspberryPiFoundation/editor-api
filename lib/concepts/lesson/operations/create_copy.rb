@@ -25,6 +25,7 @@ class Lesson
         project_copy = Project.new(project_params)
         project_copy.user_id = lesson_params[:user_id]
         project_copy.lesson_id = lesson_copy.id
+        project_copy.name = lesson_copy.name
 
         lesson.project.images.each do |image|
           project_copy.images.attach(image.blob)
