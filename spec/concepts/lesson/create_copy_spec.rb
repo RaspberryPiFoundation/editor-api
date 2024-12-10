@@ -58,10 +58,14 @@ RSpec.describe Lesson::CreateCopy, type: :unit do
     expect { described_class.call(lesson:, lesson_params:) }.to change(Project, :count).by(1)
   end
 
-  it 'gives the project a new identifier' do
+  it 'changes the project identifier' do
     response = described_class.call(lesson:, lesson_params:)
-    expect(response[:lesson].project.identifier).not_to be_nil
     expect(response[:lesson].project.identifier).not_to eq(lesson.project.identifier)
+  end
+
+  it 'generates a new project identifier' do
+    response = described_class.call(lesson:, lesson_params:)
+    expect(response[:lesson].project.identifier).to be_present
   end
 
   it 'gives the project the correct name' do
