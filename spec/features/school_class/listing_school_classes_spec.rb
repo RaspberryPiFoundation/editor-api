@@ -17,8 +17,8 @@ RSpec.describe 'Listing school classes', type: :request do
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
 
-  let!(:owner_teacher) { create(:teacher, school:, id: owner.id) }
-  let!(:owner_school_class) { create(:school_class, name: 'Owner School Class', teacher_id: owner.id, school:) }
+  let(:owner_teacher) { create(:teacher, school:, id: owner.id) }
+  let!(:owner_school_class) { create(:school_class, name: 'Owner School Class', teacher_id: owner_teacher.id, school:) }
 
   it 'responds 200 OK' do
     get("/api/schools/#{school.id}/classes", headers:)
@@ -36,7 +36,7 @@ RSpec.describe 'Listing school classes', type: :request do
     get("/api/schools/#{school.id}/classes?my_classes=true", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.first[:name]).to eq('Owner School Class')
+    expect(data.first[:name]).to eq(owner_school_class.name)
   end
 
   it 'responds with the teachers JSON' do

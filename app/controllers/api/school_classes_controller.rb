@@ -8,9 +8,7 @@ module Api
 
     def index
       school_classes = @school.classes.accessible_by(current_ability)
-      if params[:my_classes]
-        school_classes = school_classes.where(teacher_id: current_user.id)
-      end
+      school_classes = school_classes.where(teacher_id: current_user.id) if params[:my_classes]
       @school_classes_with_teachers = school_classes.with_teachers
       render :index, formats: [:json], status: :ok
     end
