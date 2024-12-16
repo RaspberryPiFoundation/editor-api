@@ -7,7 +7,9 @@ module Api
     load_and_authorize_resource :school_class, through: :school, through_association: :classes
 
     def index
-      @school_classes_with_teachers = @school.classes.accessible_by(current_ability).with_teachers
+      school_classes = @school.classes.accessible_by(current_ability)
+      school_classes = school_classes.where(teacher_id: current_user.id) if params[:my_classes] == 'true'
+      @school_classes_with_teachers = school_classes.with_teachers
       render :index, formats: [:json], status: :ok
     end
 
