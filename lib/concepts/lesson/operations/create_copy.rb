@@ -28,7 +28,7 @@ class Lesson
       end
 
       def build_project_copy(project, project_params)
-        project_attributes = project.attributes.except('id', 'identifier').merge(project_params)
+        project_attributes = project.attributes.except('id', 'identifier', 'created_at', 'updated_at').merge(project_params)
         project_copy = Project.new(project_attributes)
 
         project.images.each do |image|
