@@ -2,6 +2,7 @@
 
 module SchoolStudent
   class Error < StandardError; end
+
   class ValidationError < StandardError
     attr_reader :errors
 
@@ -10,6 +11,7 @@ module SchoolStudent
       super()
     end
   end
+
   class ConcurrencyExceededForSchool < StandardError; end
 
   class CreateBatch

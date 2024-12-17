@@ -122,12 +122,12 @@ class ProfileApiClient
 
       response.body.deep_symbolize_keys
     rescue Faraday::BadRequestError => e
-      rawError = JSON.parse(e.response_body)
+      raw_error = JSON.parse(e.response_body)
       # Profile returns an array for standard errors, and json for bulk validations
-      if rawError.is_a?(Array)
-        raise Error, rawError.first['message']
-      elsif rawError['errors']
-        raise Student422Error, rawError['errors']
+      if raw_error.is_a?(Array)
+        raise Error, raw_error.first['message']
+      elsif raw_error['errors']
+        raise Student422Error, raw_error['errors']
       else
         raise Student422Error, 'An unknown error occurred'
       end
