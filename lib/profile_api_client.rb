@@ -122,8 +122,15 @@ class ProfileApiClient
 
       response.body.deep_symbolize_keys
     rescue Faraday::BadRequestError => e
-      errors = JSON.parse(e.response_body)['errors']
-      raise Student422Error, errors
+      rawError = JSON.parse(e.response_body)
+      # Profile returns an array for standard errors, and json for bulk validations
+      if rawError.is_a?(Array)
+        raise Error, rawError.first['message']
+      elsif rawError['errors']
+        raise Student422Error, rawError['errors']
+      else
+        raise Student422Error, 'An unknown error occurred'
+      end
     end
 
     def update_school_student(token:, school_id:, student_id:, name: nil, username: nil, password: nil) # rubocop:disable Metrics/ParameterLists
