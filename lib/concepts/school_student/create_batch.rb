@@ -12,6 +12,8 @@ module SchoolStudent
     end
   end
 
+  class ConcurrencyExceededForSchool < StandardError; end
+
   class CreateBatch
     class << self
       def call(school:, school_students_params:, token:, user_id:)
