@@ -120,6 +120,6 @@ This API receives push event data from the [Raspberry Pi Learning](https://githu
 
 Individual projects can be requested from `/api/projects/{project_identifier}` and a list of a user's projects is available via the GraphQL API.
 
-Project images are uploaded via `POST` requests to `/projects/{project_identfier}/images` and stored in an S3 bucket. However, the ability to upload images in the user interface is not currently enabled for safeguarding reasons.
+Project images are uploaded via `POST` requests to `/projects/{project_identfier}/images` and stored in an S3 bucket.
 
 A project remix is created via a `POST` request to `projects/{original_project_identifier}/remix`.
