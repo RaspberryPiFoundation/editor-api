@@ -5,7 +5,7 @@ The editor API is a Rails monolith and is hosted at [`editor-api.raspberrypi.org
 - Session management
 - User auth (delegated to [Raspberry Pi Accounts / Open ID Connect](https://github.com/RaspberryPiFoundation/profile)) and permissions (managed using the `cancancan` gem)
 - Persistence of projects, including code files, data, images and metadata
-- Management of schools, school classes, lessons, teachers and students for Code Editor for Education
+- Management of schools, school classes, lessons, teachers and students for Code Editor for Education (CEfE)
 
 ## Getting Started
 
@@ -114,7 +114,7 @@ Handled in `config/initializers/cors.rb`.
 
 ### Webhooks
 
-This API receives push event data from the [Raspberry Pi Learning](https://github.com/raspberrypilearning) organisation via webhooks. These webhooks are mediated locally through `smee`, which runs in a Docker container. The webhook data is processed using the `github_webhooks` gem in the `github_webhooks_controller`.
+This API receives push event data from the [Raspberry Pi Learning](https://github.com/raspberrypilearning) organisation via webhooks. This data is used to create or update code projects related to the [Code Club Projects Site](https://projects.raspberrypi.org), and is processed using the `github_webhooks` gem in the `github_webhooks_controller`. For development purposes, these webhooks are mediated locally through `smee`, which runs in a Docker container.
 
 ## Usage
 
