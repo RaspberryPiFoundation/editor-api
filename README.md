@@ -128,5 +128,5 @@ A project remix is created via a `POST` request to `projects/{original_project_i
 
 ### Code Editor for Education
 
-Editor API provides routes for managing resources such as schools, school classes and lessons, as well as for inviting teachers and managing student account creation via `profile` requests.
+Editor API provides routes for managing resources such as schools, school classes and lessons, as well as for inviting teachers and managing student accounts via `profile` requests.
 
