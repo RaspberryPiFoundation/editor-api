@@ -102,6 +102,7 @@ module Api
         :name,
         :project_type,
         :locale,
+        :instructions,
         {
           components: %i[id name extension content index default]
         }

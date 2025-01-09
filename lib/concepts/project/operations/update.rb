@@ -42,7 +42,21 @@ class Project
         response[:error] = I18n.t 'errors.project.editing.delete_default_component'
       end
 
+      def school_project_instructions_updated_by_student?(response, update_hash)
+        is_school_project = response[:project].school.present?
+        user_is_student = current_user.student?
+        instructions_updated = response[:project].instructions != update_hash[:instructions]
+        is_school_project && user_is_student && instructions_updated
+      end
+
+      def validate_update(response, update_hash)
+        return unless school_project_instructions_updated_by_student?(response, update_hash)
+
+        response[:error] = I18n.t 'errors.project.editing.student_update_instructions'
+      end
+
       def update_project_attributes(response, update_hash)
+        validate_update(response, update_hash)
         return if response.failure?
 
         response[:project].assign_attributes(update_hash.slice(:name))
