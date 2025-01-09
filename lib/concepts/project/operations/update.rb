@@ -13,7 +13,7 @@ class Project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] ||= 'Error persisting changes'
+        response[:error] ||= "Error persisting changes: #{e.message}"
         response
       end
 
@@ -44,7 +44,7 @@ class Project
 
       def school_project_instructions_updated_by_student?(response, update_hash)
         is_school_project = response[:project].school.present?
-        user_is_student = current_user.student?
+        user_is_student = response[:project].respond_to?(:user) && response[:project].user.student?
         instructions_updated = response[:project].instructions != update_hash[:instructions]
         is_school_project && user_is_student && instructions_updated
       end
