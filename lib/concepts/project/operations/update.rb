@@ -59,7 +59,7 @@ class Project
         validate_update(response, update_hash)
         return if response.failure?
 
-        response[:project].assign_attributes(update_hash.slice(:name))
+        response[:project].assign_attributes(update_hash.slice(:name, :instructions))
       end
 
       def update_component_attributes(response, update_hash)

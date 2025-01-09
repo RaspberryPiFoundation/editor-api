@@ -6,14 +6,18 @@ RSpec.describe Project::Update, type: :unit do
   subject(:update) do
     update_hash = {
       name: 'updated project name',
-      components: component_hash
+      identifier: 'lol-lol-lol',
+      components: component_hash,
+      instructions: instructions
     }
     described_class.call(project:, update_hash:)
   end
 
-  let!(:project) { create(:project, :with_default_component, :with_components) }
+  let!(:project) { create(:project, :with_default_component, :with_components, :with_instructions) }
   let(:editable_component) { project.components.last }
   let(:default_component) { project.components.first }
+  let(:component_hash) { project.components.map { |component| hash(component) } }
+  let(:instructions) { project.instructions }
 
   describe '.call' do
     let(:edited_component_hash) do
@@ -24,6 +28,19 @@ RSpec.describe Project::Update, type: :unit do
         extension: 'py'
       }
     end
+
+    context 'when updating the instructions' do
+      let (:instructions) { 'new instructions' }
+
+      it 'returns success? true' do
+        expect(update.success?).to be(true)
+      end
+
+      it 'updates project instructions' do
+        expect { update }.to change { project.reload.instructions }.to('new instructions')
+      end
+    end
+
 
     context 'when only amending components' do
       let(:component_hash) { [default_component_hash, edited_component_hash] }
@@ -80,6 +97,15 @@ RSpec.describe Project::Update, type: :unit do
 
   def component_properties_hash(component)
     component.attributes.symbolize_keys.slice(
+      :name,
+      :content,
+      :extension
+    )
+  end
+
+  def hash(component)
+    component.attributes.symbolize_keys.slice(
+      :id,
       :name,
       :content,
       :extension
