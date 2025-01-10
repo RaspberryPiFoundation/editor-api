@@ -3,11 +3,11 @@
 class Project
   class Update
     class << self
-      def call(project:, update_hash:)
+      def call(project:, update_hash:, current_user:)
         response = setup_response(project)
 
         setup_deletions(response, update_hash)
-        update_project_attributes(response, update_hash)
+        update_project_attributes(response, update_hash, current_user)
         update_component_attributes(response, update_hash)
         persist_changes(response)
         response
@@ -42,21 +42,21 @@ class Project
         response[:error] = I18n.t 'errors.project.editing.delete_default_component'
       end
 
-      def school_project_instructions_updated_by_student?(response, update_hash)
+      def student_project_instructions_updated?(response, update_hash, current_user)
         is_school_project = response[:project].school.present?
-        user_is_student = response[:project].respond_to?(:user) && response[:project].user.student?
+        user_is_student = current_user.student?
         instructions_updated = response[:project].instructions != update_hash[:instructions]
         is_school_project && user_is_student && instructions_updated
       end
 
-      def validate_update(response, update_hash)
-        return unless school_project_instructions_updated_by_student?(response, update_hash)
+      def validate_update(response, update_hash, current_user)
+        return unless student_project_instructions_updated?(response, update_hash, current_user)
 
         response[:error] = I18n.t 'errors.project.editing.student_update_instructions'
       end
 
-      def update_project_attributes(response, update_hash)
-        validate_update(response, update_hash)
+      def update_project_attributes(response, update_hash, current_user)
+        validate_update(response, update_hash, current_user)
         return if response.failure?
 
         response[:project].assign_attributes(update_hash.slice(:name, :instructions))

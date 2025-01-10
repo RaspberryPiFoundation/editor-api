@@ -3,8 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe Project::Update, type: :unit do
-  subject(:update) { described_class.call(project:, update_hash:) }
+  subject(:update) { described_class.call(project:, update_hash:, current_user: ) }
 
+  let(:current_user) { create(:user) }
   let!(:project) { create(:project, :with_default_component) }
   let(:default_component) { project.components.first }
 
