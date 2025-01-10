@@ -6,7 +6,6 @@ RSpec.describe Project::Update, type: :unit do
   subject(:update) do
     update_hash = {
       name: 'updated project name',
-      identifier: 'lol-lol-lol',
       components: component_hash,
       instructions: instructions
     }

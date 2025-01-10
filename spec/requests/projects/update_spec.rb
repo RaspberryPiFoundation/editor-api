@@ -6,7 +6,7 @@ RSpec.describe 'Project update requests' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   context 'when authed user is project creator' do
-    let(:project) { create(:project, :with_default_component, user_id: owner.id, locale: nil) }
+    let(:project) { create(:project, :with_default_component, :with_instructions, user_id: owner.id, locale: nil) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(
@@ -21,10 +21,14 @@ RSpec.describe 'Project update requests' do
 
     let(:params) do
       { project:
-        { components: [
-          default_component_params,
-          { id: component.id, name: 'updated', extension: 'py', content: 'updated component content' }
-        ] } }
+        { 
+          instructions: 'updated instructions',  
+          components: [
+            default_component_params,
+            { id: component.id, name: 'updated', extension: 'py', content: 'updated component content' }
+          ]
+        }
+      }
     end
 
     before do
@@ -41,6 +45,11 @@ RSpec.describe 'Project update requests' do
       expect(response.body).to include('updated component content')
     end
 
+    it 'returns json with updated instructions' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+      expect(response.body).to include('updated instructions')
+    end
+
     it 'calls update operation' do
       mock_response = instance_double(OperationResponse)
       allow(mock_response).to receive(:success?).and_return(true)
@@ -50,16 +59,21 @@ RSpec.describe 'Project update requests' do
     end
 
     context 'when no components specified' do
-      let(:params) { { project: { name: 'updated project name' } } }
+      let(:params) { { project: { name: 'updated project name', instructions: 'updated instructions' } } }
 
       it 'returns success response' do
         put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response).to have_http_status(:ok)
       end
 
-      it 'returns json with updated project properties' do
+      it 'returns json with updated project name' do
         put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response.body).to include('updated project name')
+      end
+
+      it 'returns json with updated instructions' do
+        put("/api/projects/#{project.identifier}", params:, headers:)
+        expect(response.body).to include('updated instructions')
       end
 
       it 'returns json with previous project components' do
