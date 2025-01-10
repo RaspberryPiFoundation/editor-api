@@ -107,6 +107,28 @@ RSpec.describe 'Project update requests' do
     end
   end
 
+  context 'when authed user is a student' do
+    let(:project) { create(:project, school:, locale: nil, user_id: student.id) }
+    let(:params) { { project: { components: [] } } }
+    let(:school) { create(:school) }
+    let(:student) { create(:student, school:) }
+
+    before do
+      authenticated_in_hydra_as(student)
+    end
+
+    it 'returns success if instructions not updated' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns unprocessable entity if instructions updated' do
+      params[:project][:instructions] = 'updated instructions'
+      put("/api/projects/#{project.identifier}", params:, headers:)
+      expect(response).to have_http_status(:unprocessable_entity)
+    end
+  end
+
   context 'when auth token is invalid' do
     let(:project) { create(:project) }
 
