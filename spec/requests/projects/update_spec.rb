@@ -21,14 +21,13 @@ RSpec.describe 'Project update requests' do
 
     let(:params) do
       { project:
-        { 
-          instructions: 'updated instructions',  
+        {
+          instructions: 'updated instructions',
           components: [
             default_component_params,
             { id: component.id, name: 'updated', extension: 'py', content: 'updated component content' }
           ]
-        }
-      }
+        } }
     end
 
     before do

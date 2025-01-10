@@ -7,7 +7,7 @@ RSpec.describe Project::Update, type: :unit do
     update_hash = {
       name: 'updated project name',
       components: component_hash,
-      instructions: instructions
+      instructions:
     }
     described_class.call(project:, update_hash:)
   end
@@ -29,7 +29,7 @@ RSpec.describe Project::Update, type: :unit do
     end
 
     context 'when updating the instructions' do
-      let (:instructions) { 'new instructions' }
+      let(:instructions) { 'new instructions' }
 
       it 'returns success? true' do
         expect(update.success?).to be(true)
@@ -39,7 +39,6 @@ RSpec.describe Project::Update, type: :unit do
         expect { update }.to change { project.reload.instructions }.to('new instructions')
       end
     end
-
 
     context 'when only amending components' do
       let(:component_hash) { [default_component_hash, edited_component_hash] }
