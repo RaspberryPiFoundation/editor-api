@@ -9,7 +9,7 @@ RSpec.describe Project::Update, type: :unit do
       components: component_hash,
       instructions:
     }
-    described_class.call(project:, update_hash:, current_user: )
+    described_class.call(project:, update_hash:, current_user:)
   end
 
   let(:current_user) { create(:user) }
@@ -96,7 +96,7 @@ RSpec.describe Project::Update, type: :unit do
     context 'when the instructions have changed and the current user is a student' do
       let(:school) { create(:school) }
       let!(:current_user) { create(:student, school:) }
-      let!(:project) { create(:project, :with_instructions, school: school, user_id: current_user.id) }
+      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
       let(:instructions) { 'new instructions' }
 
       it 'returns success? false' do
@@ -112,7 +112,7 @@ RSpec.describe Project::Update, type: :unit do
       end
 
       it 'returns an error message' do
-        expect(update[:error]).to eq("Student cannot update project instructions")
+        expect(update[:error]).to eq('Student cannot update project instructions')
       end
     end
   end
