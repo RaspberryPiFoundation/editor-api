@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_15_154405) do
+ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -199,6 +199,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_15_154405) do
     t.uuid "school_id"
     t.uuid "lesson_id"
     t.boolean "finished"
+    t.text "instructions"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["lesson_id"], name: "index_projects_on_lesson_id"

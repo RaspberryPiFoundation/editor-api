@@ -16,7 +16,7 @@ RSpec.describe 'Project show requests' do
     end
 
     context 'when loading own project' do
-      let!(:project) { create(:project, user_id: teacher.id, locale: nil) }
+      let!(:project) { create(:project, :with_instructions, user_id: teacher.id, locale: nil) }
       let(:project_json) do
         {
           identifier: project.identifier,
@@ -24,6 +24,7 @@ RSpec.describe 'Project show requests' do
           locale: project.locale,
           name: project.name,
           user_id: project.user_id,
+          instructions: project.instructions,
           components: [],
           image_list: []
         }.to_json
@@ -54,8 +55,8 @@ RSpec.describe 'Project show requests' do
     context 'when loading a student\'s project' do
       let(:student) { create(:student, school:) }
       let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
-      let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
+      let(:teacher_project) { create(:project, :with_instructions, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
+      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions, finished: true) }
       let(:student_project_json) do
         {
           identifier: student_project.identifier,
@@ -63,6 +64,7 @@ RSpec.describe 'Project show requests' do
           locale: student_project.locale,
           name: student_project.name,
           user_id: student_project.user_id,
+          instructions: student_project.instructions,
           parent: {
             name: teacher_project.name,
             identifier: teacher_project.identifier
@@ -114,7 +116,7 @@ RSpec.describe 'Project show requests' do
 
   context 'when user is not logged in' do
     context 'when loading a starter project' do
-      let!(:starter_project) { create(:project, user_id: nil, locale: 'ja-JP') }
+      let!(:starter_project) { create(:project, :with_instructions, user_id: nil, locale: 'ja-JP') }
       let(:starter_project_json) do
         {
           identifier: starter_project.identifier,
@@ -122,6 +124,7 @@ RSpec.describe 'Project show requests' do
           locale: starter_project.locale,
           name: starter_project.name,
           user_id: starter_project.user_id,
+          instructions: starter_project.instructions,
           components: [],
           image_list: []
         }.to_json

@@ -6,14 +6,18 @@ RSpec.describe Project::Update, type: :unit do
   subject(:update) do
     update_hash = {
       name: 'updated project name',
-      components: component_hash
+      components: component_hash,
+      instructions:
     }
-    described_class.call(project:, update_hash:)
+    described_class.call(project:, update_hash:, current_user:)
   end
 
-  let!(:project) { create(:project, :with_default_component, :with_components) }
+  let(:current_user) { create(:user) }
+  let!(:project) { create(:project, :with_default_component, :with_components, :with_instructions) }
   let(:editable_component) { project.components.last }
   let(:default_component) { project.components.first }
+  let(:component_hash) { project.components.map { |component| hash(component) } }
+  let(:instructions) { project.instructions }
 
   describe '.call' do
     let(:edited_component_hash) do
@@ -23,6 +27,18 @@ RSpec.describe Project::Update, type: :unit do
         content: 'updated content',
         extension: 'py'
       }
+    end
+
+    context 'when updating the instructions' do
+      let(:instructions) { 'new instructions' }
+
+      it 'returns success? true' do
+        expect(update.success?).to be(true)
+      end
+
+      it 'updates project instructions' do
+        expect { update }.to change { project.reload.instructions }.to('new instructions')
+      end
     end
 
     context 'when only amending components' do
@@ -76,10 +92,42 @@ RSpec.describe Project::Update, type: :unit do
         expect { update }.to change { project.reload.name }.to('updated project name')
       end
     end
+
+    context 'when the instructions have changed and the current user is a student' do
+      let(:school) { create(:school) }
+      let!(:current_user) { create(:student, school:) }
+      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
+      let(:instructions) { 'new instructions' }
+
+      it 'returns success? false' do
+        expect(update.success?).to be(false)
+      end
+
+      it 'does not update project name' do
+        expect { update }.not_to change { project.reload.name }
+      end
+
+      it 'does not update project instructions' do
+        expect { update }.not_to change { project.reload.instructions }
+      end
+
+      it 'returns an error message' do
+        expect(update[:error]).to eq('Student cannot update project instructions')
+      end
+    end
   end
 
   def component_properties_hash(component)
     component.attributes.symbolize_keys.slice(
+      :name,
+      :content,
+      :extension
+    )
+  end
+
+  def hash(component)
+    component.attributes.symbolize_keys.slice(
+      :id,
       :name,
       :content,
       :extension
