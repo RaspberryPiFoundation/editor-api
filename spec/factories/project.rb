@@ -36,6 +36,7 @@ FactoryBot.define do
 
     trait :with_instructions do
       instructions { Faker::Lorem.paragraph }
+      school { create(:school) }
     end
   end
 end

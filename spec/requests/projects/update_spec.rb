@@ -6,7 +6,7 @@ RSpec.describe 'Project update requests' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   context 'when authed user is project creator' do
-    let(:project) { create(:project, :with_default_component, :with_instructions, user_id: owner.id, locale: nil) }
+    let!(:project) { create(:project, :with_default_component, :with_instructions, school:, user_id: owner.id, locale: nil) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(

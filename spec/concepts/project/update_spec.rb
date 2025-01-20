@@ -13,7 +13,7 @@ RSpec.describe Project::Update, type: :unit do
   end
 
   let(:current_user) { create(:user) }
-  let!(:project) { create(:project, :with_default_component, :with_components, :with_instructions) }
+  let!(:project) { create(:project, :with_default_component, :with_components) }
   let(:editable_component) { project.components.last }
   let(:default_component) { project.components.first }
   let(:component_hash) { project.components.map { |component| hash(component) } }
@@ -27,18 +27,6 @@ RSpec.describe Project::Update, type: :unit do
         content: 'updated content',
         extension: 'py'
       }
-    end
-
-    context 'when updating the instructions' do
-      let(:instructions) { 'new instructions' }
-
-      it 'returns success? true' do
-        expect(update.success?).to be(true)
-      end
-
-      it 'updates project instructions' do
-        expect { update }.to change { project.reload.instructions }.to('new instructions')
-      end
     end
 
     context 'when only amending components' do
@@ -90,6 +78,37 @@ RSpec.describe Project::Update, type: :unit do
 
       it 'updates project properties' do
         expect { update }.to change { project.reload.name }.to('updated project name')
+      end
+    end
+
+    context 'when updating the instructions if project does not belong to a school' do
+      let(:instructions) { 'new instructions' }
+
+      it 'returns success? false' do
+        expect(update.success?).to be(false)
+      end
+
+      it 'updates project instructions' do
+        expect { update }.not_to change { project.reload.instructions }
+      end
+
+      it 'returns an error message' do
+        expect(update[:error]).to match(/Projects with instructions must belong to a school/)
+      end
+    end
+
+    context 'when the instructions have changed and the current user is a teacher' do
+      let(:school) { create(:school) }
+      let!(:current_user) { create(:teacher, school:) }
+      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
+      let(:instructions) { 'new instructions' }
+
+      it 'returns success? true' do
+        expect(update.success?).to be(true)
+      end
+
+      it 'updates project instructions' do
+        expect { update }.to change { project.reload.instructions }.to('new instructions')
       end
     end
 
