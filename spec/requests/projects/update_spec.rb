@@ -6,7 +6,7 @@ RSpec.describe 'Project update requests' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   context 'when authed user is project creator' do
-    let!(:project) { create(:project, :with_default_component, :with_instructions, school:, user_id: owner.id, locale: nil) }
+    let!(:project) { create(:project, :with_default_component, user_id: owner.id, locale: nil) }
     let!(:component) { create(:component, project:) }
     let(:default_component_params) do
       project.components.first.attributes.symbolize_keys.slice(
@@ -22,7 +22,6 @@ RSpec.describe 'Project update requests' do
     let(:params) do
       { project:
         {
-          instructions: 'updated instructions',
           components: [
             default_component_params,
             { id: component.id, name: 'updated', extension: 'py', content: 'updated component content' }
@@ -44,11 +43,6 @@ RSpec.describe 'Project update requests' do
       expect(response.body).to include('updated component content')
     end
 
-    it 'returns json with updated instructions' do
-      put("/api/projects/#{project.identifier}", params:, headers:)
-      expect(response.body).to include('updated instructions')
-    end
-
     it 'calls update operation' do
       mock_response = instance_double(OperationResponse)
       allow(mock_response).to receive(:success?).and_return(true)
@@ -58,7 +52,7 @@ RSpec.describe 'Project update requests' do
     end
 
     context 'when no components specified' do
-      let(:params) { { project: { name: 'updated project name', instructions: 'updated instructions' } } }
+      let(:params) { { project: { name: 'updated project name' } } }
 
       it 'returns success response' do
         put("/api/projects/#{project.identifier}", params:, headers:)
@@ -70,19 +64,23 @@ RSpec.describe 'Project update requests' do
         expect(response.body).to include('updated project name')
       end
 
-      it 'returns json with updated instructions' do
-        put("/api/projects/#{project.identifier}", params:, headers:)
-        expect(response.body).to include('updated instructions')
-      end
-
       it 'returns json with previous project components' do
         put("/api/projects/#{project.identifier}", params:, headers:)
         expect(response.body).to include(project.components.first.attributes[:content].to_s)
       end
     end
 
-    context 'when update is invalid' do
+    context 'when updated project has no components' do
       let(:params) { { project: { components: [] } } }
+
+      it 'returns error response' do
+        put("/api/projects/#{project.identifier}", params:, headers:)
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+    end
+
+    context 'when updated (non-school) project has instructions' do
+      let(:params) { { project: { instructions: 'updated instructions' } } }
 
       it 'returns error response' do
         put("/api/projects/#{project.identifier}", params:, headers:)
@@ -104,6 +102,27 @@ RSpec.describe 'Project update requests' do
     it 'returns forbidden response' do
       put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  context 'when authed user is a teacher' do
+    let(:project) { create(:project, :with_instructions, school:, locale: nil, user_id: teacher.id) }
+    let(:params) { { project: { components: [], instructions: 'updated instructions' } } }
+    let(:school) { create(:school) }
+    let(:teacher) { create(:teacher, school:) }
+
+    before do
+      authenticated_in_hydra_as(teacher)
+    end
+
+    it 'returns success when instructions updated' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'includes updated instructions in response' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+      expect(response.body).to include('updated instructions')
     end
   end
 
