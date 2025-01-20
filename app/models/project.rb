@@ -90,6 +90,6 @@ class Project < ApplicationRecord
   def project_with_instructions_must_belong_to_school
     return unless instructions && !school_id
 
-    errors.add(:instructions, "Projects with instructions must belong to a school")
+    errors.add(:instructions, 'Projects with instructions must belong to a school')
   end
 end
