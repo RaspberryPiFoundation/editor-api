@@ -36,7 +36,7 @@ Rails.application.routes.draw do
       put :toggle_finished, on: :member, to: 'projects#toggle_finished'
       resource :remix, only: %i[show create], controller: 'projects/remixes'
       resources :remixes, only: %i[index], controller: 'projects/remixes'
-      resource :images, only: %i[show create], controller: 'projects/images'
+      resource :images, only: %i[show create update], controller: 'projects/images'
     end
 
     resource :project_errors, only: %i[create]

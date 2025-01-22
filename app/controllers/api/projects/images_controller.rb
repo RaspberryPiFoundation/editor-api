@@ -17,6 +17,18 @@ module Api
         @project.images.attach(params[:images])
         render '/api/projects/images', formats: [:json]
       end
+
+      def update
+        @project = Project.find_by!(identifier: params[:project_id])
+        authorize! :update, @project
+
+        puts params[:image]
+        puts 'the filename is ' + params[:image].original_filename
+        existing_image = @project.images.find { |i| i.blob.filename == params[:image].original_filename }
+        existing_image.purge
+        @project.images.attach(params[:image])
+        render '/api/projects/images', formats: [:json]
+      end
     end
   end
 end
