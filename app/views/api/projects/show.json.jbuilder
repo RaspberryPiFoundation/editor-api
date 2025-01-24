@@ -31,6 +31,16 @@ json.image_list(@project.images) do |image|
   json.url(rails_blob_url(image))
 end
 
+json.videos(@project.videos) do |video|
+  json.filename(video.filename)
+  json.url(rails_blob_url(video))
+end
+
+json.audio_files(@project.audio_files) do |audio_file|
+  json.filename(audio_file.filename)
+  json.url(rails_blob_url(audio_file))
+end
+
 json.user_name(@user&.name) if @user.present? && @project.parent
 
 json.finished(@project.finished) if @project.school.present? && @project.remixed_from_id.present?

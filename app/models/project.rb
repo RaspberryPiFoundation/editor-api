@@ -8,6 +8,8 @@ class Project < ApplicationRecord
   has_many :components, -> { order(default: :desc, name: :asc) }, dependent: :destroy, inverse_of: :project
   has_many :project_errors, dependent: :nullify
   has_many_attached :images
+  has_many_attached :videos
+  has_many_attached :audio_files
 
   accepts_nested_attributes_for :components
 
@@ -55,6 +57,10 @@ class Project < ApplicationRecord
   def last_edited_at
     # datetime that the project or one of its components was last updated
     [updated_at, components.maximum(:updated_at)].compact.max
+  end
+
+  def media
+    images + videos + audio_files
   end
 
   private

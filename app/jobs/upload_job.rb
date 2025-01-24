@@ -88,6 +88,8 @@ class UploadJob < ApplicationJob
   def format_project(project_dir, locale, repository, owner)
     components = []
     images = []
+    videos = []
+    audio_files = []
     proj_config = {}
 
     data = project_dir.object
@@ -102,14 +104,26 @@ class UploadJob < ApplicationJob
           @skip_job = true
           break
         end
-      elsif file.object.text
-        components << component(file)
       else
-        images << image(file, project_dir, locale, repository, owner)
+        mime_type = file_mime_type(file)
+        if mime_type =~ /text/
+          components << component(file)
+        else
+          media_file = media(file, project_dir, locale, repository, owner)
+          if mime_type =~ /image/
+            images << media_file
+          elsif mime_type =~ /video/
+            videos << media_file
+          elsif mime_type =~ /audio/
+            audio_files << media_file
+          else
+            raise "Unsupported file type: #{mime_type}"
+          end
+        end
       end
     end
 
-    { **proj_config, locale:, components:, images: }
+    { **proj_config, locale:, components:, images:, videos:, audio_files: }
   end
 
   def component(file)
@@ -120,7 +134,7 @@ class UploadJob < ApplicationJob
     { name:, extension:, content:, default: }
   end
 
-  def image(file, project_dir, locale, repository, owner)
+  def media(file, project_dir, locale, repository, owner)
     filename = file.name
     directory = project_dir.name
     url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
@@ -133,6 +147,10 @@ class UploadJob < ApplicationJob
 
   def owner(payload)
     payload[:repository][:owner][:name]
+  end
+
+  def file_mime_type(file)
+    Marcel::MimeType.for(file.object, name: file.name)
   end
 end
 
