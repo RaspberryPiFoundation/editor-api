@@ -42,6 +42,24 @@ RSpec.describe UploadJob do
                       }
                     },
                     {
+                      name: 'music.mp3',
+                      extension: '.mp3',
+                      object: {
+                        __typename: 'Blob',
+                        text: nil,
+                        isBinary: true
+                      }
+                    },
+                    {
+                      name: 'video.mp4',
+                      extension: '.png',
+                      object: {
+                        __typename: 'Blob',
+                        text: nil,
+                        isBinary: true
+                      }
+                    },
+                    {
                       name: 'main.py',
                       extension: '.py',
                       object: {
@@ -88,12 +106,26 @@ RSpec.describe UploadJob do
           filename: 'astronaut1.png',
           io: instance_of(StringIO)
         }
+      ],
+      videos: [
+        {
+          filename: 'video.mp4',
+          io: instance_of(StringIO)
+        }
+      ],
+      audio_files: [
+        {
+          filename: 'music.mp3',
+          io: instance_of(StringIO)
+        }
       ]
     }
   end
 
   before do
     stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
+    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
   end
 
   context 'with the build flag undefined' do
