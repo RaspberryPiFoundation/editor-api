@@ -33,5 +33,9 @@ FactoryBot.define do
                              content_type: 'image/png')
       end
     end
+
+    trait :with_instructions do
+      instructions { Faker::Lorem.paragraph }
+    end
   end
 end

@@ -6,7 +6,8 @@ json.call(
   :project_type,
   :locale,
   :name,
-  :user_id
+  :user_id,
+  :instructions
 )
 
 if @project.parent

@@ -7,6 +7,7 @@ en:
         delete_default_component: "Cannot delete default file"
         change_default_name: "Cannot amend default file name"
         change_default_extension: "Cannot amend default file extension"
+        student_update_instructions: "Student cannot update project instructions"
       remixing:
         invalid_params: "Invalid parameters"
         cannot_save: "Cannot create project remix"

@@ -47,7 +47,7 @@ module Api
     end
 
     def update
-      result = Project::Update.call(project: @project, update_hash: project_params)
+      result = Project::Update.call(project: @project, update_hash: project_params, current_user: @current_user)
 
       if result.success?
         render :show, formats: [:json]
@@ -102,6 +102,7 @@ module Api
         :name,
         :project_type,
         :locale,
+        :instructions,
         {
           components: %i[id name extension content index default]
         },
