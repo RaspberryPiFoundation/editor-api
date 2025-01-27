@@ -4,43 +4,52 @@ require 'yaml'
 
 class FilesystemProject
   CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
-  # IMAGE_FORMATS = ['.png', '.jpg', '.jpeg', '.webp'].freeze
   PROJECTS_ROOT = Rails.root.join('lib/tasks/project_components')
 
   def self.import_all!
     PROJECTS_ROOT.each_child do |dir|
       proj_config = YAML.safe_load_file(dir.join('project_config.yml').to_s)
-      files = dir.children
 
-      components = []
-      images = []
-      videos = []
-      audio_files = []
-
-      files.each do |file|
-        # skip the project_config.yml file
-        next if file.basename.to_s == 'project_config.yml'
-
-        mime_type = file_mime_type(file)
-
-        if CODE_FORMATS.include? File.extname(file)
-          components << component(file, dir)
-        elsif mime_type =~ /image/
-          images << media(file, dir)
-        elsif mime_type =~ /video/
-          videos << media(file, dir)
-        elsif mime_type =~ /audio/
-          audio_files << media(file, dir)
-        else
-          raise "File #{File.basename(file)} has unsupported file type: #{mime_type}"
-        end
-      end
+      files = dir.children.reject { |file| file.basename.to_s == 'project_config.yml' }
+      categorized_files = categorize_files(files, dir)
 
       project_importer = ProjectImporter.new(name: proj_config['NAME'], identifier: proj_config['IDENTIFIER'],
                                              type: proj_config['TYPE'] || 'python',
-                                             locale: proj_config['LOCALE'] || 'en', components:, images:, videos:, audio_files:)
+                                             locale: proj_config['LOCALE'] || 'en', **categorized_files)
       project_importer.import!
     end
+  end
+
+  def self.categorize_files(files, dir)
+    categories = {
+      components: [],
+      images: [],
+      videos: [],
+      audio_files: []
+    }
+
+    files.each do |file|
+      if CODE_FORMATS.include? File.extname(file)
+        categories[:components] << component(file, dir)
+      else
+        mime_type = file_mime_type(file)
+
+        case mime_type
+        when /text/
+          categories[:components] << component(file, dir)
+        when /image/
+          categories[:images] << media(file, dir)
+        when /video/
+          categories[:videos] << media(file, dir)
+        when /audio/
+          categories[:audio_files] << media(file, dir)
+        else
+          raise "Unsupported file type: #{mime_type}"
+        end
+      end
+    end
+
+    categories
   end
 
   def self.component(file, dir)
