@@ -86,44 +86,55 @@ class UploadJob < ApplicationJob
   end
 
   def format_project(project_dir, locale, repository, owner)
-    components = []
-    images = []
-    videos = []
-    audio_files = []
-    proj_config = {}
-
     data = project_dir.object
-    raise InvalidDirectoryStructureError, "The directory structure is incorrect and the job can't be processed." unless data.respond_to?(:entries)
+    validate_directory_structure(data)
 
-    data.entries.each do |file|
-      if file.name == 'project_config.yml'
-        proj_config = YAML.safe_load(file.object.text, symbolize_names: true)
+    proj_config_file = data.entries.find { |file| file.name == 'project_config.yml' }
+    proj_config = YAML.safe_load(proj_config_file.object.text, symbolize_names: true)
 
-        # Skip if build is set to false (for backwards compatibility the build must happen if the key is not present)
-        if proj_config[:build] == false
-          @skip_job = true
-          break
-        end
+    if proj_config[:build] == false
+      @skip_job = true
+      return proj_config
+    end
+
+    files = data.entries.reject { |file| file.name == 'project_config.yml' }
+    categorized_files = categorize_files(files, project_dir, locale, repository, owner)
+
+    { **proj_config, locale:, **categorized_files }
+  end
+
+  def validate_directory_structure(data)
+    raise InvalidDirectoryStructureError, 'The directory structure is incorrect and the job can\'t be processed.' unless data.respond_to?(:entries)
+  end
+
+  def categorize_files(files, project_dir, locale, repository, owner)
+    categories = {
+      components: [],
+      images: [],
+      videos: [],
+      audio_files: []
+    }
+
+    files.each do |file|
+      next if file.name == 'project_config.yml'
+
+      mime_type = file_mime_type(file)
+
+      case mime_type
+      when /text/
+        categories[:components] << component(file)
+      when /image/
+        categories[:images] << media(file, project_dir, locale, repository, owner)
+      when /video/
+        categories[:videos] << media(file, project_dir, locale, repository, owner)
+      when /audio/
+        categories[:audio_files] << media(file, project_dir, locale, repository, owner)
       else
-        mime_type = file_mime_type(file)
-        if mime_type =~ /text/
-          components << component(file)
-        else
-          media_file = media(file, project_dir, locale, repository, owner)
-          if mime_type =~ /image/
-            images << media_file
-          elsif mime_type =~ /video/
-            videos << media_file
-          elsif mime_type =~ /audio/
-            audio_files << media_file
-          else
-            raise "Unsupported file type: #{mime_type}"
-          end
-        end
+        raise "Unsupported file type: #{mime_type}"
       end
     end
 
-    { **proj_config, locale:, components:, images:, videos:, audio_files: }
+    categories
   end
 
   def component(file)
