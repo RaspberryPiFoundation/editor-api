@@ -105,7 +105,9 @@ module Api
         :instructions,
         {
           components: %i[id name extension content index default]
-        }
+        },
+        parent: {},
+        image_list: []
       )
     end
 
