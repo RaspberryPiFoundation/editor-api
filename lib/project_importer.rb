@@ -10,7 +10,7 @@ class ProjectImporter
     @images = kwargs[:images]
     @videos = kwargs[:videos]
     @audio_files = kwargs[:audio_files]
-    @media = images + videos + audio_files
+    @media = Array(images) + Array(videos) + Array(audio_files)
     @type = kwargs[:type]
     @locale = kwargs[:locale]
   end
