@@ -42,12 +42,11 @@ FactoryBot.define do
       end
     end
 
-
     trait :with_attached_audio do
       after(:build) do |object|
         object.audio.attach(io: Rails.root.join('spec/fixtures/files/test_audio_1.mp3').open,
-                             filename: 'test_audio',
-                             content_type: 'audio/mp3')
+                            filename: 'test_audio',
+                            content_type: 'audio/mp3')
       end
     end
 
