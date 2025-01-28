@@ -9,7 +9,7 @@ class Project < ApplicationRecord
   has_many :project_errors, dependent: :nullify
   has_many_attached :images
   has_many_attached :videos
-  has_many_attached :audio_files
+  has_many_attached :audio
 
   accepts_nested_attributes_for :components
 
@@ -60,7 +60,7 @@ class Project < ApplicationRecord
   end
 
   def media
-    images + videos + audio_files
+    images + videos + audio
   end
 
   private

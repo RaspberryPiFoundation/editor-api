@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class ProjectImporter
-  attr_reader :name, :identifier, :images, :videos, :audio_files, :media, :components, :type, :locale
+  attr_reader :name, :identifier, :images, :videos, :audio, :media, :components, :type, :locale
 
   def initialize(**kwargs)
     @name = kwargs[:name]
@@ -9,8 +9,8 @@ class ProjectImporter
     @components = kwargs[:components]
     @images = kwargs[:images]
     @videos = kwargs[:videos]
-    @audio_files = kwargs[:audio_files]
-    @media = Array(images) + Array(videos) + Array(audio_files)
+    @audio = kwargs[:audio]
+    @media = Array(images) + Array(videos) + Array(audio)
     @type = kwargs[:type]
     @locale = kwargs[:locale]
   end
@@ -75,8 +75,8 @@ class ProjectImporter
         project.images.attach(**media_file)
       elsif videos.include?(media_file)
         project.videos.attach(**media_file)
-      elsif audio_files.include?(media_file)
-        project.audio_files.attach(**media_file)
+      elsif audio.include?(media_file)
+        project.audio.attach(**media_file)
       else
         raise "Unsupported media file: #{media_file[:filename]}"
       end

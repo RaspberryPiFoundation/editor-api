@@ -28,7 +28,7 @@ RSpec.describe 'Project show requests' do
           components: [],
           image_list: [],
           videos: [],
-          audio_files: []
+          audio: []
         }.to_json
       end
 
@@ -74,7 +74,7 @@ RSpec.describe 'Project show requests' do
           components: [],
           image_list: [],
           videos: [],
-          audio_files: [],
+          audio: [],
           user_name: 'Joe Bloggs',
           finished: student_project.finished
         }.to_json
@@ -103,7 +103,7 @@ RSpec.describe 'Project show requests' do
           components: [],
           image_list: [],
           videos: [],
-          audio_files: []
+          audio: []
         }.to_json
       end
 
@@ -134,7 +134,7 @@ RSpec.describe 'Project show requests' do
           components: [],
           image_list: [],
           videos: [],
-          audio_files: []
+          audio: []
         }.to_json
       end
 
@@ -178,7 +178,7 @@ RSpec.describe 'Project show requests' do
           components: [],
           image_list: [],
           videos: [],
-          audio_files: []
+          audio: []
         }.to_json
       end
 

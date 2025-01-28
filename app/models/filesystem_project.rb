@@ -25,7 +25,7 @@ class FilesystemProject
       components: [],
       images: [],
       videos: [],
-      audio_files: []
+      audio: []
     }
 
     files.each do |file|
@@ -42,7 +42,7 @@ class FilesystemProject
         when /video/
           categories[:videos] << media(file, dir)
         when /audio/
-          categories[:audio_files] << media(file, dir)
+          categories[:audio] << media(file, dir)
         else
           raise "Unsupported file type: #{mime_type}"
         end

@@ -36,7 +36,7 @@ json.videos(@project.videos) do |video|
   json.url(rails_blob_url(video))
 end
 
-json.audio_files(@project.audio_files) do |audio_file|
+json.audio(@project.audio) do |audio_file|
   json.filename(audio_file.filename)
   json.url(rails_blob_url(audio_file))
 end

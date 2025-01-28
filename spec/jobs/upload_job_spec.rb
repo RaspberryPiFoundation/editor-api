@@ -113,7 +113,7 @@ RSpec.describe UploadJob do
           io: instance_of(StringIO)
         }
       ],
-      audio_files: [
+      audio: [
         {
           filename: 'music.mp3',
           io: instance_of(StringIO)

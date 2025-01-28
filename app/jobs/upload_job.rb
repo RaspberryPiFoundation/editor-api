@@ -112,7 +112,7 @@ class UploadJob < ApplicationJob
       components: [],
       images: [],
       videos: [],
-      audio_files: []
+      audio: []
     }
 
     files.each do |file|
@@ -128,7 +128,7 @@ class UploadJob < ApplicationJob
       when /video/
         categories[:videos] << media(file, project_dir, locale, repository, owner)
       when /audio/
-        categories[:audio_files] << media(file, project_dir, locale, repository, owner)
+        categories[:audio] << media(file, project_dir, locale, repository, owner)
       else
         raise "Unsupported file type: #{mime_type}"
       end
