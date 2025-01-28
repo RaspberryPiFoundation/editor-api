@@ -52,7 +52,7 @@ RSpec.describe UploadJob do
                     },
                     {
                       name: 'video.mp4',
-                      extension: '.png',
+                      extension: '.mp4',
                       object: {
                         __typename: 'Blob',
                         text: nil,
