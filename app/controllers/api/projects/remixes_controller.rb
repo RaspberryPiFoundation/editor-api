@@ -19,10 +19,12 @@ module Api
       end
 
       def create
+        # Ensure we have a fallback value to prevent bad requests
+        remix_origin = request.origin || request.referer
         result = Project::CreateRemix.call(params: remix_params,
                                            user_id: current_user&.id,
                                            original_project: project,
-                                           remix_origin: request.origin)
+                                           remix_origin:)
 
         if result.success?
           @project = result[:project]
@@ -42,7 +44,10 @@ module Api
         params.require(:project)
               .permit(:name,
                       :identifier,
+                      :project_type,
                       :locale,
+                      :user_id,
+                      image_list: [],
                       components: %i[id name extension content index])
       end
     end
