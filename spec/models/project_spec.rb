@@ -13,9 +13,19 @@ RSpec.describe Project, versioning: true do
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:project_errors).dependent(:nullify) }
     it { is_expected.to have_many_attached(:images) }
+    it { is_expected.to have_many_attached(:videos) }
+    it { is_expected.to have_many_attached(:audio) }
 
     it 'purges attached images' do
       expect(described_class.reflect_on_attachment(:images).options[:dependent]).to eq(:purge_later)
+    end
+
+    it 'purges attached videos' do
+      expect(described_class.reflect_on_attachment(:videos).options[:dependent]).to eq(:purge_later)
+    end
+
+    it 'purges attached audio' do
+      expect(described_class.reflect_on_attachment(:audio).options[:dependent]).to eq(:purge_later)
     end
   end
 
@@ -238,6 +248,14 @@ RSpec.describe Project, versioning: true do
     it 'returns the latest component updated_at if most recent' do
       latest_component = create(:component, project:, updated_at: 1.hour.ago)
       expect(project.last_edited_at).to eq(latest_component.updated_at)
+    end
+  end
+
+  describe '#media' do
+    let(:project) { create(:project, :with_attached_image, :with_attached_video, :with_attached_audio) }
+
+    it 'returns all media files' do
+      expect(project.media).to eq(project.images + project.videos + project.audio)
     end
   end
 

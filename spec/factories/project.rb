@@ -34,6 +34,23 @@ FactoryBot.define do
       end
     end
 
+    trait :with_attached_video do
+      after(:build) do |object|
+        object.videos.attach(io: Rails.root.join('spec/fixtures/files/test_video_1.mp4').open,
+                             filename: 'test_video',
+                             content_type: 'video/mp4')
+      end
+    end
+
+
+    trait :with_attached_audio do
+      after(:build) do |object|
+        object.audio.attach(io: Rails.root.join('spec/fixtures/files/test_audio_1.mp3').open,
+                             filename: 'test_audio',
+                             content_type: 'audio/mp3')
+      end
+    end
+
     trait :with_instructions do
       instructions { Faker::Lorem.paragraph }
     end
