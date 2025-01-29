@@ -35,6 +35,8 @@ class UploadJob < ApplicationJob
     }
   GRAPHQL
 
+  PROJECT_CONFIG = 'project_config.yml'
+
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
@@ -89,7 +91,7 @@ class UploadJob < ApplicationJob
     data = project_dir.object
     validate_directory_structure(data)
 
-    proj_config_file = data.entries.find { |file| file.name == 'project_config.yml' }
+    proj_config_file = data.entries.find { |file| file.name == PROJECT_CONFIG }
     proj_config = YAML.safe_load(proj_config_file.object.text, symbolize_names: true)
 
     if proj_config[:build] == false
@@ -97,7 +99,7 @@ class UploadJob < ApplicationJob
       return proj_config
     end
 
-    files = data.entries.reject { |file| file.name == 'project_config.yml' }
+    files = data.entries.reject { |file| file.name == PROJECT_CONFIG }
     categorized_files = categorize_files(files, project_dir, locale, repository, owner)
 
     { **proj_config, locale:, **categorized_files }
@@ -116,8 +118,6 @@ class UploadJob < ApplicationJob
     }
 
     files.each do |file|
-      next if file.name == 'project_config.yml'
-
       mime_type = file_mime_type(file)
 
       case mime_type

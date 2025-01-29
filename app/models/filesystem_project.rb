@@ -5,10 +5,11 @@ require 'yaml'
 class FilesystemProject
   CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
   PROJECTS_ROOT = Rails.root.join('lib/tasks/project_components')
+  PROJECT_CONFIG = 'project_config.yml'
 
   def self.import_all!
     PROJECTS_ROOT.each_child do |dir|
-      proj_config = YAML.safe_load_file(dir.join('project_config.yml').to_s)
+      proj_config = YAML.safe_load_file(dir.join(PROJECT_CONFIG).to_s)
 
       files = dir.children.reject { |file| file.basename.to_s == 'project_config.yml' }
       categorized_files = categorize_files(files, dir)
