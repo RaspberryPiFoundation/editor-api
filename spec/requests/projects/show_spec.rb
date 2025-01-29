@@ -16,7 +16,7 @@ RSpec.describe 'Project show requests' do
     end
 
     context 'when loading own project' do
-      let!(:project) { create(:project, :with_instructions, user_id: teacher.id, locale: nil) }
+      let!(:project) { create(:project, :with_instructions, school:, user_id: teacher.id, locale: nil) }
       let(:project_json) do
         {
           identifier: project.identifier,
@@ -122,7 +122,7 @@ RSpec.describe 'Project show requests' do
 
   context 'when user is not logged in' do
     context 'when loading a starter project' do
-      let!(:starter_project) { create(:project, :with_instructions, user_id: nil, locale: 'ja-JP') }
+      let!(:starter_project) { create(:project, user_id: nil, locale: 'ja-JP') }
       let(:starter_project_json) do
         {
           identifier: starter_project.identifier,
@@ -130,7 +130,7 @@ RSpec.describe 'Project show requests' do
           locale: starter_project.locale,
           name: starter_project.name,
           user_id: starter_project.user_id,
-          instructions: starter_project.instructions,
+          instructions: nil,
           components: [],
           image_list: [],
           videos: [],

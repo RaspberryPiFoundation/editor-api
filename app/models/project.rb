@@ -20,6 +20,7 @@ class Project < ApplicationRecord
   validates :locale, presence: true, unless: :user_id
   validate :user_has_a_role_within_the_school
   validate :user_is_a_member_or_the_owner_of_the_lesson
+  validate :project_with_instructions_must_belong_to_school
 
   scope :internal_projects, -> { where(user_id: nil) }
 
@@ -90,5 +91,11 @@ class Project < ApplicationRecord
     return if !lesson || user_id == lesson.user_id || !lesson.school_class || lesson.school_class&.members&.exists?(student_id: user_id)
 
     errors.add(:user, "'#{user_id}' is not the owner or a member of the lesson '#{lesson_id}'")
+  end
+
+  def project_with_instructions_must_belong_to_school
+    return unless instructions && !school_id
+
+    errors.add(:instructions, 'Projects with instructions must belong to a school')
   end
 end
