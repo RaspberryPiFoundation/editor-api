@@ -47,7 +47,7 @@ module Api
                       :project_type,
                       :locale,
                       :user_id,
-                      image_list: [],
+                      images: [],
                       components: %i[id name extension content index])
       end
     end

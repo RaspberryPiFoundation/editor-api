@@ -26,7 +26,7 @@ json.components(
   :content
 )
 
-json.image_list(@project.images) do |image|
+json.images(@project.images) do |image|
   json.filename(image.filename)
   json.url(rails_blob_url(image))
 end
