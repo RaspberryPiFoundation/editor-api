@@ -8,7 +8,7 @@ RSpec.describe 'Images requests' do
   let(:params) { { images: [fixture_file_upload(image_filename, 'image/png')] } }
   let(:expected_json) do
     {
-      image_list: [
+      images: [
         {
           filename: image_filename,
           url: rails_blob_url(project.images[0])

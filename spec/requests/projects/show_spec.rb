@@ -26,7 +26,7 @@ RSpec.describe 'Project show requests' do
           user_id: project.user_id,
           instructions: project.instructions,
           components: [],
-          image_list: [],
+          images: [],
           videos: [],
           audio: []
         }.to_json
@@ -72,7 +72,7 @@ RSpec.describe 'Project show requests' do
             identifier: teacher_project.identifier
           },
           components: [],
-          image_list: [],
+          images: [],
           videos: [],
           audio: [],
           user_name: 'Joe Bloggs',
@@ -101,7 +101,7 @@ RSpec.describe 'Project show requests' do
           locale: another_project.locale,
           user_id: another_project.user_id,
           components: [],
-          image_list: [],
+          images: [],
           videos: [],
           audio: []
         }.to_json
@@ -132,7 +132,7 @@ RSpec.describe 'Project show requests' do
           user_id: starter_project.user_id,
           instructions: nil,
           components: [],
-          image_list: [],
+          images: [],
           videos: [],
           audio: []
         }.to_json
@@ -176,7 +176,7 @@ RSpec.describe 'Project show requests' do
           name: project.name,
           user_id: project.user_id,
           components: [],
-          image_list: [],
+          images: [],
           videos: [],
           audio: []
         }.to_json
