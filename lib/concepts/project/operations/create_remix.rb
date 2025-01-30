@@ -35,6 +35,14 @@ class Project
           remix.images.attach(image.blob)
         end
 
+        original_project.videos.each do |video|
+          remix.videos.attach(video.blob)
+        end
+
+        original_project.audio.each do |audio_file|
+          remix.audio.attach(audio_file.blob)
+        end
+
         params[:components].each do |x|
           remix.components.build(x.slice(:name, :extension, :content))
         end
