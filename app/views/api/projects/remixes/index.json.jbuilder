@@ -7,6 +7,7 @@ json.array!(@projects_with_users) do |project, user|
     :project_type,
     :name,
     :user_id,
+    :finished,
     :updated_at,
     :last_edited_at
   )
