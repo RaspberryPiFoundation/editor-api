@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Role do
-  describe 'validations' do
+  describe 'validations', versioning: true do
     subject(:role) { build(:role) }
 
     it 'has a valid default factory' do
@@ -37,6 +37,11 @@ RSpec.describe Role do
       role.save
       duplicate_role = build(:role, school: role.school, user_id: role.user_id, role: role.role)
       expect(duplicate_role).to be_invalid
+    end
+
+    it 'enables auditing' do
+      role.save
+      expect(role.versions.length).to(eq(1))
     end
 
     context 'when the student role exists for a user and school' do
