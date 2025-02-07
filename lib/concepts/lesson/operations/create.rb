@@ -25,7 +25,9 @@ class Lesson
         new_lesson = Lesson.new(lesson_hash.except(:project_attributes))
         project_params = lesson_hash[:project_attributes].merge({ user_id: lesson_hash[:user_id],
                                                                   school_id: lesson_hash[:school_id],
-                                                                  lesson_id: new_lesson.id })
+                                                                  lesson_id: new_lesson.id,
+                                                                  school_project_attributes: { school_id: lesson_hash[:school_id] }
+                                                                   })
         new_lesson.project = Project.new(project_params)
         new_lesson
       end

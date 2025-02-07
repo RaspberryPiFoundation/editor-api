@@ -14,6 +14,7 @@ class Project < ApplicationRecord
   has_one :school_project, dependent: :destroy
 
   accepts_nested_attributes_for :components
+  accepts_nested_attributes_for :school_project
 
   before_validation :check_unique_not_null, on: :create
 
@@ -23,6 +24,8 @@ class Project < ApplicationRecord
   validate :user_has_a_role_within_the_school
   validate :user_is_a_member_or_the_owner_of_the_lesson
   validate :project_with_instructions_must_belong_to_school
+  validate :project_with_school_id_has_school_project
+  validate :school_project_school_matches_project_school
 
   scope :internal_projects, -> { where(user_id: nil) }
 
@@ -99,5 +102,17 @@ class Project < ApplicationRecord
     return unless instructions && !school_id
 
     errors.add(:instructions, 'Projects with instructions must belong to a school')
+  end
+
+  def project_with_school_id_has_school_project
+    return unless school_id && !school_project
+
+    errors.add(:school_project, 'Project with school_id must have a school_project')
+  end
+
+  def school_project_school_matches_project_school
+    return unless school_id && school_project && school_id != school_project.school_id
+
+    errors.add(:school_project, 'School project school_id must match project school_id')
   end
 end
