@@ -6,12 +6,12 @@ class Project
       def call(project_hash:)
         response = OperationResponse.new
         # ActiveRecord::Base.transaction do
-          response[:project] = build_project(project_hash)
-          response[:project].save!
-          # if response[:project].school
-          #   response[:school_project] = SchoolProject.create!(school: response[:project].school, project: response[:project])
-          #   response[:school_project].save!
-          # end
+        response[:project] = build_project(project_hash)
+        response[:project].save!
+        # if response[:project].school
+        #   response[:school_project] = SchoolProject.create!(school: response[:project].school, project: response[:project])
+        #   response[:school_project].save!
+        # end
         # end
         response
       rescue StandardError => e

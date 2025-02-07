@@ -6,7 +6,7 @@ class SchoolProject
       def call(school_project:, finished:)
         response = OperationResponse.new
         response[:school_project] = school_project
-        response[:school_project].assign_attributes(finished: finished)
+        response[:school_project].assign_attributes(finished:)
         response[:school_project].save!
         response
       rescue StandardError => e
