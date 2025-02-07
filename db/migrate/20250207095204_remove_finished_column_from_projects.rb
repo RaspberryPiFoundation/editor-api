@@ -10,5 +10,10 @@ class RemoveFinishedColumnFromProjects < ActiveRecord::Migration[7.1]
 
   def down
     add_column :projects, :finished, :boolean, default: false
+    Project.all.each do |project|
+      if project.school_project.present?
+        project.update!(finished: project.school_project.finished)
+      end
+    end
   end
 end
