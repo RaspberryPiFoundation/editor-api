@@ -7,10 +7,10 @@ json.array!(@projects_with_users) do |project, user|
     :project_type,
     :name,
     :user_id,
-    finished: project.school_project&.finished,
     :updated_at,
     :last_edited_at
   )
 
   json.user_name(user&.name)
+  json.finished(project.school_project&.finished)
 end
