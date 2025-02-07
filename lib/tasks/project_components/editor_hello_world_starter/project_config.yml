@@ -1,0 +1,9 @@
+NAME: "Hello 🌍🌎🌏"
+IDENTIFIER: "editor-hello-world-starter"
+COMPONENTS:
+  - name: "main"
+    extension: "py"
+    location: "main.py"
+    index: 0
+    default: true
+    

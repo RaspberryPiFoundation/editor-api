@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_07_095204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -198,7 +198,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
     t.string "remix_origin"
     t.uuid "school_id"
     t.uuid "lesson_id"
-    t.boolean "finished"
     t.text "instructions"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
@@ -227,6 +226,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
     t.string "description"
     t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
     t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "school_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id", null: false
+    t.uuid "project_id", null: false
+    t.boolean "finished", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_school_projects_on_project_id"
+    t.index ["school_id"], name: "index_school_projects_on_school_id"
   end
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -297,6 +306,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "school_projects", "projects"
+  add_foreign_key "school_projects", "schools"
   add_foreign_key "teacher_invitations", "schools"
   add_foreign_key "user_jobs", "good_jobs"
 end

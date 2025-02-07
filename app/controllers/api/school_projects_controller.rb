@@ -1,0 +1,32 @@
+# frozen_string_literal: true
+
+module Api
+  class SchoolProjectsController < ApiController
+    before_action :authorize_user
+    load_and_authorize_resource
+
+    def show
+      render :show, formats: [:json], status: :ok
+    end
+
+    def set_finished
+      result = SchoolProject::SetFinished.call(school_project_id: params[:id], finished: params[:finished])
+
+      if result.success?
+        head :ok
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    # private
+
+    # def school_project_params
+    #   params.require(:school_project).permit(
+    #     :school_id,
+    #     :project_id,
+    #     :finished
+    #   )
+    # end
+  end
+end
