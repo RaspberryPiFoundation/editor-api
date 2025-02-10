@@ -18,7 +18,7 @@ FROM base AS builder
 WORKDIR /app
 RUN apt-get update \
   && apt-get install --yes --no-install-recommends \
-  build-essential libpq-dev libxml2-dev libxslt1-dev git \
+  build-essential libpq-dev libxml2-dev libxslt1-dev git libyaml-dev \
   firefox-esr python2-dev \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
 COPY Gemfile Gemfile.lock /app/
