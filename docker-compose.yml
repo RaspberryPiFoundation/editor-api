@@ -37,6 +37,8 @@ services:
       - POSTGRES_DB
       - POSTGRES_PASSWORD
       - POSTGRES_USER
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
   smee:
     image: deltaprojects/smee-client
     platform: linux/amd64
