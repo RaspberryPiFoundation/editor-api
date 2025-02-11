@@ -83,6 +83,13 @@
         },
         "rubyLsp.enabledFeatures": {
           "diagnostics": true
+        },
+        "rubyLsp.rubyVersionManager": {
+          "identifier": "none"
+        },
+        "rubyLsp.rubyExecutablePath": "/usr/local/bin/ruby",
+        "rubyLsp.featureFlags": {
+          "launcher": false // ruby-lsp v0.17 will fail with this flag enabled
         }
       }
     }
