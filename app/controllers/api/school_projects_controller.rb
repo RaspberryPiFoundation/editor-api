@@ -10,7 +10,8 @@ module Api
     end
 
     def set_finished
-      result = SchoolProject::SetFinished.call(school_project_id: params[:id], finished: params[:finished])
+      project = Project.find_by(identifier: params[:identifier])
+      result = SchoolProject::SetFinished.call(school_project: project.school_project, finished: params[:finished])
 
       if result.success?
         head :ok

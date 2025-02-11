@@ -9,6 +9,11 @@ RSpec.describe 'Project toggle_finished requests' do
   let(:student) { create(:student, school:) }
   let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
   let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
+  let(:params) do
+    {
+      finished: true
+    }
+  end
 
   before do
     authenticated_in_hydra_as(student)
@@ -19,7 +24,7 @@ RSpec.describe 'Project toggle_finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: false) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/toggle_finished", headers:)
+      put("/api/projects/#{student_project.identifier}/toggle_finished", headers:, params:)
       student_project.reload
     end
 
@@ -28,7 +33,7 @@ RSpec.describe 'Project toggle_finished requests' do
     end
 
     it 'sets the completed flag to true' do
-      expect(student_project.finished).to be_truthy
+      expect(student_project.school_project.finished).to be_truthy
     end
   end
 

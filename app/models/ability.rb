@@ -99,14 +99,15 @@ class Ability
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
     can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
-    can(%i[toggle_finished], Project) do |project|
-      school_student_can_toggle_finished?(user:, school:, project:)
+    # can(%i[read], SchoolProject, project: { lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } } })
+    can(%i[set_finished], SchoolProject) do |school_project|
+      school_student_can_set_finished?(user:, school:, school_project:)
     end
   end
 
-  def school_student_can_toggle_finished?(user:, school:, project:)
-    is_my_project = project.user_id == user.id && project.school_id == school.id
-    is_a_remix = project.remixed_from_id.present?
+  def school_student_can_set_finished?(user:, school:, school_project:)
+    is_my_project = school_project.project.user_id == user.id && school_project.school_id == school.id
+    is_a_remix = school_project.project.remixed_from_id.present?
 
     is_my_project && is_a_remix
   end

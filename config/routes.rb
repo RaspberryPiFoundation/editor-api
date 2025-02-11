@@ -33,7 +33,7 @@ Rails.application.routes.draw do
     end
 
     resources :projects, only: %i[index show update destroy create] do
-      put :toggle_finished, on: :member, to: 'projects#toggle_finished'
+      put :set_finished, on: :member, to: 'school_projects#set_finished'
       resource :remix, only: %i[show create], controller: 'projects/remixes'
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
