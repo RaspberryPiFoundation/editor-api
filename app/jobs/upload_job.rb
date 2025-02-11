@@ -75,16 +75,33 @@ class UploadJob < ApplicationJob
       variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:#{locale}/code" }
     )
 
-    if response.data.errors.any?
-      error_messages = response.data.errors.messages.map { |error| error }
-      error_details = response.data.errors.details.map { |error| error }
-      error_type = error_details.dig(0, 1, 0, 'type')
-
-      # Handle NOT_FOUND errors as a special case, as this can happen when the repo is first created
-      raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}" unless error_type == 'NOT_FOUND'
-    end
-
+    handle_graphql_errors(response)
     response
+  end
+
+  def handle_graphql_errors(response)
+    errors = response&.errors.presence || response&.data&.errors
+    return if errors.blank?
+
+    error_messages, error_details, error_type = extract_error_info(errors)
+
+    # Handle NOT_FOUND errors as a special case, as this can happen when the repo is first created
+    raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}" unless error_type == 'NOT_FOUND'
+  end
+
+  def extract_error_info(errors)
+    error_type = nil
+    if errors.is_a?(Array) && errors.first.is_a?(Hash)
+      # Query level error
+      error_messages = errors.map { |error| error }
+      error_details = errors.map { |error| error }
+      error_type = error_details.dig(0, 1, 0, 'type')
+    else
+      # Top level error
+      error_messages = errors.messages['data'].first
+      error_details = errors.details['data'].first['message']
+    end
+    [error_messages, error_details, error_type]
   end
 
   def format_project(project_dir, locale, repository, owner)
