@@ -229,7 +229,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_02_07_095204) do
   end
 
   create_table "school_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "school_id", null: false
+    t.uuid "school_id"
     t.uuid "project_id", null: false
     t.boolean "finished", default: false
     t.datetime "created_at", null: false

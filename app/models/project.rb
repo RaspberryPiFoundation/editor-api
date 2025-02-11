@@ -17,7 +17,7 @@ class Project < ApplicationRecord
   # accepts_nested_attributes_for :school_project
 
   before_validation :check_unique_not_null, on: :create
-  before_validation :create_school_project_if_needed, on: :create
+  before_validation :create_school_project_if_needed
 
   validates :identifier, presence: true, uniqueness: { scope: :locale }
   validate :identifier_cannot_be_taken_by_another_user
