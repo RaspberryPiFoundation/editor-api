@@ -59,7 +59,7 @@ class Project
           proj.remixed_from_id = original_project.id
           proj.remix_origin = remix_origin
           proj.lesson_id = nil # Only the original can have a lesson id
-          proj.school_project = SchoolProject.new(school: original_project.school) if original_project.school.present?
+          # proj.school_project = SchoolProject.new(school: original_project.school) if original_project.school.present?
         end
       end
     end

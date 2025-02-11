@@ -5,6 +5,7 @@ class School < ApplicationRecord
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
   has_many :roles, dependent: :nullify
+  has_many :school_projects, dependent: :nullify
 
   VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,63}(\.[a-z]{2,63})*(/.*)?\z}ix
 

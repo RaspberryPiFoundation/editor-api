@@ -32,6 +32,7 @@ module Api
         @project = result[:project]
         render :show, formats: [:json], status: :created
       else
+        puts result[:error]
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end

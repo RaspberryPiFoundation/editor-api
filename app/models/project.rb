@@ -14,9 +14,10 @@ class Project < ApplicationRecord
   has_one :school_project, dependent: :destroy
 
   accepts_nested_attributes_for :components
-  accepts_nested_attributes_for :school_project
+  # accepts_nested_attributes_for :school_project
 
   before_validation :check_unique_not_null, on: :create
+  before_validation :create_school_project_if_needed, on: :create
 
   validates :identifier, presence: true, uniqueness: { scope: :locale }
   validate :identifier_cannot_be_taken_by_another_user
@@ -73,6 +74,12 @@ class Project < ApplicationRecord
 
   def check_unique_not_null
     self.identifier ||= PhraseIdentifier.generate
+  end
+
+  def create_school_project_if_needed
+    if self.school.present? && self.school_project.nil?
+      self.school_project = SchoolProject.new(school: self.school)
+    end
   end
 
   def identifier_cannot_be_taken_by_another_user

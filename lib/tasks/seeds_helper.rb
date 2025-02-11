@@ -99,6 +99,7 @@ module SeedsHelper
       project.project_type = 'python'
       project.components << Component.new({ extension: 'py', name: 'main',
                                             content: code })
+      # project.school_project = SchoolProject.new(school:)
     end
   end
 end

@@ -8,6 +8,20 @@ FactoryBot.define do
     project_type { 'python' }
     locale { %w[en es-LA fr-FR].sample }
 
+    transient do
+      school { nil }
+      school_id { nil }
+      finished { false }
+    end
+
+    after(:build) do |project, evaluator|
+      if evaluator.school.present? || evaluator.school_id.present?
+        school = evaluator.school_id.present? ? School.find(evaluator.school_id) : evaluator.school
+        project.school = school
+        project.school_project = build(:school_project, school: school, finished: evaluator.finished)
+      end
+    end
+
     trait :with_components do
       transient do
         component_count { 1 }
