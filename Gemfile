@@ -57,7 +57,6 @@ end
 group :development do
   gem 'awesome_print'
   gem 'rails-erd'
-  gem 'ruby-lsp', '~> 0.17.7'
   gem 'ruby-lsp-rails'
   gem 'ruby-lsp-rspec'
 end

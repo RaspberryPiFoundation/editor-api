@@ -565,7 +565,6 @@ DEPENDENCIES
   rubocop-graphql
   rubocop-rails
   rubocop-rspec
-  ruby-lsp (~> 0.17.7)
   ruby-lsp-rails
   ruby-lsp-rspec
   scout_apm
