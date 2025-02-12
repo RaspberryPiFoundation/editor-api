@@ -75,7 +75,7 @@ RSpec.describe 'Project show requests' do
           image_list: [],
           videos: [],
           audio: [],
-          user_name: 'Joe Bloggs',
+          user_name: 'Joe Bloggs'
         }.to_json
       end
 

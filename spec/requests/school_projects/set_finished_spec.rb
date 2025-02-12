@@ -41,7 +41,7 @@ RSpec.describe 'School project finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/finished", headers:, params: { finished: false})
+      put("/api/projects/#{student_project.identifier}/finished", headers:, params: { finished: false })
       student_project.reload
     end
 

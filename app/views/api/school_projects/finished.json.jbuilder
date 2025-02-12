@@ -5,7 +5,7 @@ json.call(
   :id,
   :school_id,
   :project_id,
-  :finished,
+  :finished
 )
 
 json.identifier(@school_project.project.identifier)

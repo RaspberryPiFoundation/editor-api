@@ -18,7 +18,7 @@ FactoryBot.define do
       if evaluator.school.present? || evaluator.school_id.present?
         school = evaluator.school_id.present? ? School.find(evaluator.school_id) : evaluator.school
         project.school = school
-        project.school_project = build(:school_project, school: school, finished: evaluator.finished)
+        project.school_project = build(:school_project, school:, finished: evaluator.finished)
       end
     end
 

@@ -5,7 +5,7 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource :project
 
-    def finished
+    def show_finished
       render :finished, formats: [:json], status: :ok
     end
 

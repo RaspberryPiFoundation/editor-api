@@ -77,9 +77,9 @@ class Project < ApplicationRecord
   end
 
   def create_school_project_if_needed
-    if self.school.present? && self.school_project.nil?
-      self.school_project = SchoolProject.new(school: self.school)
-    end
+    return unless school.present? && school_project.nil?
+
+    self.school_project = SchoolProject.new(school:)
   end
 
   def identifier_cannot_be_taken_by_another_user
