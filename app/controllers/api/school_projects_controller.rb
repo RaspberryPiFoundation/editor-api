@@ -5,8 +5,8 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource :project
 
-    def show
-      render :show, formats: [:json], status: :ok
+    def finished
+      render :finished, formats: [:json], status: :ok
     end
 
     def set_finished
@@ -14,7 +14,7 @@ module Api
       result = SchoolProject::SetFinished.call(school_project: project.school_project, finished: params[:finished])
 
       if result.success?
-        head :ok
+        render :finished, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
