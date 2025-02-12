@@ -9,11 +9,6 @@ RSpec.describe 'School project finished requests' do
   let(:student) { create(:student, school:) }
   let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
   let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-  let(:params) do
-    {
-      finished: true
-    }
-  end
 
   before do
     authenticated_in_hydra_as(student)
@@ -24,7 +19,7 @@ RSpec.describe 'School project finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: false) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/finished", headers:, params:)
+      put("/api/projects/#{student_project.identifier}/finished", headers:, params: { finished: true })
       student_project.reload
     end
 

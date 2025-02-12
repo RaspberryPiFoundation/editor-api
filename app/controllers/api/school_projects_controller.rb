@@ -6,6 +6,7 @@ module Api
     load_and_authorize_resource :project
 
     def show_finished
+      @school_project = Project.find_by(identifier: params[:id]).school_project
       render :finished, formats: [:json], status: :ok
     end
 
