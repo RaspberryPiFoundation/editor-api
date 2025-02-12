@@ -14,6 +14,7 @@ module Api
       result = SchoolProject::SetFinished.call(school_project: project.school_project, finished: params[:finished])
 
       if result.success?
+        @school_project = result[:school_project]
         render :finished, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
