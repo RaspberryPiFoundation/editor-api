@@ -9,16 +9,15 @@ FactoryBot.define do
     locale { %w[en es-LA fr-FR].sample }
 
     transient do
-      school { nil }
-      school_id { nil }
-      finished { false }
+      # school { nil }
+      # school_id { nil }
+      finished { nil }
     end
 
-    after(:build) do |project, evaluator|
-      if evaluator.school.present? || evaluator.school_id.present?
-        school = evaluator.school_id.present? ? School.find(evaluator.school_id) : evaluator.school
-        project.school = school
-        project.school_project = build(:school_project, school:, finished: evaluator.finished)
+    after(:create) do |project, evaluator|
+      if evaluator.finished.present?
+        project.school_project.finished = evaluator.finished
+        project.school_project.save!
       end
     end
 

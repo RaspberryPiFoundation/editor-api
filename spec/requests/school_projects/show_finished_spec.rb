@@ -9,7 +9,7 @@ RSpec.describe 'School project finished requests' do
   let(:student) { create(:student, school:) }
   let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
   let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-  let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
+  let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
   let(:school_project_json) do
     {
       id: student_project.school_project.id,
