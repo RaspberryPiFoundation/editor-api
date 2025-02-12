@@ -2,15 +2,15 @@
 
 module Api
   class SchoolProjectsController < ApiController
-    before_action :authorize_user
-    load_and_authorize_resource
+    before_action :authorize_user, only: %i[show set_finished]
+    load_and_authorize_resource :school_project
 
     def show
       render :show, formats: [:json], status: :ok
     end
 
     def set_finished
-      project = Project.find_by(identifier: params[:identifier])
+      project = Project.find_by(identifier: params[:id])
       result = SchoolProject::SetFinished.call(school_project: project.school_project, finished: params[:finished])
 
       if result.success?
