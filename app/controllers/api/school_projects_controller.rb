@@ -2,8 +2,8 @@
 
 module Api
   class SchoolProjectsController < ApiController
-    before_action :authorize_user, only: %i[show set_finished]
-    load_and_authorize_resource :school_project
+    before_action :authorize_user
+    load_and_authorize_resource :project
 
     def show
       render :show, formats: [:json], status: :ok
