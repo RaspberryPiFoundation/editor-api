@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'School project set_finished requests' do
+RSpec.describe 'School project finished requests' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
@@ -24,7 +24,7 @@ RSpec.describe 'School project set_finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: false) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/set_finished", headers:, params:)
+      put("/api/projects/#{student_project.identifier}/finished", headers:, params:)
       student_project.reload
     end
 
@@ -41,7 +41,7 @@ RSpec.describe 'School project set_finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/set_finished", headers:, params: { finished: false})
+      put("/api/projects/#{student_project.identifier}/finished", headers:, params: { finished: false})
       student_project.reload
     end
 
