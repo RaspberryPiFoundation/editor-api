@@ -9,6 +9,15 @@ RSpec.describe 'School project finished requests' do
   let(:student) { create(:student, school:) }
   let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
   let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
+  let(:school_project_json) do
+    {
+      id: student_project.school_project.id,
+      school_id: student_project.school_project.school_id,
+      project_id: student_project.school_project.project_id,
+      finished: student_project.school_project.finished,
+      identifier: student_project.identifier
+    }.to_json
+  end
 
   before do
     authenticated_in_hydra_as(student)
@@ -27,6 +36,10 @@ RSpec.describe 'School project finished requests' do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'returns the school project json' do
+      expect(response.body).to eq(school_project_json)
+    end
+
     it 'sets the completed flag to true' do
       expect(student_project.school_project.finished).to be_truthy
     end
@@ -42,6 +55,10 @@ RSpec.describe 'School project finished requests' do
 
     it 'returns success response' do
       expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns the school project json' do
+      expect(response.body).to eq(school_project_json)
     end
 
     it 'sets the completed flag to false' do
