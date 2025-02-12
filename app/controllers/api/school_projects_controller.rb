@@ -19,15 +19,5 @@ module Api
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
-
-    # private
-
-    # def school_project_params
-    #   params.require(:school_project).permit(
-    #     :school_id,
-    #     :project_id,
-    #     :finished
-    #   )
-    # end
   end
 end
