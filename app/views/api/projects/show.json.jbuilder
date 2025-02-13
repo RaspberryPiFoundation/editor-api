@@ -42,5 +42,3 @@ json.audio(@project.audio) do |audio_file|
 end
 
 json.user_name(@user&.name) if @user.present? && @project.parent
-
-json.finished(@project.finished) if @project.school.present? && @project.remixed_from_id.present?

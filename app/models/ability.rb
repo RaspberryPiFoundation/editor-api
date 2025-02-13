@@ -9,7 +9,6 @@ class Ability
     return unless user
 
     define_authenticated_non_student_abilities(user)
-
     user.schools.each do |school|
       define_school_student_abilities(user:, school:) if user.school_student?(school)
       define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
@@ -99,16 +98,7 @@ class Ability
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
     can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
-    can(%i[toggle_finished], Project) do |project|
-      school_student_can_toggle_finished?(user:, school:, project:)
-    end
-  end
-
-  def school_student_can_toggle_finished?(user:, school:, project:)
-    is_my_project = project.user_id == user.id && project.school_id == school.id
-    is_a_remix = project.remixed_from_id.present?
-
-    is_my_project && is_a_remix
+    can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)

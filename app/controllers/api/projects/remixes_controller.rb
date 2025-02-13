@@ -8,7 +8,7 @@ module Api
 
       def index
         projects = Project.where(remixed_from_id: project.id).accessible_by(current_ability)
-        @projects_with_users = projects.with_users(@current_user)
+        @projects_with_users = projects.includes(:school_project).with_users(@current_user)
         render index: @projects_with_users, formats: [:json]
       end
 
@@ -47,6 +47,9 @@ module Api
                       :project_type,
                       :locale,
                       :user_id,
+                      :videos,
+                      :audio,
+                      :instructions,
                       image_list: [],
                       components: %i[id name extension content index])
       end

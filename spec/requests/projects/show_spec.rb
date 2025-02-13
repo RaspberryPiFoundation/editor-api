@@ -58,7 +58,7 @@ RSpec.describe 'Project show requests' do
       let(:student) { create(:student, school:) }
       let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
       let(:teacher_project) { create(:project, :with_instructions, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions, finished: true) }
+      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions) }
       let(:student_project_json) do
         {
           identifier: student_project.identifier,
@@ -75,8 +75,7 @@ RSpec.describe 'Project show requests' do
           image_list: [],
           videos: [],
           audio: [],
-          user_name: 'Joe Bloggs',
-          finished: student_project.finished
+          user_name: 'Joe Bloggs'
         }.to_json
       end
 

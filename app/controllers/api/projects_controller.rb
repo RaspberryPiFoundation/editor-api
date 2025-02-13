@@ -5,7 +5,7 @@ require 'project_loader'
 module Api
   class ProjectsController < ApiController
     before_action :authorize_user, only: %i[create update index destroy]
-    before_action :load_project, only: %i[show update toggle_finished destroy]
+    before_action :load_project, only: %i[show update destroy]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
     before_action :verify_lesson_belongs_to_school, only: :create
@@ -31,16 +31,6 @@ module Api
       if result.success?
         @project = result[:project]
         render :show, formats: [:json], status: :created
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
-    end
-
-    def toggle_finished
-      result = Project::ToggleFinished.call(project: @project)
-
-      if result.success?
-        head :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
