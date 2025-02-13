@@ -98,7 +98,7 @@ class Ability
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
     can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
-    can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
+    can(%i[get_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
