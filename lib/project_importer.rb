@@ -69,7 +69,7 @@ class ProjectImporter
       if existing_media_file
         next if existing_media_file.blob.checksum == media_checksum(media_file[:io])
 
-        existing_media.purge
+        existing_media_file.purge
       end
       if images.include?(media_file)
         project.images.attach(**media_file)
