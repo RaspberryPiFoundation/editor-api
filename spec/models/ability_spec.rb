@@ -146,18 +146,18 @@ RSpec.describe Ability do
       let(:teacher) { create(:teacher, school:) }
       let(:school_class) { build(:school_class, school:, teacher_id: teacher.id) }
       let(:lesson) { build(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
-      let!(:school_project) { build(:project, school:, lesson:, user_id: teacher.id) }
+      let!(:project) { build(:project, school:, lesson:, user_id: teacher.id) }
 
       context 'when user is a school owner' do
         before do
           create(:owner_role, user_id: user.id, school:)
         end
 
-        it { is_expected.to be_able_to(:read, school_project) }
-        it { is_expected.not_to be_able_to(:create, school_project) }
-        it { is_expected.not_to be_able_to(:update, school_project) }
-        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
-        it { is_expected.not_to be_able_to(:destroy, school_project) }
+        it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
       end
 
       context 'when user is a school teacher' do
@@ -165,11 +165,11 @@ RSpec.describe Ability do
           create(:teacher_role, user_id: user.id, school:)
         end
 
-        it { is_expected.to be_able_to(:read, school_project) }
-        it { is_expected.not_to be_able_to(:create, school_project) }
-        it { is_expected.to be_able_to(:update, school_project) }
-        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
-        it { is_expected.not_to be_able_to(:destroy, school_project) }
+        it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
       end
 
       context 'when user is a school student and belongs to the teachers class' do
@@ -178,11 +178,11 @@ RSpec.describe Ability do
           create(:class_member, school_class:, student_id: user.id)
         end
 
-        it { is_expected.to be_able_to(:read, school_project) }
-        it { is_expected.not_to be_able_to(:create, school_project) }
-        it { is_expected.not_to be_able_to(:update, school_project) }
-        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
-        it { is_expected.not_to be_able_to(:destroy, school_project) }
+        it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
       end
 
       context 'when user is a school student and does not belong to the teachers class' do
@@ -190,11 +190,11 @@ RSpec.describe Ability do
           create(:student_role, user_id: user.id, school:)
         end
 
-        it { is_expected.not_to be_able_to(:read, school_project) }
-        it { is_expected.not_to be_able_to(:create, school_project) }
-        it { is_expected.not_to be_able_to(:update, school_project) }
-        it { is_expected.not_to be_able_to(:toggle_finished, school_project) }
-        it { is_expected.not_to be_able_to(:destroy, school_project) }
+        it { is_expected.not_to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
       end
     end
 
@@ -217,7 +217,7 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:create, remixed_project) }
         it { is_expected.to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
-        it { is_expected.to be_able_to(:toggle_finished, remixed_project) }
+        it { is_expected.to be_able_to(:set_finished, remixed_project.school_project) }
       end
 
       context 'when user is teacher that does not own the orginal project' do
@@ -227,7 +227,7 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
-        it { is_expected.not_to be_able_to(:toggle_finished, remixed_project) }
+        it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
       end
 
       context 'when user is teacher that owns the orginal project' do
@@ -237,7 +237,7 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
-        it { is_expected.not_to be_able_to(:toggle_finished, remixed_project) }
+        it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
       end
     end
   end

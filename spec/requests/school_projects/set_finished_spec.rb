@@ -2,13 +2,22 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Project toggle_finished requests' do
+RSpec.describe 'School project finished requests' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
   let(:student) { create(:student, school:) }
   let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
   let(:teacher_project) { create(:project, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
+  let(:school_project_json) do
+    {
+      id: student_project.school_project.id,
+      school_id: student_project.school_project.school_id,
+      project_id: student_project.school_project.project_id,
+      finished: student_project.school_project.finished,
+      identifier: student_project.identifier
+    }.to_json
+  end
 
   before do
     authenticated_in_hydra_as(student)
@@ -19,7 +28,7 @@ RSpec.describe 'Project toggle_finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: false) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/toggle_finished", headers:)
+      put("/api/projects/#{student_project.identifier}/finished", headers:, params: { finished: true })
       student_project.reload
     end
 
@@ -27,8 +36,12 @@ RSpec.describe 'Project toggle_finished requests' do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'returns the school project json' do
+      expect(response.body).to eq(school_project_json)
+    end
+
     it 'sets the completed flag to true' do
-      expect(student_project.finished).to be_truthy
+      expect(student_project.school_project.finished).to be_truthy
     end
   end
 
@@ -36,7 +49,7 @@ RSpec.describe 'Project toggle_finished requests' do
     let!(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, finished: true) }
 
     before do
-      put("/api/projects/#{student_project.identifier}/toggle_finished", headers:)
+      put("/api/projects/#{student_project.identifier}/finished", headers:, params: { finished: false })
       student_project.reload
     end
 
@@ -44,8 +57,12 @@ RSpec.describe 'Project toggle_finished requests' do
       expect(response).to have_http_status(:ok)
     end
 
+    it 'returns the school project json' do
+      expect(response.body).to eq(school_project_json)
+    end
+
     it 'sets the completed flag to false' do
-      expect(student_project.finished).to be_falsey
+      expect(student_project.school_project.finished).to be_falsey
     end
   end
 end
