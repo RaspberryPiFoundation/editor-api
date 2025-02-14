@@ -27,15 +27,30 @@ RSpec.describe 'School project finished requests' do
   context 'when the user is a student' do
     before do
       authenticated_in_hydra_as(student)
-      get("/api/projects/#{student_project.identifier}/finished", headers:)
     end
 
-    it 'returns success response' do
-      expect(response).to have_http_status(:ok)
+    context 'when user owns project' do
+      before do
+        get("/api/projects/#{student_project.identifier}/finished", headers:)
+      end
+
+      it 'returns success response' do
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns response containing correct school project data' do
+        expect(response.body).to eq(school_project_json)
+      end
     end
 
-    it 'returns response containing correct school project data' do
-      expect(response.body).to eq(school_project_json)
+    context 'when user does not own project' do
+      before do
+        get("/api/projects/#{teacher_project.identifier}/finished", headers:)
+      end
+
+      it 'returns forbidden response' do
+        expect(response).to have_http_status(:forbidden)
+      end
     end
   end
 end
