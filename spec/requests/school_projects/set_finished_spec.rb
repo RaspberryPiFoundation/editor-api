@@ -65,4 +65,19 @@ RSpec.describe 'School project finished requests' do
       expect(student_project.school_project.finished).to be_falsey
     end
   end
+
+  context 'when the user does not own the project' do
+    before do
+      put("/api/projects/#{teacher_project.identifier}/finished", headers:, params: { finished: true })
+      teacher_project.reload
+    end
+
+    it 'returns forbidden response' do
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'does not change the finished flag' do
+      expect(teacher_project.school_project.finished).to be_falsey
+    end
+  end
 end
