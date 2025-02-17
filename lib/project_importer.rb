@@ -71,16 +71,28 @@ class ProjectImporter
 
         existing_media_file.purge
       end
+
       if images.include?(media_file)
-        project.images.attach(**media_file)
+        blob = create_blob(media_file)
+        project.images.attach(blob)
       elsif videos.include?(media_file)
-        project.videos.attach(**media_file)
+        blob = create_blob(media_file)
+        project.videos.attach(blob)
       elsif audio.include?(media_file)
-        project.audio.attach(**media_file)
+        blob = create_blob(media_file)
+        project.audio.attach(blob)
       else
         raise "Unsupported media file: #{media_file[:filename]}"
       end
     end
+  end
+
+  def create_blob(media_file)
+    ActiveStorage::Blob.create_and_upload!(
+      io: media_file[:io],
+      filename: media_file[:filename],
+      content_type: media_file[:content_type]
+    )
   end
 
   def find_existing_media_file(filename)
