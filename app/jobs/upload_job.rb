@@ -40,10 +40,6 @@ class UploadJob < ApplicationJob
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
-      if projects_data.data.repository&.object.nil?
-        Rails.logger.warn 'Build skipped, does the repo exist?'
-        break
-      end
 
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
@@ -80,28 +76,10 @@ class UploadJob < ApplicationJob
   end
 
   def handle_graphql_errors(response)
-    errors = response&.errors.presence || response&.data&.errors
+    errors = response&.errors || response&.data&.errors
     return if errors.blank?
 
-    error_messages, error_details, error_type = extract_error_info(errors)
-
-    # Handle NOT_FOUND errors as a special case, as this can happen when the repo is first created
-    raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}" unless error_type == 'NOT_FOUND'
-  end
-
-  def extract_error_info(errors)
-    error_type = nil
-    if errors.is_a?(Array) && errors.first.is_a?(Hash)
-      # Query level error
-      error_messages = errors.map { |error| error }
-      error_details = errors.map { |error| error }
-      error_type = error_details.dig(0, 1, 0, 'type')
-    else
-      # Top level error
-      error_messages = errors.messages['data'].first
-      error_details = errors.details['data'].first['message']
-    end
-    [error_messages, error_details, error_type]
+    raise GraphQL::Client::Error, "GraphQL query failed with errors: #{errors.inspect}"
   end
 
   def format_project(project_dir, locale, repository, owner)
