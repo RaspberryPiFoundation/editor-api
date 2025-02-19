@@ -4,6 +4,11 @@ require 'open-uri'
 require 'github_api'
 
 class UploadJob < ApplicationJob
+  retry_on StandardError, attempts: 3, wait: ->(i) { 2**i } do |_job, e|
+    Sentry.capture_exception(e)
+    raise e
+  end
+
   @skip_job = false
 
   ProjectContentQuery = GithubApi::Client.parse <<-GRAPHQL
@@ -40,6 +45,10 @@ class UploadJob < ApplicationJob
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
+      if projects_data.data.repository&.object.nil?
+        Rails.logger.warn 'Build skipped, does the repo exist?'
+        raise RepositoryNotFound, "The repository could not be found: #{repository(payload)}"
+      end
 
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
@@ -51,9 +60,6 @@ class UploadJob < ApplicationJob
         project_importer = ProjectImporter.new(**project)
         project_importer.import!
       end
-    rescue StandardError => e
-      Sentry.capture_exception(e)
-      raise e # Re-raise the error to make the job fail
     end
   end
 
@@ -161,3 +167,4 @@ class UploadJob < ApplicationJob
 end
 
 class InvalidDirectoryStructureError < StandardError; end
+class RepositoryNotFound < StandardError; end
