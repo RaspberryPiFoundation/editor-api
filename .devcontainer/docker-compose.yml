@@ -12,6 +12,6 @@ services:
       - bundle:/usr/local/bundle
 
 volumes:
-  node_modules: null
+  node_modules:
   postgres_data:
-  bundle: null
+  bundle:
