@@ -47,7 +47,7 @@ class UploadJob < ApplicationJob
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
       if projects_data.data.repository&.object.nil?
         Rails.logger.warn 'Build skipped, does the repo exist?'
-        raise RepositoryNotFound, "The repository could not be found: #{repository(payload)}"
+        raise RepositoryNotFound, "The repository could not be found (is it private?): #{repository(payload)}"
       end
 
       projects_data.data.repository.object.entries.each do |project_dir|
