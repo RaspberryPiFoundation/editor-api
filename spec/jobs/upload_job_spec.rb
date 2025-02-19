@@ -214,7 +214,7 @@ RSpec.describe UploadJob do
           {
             'message' => 'Simulated INTERNAL_SERVER_ERROR message',
             'locations' => [{ 'line' => 2, 'column' => 4 }],
-            'path' => ['query', 'repository', 'object'],
+            'path' => %w[query repository object],
             'extensions' => { 'code' => 'INTERNAL_SERVER_ERROR' }
           }
         ]
@@ -229,5 +229,4 @@ RSpec.describe UploadJob do
       expect { described_class.perform_now(payload) }.to raise_error(GraphQL::Client::Error, /Simulated INTERNAL_SERVER_ERROR message/)
     end
   end
-
 end
