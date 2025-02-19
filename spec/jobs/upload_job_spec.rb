@@ -206,4 +206,27 @@ RSpec.describe UploadJob do
       expect { described_class.perform_now(payload) }.to change(Project, :count).by(1)
     end
   end
+
+  context 'with a graphql error response' do
+    let(:raw_response) do
+      {
+        errors: [
+          {
+            'message' => 'Simulated INTERNAL_SERVER_ERROR message',
+            'locations' => [{ 'line' => 2, 'column' => 4 }],
+            'path' => %w[query repository object],
+            'extensions' => { 'code' => 'INTERNAL_SERVER_ERROR' }
+          }
+        ]
+      }
+    end
+
+    before do
+      stub_request(:post, 'https://api.github.com/graphql').to_return(status: 200, body: raw_response.to_json, headers: {})
+    end
+
+    it 'raises a GraphQL::Client::Error' do
+      expect { described_class.perform_now(payload) }.to raise_error(GraphQL::Client::Error, /Simulated INTERNAL_SERVER_ERROR message/)
+    end
+  end
 end
