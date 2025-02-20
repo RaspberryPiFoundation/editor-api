@@ -77,6 +77,12 @@
         "rubyLsp.rubyExecutablePath": "/usr/local/bin/ruby",
         "rubyLsp.featureFlags": {
           "launcher": false // ruby-lsp v0.17 will fail with this flag enabled
+        },
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit"
+        },
+        "rubyLsp.enabledFeatures": {
+          "diagnostics": true
         }
       }
     }
