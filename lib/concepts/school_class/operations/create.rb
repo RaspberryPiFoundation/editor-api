@@ -21,7 +21,7 @@ class SchoolClass
         new_class = school.classes.build(school_class_params.except(:teacher_ids))
         if school_class_params[:teacher_ids].present?
           school_class_params[:teacher_ids].each do |teacher_id|
-            new_class.class_teachers.build(teacher_id: teacher_id)
+            new_class.class_teachers.build(teacher_id:)
           end
         end
         new_class

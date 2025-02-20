@@ -9,8 +9,8 @@ RSpec.describe School do
 
   describe 'associations' do
     it 'has many classes' do
-      create(:school_class, school:, teacher_id: teacher.id)
-      create(:school_class, school:, teacher_id: teacher.id)
+      create(:school_class, school:, teacher_ids: [teacher.id])
+      create(:school_class, school:, teacher_ids: [teacher.id])
       expect(school.classes.size).to eq(2)
     end
 
@@ -34,7 +34,7 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let!(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let!(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
       let!(:lesson_2) { create(:lesson, user_id: teacher.id, school:) }
       let!(:project) { create(:project, user_id: student.id, school:) }

@@ -8,7 +8,7 @@ RSpec.describe 'Listing class members', type: :request do
   let(:owner) { create(:owner, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:students) { create_list(:student, 3, school:) }
-  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+  let(:school_class) { build(:school_class, teacher_ids: [teacher.id], school:) }
 
   before do
     authenticated_in_hydra_as(owner)

@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a class member', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+  let!(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:, name: 'School Student', username: 'school-student') }
   let(:teacher) { create(:teacher, school:) }

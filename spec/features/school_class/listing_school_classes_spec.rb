@@ -11,7 +11,7 @@ RSpec.describe 'Listing school classes', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: teacher.id, school:) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
@@ -58,7 +58,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-teacher doesn't teach" do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
-    create(:school_class, school:, teacher_id: teacher.id)
+    create(:school_class, school:, teacher_ids: [teacher.id])
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
@@ -69,7 +69,7 @@ RSpec.describe 'Listing school classes', type: :request do
   it "does not include school classes that the school-student isn't a member of" do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(student)
-    create(:school_class, school:, teacher_id: teacher.id)
+    create(:school_class, school:, teacher_ids: [teacher.id])
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)

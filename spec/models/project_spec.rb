@@ -111,7 +111,7 @@ RSpec.describe Project, versioning: true do
       let(:school) { create(:school) }
       let(:teacher) { create(:teacher, school:) }
       let(:student) { create(:student, school:) }
-      let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
 
       before do
         lesson = create(:lesson, school:, school_class:, user_id: teacher.id)

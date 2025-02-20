@@ -17,7 +17,7 @@ RSpec.describe Lesson do
     end
 
     it 'optionally belongs to a school class' do
-      school_class = create(:school_class, teacher_id: teacher.id, school:)
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
 
       lesson = create(:lesson, school_class:, school: school_class.school, user_id: teacher.id)
       expect(lesson.school_class).to be_a(SchoolClass)
@@ -84,7 +84,7 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class, teacher_id: teacher.id, school:))
+        lesson.update!(school_class: create(:school_class, teacher_ids: [teacher.id], school:))
       end
 
       let(:school) { create(:school) }
@@ -142,7 +142,7 @@ RSpec.describe Lesson do
     let(:school) { create(:school) }
 
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_id: teacher.id, school:), user_id: teacher.id)
+      lesson = create(:lesson, school_class: build(:school_class, teacher_ids: [teacher.id], school:), user_id: teacher.id)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 

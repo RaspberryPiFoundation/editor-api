@@ -9,7 +9,7 @@ RSpec.describe ClassMember, versioning: true do
 
   let(:student) { create(:student, school:, name: 'School Student') }
   let(:school) { create(:school) }
-  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+  let(:school_class) { build(:school_class, teacher_ids: [teacher.id], school:) }
   let(:teacher) { create(:teacher, school:) }
 
   describe 'associations' do

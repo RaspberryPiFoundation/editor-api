@@ -2,18 +2,18 @@
 
 FactoryBot.define do
   factory :school_class do
-    # teacher_ids { [SecureRandom.uuid] }
     sequence(:name) { |n| "Class #{n}" }
 
     transient do
-      teacher_ids {[SecureRandom.uuid]}
+      teacher_ids { [SecureRandom.uuid] }
     end
 
-    after(:create) do |school_class, evaluator|
+    after(:build) do |school_class, evaluator|
       class_teachers = evaluator.teacher_ids.map do |teacher_id|
-        create(:class_teacher, school_class:, teacher_id:)
+        build(:class_teacher, school_class:, teacher_id:)
       end
-      school_class.update!(class_teachers:)
+      school_class.class_teachers = class_teachers
+      school_class.save!
     end
   end
 end

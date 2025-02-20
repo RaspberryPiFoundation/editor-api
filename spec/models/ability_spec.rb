@@ -144,7 +144,7 @@ RSpec.describe Ability do
       let(:user) { create(:user) }
       let(:school) { create(:school) }
       let(:teacher) { create(:teacher, school:) }
-      let(:school_class) { build(:school_class, school:, teacher_id: teacher.id) }
+      let(:school_class) { build(:school_class, school:, teacher_ids: [teacher.id]) }
       let(:lesson) { build(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let!(:project) { build(:project, school:, lesson:, user_id: teacher.id) }
 
@@ -204,7 +204,7 @@ RSpec.describe Ability do
       let(:school) { create(:school) }
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
-      let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let(:class_member) { create(:class_student, school_class:, student_id: student.id) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }

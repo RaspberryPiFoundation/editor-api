@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ClassMember::Create, type: :unit do
-  let!(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+  let!(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }

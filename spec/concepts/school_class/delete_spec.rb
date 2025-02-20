@@ -7,7 +7,7 @@ RSpec.describe SchoolClass::Delete, type: :unit do
     create(:class_student, student_id: student.id, school_class:)
   end
 
-  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+  let(:school_class) { build(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school_class_id) { school_class.id }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
