@@ -3,7 +3,7 @@
 class ConcurrencyExceededForSchool < StandardError; end
 
 class CreateStudentsJob < ApplicationJob
-  retry_on StandardError, attempts: 3 do |_job, e|
+  retry_on StandardError, wait: :polynomially_longer, attempts: 3 do |_job, e|
     Sentry.capture_exception(e)
     raise e
   end
