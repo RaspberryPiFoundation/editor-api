@@ -3,8 +3,17 @@
 require 'open-uri'
 require 'github_api'
 
+class InvalidDirectoryStructureError < StandardError; end
+class RepositoryNotFoundError < StandardError; end
+
 class UploadJob < ApplicationJob
-  retry_on StandardError, attempts: 3, wait: ->(i) { 2**i } do |_job, e|
+  retry_on StandardError, wait: :polynomially_longer, attempts: 3 do |_job, e|
+    Sentry.capture_exception(e)
+    raise e
+  end
+
+  # Don't retry...
+  rescue_from RepositoryNotFoundError, InvalidDirectoryStructureError do |e|
     Sentry.capture_exception(e)
     raise e
   end
@@ -45,7 +54,7 @@ class UploadJob < ApplicationJob
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
-      raise RepositoryNotFound, "Repository not found (is it private?): #{repository(payload)}" if projects_data.data.repository&.object.nil?
+      raise RepositoryNotFoundError, "Repository not found: #{repository(payload)}" if projects_data.data&.repository&.object.nil?
 
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
@@ -162,6 +171,3 @@ class UploadJob < ApplicationJob
     Marcel::MimeType.for(file.object, name: file.name)
   end
 end
-
-class InvalidDirectoryStructureError < StandardError; end
-class RepositoryNotFound < StandardError; end
