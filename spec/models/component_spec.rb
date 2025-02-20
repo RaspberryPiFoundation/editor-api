@@ -8,6 +8,7 @@ RSpec.describe Component, versioning: true do
   it { is_expected.to belong_to(:project) }
   it { is_expected.to validate_presence_of(:name) }
   it { is_expected.to validate_presence_of(:extension) }
+  it { is_expected.to validate_length_of(:content).is_at_most(8_500_000) }
 
   context 'when default component' do
     let(:component) { create(:default_python_component) }

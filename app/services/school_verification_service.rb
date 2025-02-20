@@ -16,11 +16,12 @@ class SchoolVerificationService
     end
   rescue StandardError => e
     Sentry.capture_exception(e)
-    Rails.logger.error { "Failed to verify school #{@school_id}: #{e.message}" }
+    Rails.logger.error { "Failed to verify school #{@school.id}: #{e.message}" }
     false
   else
     true
   end
 
   delegate :reject, to: :school
+  delegate :reopen, to: :school
 end

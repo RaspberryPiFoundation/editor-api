@@ -5,6 +5,7 @@ class School < ApplicationRecord
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
   has_many :roles, dependent: :nullify
+  has_many :school_projects, dependent: :nullify
 
   VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,63}(\.[a-z]{2,63})*(/.*)?\z}ix
 
@@ -25,7 +26,6 @@ class School < ApplicationRecord
             absence: { unless: proc { |school| school.verified? } },
             format: { with: /\d\d-\d\d-\d\d/, allow_nil: true }
   validate :verified_at_cannot_be_changed
-  validate :rejected_at_cannot_be_changed
   validate :code_cannot_be_changed
 
   before_validation :normalize_reference
@@ -65,6 +65,10 @@ class School < ApplicationRecord
 
   def reject
     update(rejected_at: Time.zone.now)
+  end
+
+  def reopen
+    update(rejected_at: nil)
   end
 
   def postal_code=(str)

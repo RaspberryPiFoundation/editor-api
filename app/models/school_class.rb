@@ -13,6 +13,12 @@ class SchoolClass < ApplicationRecord
   validates :name, presence: true
   # validate :teacher_has_the_school_teacher_role_for_the_school
 
+  has_paper_trail(
+    meta: {
+      meta_school_id: ->(cm) { cm.school&.id }
+    }
+  )
+
   def self.teachers
     User.from_userinfo(ids: ClassTeacher.pluck(:teacher_id))
   end

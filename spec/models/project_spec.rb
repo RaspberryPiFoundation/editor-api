@@ -13,9 +13,20 @@ RSpec.describe Project, versioning: true do
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:project_errors).dependent(:nullify) }
     it { is_expected.to have_many_attached(:images) }
+    it { is_expected.to have_many_attached(:videos) }
+    it { is_expected.to have_many_attached(:audio) }
+    it { is_expected.to have_one(:school_project).dependent(:destroy) }
 
     it 'purges attached images' do
       expect(described_class.reflect_on_attachment(:images).options[:dependent]).to eq(:purge_later)
+    end
+
+    it 'purges attached videos' do
+      expect(described_class.reflect_on_attachment(:videos).options[:dependent]).to eq(:purge_later)
+    end
+
+    it 'purges attached audio' do
+      expect(described_class.reflect_on_attachment(:audio).options[:dependent]).to eq(:purge_later)
     end
   end
 
@@ -38,6 +49,22 @@ RSpec.describe Project, versioning: true do
 
     it 'is valid if user but no locale' do
       valid_project = build(:project, locale: nil)
+      expect(valid_project).to be_valid
+    end
+
+    it 'is invalid if school_id but no school project' do
+      invalid_project = build(:project, school_id: SecureRandom.uuid)
+      expect(invalid_project).to be_invalid
+    end
+
+    it 'is invalid if school_id and school project with different school_id' do
+      invalid_project = build(:project, school_id: SecureRandom.uuid, school_project: build(:school_project, school_id: SecureRandom.uuid))
+      expect(invalid_project).to be_invalid
+    end
+
+    it 'is valid if school_id and school project with matching school_id' do
+      school_id = SecureRandom.uuid
+      valid_project = build(:project, school_id:, school_project: build(:school_project, school_id:))
       expect(valid_project).to be_valid
     end
 
@@ -123,6 +150,24 @@ RSpec.describe Project, versioning: true do
     it 'generates an identifier if nil' do
       unsaved_project = build(:project, identifier: nil)
       expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
+    end
+  end
+
+  describe 'create_school_project_if_needed' do
+    let(:teacher) { create(:teacher, school:) }
+    let(:teacher_project) { create(:project, school_id: school.id, user_id: teacher.id) }
+    let(:project) { create(:project) }
+
+    it 'creates a school project if the project belongs to a school' do
+      expect(teacher_project.school_project).to be_present
+    end
+
+    it 'gives the school project the same school_id as the project' do
+      expect(teacher_project.school_project.school_id).to eq(school.id)
+    end
+
+    it 'does not create a school project if the project does not belong to a school' do
+      expect(project.school_project).to be_nil
     end
   end
 
@@ -238,6 +283,14 @@ RSpec.describe Project, versioning: true do
     it 'returns the latest component updated_at if most recent' do
       latest_component = create(:component, project:, updated_at: 1.hour.ago)
       expect(project.last_edited_at).to eq(latest_component.updated_at)
+    end
+  end
+
+  describe '#media' do
+    let(:project) { create(:project, :with_attached_image, :with_attached_video, :with_attached_audio) }
+
+    it 'returns all media files' do
+      expect(project.media).to eq(project.images + project.videos + project.audio)
     end
   end
 

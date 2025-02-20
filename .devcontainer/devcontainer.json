@@ -66,11 +66,17 @@
         "codezombiech.gitignore",
         "shopify.ruby-lsp",
         "koichisasada.vscode-rdbg",
-        "rangav.vscode-thunder-client",
+        "postman.postman-for-vscode",
         "ninoseki.vscode-mogami"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit"
+        },
+        "rubyLsp.enabledFeatures": {
+          "diagnostics": true
+        }
       }
     }
   }

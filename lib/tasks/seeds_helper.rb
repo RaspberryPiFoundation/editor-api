@@ -23,6 +23,7 @@ module SeedsHelper
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
+      school.creator_agree_to_ux_contact = true
     end
   end
 
@@ -45,11 +46,11 @@ module SeedsHelper
     # rubocop:enable Rails/SkipsModelValidations
   end
 
-  def create_school_class(teacher_id, school)
+  def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample)
     SchoolClass.find_or_create_by!(teacher_id:, school:) do |school_class|
       Rails.logger.info 'Seeding a class...'
-      school_class.name = Faker::Educator.course_name
-      school_class.description = Faker::Hacker.phrases.sample
+      school_class.name = name
+      school_class.description = description
       school_class.teacher_id = teacher_id
       school_class.school = school
     end
@@ -87,7 +88,7 @@ module SeedsHelper
     end
   end
 
-  def create_project(user_id, school, lesson)
+  def create_project(user_id, school, lesson, code = '')
     Project.find_or_create_by!(user_id:, school:, lesson:) do |project|
       Rails.logger.info "Seeding a project for #{lesson.name}..."
       project.name = lesson.name
@@ -97,7 +98,7 @@ module SeedsHelper
       project.locale = 'en'
       project.project_type = 'python'
       project.components << Component.new({ extension: 'py', name: 'main',
-                                            content: '' })
+                                            content: code })
     end
   end
 end

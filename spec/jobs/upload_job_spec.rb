@@ -42,6 +42,24 @@ RSpec.describe UploadJob do
                       }
                     },
                     {
+                      name: 'music.mp3',
+                      extension: '.mp3',
+                      object: {
+                        __typename: 'Blob',
+                        text: nil,
+                        isBinary: true
+                      }
+                    },
+                    {
+                      name: 'video.mp4',
+                      extension: '.mp4',
+                      object: {
+                        __typename: 'Blob',
+                        text: nil,
+                        isBinary: true
+                      }
+                    },
+                    {
                       name: 'main.py',
                       extension: '.py',
                       object: {
@@ -88,12 +106,26 @@ RSpec.describe UploadJob do
           filename: 'astronaut1.png',
           io: instance_of(StringIO)
         }
+      ],
+      videos: [
+        {
+          filename: 'video.mp4',
+          io: instance_of(StringIO)
+        }
+      ],
+      audio: [
+        {
+          filename: 'music.mp3',
+          io: instance_of(StringIO)
+        }
       ]
     }
   end
 
   before do
     stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
+    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
   end
 
   context 'with the build flag undefined' do
@@ -172,6 +204,29 @@ RSpec.describe UploadJob do
 
     it 'saves the project to the database' do
       expect { described_class.perform_now(payload) }.to change(Project, :count).by(1)
+    end
+  end
+
+  context 'with a graphql error response' do
+    let(:raw_response) do
+      {
+        errors: [
+          {
+            'message' => 'Simulated INTERNAL_SERVER_ERROR message',
+            'locations' => [{ 'line' => 2, 'column' => 4 }],
+            'path' => %w[query repository object],
+            'extensions' => { 'code' => 'INTERNAL_SERVER_ERROR' }
+          }
+        ]
+      }
+    end
+
+    before do
+      stub_request(:post, 'https://api.github.com/graphql').to_return(status: 200, body: raw_response.to_json, headers: {})
+    end
+
+    it 'raises a GraphQL::Client::Error' do
+      expect { described_class.perform_now(payload) }.to raise_error(GraphQL::Client::Error, /Simulated INTERNAL_SERVER_ERROR message/)
     end
   end
 end

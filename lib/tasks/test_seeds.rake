@@ -57,12 +57,13 @@ namespace :test_seeds do
 
       # for each of the owner and teacher, create a class and assign students
       [creator_id, teacher_id].each do |user_id|
-        school_class = create_school_class(user_id, school)
+        teacher_name = user_id == creator_id ? 'Jane Doe' : 'John Doe'
+        school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
         assign_students(school_class, school)
 
         lessons = create_lessons(user_id, school, school_class)
         lessons.each do |lesson|
-          create_project(user_id, school, lesson)
+          create_project(user_id, school, lesson, 'print("Hello World!")')
         end
       end
       Rails.logger.info 'Done...'

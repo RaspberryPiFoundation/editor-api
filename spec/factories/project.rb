@@ -8,6 +8,19 @@ FactoryBot.define do
     project_type { 'python' }
     locale { %w[en es-LA fr-FR].sample }
 
+    transient do
+      # school { nil }
+      # school_id { nil }
+      finished { nil }
+    end
+
+    after(:create) do |project, evaluator|
+      if evaluator.finished.present?
+        project.school_project.finished = evaluator.finished
+        project.school_project.save!
+      end
+    end
+
     trait :with_components do
       transient do
         component_count { 1 }
@@ -32,6 +45,27 @@ FactoryBot.define do
                              filename: 'test_image',
                              content_type: 'image/png')
       end
+    end
+
+    trait :with_attached_video do
+      after(:build) do |object|
+        object.videos.attach(io: Rails.root.join('spec/fixtures/files/test_video_1.mp4').open,
+                             filename: 'test_video',
+                             content_type: 'video/mp4')
+      end
+    end
+
+    trait :with_attached_audio do
+      after(:build) do |object|
+        object.audio.attach(io: Rails.root.join('spec/fixtures/files/test_audio_1.mp3').open,
+                            filename: 'test_audio',
+                            content_type: 'audio/mp3')
+      end
+    end
+
+    trait :with_instructions do
+      instructions { Faker::Lorem.paragraph }
+      school { create(:school) }
     end
   end
 end

@@ -26,6 +26,18 @@ module Admin
       redirect_to admin_school_path(requested_resource)
     end
 
+    def reopen
+      service = SchoolVerificationService.new(requested_resource)
+
+      if service.reopen
+        flash[:notice] = t('administrate.controller.reopen_school.success')
+      else
+        flash[:error] = t('administrate.controller.reopen_school.error')
+      end
+
+      redirect_to admin_school_path(requested_resource)
+    end
+
     def default_sorting_attribute
       :created_at
     end

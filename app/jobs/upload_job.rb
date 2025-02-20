@@ -35,13 +35,11 @@ class UploadJob < ApplicationJob
     }
   GRAPHQL
 
+  PROJECT_CONFIG = 'project_config.yml'
+
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
-      if projects_data.data.repository&.object.nil?
-        Rails.logger.warn 'Build skipped, does the repo exist?'
-        break
-      end
 
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
@@ -73,43 +71,65 @@ class UploadJob < ApplicationJob
       variables: { repository:, owner:, expression: "#{ENV.fetch('GITHUB_WEBHOOK_REF')}:#{locale}/code" }
     )
 
-    if response.data.errors.any?
-      error_messages = response.data.errors.messages.map { |error| error }
-      error_details = response.data.errors.details.map { |error| error }
-      error_type = error_details.dig(0, 1, 0, 'type')
-
-      # Handle NOT_FOUND errors as a special case, as this can happen when the repo is first created
-      raise GraphQL::Client::Error, "GraphQL query failed with errors: #{error_messages}. Details: #{error_details}" unless error_type == 'NOT_FOUND'
-    end
-
+    handle_graphql_errors(response)
     response
   end
 
+  def handle_graphql_errors(response)
+    errors = response&.errors || response&.data&.errors
+    return if errors.blank?
+
+    raise GraphQL::Client::Error, "GraphQL query failed with errors: #{errors.inspect}"
+  end
+
   def format_project(project_dir, locale, repository, owner)
-    components = []
-    images = []
-    proj_config = {}
-
     data = project_dir.object
-    raise InvalidDirectoryStructureError, "The directory structure is incorrect and the job can't be processed." unless data.respond_to?(:entries)
+    validate_directory_structure(data)
 
-    data.entries.each do |file|
-      if file.name == 'project_config.yml'
-        proj_config = YAML.safe_load(file.object.text, symbolize_names: true)
+    proj_config_file = data.entries.find { |file| file.name == PROJECT_CONFIG }
+    proj_config = YAML.safe_load(proj_config_file.object.text, symbolize_names: true)
 
-        # Skip if build is set to false (for backwards compatibility the build must happen if the key is not present)
-        if proj_config[:build] == false
-          @skip_job = true
-          break
-        end
-      elsif file.object.text
-        components << component(file)
+    if proj_config[:build] == false
+      @skip_job = true
+      return proj_config
+    end
+
+    files = data.entries.reject { |file| file.name == PROJECT_CONFIG }
+    categorized_files = categorize_files(files, project_dir, locale, repository, owner)
+
+    { **proj_config, locale:, **categorized_files }
+  end
+
+  def validate_directory_structure(data)
+    raise InvalidDirectoryStructureError, 'The directory structure is incorrect and the job can\'t be processed.' unless data.respond_to?(:entries)
+  end
+
+  def categorize_files(files, project_dir, locale, repository, owner)
+    categories = {
+      components: [],
+      images: [],
+      videos: [],
+      audio: []
+    }
+
+    files.each do |file|
+      mime_type = file_mime_type(file)
+
+      case mime_type
+      when /text/
+        categories[:components] << component(file)
+      when /image/
+        categories[:images] << media(file, project_dir, locale, repository, owner)
+      when /video/
+        categories[:videos] << media(file, project_dir, locale, repository, owner)
+      when /audio/
+        categories[:audio] << media(file, project_dir, locale, repository, owner)
       else
-        images << image(file, project_dir, locale, repository, owner)
+        raise "Unsupported file type: #{mime_type}"
       end
     end
 
-    { **proj_config, locale:, components:, images: }
+    categories
   end
 
   def component(file)
@@ -120,7 +140,7 @@ class UploadJob < ApplicationJob
     { name:, extension:, content:, default: }
   end
 
-  def image(file, project_dir, locale, repository, owner)
+  def media(file, project_dir, locale, repository, owner)
     filename = file.name
     directory = project_dir.name
     url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
@@ -133,6 +153,10 @@ class UploadJob < ApplicationJob
 
   def owner(payload)
     payload[:repository][:owner][:name]
+  end
+
+  def file_mime_type(file)
+    Marcel::MimeType.for(file.object, name: file.name)
   end
 end
 

@@ -183,6 +183,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'does not require creator_agree_to_ux_contact to be true' do
+      school.creator_agree_to_ux_contact = false
+      expect(school).to be_valid
+    end
+
     it 'cannot have #rejected_at set when #verified_at is present' do
       school.verify!
       school.reject
@@ -199,12 +204,6 @@ RSpec.describe School do
       school.verify!
       school.update(verified_at: nil)
       expect(school.errors[:verified_at]).to include('cannot be changed after verification')
-    end
-
-    it "cannot change #rejected_at once it's been set" do
-      school.reject
-      school.update(rejected_at: nil)
-      expect(school.errors[:rejected_at]).to include('cannot be changed after rejection')
     end
 
     it 'requires #code to be unique' do
@@ -394,6 +393,22 @@ RSpec.describe School do
     it 'returns false on unsuccessful rejection' do
       school.verified_at = Time.zone.now
       expect(school.reject).to be(false)
+    end
+  end
+
+  describe '#reopen' do
+    it 'sets rejected_at to nil' do
+      school.reopen
+      expect(school.rejected_at).to be_nil
+    end
+
+    it 'returns true on successful reopening' do
+      expect(school.reopen).to be(true)
+    end
+
+    it 'returns false on unsuccessful reopening' do
+      school.verified_at = Time.zone.now
+      expect(school.reopen).to be(false)
     end
   end
 end

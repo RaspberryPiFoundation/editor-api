@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2024_11_01_142545) do
+ActiveRecord::Schema[7.1].define(version: 2025_02_07_095204) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -208,7 +208,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_01_142545) do
     t.string "remix_origin"
     t.uuid "school_id"
     t.uuid "lesson_id"
-    t.boolean "finished"
+    t.text "instructions"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["lesson_id"], name: "index_projects_on_lesson_id"
@@ -236,6 +236,16 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_01_142545) do
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
+  create_table "school_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id"
+    t.uuid "project_id", null: false
+    t.boolean "finished", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_school_projects_on_project_id"
+    t.index ["school_id"], name: "index_school_projects_on_school_id"
+  end
+
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "name", null: false
     t.string "reference"
@@ -256,6 +266,7 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_01_142545) do
     t.boolean "creator_agree_authority"
     t.boolean "creator_agree_terms_and_conditions"
     t.string "code"
+    t.boolean "creator_agree_to_ux_contact", default: false
     t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true
@@ -304,6 +315,8 @@ ActiveRecord::Schema[7.1].define(version: 2024_11_01_142545) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "school_projects", "projects"
+  add_foreign_key "school_projects", "schools"
   add_foreign_key "teacher_invitations", "schools"
   add_foreign_key "user_jobs", "good_jobs"
 end

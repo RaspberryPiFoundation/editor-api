@@ -3,7 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe Lesson::Update, type: :unit do
-  let(:lesson) { create(:lesson, name: 'Test Lesson') }
+  let(:school) { create(:school) }
+  let(:teacher) { create(:teacher, school:) }
+  let(:student) { create(:student, school:) }
+  let(:lesson) { create(:lesson, name: 'Test Lesson', user_id: teacher.id) }
+  let!(:student_project) { create(:project, remixed_from_id: lesson.project.id, user_id: student.id) }
 
   let(:lesson_params) do
     { name: 'New Name' }
@@ -17,6 +21,16 @@ RSpec.describe Lesson::Update, type: :unit do
   it 'updates the lesson' do
     response = described_class.call(lesson:, lesson_params:)
     expect(response[:lesson].name).to eq('New Name')
+  end
+
+  it 'updates the project name' do
+    described_class.call(lesson:, lesson_params:)
+    expect(lesson.project.name).to eq('New Name')
+  end
+
+  it 'updates the student project name' do
+    described_class.call(lesson:, lesson_params:)
+    expect(student_project.reload.name).to eq('New Name')
   end
 
   it 'returns the lesson in the operation response' do

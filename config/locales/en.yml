@@ -1,17 +1,20 @@
 en:
   errors:
     admin:
-      unauthorized: 'Not authorized.'
+      unauthorized: "Not authorized."
     project:
       editing:
-        delete_default_component: 'Cannot delete default file'
-        change_default_name: 'Cannot amend default file name'
-        change_default_extension: 'Cannot amend default file extension'
+        delete_default_component: "Cannot delete default file"
+        change_default_name: "Cannot amend default file name"
+        change_default_extension: "Cannot amend default file extension"
+        student_update_instructions: "Student cannot update project instructions"
       remixing:
-        invalid_params: 'Invalid parameters'
-        cannot_save: 'Cannot create project remix'
+        invalid_params: "Invalid parameters"
+        cannot_save: "Cannot create project remix"
   validations:
     school:
-      website: 'must be a valid URL'
+      website: "must be a valid URL"
     invitation:
       email_address: "'%<value>s' is invalid"
+    school_student:
+      not_empty: "You must supply a %{field}"

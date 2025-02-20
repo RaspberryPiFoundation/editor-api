@@ -10,6 +10,12 @@ class Role < ApplicationRecord
   validate :students_cannot_have_additional_roles
   validate :users_can_only_have_roles_in_one_school
 
+  has_paper_trail(
+    meta: {
+      meta_school_id: ->(cm) { cm.school&.id }
+    }
+  )
+
   private
 
   def students_cannot_have_additional_roles
