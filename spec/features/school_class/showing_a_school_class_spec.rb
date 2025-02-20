@@ -29,7 +29,7 @@ RSpec.describe 'Showing a school class', type: :request do
   it 'responds 200 OK when the user is a student in the class' do
     student = create(:student, school:)
     authenticated_in_hydra_as(student)
-    create(:class_member, school_class:, student_id: student.id)
+    create(:class_student, school_class:, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)

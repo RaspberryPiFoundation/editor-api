@@ -9,9 +9,8 @@ class SchoolClass < ApplicationRecord
 
   scope :with_class_teacher, ->(user_id) { joins(:class_teachers).where(class_teachers: { id: user_id }) }
 
-  # validates :teacher_id, presence: true
   validates :name, presence: true
-  # validate :teacher_has_the_school_teacher_role_for_the_school
+  validate :school_class_has_at_least_one_teacher
 
   has_paper_trail(
     meta: {
@@ -36,15 +35,11 @@ class SchoolClass < ApplicationRecord
     [self, User.from_userinfo(ids: teacher_ids)]
   end
 
-  # private
+  private
 
-  # def teacher_has_the_school_teacher_role_for_the_school
-  #   return unless teacher_id_changed? && errors.blank?
-
-  #   user = User.new(id: teacher_id)
-  #   return if user.school_teacher?(school)
-
-  #   msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{school.id}'"
-  #   errors.add(:user, msg)
-  # end
+  def school_class_has_at_least_one_teacher
+    return if class_teachers.present?
+    
+    errors.add(:class_teachers, 'must have at least one teacher')
+  end
 end

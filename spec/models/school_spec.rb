@@ -41,7 +41,7 @@ RSpec.describe School do
       let!(:role) { create(:role, school:) }
 
       before do
-        create(:class_member, school_class:, student_id: student.id)
+        create(:class_student, school_class:, student_id: student.id)
       end
 
       it 'also destroys school classes to avoid making them invalid' do

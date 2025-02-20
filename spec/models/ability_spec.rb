@@ -175,7 +175,7 @@ RSpec.describe Ability do
       context 'when user is a school student and belongs to the teachers class' do
         before do
           create(:student_role, user_id: user.id, school:)
-          create(:class_member, school_class:, student_id: user.id)
+          create(:class_student, school_class:, student_id: user.id)
         end
 
         it { is_expected.to be_able_to(:read, project) }
@@ -205,7 +205,7 @@ RSpec.describe Ability do
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
       let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
-      let(:class_member) { create(:class_member, school_class:, student_id: student.id) }
+      let(:class_member) { create(:class_student, school_class:, student_id: student.id) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
       let!(:remixed_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }

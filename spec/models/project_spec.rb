@@ -129,14 +129,14 @@ RSpec.describe Project, versioning: true do
       end
 
       it 'fails if the user is not a member of the lesson' do
-        create(:class_member, school_class:, student_id: teacher.id)
+        create(:class_student, school_class:, student_id: teacher.id)
 
         project.user_id = student.id
         expect(project).to be_invalid
       end
 
       it 'suceeds if the user is a member of the lesson' do
-        create(:class_member, school_class:, student_id: student.id)
+        create(:class_student, school_class:, student_id: student.id)
 
         project.user_id = student.id
         expect(project).to be_invalid

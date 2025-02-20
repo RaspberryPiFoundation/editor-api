@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass::Delete, type: :unit do
   before do
-    create(:class_member, student_id: student.id, school_class:)
+    create(:class_student, student_id: student.id, school_class:)
   end
 
   let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }

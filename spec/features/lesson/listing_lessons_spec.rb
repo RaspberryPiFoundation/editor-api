@@ -202,7 +202,7 @@ RSpec.describe 'Listing lessons', type: :request do
     it "includes the lesson when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
-      create(:class_member, school_class:, student_id: student.id)
+      create(:class_student, school_class:, student_id: student.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)

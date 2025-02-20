@@ -8,7 +8,7 @@ RSpec.describe 'Deleting a class member', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
+  let!(:class_member) { create(:class_student, student_id: student.id, school_class:) }
   let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }

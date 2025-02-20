@@ -16,7 +16,7 @@ RSpec.describe ClassMember::List, type: :unit do
   context 'with students and a teacher' do
     before do
       student_ids.each do |student_id|
-        create(:class_member, school_class:, student_id:)
+        create(:class_student, school_class:, student_id:)
       end
 
       student_attributes = students.map do |student|

@@ -5,9 +5,10 @@ require 'rails_helper'
 RSpec.describe SchoolClass::Create, type: :unit do
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
+  # let(:class_teacher) { create(:class_teacher, school_class:, teacher_id:) }
 
   let(:school_class_params) do
-    { name: 'Test School Class', teacher_id: teacher.id }
+    { name: 'Test School Class', teacher_ids: [teacher.id] }
   end
 
   it 'returns a successful operation response' do
@@ -34,9 +35,9 @@ RSpec.describe SchoolClass::Create, type: :unit do
     expect(response[:school_class].name).to eq('Test School Class')
   end
 
-  it 'assigns the teacher_id' do
+  it 'assigns the teacher' do
     response = described_class.call(school:, school_class_params:)
-    expect(response[:school_class].teacher_id).to eq(teacher.id)
+    expect(response[:school_class].teacher_ids).to eq([teacher.id])
   end
 
   context 'when creation fails' do

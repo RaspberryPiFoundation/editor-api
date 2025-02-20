@@ -14,12 +14,12 @@ RSpec.describe ClassMember, versioning: true do
 
   describe 'associations' do
     it 'belongs to a school_class' do
-      class_member = create(:class_member, student_id: student.id, school_class:)
+      class_member = create(:class_student, student_id: student.id, school_class:)
       expect(class_member.school_class).to be_a(SchoolClass)
     end
 
     it 'belongs to a school (via school_class)' do
-      class_member = create(:class_member, student_id: student.id, school_class:)
+      class_member = create(:class_student, student_id: student.id, school_class:)
       expect(class_member.school).to be_a(School)
     end
   end
@@ -63,7 +63,7 @@ RSpec.describe ClassMember, versioning: true do
   end
 
   describe 'auditing' do
-    subject(:class_member) { create(:class_member, student_id: student.id, school_class:) }
+    subject(:class_member) { create(:class_student, student_id: student.id, school_class:) }
 
     it 'enables auditing' do
       expect(class_member.versions.length).to(eq(1))

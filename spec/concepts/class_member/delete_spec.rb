@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe ClassMember::Delete, type: :unit do
-  let!(:class_member) { create(:class_member, student_id: student.id, school_class:) }
+  let!(:class_member) { create(:class_student, student_id: student.id, school_class:) }
   let(:class_member_id) { class_member.id }
   let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
   let(:school) { create(:school) }

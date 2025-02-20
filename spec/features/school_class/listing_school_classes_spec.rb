@@ -7,7 +7,7 @@ RSpec.describe 'Listing school classes', type: :request do
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(teacher)
 
-    create(:class_member, school_class:, student_id: student.id)
+    create(:class_student, school_class:, student_id: student.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
