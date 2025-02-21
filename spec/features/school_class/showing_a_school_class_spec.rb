@@ -45,8 +45,9 @@ RSpec.describe 'Showing a school class', type: :request do
   it 'responds with the teacher JSON' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
+    pp data
 
-    expect(data[:teacher_name]).to eq('School Teacher')
+    expect(data[:teachers].first[:name]).to eq('School Teacher')
   end
 
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do

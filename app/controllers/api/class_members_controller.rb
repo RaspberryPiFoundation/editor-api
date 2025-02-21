@@ -8,8 +8,8 @@ module Api
     load_and_authorize_resource :class_student, through: :school_class, through_association: :students
 
     def index
-      @class_members = @school_class.students.accessible_by(current_ability)
-      result = ClassMember::List.call(school_class: @school_class, class_members: @class_members, token: current_user.token)
+      @class_students = @school_class.students.accessible_by(current_ability)
+      result = ClassMember::List.call(school_class: @school_class, class_students: @class_students, token: current_user.token)
 
       if result.success?
         @class_members = result[:class_members]

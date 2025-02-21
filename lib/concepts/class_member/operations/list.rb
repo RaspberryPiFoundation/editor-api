@@ -3,15 +3,15 @@
 module ClassMember
   class List
     class << self
-      def call(school_class:, class_members:, token:)
+      def call(school_class:, class_students:, token:)
         response = OperationResponse.new
         response[:class_members] = []
 
         begin
           school = school_class.school
-          student_ids = class_members.pluck(:student_id)
+          student_ids = class_students.pluck(:student_id)
           students = SchoolStudent::List.call(school:, token:, student_ids:).fetch(:school_students, [])
-          class_members.each do |member|
+          class_students.each do |member|
             member.student = students.find { |student| student.id == member.student_id }
           end
 
@@ -23,7 +23,7 @@ module ClassMember
           return response
         end
 
-        response[:class_members] = teachers + class_members.sort do |a, b|
+        response[:class_members] = teachers + class_students.sort do |a, b|
           a.student.name <=> b.student.name
         end
 

@@ -15,8 +15,8 @@ RSpec.describe ClassMember::Create, type: :unit do
     expect(response.success?).to be(true)
   end
 
-  it 'creates a school class' do
-    expect { described_class.call(school_class:, students:) }.to change(ClassMember, :count).by(3)
+  it 'creates class students' do
+    expect { described_class.call(school_class:, students:) }.to change(ClassStudent, :count).by(3)
   end
 
   it 'returns a class members JSON array' do
@@ -24,9 +24,9 @@ RSpec.describe ClassMember::Create, type: :unit do
     expect(response[:class_members].size).to eq(3)
   end
 
-  it 'returns class members in the operation response' do
+  it 'returns class students in the operation response' do
     response = described_class.call(school_class:, students:)
-    expect(response[:class_members]).to all(be_a(ClassMember))
+    expect(response[:class_members]).to all(be_a(ClassStudent))
   end
 
   it 'assigns the school_class' do
@@ -48,7 +48,7 @@ RSpec.describe ClassMember::Create, type: :unit do
       let(:students) { nil }
 
       it 'does not create a class member' do
-        expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
+        expect { described_class.call(school_class:, students:) }.not_to change(ClassStudent, :count)
       end
 
       it 'returns a failed operation response' do
@@ -75,7 +75,7 @@ RSpec.describe ClassMember::Create, type: :unit do
         let(:students) { [different_school_student] }
 
         it 'does not create a class member' do
-          expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
+          expect { described_class.call(school_class:, students:) }.not_to change(ClassStudent, :count)
         end
 
         it 'returns a successful operation response' do
@@ -114,7 +114,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
         it 'returns class members in the operation response' do
           response = described_class.call(school_class:, students: new_students)
-          expect(response[:class_members]).to all(be_a(ClassMember))
+          expect(response[:class_members]).to all(be_a(ClassStudent))
         end
 
         it 'assigns the school_class' do

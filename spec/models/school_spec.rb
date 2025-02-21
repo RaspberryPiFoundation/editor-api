@@ -48,8 +48,12 @@ RSpec.describe School do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
       end
 
-      it 'also destroys class members to avoid making them invalid' do
-        expect { school.destroy! }.to change(ClassMember, :count).by(-1)
+      it 'also destroys class students to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassStudent, :count).by(-1)
+      end
+
+      it 'also destroys class teachers to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassTeacher, :count).by(-1)
       end
 
       it 'does not destroy lessons' do

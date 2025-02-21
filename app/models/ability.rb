@@ -104,7 +104,7 @@ class Ability
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
     is_my_lesson = lesson.school_id == school.id && lesson.user_id == user.id
-    is_my_class = lesson.school_class && lesson.school_class.teacher_id == user.id
+    is_my_class = lesson.school_class && lesson.school_class.teacher_ids.include?(user.id)
 
     is_my_lesson && (is_my_class || !lesson.school_class)
   end
