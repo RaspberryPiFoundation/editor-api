@@ -18,7 +18,7 @@ RSpec.describe 'test_seeds', type: :task do
       create(:role, user_id: creator_id, school:)
       create(:student_role, user_id: student_1, school:)
       create(:teacher_role, user_id: creator_id, school:)
-      school_class = create(:school_class, school_id: school.id, teacher_id: creator_id)
+      school_class = create(:school_class, school_id: school.id, teacher_ids: [creator_id])
       create(:class_student, student_id: student_1, school_class_id: school_class.id)
       create(:lesson, school_id: school.id, user_id: creator_id)
     end
@@ -28,7 +28,7 @@ RSpec.describe 'test_seeds', type: :task do
       task.invoke
       expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
       expect(School.where(creator_id:)).not_to exist
-      expect(ClassMember.where(student_id: student_1)).not_to exist
+      expect(ClassStudent.where(student_id: student_1)).not_to exist
       expect(SchoolClass.where(school_id: school.id)).not_to exist
       expect(Lesson.where(school_id: school.id)).not_to exist
       expect(Project.where(school_id: school.id)).not_to exist
@@ -65,20 +65,19 @@ RSpec.describe 'test_seeds', type: :task do
     # rubocop:disable RSpec/MultipleExpectations
     it 'creates class with lessons for the owner' do
       school_id = School.find_by(creator_id:).id
-      school_class = SchoolClass.where(school_id:, teacher_id: creator_id)
-      expect(school_class).to exist
-      school_class_id = SchoolClass.find_by(school_id:, teacher_id: creator_id).id
-      expect(Lesson.where(school_id:, school_class_id:).length).to eq(2)
+      school_class = SchoolClass.joins(:class_teachers).find_by(school_id:, class_teachers: {teacher_id: creator_id})
+
+      expect(school_class).not_to be_nil
+      expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(2)
     end
     # rubocop:enable RSpec/MultipleExpectations
 
     # rubocop:disable RSpec/MultipleExpectations
     it 'creates class with lessons for the teacher' do
       school_id = School.find_by(creator_id:).id
-      school_class = SchoolClass.where(school_id:, teacher_id:)
-      expect(school_class).to exist
-      school_class_id = SchoolClass.find_by(school_id:, teacher_id:).id
-      expect(Lesson.where(school_id:, school_class_id:).length).to eq(2)
+      school_class = SchoolClass.joins(:class_teachers).find_by(school_id:, class_teachers: {teacher_id:})
+      expect(school_class).not_to be_nil
+      expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(2)
     end
     # rubocop:enable RSpec/MultipleExpectations
 
@@ -87,9 +86,9 @@ RSpec.describe 'test_seeds', type: :task do
       school_id = School.find_by(creator_id:).id
       school_class_id = SchoolClass.find_by(school_id:).id
       expect(Role.student.where(user_id: student_1, school_id:)).to exist
-      expect(ClassMember.where(student_id: student_1, school_class_id:)).to exist
+      expect(ClassStudent.where(student_id: student_1, school_class_id:)).to exist
       expect(Role.student.where(user_id: student_2, school_id:)).to exist
-      expect(ClassMember.where(student_id: student_2, school_class_id:)).to exist
+      expect(ClassStudent.where(student_id: student_2, school_class_id:)).to exist
     end
     # rubocop:enable RSpec/MultipleExpectations
   end

@@ -41,8 +41,8 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    school_class.members.each do |class_member|
-      expect(data.pluck(:id)).to include(class_member.id)
+    school_class.students.each do |student|
+      expect(data.pluck(:id)).to include(student.id)
     end
   end
 
@@ -51,8 +51,8 @@ RSpec.describe 'Listing class members', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
     student_ids = data.pluck(:student).compact.pluck(:id)
 
-    school_class.members.each do |class_member|
-      expect(student_ids).to include(class_member.student_id)
+    school_class.students.each do |student|
+      expect(student_ids).to include(student.student_id)
     end
   end
 

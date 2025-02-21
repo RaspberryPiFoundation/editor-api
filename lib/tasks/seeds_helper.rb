@@ -47,12 +47,15 @@ module SeedsHelper
   end
 
   def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample)
-    SchoolClass.find_or_create_by!(teacher_id:, school:) do |school_class|
+    SchoolClass.joins(:class_teachers)
+                              .where(class_teachers: { teacher_id: }, school:)
+                              .first_or_create! do |school_class|
       Rails.logger.info 'Seeding a class...'
       school_class.name = name
       school_class.description = description
-      school_class.teacher_id = teacher_id
+      # school_class.teacher_id = teacher_id
       school_class.school = school
+      school_class.class_teachers = [ClassTeacher.new(teacher_id: teacher_id)]
     end
   end
 
@@ -66,10 +69,10 @@ module SeedsHelper
       Rails.logger.info 'Assigning student role...'
       Role.student.find_or_create_by!(user_id: student_id, school:)
 
-      ClassMember.find_or_create_by!(student_id:, school_class:) do |class_member|
+      ClassStudent.find_or_create_by!(student_id:, school_class:) do |class_student|
         Rails.logger.info 'Adding student...'
-        class_member.student_id = student_id
-        class_member.school_class = school_class
+        class_student.student_id = student_id
+        class_student.school_class = school_class
       end
     end
   end

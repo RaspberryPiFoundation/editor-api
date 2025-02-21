@@ -26,8 +26,12 @@ RSpec.describe School::Delete, type: :unit do
     expect { described_class.call(school_id:) }.to change(SchoolClass, :count).by(-1)
   end
 
-  it 'deletes class members in the school' do
-    expect { described_class.call(school_id:) }.to change(ClassMember, :count).by(-1)
+  it 'deletes class students in the school' do
+    expect { described_class.call(school_id:) }.to change(ClassStudent, :count).by(-1)
+  end
+
+  it 'deletes class teachers in the school' do
+    expect { described_class.call(school_id:) }.to change(ClassTeacher, :count).by(-1)
   end
 
   context 'when deletion fails' do
