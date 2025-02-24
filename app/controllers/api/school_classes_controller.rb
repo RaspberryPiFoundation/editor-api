@@ -19,7 +19,7 @@ module Api
     end
 
     def create
-      result = SchoolClass::Create.call(school: @school, school_class_params:)
+      result = SchoolClass::Create.call(school: @school, school_class_params:, current_user:)
 
       if result.success?
         @school_class_with_teachers = result[:school_class].with_teachers
@@ -55,7 +55,7 @@ module Api
 
     def school_class_params
       # A school teacher may only create classes they own.
-      params.require(:school_class).permit(:name, :description).merge(teacher_id: current_user.id)
+      params.require(:school_class).permit(:name, :description)
     end
 
     def school_owner?

@@ -8,35 +8,35 @@ RSpec.describe SchoolClass::Create, type: :unit do
   # let(:class_teacher) { create(:class_teacher, school_class:, teacher_id:) }
 
   let(:school_class_params) do
-    { name: 'Test School Class', teacher_ids: [teacher.id] }
+    { name: 'Test School Class' }
   end
 
   it 'returns a successful operation response' do
-    response = described_class.call(school:, school_class_params:)
+    response = described_class.call(school:, school_class_params:, current_user: teacher)
     expect(response.success?).to be(true)
   end
 
   it 'creates a school class' do
-    expect { described_class.call(school:, school_class_params:) }.to change(SchoolClass, :count).by(1)
+    expect { described_class.call(school:, school_class_params:, current_user: teacher) }.to change(SchoolClass, :count).by(1)
   end
 
   it 'returns the school class in the operation response' do
-    response = described_class.call(school:, school_class_params:)
+    response = described_class.call(school:, school_class_params:, current_user: teacher)
     expect(response[:school_class]).to be_a(SchoolClass)
   end
 
   it 'assigns the school' do
-    response = described_class.call(school:, school_class_params:)
+    response = described_class.call(school:, school_class_params:, current_user: teacher)
     expect(response[:school_class].school).to eq(school)
   end
 
   it 'assigns the name' do
-    response = described_class.call(school:, school_class_params:)
+    response = described_class.call(school:, school_class_params:, current_user: teacher)
     expect(response[:school_class].name).to eq('Test School Class')
   end
 
   it 'assigns the teacher' do
-    response = described_class.call(school:, school_class_params:)
+    response = described_class.call(school:, school_class_params:, current_user: teacher)
     expect(response[:school_class].teacher_ids).to eq([teacher.id])
   end
 
@@ -48,21 +48,21 @@ RSpec.describe SchoolClass::Create, type: :unit do
     end
 
     it 'does not create a school class' do
-      expect { described_class.call(school:, school_class_params:) }.not_to change(SchoolClass, :count)
+      expect { described_class.call(school:, school_class_params:, current_user: teacher) }.not_to change(SchoolClass, :count)
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(school:, school_class_params:)
+      response = described_class.call(school:, school_class_params:, current_user: teacher)
       expect(response.failure?).to be(true)
     end
 
     it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_class_params:)
+      response = described_class.call(school:, school_class_params:, current_user: teacher)
       expect(response[:error]).to match(/Error creating school class/)
     end
 
     it 'sent the exception to Sentry' do
-      described_class.call(school:, school_class_params:)
+      described_class.call(school:, school_class_params:, current_user: teacher)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end

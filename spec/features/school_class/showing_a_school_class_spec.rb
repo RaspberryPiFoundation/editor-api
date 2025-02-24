@@ -45,7 +45,6 @@ RSpec.describe 'Showing a school class', type: :request do
   it 'responds with the teacher JSON' do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
-    pp data
 
     expect(data[:teachers].first[:name]).to eq('School Teacher')
   end

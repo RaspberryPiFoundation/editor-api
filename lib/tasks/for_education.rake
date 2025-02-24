@@ -111,7 +111,6 @@ namespace :for_education do
       end
       Rails.logger.info 'Done...'
     rescue StandardError => e
-      pp "there was an error: #{e.message}"
       Rails.logger.error "Failed: #{e.message}"
       raise ActiveRecord::Rollback
     end

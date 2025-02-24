@@ -12,7 +12,6 @@ json.array!(@school_classes_with_teachers) do |school_class, teachers|
   )
 
   json.teachers(teachers) do |teacher|
-    pp 'the teacher is', teacher
     json.call(
       teacher,
       :id,

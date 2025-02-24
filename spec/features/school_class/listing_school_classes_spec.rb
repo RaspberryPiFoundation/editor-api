@@ -21,11 +21,7 @@ RSpec.describe 'Listing school classes', type: :request, skip: true do
   let!(:owner_school_class) { create(:school_class, name: 'Owner School Class', teacher_ids: [owner_teacher.id], school:) }
 
   it 'responds 200 OK' do
-    # pp 'the owner is', owner_school_class.class_teachers.first
-    # pp 'the other teacher is', school_class.class_teachers.first
     get("/api/schools/#{school.id}/classes", headers:)
-
-    # pp response.body
     expect(response).to have_http_status(:ok)
   end
 

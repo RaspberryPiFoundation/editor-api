@@ -50,14 +50,14 @@ RSpec.describe 'Creating a school class', type: :request do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_name]).to eq('School Teacher')
+    expect(data[:teachers].first[:name]).to eq('School Teacher')
   end
 
   it 'sets the class teacher to the specified user for school-owner users' do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_id]).to eq(teacher.id)
+    expect(data[:teachers].first[:id]).to eq(teacher.id)
   end
 
   it 'sets the class teacher to the current user for school-teacher users' do
@@ -68,7 +68,7 @@ RSpec.describe 'Creating a school class', type: :request do
     post("/api/schools/#{school.id}/classes", headers:, params: new_params)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_id]).to eq(teacher.id)
+    expect(data[:teachers].first[:id]).to eq(teacher.id)
   end
 
   it 'responds 400 Bad Request when params are missing' do

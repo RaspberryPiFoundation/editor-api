@@ -3,9 +3,9 @@
 class SchoolClass
   class Create
     class << self
-      def call(school:, school_class_params:)
+      def call(school:, school_class_params:, current_user:)
         response = OperationResponse.new
-        response[:school_class] = build_class(school, school_class_params)
+        response[:school_class] = build_class(school, school_class_params, current_user)
         response[:school_class].save!
         response
       rescue StandardError => e
@@ -17,13 +17,9 @@ class SchoolClass
 
       private
 
-      def build_class(school, school_class_params)
-        new_class = school.classes.build(school_class_params.except(:teacher_ids))
-        if school_class_params[:teacher_ids].present?
-          school_class_params[:teacher_ids].each do |teacher_id|
-            new_class.class_teachers.build(teacher_id:)
-          end
-        end
+      def build_class(school, school_class_params, current_user)
+        new_class = school.classes.build(school_class_params)
+        new_class.class_teachers.build(teacher_id: current_user.id)
         new_class
       end
     end
