@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe SchoolClass::Create, type: :unit do
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
-  # let(:class_teacher) { create(:class_teacher, school_class:, teacher_id:) }
 
   let(:school_class_params) do
     { name: 'Test School Class' }
