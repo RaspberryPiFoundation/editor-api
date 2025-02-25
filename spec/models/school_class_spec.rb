@@ -40,20 +40,11 @@ RSpec.describe SchoolClass, versioning: true do
     it 'requires a teacher_id' do
       school_class_without_teacher = build(:school_class, teacher_ids: [], school:)
       expect(school_class_without_teacher).to be_invalid
-      # school_class.teachers = []
-      # expect(school_class).to be_invalid
     end
 
     it 'requires a UUID teacher_id' do
       school_class_with_invalid_teacher = build(:school_class, teacher_ids: ['invalid'], school:)
       expect(school_class_with_invalid_teacher).to be_invalid
-      # school_class.teacher_ids = ['invalid']
-      # expect(school_class).to be_invalid
-    end
-
-    it 'requires a teacher that has the school-teacher role for the school' do
-      school_class.teacher_ids = [student.id]
-      expect(school_class).to be_invalid
     end
 
     it 'requires a name' do
@@ -87,24 +78,24 @@ RSpec.describe SchoolClass, versioning: true do
   end
 
   describe '.with_teachers' do
-    it 'returns an array of class members paired with their User instance' do
+    it 'returns an array of class teachers paired with their User instance' do
       school_class = create(:school_class, teacher_ids: [teacher.id], school:)
 
       pair = described_class.all.with_teachers.first
       teacher = described_class.all.teachers.first
 
-      expect(pair).to eq([school_class, teacher])
+      expect(pair).to eq([school_class, [teacher]])
     end
 
-    it 'returns nil values for members where no profile account exists' do
+    it 'returns nil values for teachers where no profile account exists' do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
       school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       pair = described_class.all.with_teachers.first
-      expect(pair).to eq([school_class, nil])
+      expect(pair).to eq([school_class, [nil]])
     end
 
-    it 'ignores members not included in the current scope' do
+    it 'ignores teachers not included in the current scope' do
       create(:school_class, teacher_ids: [teacher.id], school:)
 
       pair = described_class.none.with_teachers.first

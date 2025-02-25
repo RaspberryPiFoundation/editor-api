@@ -2,10 +2,10 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Listing school classes', type: :request, skip: true do
+RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
+    stub_user_info_api_for_users(teacher_ids, users: [owner_teacher, teacher])
 
     create(:class_student, school_class:, student_id: student.id)
   end
@@ -16,6 +16,7 @@ RSpec.describe 'Listing school classes', type: :request, skip: true do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
+  let(:teacher_ids) { [teacher, owner_teacher].map(&:id) }
 
   let(:owner_teacher) { create(:teacher, school:, id: owner.id, name: owner.name, email: owner.email) }
   let!(:owner_school_class) { create(:school_class, name: 'Owner School Class', teacher_ids: [owner_teacher.id], school:) }
@@ -42,17 +43,15 @@ RSpec.describe 'Listing school classes', type: :request, skip: true do
   it 'responds with the teachers JSON' do
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.first[:teacher_name]).to eq('School Teacher')
+    expect(data.first[:teachers].first[:name]).to eq('School Teacher')
   end
 
-  it "responds with nil attributes for teachers if the user profile doesn't exist" do
+  it "skips teachers if the user profile doesn't exist" do
     stub_user_info_api_for_unknown_users(user_id: teacher.id)
 
     get("/api/schools/#{school.id}/classes", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.first[:teacher_name]).to be_nil
+    expect(data.first[:teachers].first).to be_nil
   end
 
   it "does not include school classes that the school-teacher doesn't teach" do
@@ -67,8 +66,8 @@ RSpec.describe 'Listing school classes', type: :request, skip: true do
   end
 
   it "does not include school classes that the school-student isn't a member of" do
-    teacher = create(:teacher, school:)
     authenticated_in_hydra_as(student)
+    stub_user_info_api_for(teacher)
     create(:school_class, school:, teacher_ids: [teacher.id])
 
     get("/api/schools/#{school.id}/classes", headers:)

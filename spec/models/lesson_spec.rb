@@ -142,7 +142,8 @@ RSpec.describe Lesson do
     let(:school) { create(:school) }
 
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_ids: [teacher.id], school:), user_id: teacher.id)
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      lesson = create(:lesson, school_class:, user_id: teacher.id)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 

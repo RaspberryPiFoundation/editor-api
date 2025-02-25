@@ -19,7 +19,8 @@ class SchoolClass < ApplicationRecord
   )
 
   def self.teachers
-    User.from_userinfo(ids: ClassTeacher.pluck(:teacher_id))
+    teacher_ids = self.all.map(&:teacher_ids).flatten.uniq
+    User.from_userinfo(ids: teacher_ids)
   end
 
   def self.with_teachers

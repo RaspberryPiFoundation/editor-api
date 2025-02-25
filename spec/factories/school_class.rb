@@ -13,7 +13,6 @@ FactoryBot.define do
         build(:class_teacher, school_class:, teacher_id:)
       end
       school_class.class_teachers = class_teachers
-      school_class.save!
     end
   end
 end
