@@ -20,6 +20,19 @@ RSpec.describe SchoolClass, versioning: true do
     it { is_expected.to have_many(:lessons).dependent(:nullify) }
   end
 
+  describe 'nested attributes' do
+    it 'accepts nested attributes for class_teachers' do
+      school_class_attributes = attributes_for(:school_class).merge(
+        class_teachers_attributes: [
+          { teacher_id: teacher.id }
+        ]
+      )
+
+      school_class = SchoolClass.new(school_class_attributes)
+      expect(school_class.class_teachers.first.teacher_id).to eq(teacher.id)
+    end
+  end
+
   describe 'validations' do
     subject(:school_class) { build(:school_class, teacher_ids: [teacher.id], school:) }
 
@@ -36,12 +49,12 @@ RSpec.describe SchoolClass, versioning: true do
       expect(school_class).to be_invalid
     end
 
-    it 'requires a teacher_id' do
+    it 'requires teacher_ids' do
       school_class_without_teacher = build(:school_class, teacher_ids: [], school:)
       expect(school_class_without_teacher).to be_invalid
     end
 
-    it 'requires a UUID teacher_id' do
+    it 'requires UUID teacher_ids' do
       school_class_with_invalid_teacher = build(:school_class, teacher_ids: ['invalid'], school:)
       expect(school_class_with_invalid_teacher).to be_invalid
     end
@@ -118,6 +131,13 @@ RSpec.describe SchoolClass, versioning: true do
       school_class_with_teachers = school_class.with_teachers
 
       expect(school_class_with_teachers).to eq([school_class, []])
+    end
+  end
+
+  describe '#teacher_ids' do
+    it 'returns an array of teacher ids' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      expect(school_class.teacher_ids).to eq([teacher.id])
     end
   end
 
