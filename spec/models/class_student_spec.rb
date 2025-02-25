@@ -14,13 +14,13 @@ RSpec.describe ClassStudent, versioning: true do
 
   describe 'associations' do
     it 'belongs to a school_class' do
-      class_member = create(:class_student, student_id: student.id, school_class:)
-      expect(class_member.school_class).to be_a(SchoolClass)
+      class_student = create(:class_student, student_id: student.id, school_class:)
+      expect(class_student.school_class).to be_a(SchoolClass)
     end
 
     it 'belongs to a school (via school_class)' do
-      class_member = create(:class_student, student_id: student.id, school_class:)
-      expect(class_member.school).to be_a(School)
+      class_student = create(:class_student, student_id: student.id, school_class:)
+      expect(class_student.school).to be_a(School)
     end
   end
 
