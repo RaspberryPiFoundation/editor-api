@@ -11,7 +11,6 @@ RSpec.describe UploadJob do
     end
   end
 
-  ActiveJob::Base.queue_adapter = :test
   let(:graphql_response) do
     GraphQL::Client::Response.new(raw_response, data: UploadJob::ProjectContentQuery.new(raw_response['data'], GraphQL::Client::Errors.new))
   end
@@ -211,31 +210,33 @@ RSpec.describe UploadJob do
     end
   end
 
-  context 'when repository is not found' do
-    let(:graphql_response) do
-      GraphQL::Client::Response.new(
-        {
-          'errors' => [
-            {
-              'message' => 'Simulated NOT_FOUND error message',
-              'locations' => [{ 'line' => 2, 'column' => 4 }],
-              'path' => %w[query repository],
-              'extensions' => { 'code' => 'NOT_FOUND' }
-            }
-          ]
-        },
-        data: nil
-      )
+  context 'when GitHub returns nothing for the locale' do
+    let(:raw_response) { { data: { repository: nil } } }
+
+    before do
+      allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
+    end
+
+    it 'raises DataNotFoundError' do
+      expect do
+        described_class.perform_now(payload)
+      end.to raise_error(DataNotFoundError)
+    end
+  end
+
+  context 'when locale is unsupported' do
+    let(:raw_response) { { data: { repository: nil } } }
+    let(:bad_payload) do
+      { repository: { name: 'my-amazing-repo', owner: { name: 'me' } }, commits: [{ added: ['unsupported-locale/code/dont-collide-starter/main.py'], modified: [], removed: [] }] }
     end
 
     before do
       allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
     end
 
-    it 'raises RepositoryNotFoundError' do
-      expect do
-        described_class.perform_now(payload)
-      end.to raise_error(RepositoryNotFoundError, 'Repository not found: my-amazing-repo')
+    it 'does not request data from Github' do
+      described_class.perform_now(bad_payload)
+      expect(GithubApi::Client).not_to have_received(:query)
     end
   end
 end
