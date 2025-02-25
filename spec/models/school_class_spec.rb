@@ -28,7 +28,7 @@ RSpec.describe SchoolClass, versioning: true do
         ]
       )
 
-      school_class = SchoolClass.new(school_class_attributes)
+      school_class = described_class.new(school_class_attributes)
       expect(school_class.class_teachers.map(&:teacher_id)).to eq([teacher.id, second_teacher.id])
     end
   end

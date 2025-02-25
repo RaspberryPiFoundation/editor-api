@@ -86,7 +86,7 @@ RSpec.describe 'test_seeds', type: :task do
     # rubocop:enable RSpec/MultipleExpectations
 
     it 'creates a class teacher association for the teacher' do
-      expect(ClassTeacher.where(teacher_id: teacher_id).length).to eq(1)
+      expect(ClassTeacher.where(teacher_id:).length).to eq(1)
     end
 
     # rubocop:disable RSpec/MultipleExpectations
