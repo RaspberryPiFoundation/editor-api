@@ -19,7 +19,7 @@ class SchoolClass < ApplicationRecord
   )
 
   def self.teachers
-    teacher_ids = self.all.map(&:teacher_ids).flatten.uniq
+    teacher_ids = all.map(&:teacher_ids).flatten.uniq
     User.from_userinfo(ids: teacher_ids)
   end
 
@@ -40,7 +40,7 @@ class SchoolClass < ApplicationRecord
 
   def school_class_has_at_least_one_teacher
     return if class_teachers.present?
-    
+
     errors.add(:class_teachers, 'must have at least one teacher')
   end
 end

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Listing school classes', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_user_info_api_for_users(teacher_ids, users: [owner_teacher, teacher])
+    stub_user_info_api_for_users([teacher, owner_teacher].map(&:id), users: [owner_teacher, teacher])
 
     create(:class_student, school_class:, student_id: student.id)
   end
@@ -16,7 +16,6 @@ RSpec.describe 'Listing school classes', type: :request do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
-  let(:teacher_ids) { [teacher, owner_teacher].map(&:id) }
 
   let(:owner_teacher) { create(:teacher, school:, id: owner.id, name: owner.name, email: owner.email) }
   let!(:owner_school_class) { create(:school_class, name: 'Owner School Class', teacher_ids: [owner_teacher.id], school:) }

@@ -48,14 +48,14 @@ module SeedsHelper
 
   def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample)
     SchoolClass.joins(:class_teachers)
-                              .where(class_teachers: { teacher_id: }, school:)
-                              .first_or_create! do |school_class|
+               .where(class_teachers: { teacher_id: }, school:)
+               .first_or_create! do |school_class|
       Rails.logger.info 'Seeding a class...'
       school_class.name = name
       school_class.description = description
       # school_class.teacher_id = teacher_id
       school_class.school = school
-      school_class.class_teachers = [ClassTeacher.new(teacher_id: teacher_id)]
+      school_class.class_teachers = [ClassTeacher.new(teacher_id:)]
     end
   end
 

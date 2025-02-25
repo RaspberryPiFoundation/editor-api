@@ -65,7 +65,7 @@ RSpec.describe 'test_seeds', type: :task do
     # rubocop:disable RSpec/MultipleExpectations
     it 'creates class with lessons for the owner' do
       school_id = School.find_by(creator_id:).id
-      school_class = SchoolClass.joins(:class_teachers).find_by(school_id:, class_teachers: {teacher_id: creator_id})
+      school_class = SchoolClass.joins(:class_teachers).find_by(school_id:, class_teachers: { teacher_id: creator_id })
 
       expect(school_class).not_to be_nil
       expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(2)
@@ -75,7 +75,7 @@ RSpec.describe 'test_seeds', type: :task do
     # rubocop:disable RSpec/MultipleExpectations
     it 'creates class with lessons for the teacher' do
       school_id = School.find_by(creator_id:).id
-      school_class = SchoolClass.joins(:class_teachers).find_by(school_id:, class_teachers: {teacher_id:})
+      school_class = SchoolClass.joins(:class_teachers).find_by(school_id:, class_teachers: { teacher_id: })
       expect(school_class).not_to be_nil
       expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(2)
     end

@@ -14,11 +14,10 @@ RSpec.describe SchoolClass, versioning: true do
   let(:school) { create(:school) }
 
   describe 'associations' do
-    it {is_expected.to belong_to(:school)}
-    it {is_expected.to have_many(:students).dependent(:destroy)}
-    it {is_expected.to have_many(:class_teachers).dependent(:destroy)}
-    it {is_expected.to have_many(:lessons).dependent(:nullify)}
-    it {is_expected.to belong_to(:school)}
+    it { is_expected.to belong_to(:school) }
+    it { is_expected.to have_many(:students).dependent(:destroy) }
+    it { is_expected.to have_many(:class_teachers).dependent(:destroy) }
+    it { is_expected.to have_many(:lessons).dependent(:nullify) }
   end
 
   describe 'validations' do
@@ -114,10 +113,10 @@ RSpec.describe SchoolClass, versioning: true do
 
     it 'skips user if the teacher has no profile account' do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
-      
+
       school_class = create(:school_class, school:, teacher_ids: [teacher.id])
       school_class_with_teachers = school_class.with_teachers
-      
+
       expect(school_class_with_teachers).to eq([school_class, []])
     end
   end
