@@ -7,7 +7,7 @@ class SchoolClass < ApplicationRecord
   has_many :lessons, dependent: :nullify
   accepts_nested_attributes_for :class_teachers
 
-  scope :with_class_teacher, ->(user_id) { joins(:class_teachers).where(class_teachers: { id: user_id }) }
+  scope :with_class_teachers, ->(user_id) { joins(:class_teachers).where(class_teachers: { id: user_id }) }
 
   validates :name, presence: true
   validate :school_class_has_at_least_one_teacher

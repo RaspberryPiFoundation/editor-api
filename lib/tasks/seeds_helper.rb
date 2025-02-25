@@ -53,7 +53,6 @@ module SeedsHelper
       Rails.logger.info 'Seeding a class...'
       school_class.name = name
       school_class.description = description
-      # school_class.teacher_id = teacher_id
       school_class.school = school
       school_class.class_teachers = [ClassTeacher.new(teacher_id:)]
     end

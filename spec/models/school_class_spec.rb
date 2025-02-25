@@ -60,7 +60,7 @@ RSpec.describe SchoolClass, versioning: true do
       expect(teacher.name).to eq('School Teacher')
     end
 
-    it 'ignores members where no profile account exists' do
+    it 'ignores teachers where no profile account exists' do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
       create(:school_class, school:, teacher_ids: [teacher.id])
 
@@ -68,7 +68,7 @@ RSpec.describe SchoolClass, versioning: true do
       expect(teacher).to be_nil
     end
 
-    it 'ignores members not included in the current scope' do
+    it 'ignores teachers not included in the current scope' do
       create(:school_class, teacher_ids: [teacher.id], school:)
 
       teacher = described_class.none.teachers.first
