@@ -72,21 +72,6 @@
         "terminal.integrated.defaultProfile.linux": "zsh",
         "editor.codeActionsOnSave": {
           "source.fixAll": "explicit"
-        },
-        "rubyLsp.enabledFeatures": {
-          "diagnostics": true
-        },
-        "terminal.integrated.profiles.linux": {
-          "sh": {
-            "path": "/bin/zsh"
-          }
-        },
-        "rubyLsp.rubyVersionManager": {
-          "identifier": "none"
-        },
-        "rubyLsp.rubyExecutablePath": "/usr/local/bin/ruby",
-        "rubyLsp.featureFlags": {
-          "launcher": false // ruby-lsp v0.17 will fail with this flag enabled
         }
       }
     }
