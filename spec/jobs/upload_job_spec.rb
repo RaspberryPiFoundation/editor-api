@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe UploadJob do
+  include ActiveJob::TestHelper
+
   around do |example|
     ClimateControl.modify GITHUB_AUTH_TOKEN: 'secret', GITHUB_WEBHOOK_REF: 'branches/whatever' do
       example.run
@@ -122,18 +124,16 @@ RSpec.describe UploadJob do
     }
   end
 
-  before do
-    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
-    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
-    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
-  end
-
   context 'with the build flag undefined' do
     let(:raw_response) { modifiable_response }
 
     before do
       allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
       allow(ProjectImporter).to receive(:new).and_call_original
+
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
     end
 
     it 'enqueues the job' do
@@ -188,6 +188,10 @@ RSpec.describe UploadJob do
     let(:raw_response) { modifiable_response.deep_dup }
 
     before do
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
+
       project_dir_entry = raw_response['data']['repository']['object']['entries'].find do |entry|
         entry['name'] == 'dont-collide-starter'
       end
@@ -207,26 +211,31 @@ RSpec.describe UploadJob do
     end
   end
 
-  context 'with a graphql error response' do
-    let(:raw_response) do
-      {
-        errors: [
-          {
-            'message' => 'Simulated INTERNAL_SERVER_ERROR message',
-            'locations' => [{ 'line' => 2, 'column' => 4 }],
-            'path' => %w[query repository object],
-            'extensions' => { 'code' => 'INTERNAL_SERVER_ERROR' }
-          }
-        ]
-      }
+  context 'when repository is not found' do
+    let(:graphql_response) do
+      GraphQL::Client::Response.new(
+        {
+          'errors' => [
+            {
+              'message' => 'Simulated NOT_FOUND error message',
+              'locations' => [{ 'line' => 2, 'column' => 4 }],
+              'path' => %w[query repository],
+              'extensions' => { 'code' => 'NOT_FOUND' }
+            }
+          ]
+        },
+        data: nil
+      )
     end
 
     before do
-      stub_request(:post, 'https://api.github.com/graphql').to_return(status: 200, body: raw_response.to_json, headers: {})
+      allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
     end
 
-    it 'raises a GraphQL::Client::Error' do
-      expect { described_class.perform_now(payload) }.to raise_error(GraphQL::Client::Error, /Simulated INTERNAL_SERVER_ERROR message/)
+    it 'raises RepositoryNotFoundError' do
+      expect do
+        described_class.perform_now(payload)
+      end.to raise_error(RepositoryNotFoundError, 'Repository not found: my-amazing-repo')
     end
   end
 end
