@@ -94,6 +94,7 @@ RSpec.describe 'Project show requests' do
       before do
         stub_user_info_api_for_users([teacher.id, another_teacher.id], users: [teacher, another_teacher])
       end
+
       let(:another_teacher) { create(:teacher, school:) }
       let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id, another_teacher.id]) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: another_teacher.id, visibility: 'teachers') }

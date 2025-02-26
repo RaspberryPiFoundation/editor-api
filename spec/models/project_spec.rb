@@ -72,9 +72,9 @@ RSpec.describe Project, versioning: true do
       school = create(:school)
       teacher = create(:teacher, school:)
       school_class = create(:school_class, school:, teacher_ids: [teacher.id])
-      lesson = create(:lesson, school:, school_class: school_class, user_id: teacher.id)
+      lesson = create(:lesson, school:, school_class:, user_id: teacher.id)
       invalid_project = build(:project, school:, lesson:, user_id: SecureRandom.uuid)
-      
+
       expect(invalid_project).to be_invalid
     end
 
