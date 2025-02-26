@@ -2,9 +2,10 @@
 
 require 'open-uri'
 require 'github_api'
+require 'locales'
 
 class InvalidDirectoryStructureError < StandardError; end
-class RepositoryNotFoundError < StandardError; end
+class DataNotFoundError < StandardError; end
 
 class UploadJob < ApplicationJob
   retry_on StandardError, wait: :polynomially_longer, attempts: 3 do |_job, e|
@@ -13,10 +14,12 @@ class UploadJob < ApplicationJob
   end
 
   # Don't retry...
-  rescue_from RepositoryNotFoundError, InvalidDirectoryStructureError do |e|
+  rescue_from DataNotFoundError, InvalidDirectoryStructureError do |e|
     Sentry.capture_exception(e)
     raise e
   end
+
+  VALID_LOCALES = Locales.load_locales.freeze
 
   @skip_job = false
 
@@ -54,7 +57,9 @@ class UploadJob < ApplicationJob
   def perform(payload)
     modified_locales(payload).each do |locale|
       projects_data = load_projects_data(locale, repository(payload), owner(payload))
-      raise RepositoryNotFoundError, "Repository not found: #{repository(payload)}" if projects_data.data&.repository&.object.nil?
+
+      # A missing repo just returns nil...
+      raise DataNotFoundError, "Data not found in: #{repository(payload)} (with locale: #{locale})" if projects_data.data&.repository&.object.nil?
 
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
@@ -74,7 +79,8 @@ class UploadJob < ApplicationJob
   def modified_locales(payload)
     commits = payload[:commits]
     modified_paths = commits.map { |commit| commit[:added] | commit[:modified] | commit[:removed] }.flatten
-    modified_paths.map { |path| path.split('/')[0] }.uniq
+    locales = modified_paths.map { |path| path.split('/')[0] }.uniq
+    locales.select { |locale| VALID_LOCALES.include?(locale.to_sym) }
   end
 
   def load_projects_data(locale, repository, owner)

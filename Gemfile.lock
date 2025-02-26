@@ -543,6 +543,7 @@ DEPENDENCIES
   graphiql-rails
   graphql
   graphql-client
+  i18n
   image_processing
   importmap-rails
   jbuilder
