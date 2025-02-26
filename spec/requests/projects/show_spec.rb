@@ -90,6 +90,40 @@ RSpec.describe 'Project show requests' do
       end
     end
 
+    context 'when loading another teacher\'s project in a class where user is a teacher' do
+      before do
+        stub_user_info_api_for_users([teacher.id, another_teacher.id], users: [teacher, another_teacher])
+      end
+      let(:another_teacher) { create(:teacher, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id, another_teacher.id]) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: another_teacher.id, visibility: 'teachers') }
+      let(:another_teacher_project) { create(:project, :with_instructions, school:, lesson:, user_id: another_teacher.id, locale: nil) }
+      let(:another_teacher_project_json) do
+        {
+          identifier: another_teacher_project.identifier,
+          project_type: 'python',
+          locale: another_teacher_project.locale,
+          name: another_teacher_project.name,
+          user_id: teacher.id,
+          instructions: another_teacher_project.instructions,
+          components: [],
+          image_list: [],
+          videos: [],
+          audio: []
+        }.to_json
+      end
+
+      it 'returns success response' do
+        get("/api/projects/#{another_teacher_project.identifier}", headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the project json' do
+        get("/api/projects/#{another_teacher_project.identifier}", headers:)
+        expect(response.body).to eq(another_teacher_project_json)
+      end
+    end
+
     context 'when loading another user\'s project' do
       let!(:another_project) { create(:project, user_id: SecureRandom.uuid, locale: nil) }
       let(:another_project_json) do

@@ -100,12 +100,18 @@ class Project < ApplicationRecord
     # TODO: Revisit the case where the lesson is not associated to a class i.e. when we build a lesson library
     no_lesson = !lesson
     no_school_class = lesson && !lesson.school_class
-    user_is_class_student = lesson && lesson.school_class&.students&.exists?(student_id: user_id)
-    user_is_class_teacher = lesson && lesson.school_class&.class_teachers&.exists?(teacher_id: user_id)
 
     return if no_lesson || no_school_class || user_is_class_student || user_is_class_teacher
 
     errors.add(:user, "'#{user_id}' is not a class member or the owner of the lesson '#{lesson_id}'")
+  end
+
+  def user_is_class_student
+    lesson&.school_class&.students&.exists?(student_id: user_id)
+  end
+
+  def user_is_class_teacher
+    lesson&.school_class&.class_teachers&.exists?(teacher_id: user_id)
   end
 
   def project_with_instructions_must_belong_to_school
