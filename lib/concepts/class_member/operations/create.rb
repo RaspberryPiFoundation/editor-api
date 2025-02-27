@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class ClassMember
+module ClassMember
   class Create
     class << self
       def call(school_class:, students:)
@@ -21,12 +21,12 @@ class ClassMember
 
       def create_class_members(school_class:, students:, response:)
         students.each do |student|
-          class_member = school_class.members.build({ student_id: student.id })
-          class_member.student = student
-          class_member.save!
-          response[:class_members] << class_member
+          class_student = school_class.students.build({ student_id: student.id })
+          class_student.student = student
+          class_student.save!
+          response[:class_members] << class_student
         rescue StandardError => e
-          handle_class_member_error(e, class_member, student, response)
+          handle_class_member_error(e, class_student, student, response)
           response
         end
       end

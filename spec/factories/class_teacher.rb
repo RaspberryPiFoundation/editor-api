@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 FactoryBot.define do
-  factory :class_member do
+  factory :class_teacher do
     school_class
-    student_id { SecureRandom.uuid }
+    teacher_id { SecureRandom.uuid }
   end
 end

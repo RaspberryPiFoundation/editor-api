@@ -4,49 +4,37 @@ require 'rails_helper'
 
 RSpec.describe SchoolClass, versioning: true do
   before do
-    stub_user_info_api_for(teacher)
+    stub_user_info_api_for_users([teacher.id, second_teacher.id], users: [teacher, second_teacher])
   end
 
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
+  let(:second_teacher) { create(:teacher, school:, name: 'Second Teacher') }
   let(:school) { create(:school) }
 
   describe 'associations' do
-    it 'belongs to a school' do
-      school_class = create(:school_class, teacher_id: teacher.id, school:)
-      expect(school_class.school).to be_a(School)
-    end
+    it { is_expected.to belong_to(:school) }
+    it { is_expected.to have_many(:students).dependent(:destroy) }
+    it { is_expected.to have_many(:teachers).dependent(:destroy) }
+    it { is_expected.to have_many(:lessons).dependent(:nullify) }
+  end
 
-    it 'has many members' do
-      school_class = create(:school_class, members: [build(:class_member, student_id: student.id)], teacher_id: teacher.id, school:)
-      expect(school_class.members.size).to eq(1)
-    end
+  describe 'nested attributes' do
+    it 'accepts nested attributes for teachers' do
+      school_class_attributes = attributes_for(:school_class).merge(
+        teachers_attributes: [
+          { teacher_id: teacher.id },
+          { teacher_id: second_teacher.id }
+        ]
+      )
 
-    it 'has many lessons' do
-      school_class = create(:school_class, lessons: [build(:lesson, user_id: teacher.id)], teacher_id: teacher.id, school:)
-      expect(school_class.lessons.size).to eq(1)
-    end
-
-    context 'when a school_class is destroyed' do
-      let!(:school_class) { create(:school_class, members: [build(:class_member, student_id: student.id)], lessons: [build(:lesson, user_id: teacher.id)], teacher_id: teacher.id, school:) }
-
-      it 'also destroys class members to avoid making them invalid' do
-        expect { school_class.destroy! }.to change(ClassMember, :count).by(-1)
-      end
-
-      it 'does not destroy lessons' do
-        expect { school_class.destroy! }.not_to change(Lesson, :count)
-      end
-
-      it 'nullifies school_class_id on lessons' do
-        school_class.destroy!
-        expect(Lesson.last.school_class).to be_nil
-      end
+      school_class = described_class.new(school_class_attributes)
+      expect(school_class.teachers.map(&:teacher_id)).to eq([teacher.id, second_teacher.id])
     end
   end
 
   describe 'validations' do
-    subject(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+    subject(:school_class) { build(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:) }
 
     it 'has a valid default factory' do
       expect(school_class).to be_valid
@@ -61,19 +49,14 @@ RSpec.describe SchoolClass, versioning: true do
       expect(school_class).to be_invalid
     end
 
-    it 'requires a teacher_id' do
-      school_class.teacher_id = ' '
-      expect(school_class).to be_invalid
+    it 'requires teacher_ids' do
+      school_class_without_teacher = build(:school_class, teacher_ids: [], school:)
+      expect(school_class_without_teacher).to be_invalid
     end
 
-    it 'requires a UUID teacher_id' do
-      school_class.teacher_id = 'invalid'
-      expect(school_class).to be_invalid
-    end
-
-    it 'requires a teacher that has the school-teacher role for the school' do
-      school_class.teacher_id = student.id
-      expect(school_class).to be_invalid
+    it 'requires UUID teacher_ids' do
+      school_class_with_invalid_teacher = build(:school_class, teacher_ids: ['invalid'], school:)
+      expect(school_class_with_invalid_teacher).to be_invalid
     end
 
     it 'requires a name' do
@@ -84,22 +67,22 @@ RSpec.describe SchoolClass, versioning: true do
 
   describe '.teachers' do
     it 'returns User instances for the current scope' do
-      create(:school_class, teacher_id: teacher.id, school:)
+      create(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:)
 
       teacher = described_class.all.teachers.first
       expect(teacher.name).to eq('School Teacher')
     end
 
-    it 'ignores members where no profile account exists' do
+    it 'ignores teachers where no profile account exists' do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
-      create(:school_class, school:, teacher_id: teacher.id)
+      create(:school_class, school:, teacher_ids: [teacher.id])
 
       teacher = described_class.all.teachers.first
       expect(teacher).to be_nil
     end
 
-    it 'ignores members not included in the current scope' do
-      create(:school_class, teacher_id: teacher.id, school:)
+    it 'ignores teachers not included in the current scope' do
+      create(:school_class, teacher_ids: [teacher.id], school:)
 
       teacher = described_class.none.teachers.first
       expect(teacher).to be_nil
@@ -107,52 +90,59 @@ RSpec.describe SchoolClass, versioning: true do
   end
 
   describe '.with_teachers' do
-    it 'returns an array of class members paired with their User instance' do
-      school_class = create(:school_class, teacher_id: teacher.id, school:)
+    it 'returns an array of class teachers paired with their User instance' do
+      school_class = create(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:)
 
       pair = described_class.all.with_teachers.first
       teacher = described_class.all.teachers.first
 
-      expect(pair).to eq([school_class, teacher])
+      expect(pair).to eq([school_class, [teacher, second_teacher]])
     end
 
-    it 'returns nil values for members where no profile account exists' do
+    it 'returns nil values for teachers where no profile account exists' do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
-      school_class = create(:school_class, school:, teacher_id: teacher.id)
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       pair = described_class.all.with_teachers.first
-      expect(pair).to eq([school_class, nil])
+      expect(pair).to eq([school_class, [nil]])
     end
 
-    it 'ignores members not included in the current scope' do
-      create(:school_class, teacher_id: teacher.id, school:)
+    it 'ignores teachers not included in the current scope' do
+      create(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:)
 
       pair = described_class.none.with_teachers.first
       expect(pair).to be_nil
     end
   end
 
-  describe '#with_teacher' do
-    it 'returns the class member paired with their User instance' do
-      school_class = create(:school_class, teacher_id: teacher.id, school:)
+  describe '#with_teachers' do
+    it 'returns the class teachers paired with their User instances' do
+      school_class = create(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:)
+      school_class_with_teachers = school_class.with_teachers
 
-      pair = school_class.with_teacher
-      teacher = described_class.all.teachers.first
-
-      expect(pair).to eq([school_class, teacher])
+      expect(school_class_with_teachers).to eq([school_class, [teacher, second_teacher]])
     end
 
-    it 'returns a nil value if the member has no profile account' do
+    it 'skips user if the teacher has no profile account' do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
-      school_class = create(:school_class, school:, teacher_id: teacher.id)
+      stub_user_info_api_for(second_teacher)
 
-      pair = school_class.with_teacher
-      expect(pair).to eq([school_class, nil])
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id, second_teacher.id])
+      school_class_with_teachers = school_class.with_teachers
+
+      expect(school_class_with_teachers).to eq([school_class, [second_teacher]])
+    end
+  end
+
+  describe '#teacher_ids' do
+    it 'returns an array of teacher ids' do
+      school_class = create(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:)
+      expect(school_class.teacher_ids).to eq([teacher.id, second_teacher.id])
     end
   end
 
   describe 'auditing' do
-    subject(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    subject(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
 
     it 'enables auditing' do
       expect(school_class.versions.length).to(eq(1))

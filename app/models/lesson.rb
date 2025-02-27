@@ -70,7 +70,7 @@ class Lesson < ApplicationRecord
   end
 
   def user_is_the_school_teacher_for_the_school_class
-    return if !school_class || user_id == school_class.teacher_id
+    return if !school_class || school_class.teacher_ids.include?(user_id)
 
     errors.add(:user, "'#{user_id}' is not the 'school-teacher' for school_class '#{school_class.id}'")
   end

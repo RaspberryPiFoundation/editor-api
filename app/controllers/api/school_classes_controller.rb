@@ -8,21 +8,21 @@ module Api
 
     def index
       school_classes = @school.classes.accessible_by(current_ability)
-      school_classes = school_classes.where(teacher_id: current_user.id) if params[:my_classes] == 'true'
+      school_classes = school_classes.joins(:teachers).where(teachers: { teacher_id: current_user.id }) if params[:my_classes] == 'true'
       @school_classes_with_teachers = school_classes.with_teachers
       render :index, formats: [:json], status: :ok
     end
 
     def show
-      @school_class_with_teacher = @school_class.with_teacher
+      @school_class_with_teachers = @school_class.with_teachers
       render :show, formats: [:json], status: :ok
     end
 
     def create
-      result = SchoolClass::Create.call(school: @school, school_class_params:)
+      result = SchoolClass::Create.call(school: @school, school_class_params:, current_user:)
 
       if result.success?
-        @school_class_with_teacher = result[:school_class].with_teacher
+        @school_class_with_teachers = result[:school_class].with_teachers
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -34,7 +34,7 @@ module Api
       result = SchoolClass::Update.call(school_class:, school_class_params:)
 
       if result.success?
-        @school_class_with_teacher = result[:school_class].with_teacher
+        @school_class_with_teachers = result[:school_class].with_teachers
         render :show, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -55,7 +55,7 @@ module Api
 
     def school_class_params
       # A school teacher may only create classes they own.
-      params.require(:school_class).permit(:name, :description).merge(teacher_id: current_user.id)
+      params.require(:school_class).permit(:name, :description)
     end
 
     def school_owner?

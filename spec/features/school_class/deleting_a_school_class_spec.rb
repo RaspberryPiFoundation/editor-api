@@ -8,7 +8,7 @@ RSpec.describe 'Deleting a school class', type: :request do
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+  let!(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
   let(:owner) { create(:owner, school:) }

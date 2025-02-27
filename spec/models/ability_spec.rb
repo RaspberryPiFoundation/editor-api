@@ -144,7 +144,7 @@ RSpec.describe Ability do
       let(:user) { create(:user) }
       let(:school) { create(:school) }
       let(:teacher) { create(:teacher, school:) }
-      let(:school_class) { build(:school_class, school:, teacher_id: teacher.id) }
+      let(:school_class) { build(:school_class, school:, teacher_ids: [teacher.id]) }
       let(:lesson) { build(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let!(:project) { build(:project, school:, lesson:, user_id: teacher.id) }
 
@@ -175,7 +175,7 @@ RSpec.describe Ability do
       context 'when user is a school student and belongs to the teachers class' do
         before do
           create(:student_role, user_id: user.id, school:)
-          create(:class_member, school_class:, student_id: user.id)
+          create(:class_student, school_class:, student_id: user.id)
         end
 
         it { is_expected.to be_able_to(:read, project) }
@@ -204,8 +204,9 @@ RSpec.describe Ability do
       let(:school) { create(:school) }
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
-      let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
-      let(:class_member) { create(:class_member, school_class:, student_id: student.id) }
+      let(:another_teacher) { create(:teacher, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id, another_teacher.id]) }
+      let(:class_member) { create(:class_student, school_class:, student_id: student.id) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
       let!(:remixed_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
@@ -232,6 +233,20 @@ RSpec.describe Ability do
 
       context 'when user is teacher that owns the orginal project' do
         let(:user) { teacher }
+
+        it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:create, remixed_project) }
+        it { is_expected.not_to be_able_to(:update, remixed_project) }
+        it { is_expected.not_to be_able_to(:destroy, remixed_project) }
+        it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
+      end
+
+      context 'when user is another teacher of the class' do
+        let(:user) { another_teacher }
+
+        it { is_expected.to be_able_to(:read, original_project) }
+        it { is_expected.not_to be_able_to(:create, original_project) }
+        it { is_expected.to be_able_to(:update, original_project) }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }

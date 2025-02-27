@@ -34,7 +34,7 @@ namespace :for_education do
 
       # Destroy the class members and then the class itself
       school_class_ids = SchoolClass.where(school_id:).pluck(:id)
-      ClassMember.where(school_class_id: [school_class_ids]).destroy_all
+      ClassStudent.where(school_class_id: [school_class_ids]).destroy_all
       SchoolClass.where(id: [school_class_ids]).destroy_all
 
       # Destroy the school
