@@ -26,7 +26,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let(:project) { create(:project, user_id: authenticated_user.id, project_type: :python) }
+    let(:project) { create(:project, user_id: authenticated_user.id, project_type: 'python') }
     let(:project_id) { project.to_gid_param }
     let(:school) { create(:school) }
 
