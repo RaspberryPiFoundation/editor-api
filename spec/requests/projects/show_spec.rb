@@ -156,11 +156,12 @@ RSpec.describe 'Project show requests' do
 
   context 'when user is not logged in' do
     context 'when loading a starter project' do
-      let!(:starter_project) { create(:project, user_id: nil, locale: 'ja-JP') }
+      let(:project_type) { 'python' }
+      let!(:starter_project) { create(:project, user_id: nil, locale: 'ja-JP', project_type:) }
       let(:starter_project_json) do
         {
           identifier: starter_project.identifier,
-          project_type: 'python',
+          project_type:,
           locale: starter_project.locale,
           name: starter_project.name,
           user_id: starter_project.user_id,
@@ -190,6 +191,15 @@ RSpec.describe 'Project show requests' do
       it 'returns 404 response if invalid project' do
         get('/api/projects/no-such-project', headers:)
         expect(response).to have_http_status(:not_found)
+      end
+
+      context 'when project is a scratch project' do
+        let(:project_type) { 'scratch' }
+
+        it 'returns 404 response if scratch project' do
+          get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}", headers:)
+          expect(response).to have_http_status(:not_found)
+        end
       end
 
       it 'creates a new ProjectLoader with the correct parameters' do
