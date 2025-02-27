@@ -10,7 +10,7 @@ RSpec.describe 'mutation CreateProject() { ... }' do
     {
       project: {
         name: 'Untitled project',
-        projectType: 'python',
+        projectType: Project::Types::PYTHON,
         components: [{
           content: 'Insert Python Here',
           default: true,

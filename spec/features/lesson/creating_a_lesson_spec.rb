@@ -19,7 +19,7 @@ RSpec.describe 'Creating a lesson', type: :request do
         name: 'Test Lesson',
         project_attributes: {
           name: 'Hello world project',
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           components: [
             { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
           ]
@@ -68,7 +68,7 @@ RSpec.describe 'Creating a lesson', type: :request do
           school_id: school.id,
           project_attributes: {
             name: 'Hello world project',
-            project_type: 'python',
+            project_type: Project::Types::PYTHON,
             components: [
               { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
             ]
@@ -130,7 +130,7 @@ RSpec.describe 'Creating a lesson', type: :request do
           school_class_id: school_class.id,
           project_attributes: {
             name: 'Hello world project',
-            project_type: 'python',
+            project_type: Project::Types::PYTHON,
             components: [
               { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
             ]

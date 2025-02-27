@@ -98,7 +98,7 @@ module SeedsHelper
       project.school = school
       project.lesson = lesson
       project.locale = 'en'
-      project.project_type = 'python'
+      project.project_type = Project::Types::PYTHON
       project.components << Component.new({ extension: 'py', name: 'main',
                                             content: code })
     end

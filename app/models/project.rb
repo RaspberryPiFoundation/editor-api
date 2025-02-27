@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class Project < ApplicationRecord
+  module Types
+    PYTHON = 'python'
+    HTML = 'html'
+    SCRATCH = 'scratch'
+  end
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
