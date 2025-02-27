@@ -5,7 +5,7 @@ FactoryBot.define do
     user_id { SecureRandom.uuid }
     name { Faker::Book.title }
     identifier { "#{Faker::Verb.base}-#{Faker::Verb.base}-#{Faker::Verb.base}" }
-    project_type { 'python' }
+    project_type { Project::Types::PYTHON }
     locale { %w[en es-LA fr-FR].sample }
 
     transient do
