@@ -13,9 +13,5 @@ json.call(
 )
 
 json.teachers(teachers) do |teacher|
-  json.call(
-    teacher,
-    :id,
-    :name
-  )
+  json.partial! '/api/school_teachers/school_teacher', teacher:, include_email: false
 end

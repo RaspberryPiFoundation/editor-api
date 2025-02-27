@@ -141,7 +141,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
       authenticated_in_hydra_as(teacher)
-      school_class.update!(class_teachers: [ClassTeacher.new({ teacher_id: teacher.id })])
+      school_class.update!(teachers: [ClassTeacher.new({ teacher_id: teacher.id })])
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)

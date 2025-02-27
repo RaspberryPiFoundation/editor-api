@@ -3,11 +3,11 @@
 class SchoolClass < ApplicationRecord
   belongs_to :school
   has_many :students, class_name: :ClassStudent, inverse_of: :school_class, dependent: :destroy
-  has_many :class_teachers, class_name: :ClassTeacher, inverse_of: :school_class, dependent: :destroy
+  has_many :teachers, class_name: :ClassTeacher, inverse_of: :school_class, dependent: :destroy
   has_many :lessons, dependent: :nullify
-  accepts_nested_attributes_for :class_teachers
+  accepts_nested_attributes_for :teachers
 
-  scope :with_class_teachers, ->(user_id) { joins(:class_teachers).where(class_teachers: { id: user_id }) }
+  scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
 
   validates :name, presence: true
   validate :school_class_has_at_least_one_teacher
@@ -29,7 +29,7 @@ class SchoolClass < ApplicationRecord
   end
 
   def teacher_ids
-    class_teachers.pluck(:teacher_id)
+    teachers.pluck(:teacher_id)
   end
 
   def with_teachers
@@ -39,8 +39,8 @@ class SchoolClass < ApplicationRecord
   private
 
   def school_class_has_at_least_one_teacher
-    return if class_teachers.present?
+    return if teachers.present?
 
-    errors.add(:class_teachers, 'must have at least one teacher')
+    errors.add(:teachers, 'must have at least one teacher')
   end
 end

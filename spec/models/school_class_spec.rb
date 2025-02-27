@@ -15,21 +15,21 @@ RSpec.describe SchoolClass, versioning: true do
   describe 'associations' do
     it { is_expected.to belong_to(:school) }
     it { is_expected.to have_many(:students).dependent(:destroy) }
-    it { is_expected.to have_many(:class_teachers).dependent(:destroy) }
+    it { is_expected.to have_many(:teachers).dependent(:destroy) }
     it { is_expected.to have_many(:lessons).dependent(:nullify) }
   end
 
   describe 'nested attributes' do
-    it 'accepts nested attributes for class_teachers' do
+    it 'accepts nested attributes for teachers' do
       school_class_attributes = attributes_for(:school_class).merge(
-        class_teachers_attributes: [
+        teachers_attributes: [
           { teacher_id: teacher.id },
           { teacher_id: second_teacher.id }
         ]
       )
 
       school_class = described_class.new(school_class_attributes)
-      expect(school_class.class_teachers.map(&:teacher_id)).to eq([teacher.id, second_teacher.id])
+      expect(school_class.teachers.map(&:teacher_id)).to eq([teacher.id, second_teacher.id])
     end
   end
 

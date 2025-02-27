@@ -19,7 +19,7 @@ class SchoolClass
 
       def build_class(school, school_class_params, current_user)
         new_class = school.classes.build(school_class_params)
-        new_class.class_teachers.build(teacher_id: current_user.id)
+        new_class.teachers.build(teacher_id: current_user.id)
         new_class
       end
     end

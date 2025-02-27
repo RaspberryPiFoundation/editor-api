@@ -111,7 +111,7 @@ class Project < ApplicationRecord
   end
 
   def user_is_class_teacher
-    lesson&.school_class&.class_teachers&.exists?(teacher_id: user_id)
+    lesson&.school_class&.teachers&.exists?(teacher_id: user_id)
   end
 
   def project_with_instructions_must_belong_to_school

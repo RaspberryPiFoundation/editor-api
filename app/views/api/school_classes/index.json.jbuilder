@@ -13,11 +13,7 @@ json.array!(@school_classes_with_teachers) do |school_class, teachers|
 
   json.teachers(teachers) do |teacher|
     if teacher.present?
-      json.call(
-        teacher,
-        :id,
-        :name
-      )
+      json.partial! '/api/school_teachers/school_teacher', teacher:, include_email: false
     end
   end
 end

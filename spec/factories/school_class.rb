@@ -9,10 +9,10 @@ FactoryBot.define do
     end
 
     after(:build) do |school_class, evaluator|
-      class_teachers = evaluator.teacher_ids.map do |teacher_id|
+      teachers = evaluator.teacher_ids.map do |teacher_id|
         build(:class_teacher, school_class:, teacher_id:)
       end
-      school_class.class_teachers = class_teachers
+      school_class.teachers = teachers
     end
   end
 end
