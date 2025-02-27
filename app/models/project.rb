@@ -1,6 +1,12 @@
 # frozen_string_literal: true
 
 class Project < ApplicationRecord
+  module Types
+    PYTHON = 'python'
+    HTML = 'html'
+    SCRATCH = 'scratch'
+  end
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
@@ -26,7 +32,7 @@ class Project < ApplicationRecord
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
 
-  default_scope -> { where.not(project_type: 'scratch') }
+  default_scope -> { where.not(project_type: Types::SCRATCH) }
 
   scope :internal_projects, -> { where(user_id: nil) }
 

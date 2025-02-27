@@ -20,7 +20,7 @@ RSpec.describe 'Project show requests' do
       let(:project_json) do
         {
           identifier: project.identifier,
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           locale: project.locale,
           name: project.name,
           user_id: project.user_id,
@@ -62,7 +62,7 @@ RSpec.describe 'Project show requests' do
       let(:student_project_json) do
         {
           identifier: student_project.identifier,
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           locale: student_project.locale,
           name: student_project.name,
           user_id: student_project.user_id,
@@ -102,7 +102,7 @@ RSpec.describe 'Project show requests' do
       let(:another_teacher_project_json) do
         {
           identifier: another_teacher_project.identifier,
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           locale: another_teacher_project.locale,
           name: another_teacher_project.name,
           user_id: teacher.id,
@@ -130,7 +130,7 @@ RSpec.describe 'Project show requests' do
       let(:another_project_json) do
         {
           identifier: another_project.identifier,
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           name: another_project.name,
           locale: another_project.locale,
           user_id: another_project.user_id,
@@ -156,7 +156,7 @@ RSpec.describe 'Project show requests' do
 
   context 'when user is not logged in' do
     context 'when loading a starter project' do
-      let(:project_type) { 'python' }
+      let(:project_type) { Project::Types::PYTHON }
       let!(:starter_project) { create(:project, user_id: nil, locale: 'ja-JP', project_type:) }
       let(:starter_project_json) do
         {
@@ -194,7 +194,7 @@ RSpec.describe 'Project show requests' do
       end
 
       context 'when project is a scratch project' do
-        let(:project_type) { 'scratch' }
+        let(:project_type) { Project::Types::SCRATCH }
 
         context 'when project_type is set to scratch in query params' do
           before do
@@ -233,7 +233,7 @@ RSpec.describe 'Project show requests' do
       let(:project_json) do
         {
           identifier: project.identifier,
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           locale: project.locale,
           name: project.name,
           user_id: project.user_id,

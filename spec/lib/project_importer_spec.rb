@@ -7,7 +7,7 @@ RSpec.describe ProjectImporter do
     described_class.new(
       name: 'My amazing project',
       identifier: 'my-amazing-project',
-      type: 'python',
+      type: Project::Types::PYTHON,
       locale: 'ja-JP',
       components: [
         { name: 'main', extension: 'py', content: 'print(\'hello\')', default: true },
