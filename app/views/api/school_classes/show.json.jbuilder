@@ -1,16 +1,17 @@
 # frozen_string_literal: true
 
-school_class, teacher = @school_class_with_teacher
+school_class, teachers = @school_class_with_teachers
 
 json.call(
   school_class,
   :id,
   :description,
   :school_id,
-  :teacher_id,
   :name,
   :created_at,
   :updated_at
 )
 
-json.teacher_name(teacher&.name)
+json.teachers(teachers) do |teacher|
+  json.partial! '/api/school_teachers/school_teacher', teacher:, include_email: false
+end

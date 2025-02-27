@@ -9,8 +9,8 @@ RSpec.describe School do
 
   describe 'associations' do
     it 'has many classes' do
-      create(:school_class, school:, teacher_id: teacher.id)
-      create(:school_class, school:, teacher_id: teacher.id)
+      create(:school_class, school:, teacher_ids: [teacher.id])
+      create(:school_class, school:, teacher_ids: [teacher.id])
       expect(school.classes.size).to eq(2)
     end
 
@@ -34,22 +34,26 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let!(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let!(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
       let!(:lesson_2) { create(:lesson, user_id: teacher.id, school:) }
       let!(:project) { create(:project, user_id: student.id, school:) }
       let!(:role) { create(:role, school:) }
 
       before do
-        create(:class_member, school_class:, student_id: student.id)
+        create(:class_student, school_class:, student_id: student.id)
       end
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
       end
 
-      it 'also destroys class members to avoid making them invalid' do
-        expect { school.destroy! }.to change(ClassMember, :count).by(-1)
+      it 'also destroys class students to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassStudent, :count).by(-1)
+      end
+
+      it 'also destroys class teachers to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassTeacher, :count).by(-1)
       end
 
       it 'does not destroy lessons' do

@@ -21,7 +21,7 @@ class Project < ApplicationRecord
   validate :identifier_cannot_be_taken_by_another_user
   validates :locale, presence: true, unless: :user_id
   validate :user_has_a_role_within_the_school
-  validate :user_is_a_member_or_the_owner_of_the_lesson
+  validate :user_is_class_teacher_or_student
   validate :project_with_instructions_must_belong_to_school
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
@@ -96,11 +96,22 @@ class Project < ApplicationRecord
     errors.add(:user, msg)
   end
 
-  def user_is_a_member_or_the_owner_of_the_lesson
+  def user_is_class_teacher_or_student
     # TODO: Revisit the case where the lesson is not associated to a class i.e. when we build a lesson library
-    return if !lesson || user_id == lesson.user_id || !lesson.school_class || lesson.school_class&.members&.exists?(student_id: user_id)
+    no_lesson = !lesson
+    no_school_class = lesson && !lesson.school_class
 
-    errors.add(:user, "'#{user_id}' is not the owner or a member of the lesson '#{lesson_id}'")
+    return if no_lesson || no_school_class || user_is_class_student || user_is_class_teacher
+
+    errors.add(:user, "'#{user_id}' is not a class member or the owner of the lesson '#{lesson_id}'")
+  end
+
+  def user_is_class_student
+    lesson&.school_class&.students&.exists?(student_id: user_id)
+  end
+
+  def user_is_class_teacher
+    lesson&.school_class&.teachers&.exists?(teacher_id: user_id)
   end
 
   def project_with_instructions_must_belong_to_school

@@ -8,7 +8,7 @@ RSpec.describe 'Listing class members', type: :request do
   let(:owner) { create(:owner, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:students) { create_list(:student, 3, school:) }
-  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+  let(:school_class) { build(:school_class, teacher_ids: [teacher.id], school:) }
 
   before do
     authenticated_in_hydra_as(owner)
@@ -19,7 +19,7 @@ RSpec.describe 'Listing class members', type: :request do
     stub_profile_api_list_school_students(school:, student_attributes:)
 
     students.each do |student|
-      create(:class_member, student_id: student.id, school_class:)
+      create(:class_student, student_id: student.id, school_class:)
     end
 
     stub_user_info_api_for(teacher)
@@ -41,8 +41,8 @@ RSpec.describe 'Listing class members', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    school_class.members.each do |class_member|
-      expect(data.pluck(:id)).to include(class_member.id)
+    school_class.students.each do |student|
+      expect(data.pluck(:id)).to include(student.id)
     end
   end
 
@@ -51,8 +51,8 @@ RSpec.describe 'Listing class members', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
     student_ids = data.pluck(:student).compact.pluck(:id)
 
-    school_class.members.each do |class_member|
-      expect(student_ids).to include(class_member.student_id)
+    school_class.students.each do |student|
+      expect(student_ids).to include(student.student_id)
     end
   end
 

@@ -2,12 +2,15 @@
 
 class SchoolClass < ApplicationRecord
   belongs_to :school
-  has_many :members, class_name: :ClassMember, inverse_of: :school_class, dependent: :destroy
+  has_many :students, class_name: :ClassStudent, inverse_of: :school_class, dependent: :destroy
+  has_many :teachers, class_name: :ClassTeacher, inverse_of: :school_class, dependent: :destroy
   has_many :lessons, dependent: :nullify
+  accepts_nested_attributes_for :teachers
 
-  validates :teacher_id, presence: true
+  scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
+
   validates :name, presence: true
-  validate :teacher_has_the_school_teacher_role_for_the_school
+  validate :school_class_has_at_least_one_teacher
 
   has_paper_trail(
     meta: {
@@ -16,27 +19,28 @@ class SchoolClass < ApplicationRecord
   )
 
   def self.teachers
-    User.from_userinfo(ids: pluck(:teacher_id))
+    teacher_ids = all.map(&:teacher_ids).flatten.uniq
+    User.from_userinfo(ids: teacher_ids)
   end
 
   def self.with_teachers
     by_id = teachers.index_by(&:id)
-    all.map { |instance| [instance, by_id[instance.teacher_id]] }
+    all.map { |instance| [instance, instance.teacher_ids.map { |teacher_id| by_id[teacher_id] }] }
   end
 
-  def with_teacher
-    [self, User.from_userinfo(ids: teacher_id).first]
+  def teacher_ids
+    teachers.pluck(:teacher_id)
+  end
+
+  def with_teachers
+    [self, User.from_userinfo(ids: teacher_ids)]
   end
 
   private
 
-  def teacher_has_the_school_teacher_role_for_the_school
-    return unless teacher_id_changed? && errors.blank?
+  def school_class_has_at_least_one_teacher
+    return if teachers.present?
 
-    user = User.new(id: teacher_id)
-    return if user.school_teacher?(school)
-
-    msg = "'#{teacher_id}' does not have the 'school-teacher' role for organisation '#{school.id}'"
-    errors.add(:user, msg)
+    errors.add(:teachers, 'must have at least one teacher')
   end
 end

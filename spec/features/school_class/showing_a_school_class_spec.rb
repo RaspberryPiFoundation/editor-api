@@ -8,7 +8,7 @@ RSpec.describe 'Showing a school class', type: :request do
     stub_user_info_api_for(teacher)
   end
 
-  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_id: teacher.id, school:) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
@@ -29,7 +29,7 @@ RSpec.describe 'Showing a school class', type: :request do
   it 'responds 200 OK when the user is a student in the class' do
     student = create(:student, school:)
     authenticated_in_hydra_as(student)
-    create(:class_member, school_class:, student_id: student.id)
+    create(:class_student, school_class:, student_id: student.id)
 
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:ok)
@@ -46,7 +46,7 @@ RSpec.describe 'Showing a school class', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_name]).to eq('School Teacher')
+    expect(data[:teachers].first[:name]).to eq('School Teacher')
   end
 
   it "responds with nil attributes for the teacher if their user profile doesn't exist" do

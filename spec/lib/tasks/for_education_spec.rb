@@ -18,8 +18,8 @@ RSpec.describe 'for_education', type: :task do
       create(:role, user_id: creator_id, school:)
       create(:student_role, user_id: student_1, school:)
       create(:teacher_role, user_id: creator_id, school:)
-      school_class = create(:school_class, school_id: school.id, teacher_id: creator_id)
-      create(:class_member, student_id: student_1, school_class_id: school_class.id)
+      school_class = create(:school_class, school_id: school.id, teacher_ids: [creator_id])
+      create(:class_student, student_id: student_1, school_class_id: school_class.id)
       create(:lesson, school_id: school.id, user_id: creator_id)
     end
 
@@ -28,8 +28,9 @@ RSpec.describe 'for_education', type: :task do
       task.invoke
       expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
       expect(School.where(creator_id:)).not_to exist
-      expect(ClassMember.where(student_id: student_1)).not_to exist
+      expect(ClassStudent.where(student_id: student_1)).not_to exist
       expect(SchoolClass.where(school_id: school.id)).not_to exist
+      expect(ClassTeacher.where(teacher_id: creator_id)).not_to exist
       expect(Lesson.where(school_id: school.id)).not_to exist
       expect(Project.where(school_id: school.id)).not_to exist
     end
@@ -80,14 +81,18 @@ RSpec.describe 'for_education', type: :task do
       expect(Role.teacher.where(user_id: teacher_id, school_id: school.id)).to exist
     end
 
+    it 'creates a class teacher association for the creator' do
+      expect(ClassTeacher.where(teacher_id: creator_id).length).to eq(1)
+    end
+
     # rubocop:disable RSpec/MultipleExpectations
     it 'assigns students' do
       school_id = School.find_by(creator_id:).id
       school_class_id = SchoolClass.find_by(school_id:).id
       expect(Role.student.where(user_id: student_1, school_id:)).to exist
-      expect(ClassMember.where(student_id: student_1, school_class_id:)).to exist
+      expect(ClassStudent.where(student_id: student_1, school_class_id:)).to exist
       expect(Role.student.where(user_id: student_2, school_id:)).to exist
-      expect(ClassMember.where(student_id: student_2, school_class_id:)).to exist
+      expect(ClassStudent.where(student_id: student_2, school_class_id:)).to exist
     end
     # rubocop:enable RSpec/MultipleExpectations
   end

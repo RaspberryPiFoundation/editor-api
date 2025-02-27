@@ -13,8 +13,8 @@ RSpec.describe 'Listing lessons', type: :request do
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
   let(:school) { create(:school) }
-  let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
-  let(:another_school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+  let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
+  let(:another_school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
 
   it 'responds 200 OK' do
     get('/api/lessons', headers:)
@@ -184,7 +184,7 @@ RSpec.describe 'Listing lessons', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -202,7 +202,7 @@ RSpec.describe 'Listing lessons', type: :request do
     it "includes the lesson when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
-      create(:class_member, school_class:, student_id: student.id)
+      create(:class_student, school_class:, student_id: student.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)

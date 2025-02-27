@@ -68,6 +68,16 @@ RSpec.describe Project, versioning: true do
       expect(valid_project).to be_valid
     end
 
+    it 'is invalid if a school project with lesson and class but user is not class member' do
+      school = create(:school)
+      teacher = create(:teacher, school:)
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id])
+      lesson = create(:lesson, school:, school_class:, user_id: teacher.id)
+      invalid_project = build(:project, school:, lesson:, user_id: SecureRandom.uuid)
+
+      expect(invalid_project).to be_invalid
+    end
+
     context 'with same identifier and same user as existing project' do
       let(:user_id) { project.user_id }
 
@@ -111,7 +121,7 @@ RSpec.describe Project, versioning: true do
       let(:school) { create(:school) }
       let(:teacher) { create(:teacher, school:) }
       let(:student) { create(:student, school:) }
-      let(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
 
       before do
         lesson = create(:lesson, school:, school_class:, user_id: teacher.id)
@@ -129,14 +139,14 @@ RSpec.describe Project, versioning: true do
       end
 
       it 'fails if the user is not a member of the lesson' do
-        create(:class_member, school_class:, student_id: teacher.id)
+        create(:class_student, school_class:, student_id: teacher.id)
 
         project.user_id = student.id
         expect(project).to be_invalid
       end
 
       it 'suceeds if the user is a member of the lesson' do
-        create(:class_member, school_class:, student_id: student.id)
+        create(:class_student, school_class:, student_id: student.id)
 
         project.user_id = student.id
         expect(project).to be_invalid

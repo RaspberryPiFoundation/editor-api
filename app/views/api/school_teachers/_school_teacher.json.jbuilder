@@ -3,6 +3,9 @@
 json.call(
   teacher,
   :id,
-  :email,
   :name
 )
+
+include_email = local_assigns.fetch(:include_email, true)
+
+json.email(teacher.email) if include_email

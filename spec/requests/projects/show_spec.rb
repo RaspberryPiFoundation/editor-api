@@ -55,10 +55,10 @@ RSpec.describe 'Project show requests' do
     end
 
     context 'when loading a student\'s project' do
-      let(:student) { create(:student, school:) }
-      let(:lesson) { build(:lesson, school:, user_id: teacher.id, visibility: 'students') }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:teacher_project) { create(:project, :with_instructions, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions) }
+      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: create(:student, school:).id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions) }
       let(:student_project_json) do
         {
           identifier: student_project.identifier,
@@ -87,6 +87,41 @@ RSpec.describe 'Project show requests' do
       it 'includes the expected parameters in the project json' do
         get("/api/projects/#{student_project.identifier}", headers:)
         expect(response.body).to eq(student_project_json)
+      end
+    end
+
+    context 'when loading another teacher\'s project in a class where user is a teacher' do
+      before do
+        stub_user_info_api_for_users([teacher.id, another_teacher.id], users: [teacher, another_teacher])
+      end
+
+      let(:another_teacher) { create(:teacher, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id, another_teacher.id]) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: another_teacher.id, visibility: 'teachers') }
+      let(:another_teacher_project) { create(:project, :with_instructions, school:, lesson:, user_id: another_teacher.id, locale: nil) }
+      let(:another_teacher_project_json) do
+        {
+          identifier: another_teacher_project.identifier,
+          project_type: 'python',
+          locale: another_teacher_project.locale,
+          name: another_teacher_project.name,
+          user_id: teacher.id,
+          instructions: another_teacher_project.instructions,
+          components: [],
+          image_list: [],
+          videos: [],
+          audio: []
+        }.to_json
+      end
+
+      it 'returns success response' do
+        get("/api/projects/#{another_teacher_project.identifier}", headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the project json' do
+        get("/api/projects/#{another_teacher_project.identifier}", headers:)
+        expect(response.body).to eq(another_teacher_project_json)
       end
     end
 
