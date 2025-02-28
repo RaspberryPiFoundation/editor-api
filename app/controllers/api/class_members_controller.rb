@@ -20,8 +20,10 @@ module Api
     end
 
     def create
+      puts "creating class member", class_member_params
       user_ids = [class_member_params[:user_id]]
       result = ClassMember::Create.call(school_class: @school_class, user_ids:, token: current_user.token)
+      pp 'the result is', result
 
       if result.success?
         @class_member = result[:class_members].first
@@ -55,11 +57,11 @@ module Api
     private
 
     def class_member_params
-      params.require(:class_member).permit(:student_id)
+      params.require(:class_member).permit(:user_id)
     end
 
     def create_batch_params
-      params.permit(student_ids: [])
+      params.permit(user_ids: [])
     end
   end
 end

@@ -5,7 +5,7 @@ module SchoolTeacher
     class << self
       def call(school:, teacher_ids: nil)
         response = OperationResponse.new
-        teacher_ids = school.roles.where(role: :teacher)&.pluck(:user_id) if teacher_ids.blank?
+        teacher_ids = school.roles.where(role: :teacher)&.pluck(:user_id) if teacher_ids.nil?
         response[:school_teachers] = list_teachers(teacher_ids)
         response
       rescue StandardError => e

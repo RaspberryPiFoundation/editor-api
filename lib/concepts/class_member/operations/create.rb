@@ -9,17 +9,17 @@ module ClassMember
         response[:errors] = {}
         raise ArgumentError, 'No valid users provided' if user_ids.blank?
 
-        puts "creating class members"
-
         students = find_students(school: school_class.school, user_ids:, token:)
         create_class_students(school_class:, students:, response:)
 
         teachers = find_teachers(school: school_class.school, user_ids:)
         create_class_teachers(school_class:, teachers:, response:)
 
+        invalid_user_ids = user_ids - students.map(&:id) - teachers.map(&:id)
+        invalid_user_ids.each { |user_id| handle_class_member_error(user_id, school_class.school, response) }
+
         response
       rescue StandardError => e
-        pp 'the error is', e
         Sentry.capture_exception(e)
         response[:error] = "Error creating class members: #{e.message}"
         response
@@ -28,19 +28,16 @@ module ClassMember
       private
 
       def find_students(school:, user_ids:, token:)
-        puts 'finding students'
         student_ids = Role.where(user_id: user_ids, school:, role: 'student').pluck(:user_id)
         SchoolStudent::List.call(school:, student_ids:, token:).fetch(:school_students, [])
       end
 
       def find_teachers(school:, user_ids:)
-        puts 'finding teachers'
         teacher_ids = Role.where(user_id: user_ids, school:, role: 'teacher').pluck(:user_id)
         SchoolTeacher::List.call(school:, teacher_ids:).fetch(:school_teachers, [])
       end
 
       def create_class_students(school_class:, students:, response:)
-        puts 'creating class students'
         students.each do |student|
           class_student = school_class.students.build({ student_id: student.id })
           class_student.student = student
@@ -53,7 +50,6 @@ module ClassMember
       end
 
       def create_class_teachers(school_class:, teachers:, response:)
-        puts 'creating class teachers'
         teachers.each do |teacher|
           class_teacher = school_class.teachers.build({ teacher_id: teacher.id })
           class_teacher.teacher = teacher
@@ -75,6 +71,10 @@ module ClassMember
         Sentry.capture_exception(exception)
         errors = class_member.errors.full_messages.join(',')
         response[:errors][teacher.id] = "Error creating class member for teacher #{teacher.id}: #{errors}"
+      end
+
+      def handle_class_member_error(user_id, school, response)
+        response[:errors][user_id] = "Error creating class member for user #{user_id}: User '#{user_id}' does not have the 'school-teacher' or 'school-student' role for organisation '#{school.id}'"
       end
     end
   end

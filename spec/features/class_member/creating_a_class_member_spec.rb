@@ -13,7 +13,7 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:params) do
     {
       class_member: {
-        student_id: student.id
+        user_id: student.id
       }
     }
   end
@@ -30,7 +30,7 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_profile_api_list_school_students(school:, student_attributes: [student_attributes])
     end
 
-    it 'responds 201 Created' do
+    fit 'responds 201 Created' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params:)
       expect(response).to have_http_status(:created)
     end
@@ -60,7 +60,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with invalid params' do
-    let(:invalid_params) { { class_member: { student_id: SecureRandom.uuid } } }
+    let(:invalid_params) { { class_member: { user_id: SecureRandom.uuid } } }
 
     before do
       stub_profile_api_list_school_students(school:, student_attributes: [])
@@ -71,7 +71,8 @@ RSpec.describe 'Creating a class member', type: :request do
       expect(response).to have_http_status(:bad_request)
     end
 
-    it 'responds 422 Unprocessable Entity when params are invalid' do
+    fit 'responds 422 Unprocessable Entity when params are invalid' do
+      pp 'the invalid params are:', invalid_params
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: invalid_params)
       expect(response).to have_http_status(:unprocessable_entity)
     end

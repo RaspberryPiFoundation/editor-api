@@ -22,7 +22,7 @@ module ProfileApiMock
   def stub_profile_api_list_school_students(school:, student_attributes:)
     now = Time.current.to_fs(:iso8601) # rubocop:disable Naming/VariableNumber
 
-    students = student_attributes.map do |student_attrs|
+    students = (student_attributes || []).map do |student_attrs|
       ProfileApiClient::Student.new(
         schoolId: school.id,
         id: student_attrs[:id],
