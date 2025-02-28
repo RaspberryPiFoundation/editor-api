@@ -20,9 +20,8 @@ module Api
     end
 
     def create
-      student_ids = [class_member_params[:student_id]]
-      students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
-      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students])
+      user_ids = [class_member_params[:user_id]]
+      result = ClassMember::Create.call(school_class: @school_class, user_ids:, token: current_user.token)
 
       if result.success?
         @class_member = result[:class_members].first
@@ -33,8 +32,7 @@ module Api
     end
 
     def create_batch
-      students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: create_batch_params)
-      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students])
+      result = ClassMember::Create.call(school_class: @school_class, user_ids: create_batch_params, token: current_user.token)
 
       if result.success?
         @class_members = result[:class_members]
