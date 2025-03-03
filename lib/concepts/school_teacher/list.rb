@@ -10,6 +10,7 @@ module SchoolTeacher
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
+        pp 'the error is', e
         response[:error] = "Error listing school teachers: #{e}"
         response
       end

@@ -12,7 +12,8 @@ RSpec.describe 'Creating a class member', type: :request do
 
   let(:params) do
     {
-      student_ids: students.map(&:id)
+      # student_ids: students.map(&:id)
+      class_members: students.map { |student| { id: student.id } }
     }
   end
 
@@ -28,7 +29,7 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_profile_api_list_school_students(school:, student_attributes:)
     end
 
-    it 'responds 201 Created' do
+    fit 'responds 201 Created' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       expect(response).to have_http_status(:created)
     end

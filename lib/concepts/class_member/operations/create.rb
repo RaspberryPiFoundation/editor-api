@@ -3,7 +3,7 @@
 module ClassMember
   class Create
     class << self
-      def call(school_class:, students:, teachers: [])
+      def call(school_class:, students: [], teachers: [])
         response = OperationResponse.new
         response[:class_members] = []
         response[:errors] = {}
