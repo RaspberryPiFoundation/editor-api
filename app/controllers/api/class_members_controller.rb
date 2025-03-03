@@ -20,9 +20,16 @@ module Api
     end
 
     def create
-      student_ids = [class_member_params[:student_id]]
-      students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
-      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students])
+      user_ids = [class_member_params[:user_id]]
+      user_type = class_member_params[:type]
+      if ['teacher', 'owner'].include?(user_type)
+        teachers = SchoolTeacher::List.call(school: @school, token: current_user.token, teacher_ids: user_ids)
+        students = { school_students: [] }
+      else
+        teachers = { school_teachers: [] }
+        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: user_ids)
+      end
+      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
       if result.success?
         @class_member = result[:class_members].first
