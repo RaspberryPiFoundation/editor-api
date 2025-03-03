@@ -39,7 +39,7 @@ module SchoolMember
         end
         response
       end
-      # rubocop:disable Metrics/CyclomaticComplexity
-    enable
+    end
+    # rubocop:enable Metrics/CyclomaticComplexity
   end
 end
