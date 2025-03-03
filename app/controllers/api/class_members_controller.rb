@@ -45,17 +45,8 @@ module Api
       teacher_ids = teacher_objects.pluck(:user_id)
       student_ids = student_objects.pluck(:user_id)
 
-      if student_ids.present?
-        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: student_ids)
-      else
-        students = { school_students: [] }
-      end
-
-      if teacher_ids.present?
-        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: teacher_ids)
-      else
-        teachers = { school_teachers: [] }
-      end
+      students = list_students(@school, current_user.token, student_ids)
+      teachers = list_teachers(@school, teacher_ids)
 
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
@@ -88,7 +79,24 @@ module Api
 
       class_members.map do |class_member|
         next if class_member.blank?
+
         class_member.permit(:user_id, :type).to_h.with_indifferent_access
+      end
+    end
+
+    def list_students(school, _token, student_ids)
+      if student_ids.present?
+        SchoolStudent::List.call(school:, token: current_user.token, student_ids:)
+      else
+        { school_students: [] }
+      end
+    end
+
+    def list_teachers(school, teacher_ids)
+      if teacher_ids.present?
+        SchoolTeacher::List.call(school:, teacher_ids:)
+      else
+        { school_teachers: [] }
       end
     end
   end
