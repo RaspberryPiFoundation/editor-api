@@ -33,10 +33,7 @@ module SchoolMember
           response
         end
 
-        type_priority = { owner: 0, teacher: 1, student: 2 }
-        response[:school_members] = (owners + teachers + students).sort do |a, b|
-          [type_priority[a.type], a.name] <=> [type_priority[b.type], b.name]
-        end
+        response[:school_members] = (owners + teachers + students).sort_by(&:name)
         response
       end
     end

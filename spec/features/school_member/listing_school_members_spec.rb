@@ -80,35 +80,14 @@ RSpec.describe 'Listing school members', type: :request do
     )
   end
 
-  it 'responds with owners at the top' do
-    get("/api/schools/#{school.id}/members", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[0][:owner]).to be_truthy
-  end
-
-  it 'responds with teachers second from the top' do
-    get("/api/schools/#{school.id}/members", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[1][:teacher]).to be_truthy
-  end
-
-  it 'responds with students after owners and teachers' do
-    get("/api/schools/#{school.id}/members", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[2][:student]).to be_truthy
-  end
-
   it 'responds with students in alphabetical order by name ascending' do
     get("/api/schools/#{school.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    student_names = data.pluck(:student).compact.pluck(:name)
-    sorted_student_names = student_names.sort
+    names = data.map { |member| member.values.first[:name] }
+    sorted_names = names.sort
 
-    expect(student_names).to eq(sorted_student_names)
+    expect(names).to eq(sorted_names)
   end
 
   it 'creates the school owner safeguarding flag' do
