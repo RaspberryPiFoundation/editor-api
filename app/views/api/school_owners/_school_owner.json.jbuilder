@@ -1,13 +1,13 @@
 # frozen_string_literal: true
 
 json.call(
-  teacher,
+  owner,
   :id,
   :name
 )
 
-json.type(teacher.type) if teacher.respond_to?(:type)
+json.type(owner.type) if owner.respond_to?(:type)
 
 include_email = local_assigns.fetch(:include_email, true)
 
-json.email(teacher.email) if include_email
+json.email(owner.email) if include_email

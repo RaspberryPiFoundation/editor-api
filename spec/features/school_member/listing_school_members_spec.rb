@@ -29,7 +29,7 @@ RSpec.describe 'Listing school members', type: :request do
     get("/api/schools/#{school.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.size).to eq(4)
+    expect(data.size).to eq(5)
   end
 
   it 'responds with the correct student ids' do
@@ -51,7 +51,8 @@ RSpec.describe 'Listing school members', type: :request do
       {
         id: students[0].id,
         username: students[0].username,
-        name: students[0].name
+        name: students[0].name,
+        type: 'student'
       }
     )
   end
@@ -73,16 +74,31 @@ RSpec.describe 'Listing school members', type: :request do
       {
         id: teacher.id,
         name: teacher.name,
-        email: teacher.email
+        email: teacher.email,
+        type: 'teacher'
       }
     )
   end
 
-  it 'responds with teachers at the top' do
+  it 'responds with owners at the top' do
     get("/api/schools/#{school.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[0][:teacher]).to be_truthy
+    expect(data[0][:owner]).to be_truthy
+  end
+
+  it 'responds with teachers second from the top' do
+    get("/api/schools/#{school.id}/members", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[1][:teacher]).to be_truthy
+  end
+
+  it 'responds with students after owners and teachers' do
+    get("/api/schools/#{school.id}/members", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[2][:student]).to be_truthy
   end
 
   it 'responds with students in alphabetical order by name ascending' do

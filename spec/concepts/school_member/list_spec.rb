@@ -25,11 +25,6 @@ RSpec.describe SchoolMember::List, type: :unit do
       expect(response.success?).to be(true)
     end
 
-    it 'returns school members in the operation response' do
-      response = described_class.call(school:, token:)
-      expect(response[:school_members].count { |member| member.is_a?(User) }).to eq(4)
-    end
-
     it 'contains the expected students' do
       response = described_class.call(school:, token:)
       students.each do |student|
