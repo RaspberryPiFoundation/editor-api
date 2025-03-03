@@ -41,11 +41,22 @@ module Api
 
     def create_batch
       teacher_objects = create_batch_params.select { |user| %w[teacher owner].include?(user[:type]) }
-      student_objects = create_batch_params.reject { |user| teacher_objects.pluck(:user_id).exclude?(user[:user_id]) }
+      student_objects = create_batch_params.select { |user| teacher_objects.pluck(:user_id).exclude?(user[:user_id]) }
       teacher_ids = teacher_objects.pluck(:user_id)
       student_ids = student_objects.pluck(:user_id)
-      students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids:)
-      teachers = SchoolTeacher::List.call(school: @school, teacher_ids:)
+
+      if student_ids.present?
+        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: student_ids)
+      else
+        students = { school_students: [] }
+      end
+
+      if teacher_ids.present?
+        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: teacher_ids)
+      else
+        teachers = { school_teachers: [] }
+      end
+
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
       if result.success?
@@ -77,7 +88,6 @@ module Api
 
       class_members.map do |class_member|
         next if class_member.blank?
-
         class_member.permit(:user_id, :type).to_h.with_indifferent_access
       end
     end

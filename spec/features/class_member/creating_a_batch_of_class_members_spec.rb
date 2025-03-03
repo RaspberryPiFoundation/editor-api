@@ -12,8 +12,7 @@ RSpec.describe 'Creating a class member', type: :request do
 
   let(:params) do
     {
-      # student_ids: students.map(&:id)
-      class_members: students.map { |student| { id: student.id } }
+      class_members: students.map { |student| { user_id: student.id, type: 'student' } }
     }
   end
 
@@ -29,7 +28,7 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_profile_api_list_school_students(school:, student_attributes:)
     end
 
-    fit 'responds 201 Created' do
+    it 'responds 201 Created' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       expect(response).to have_http_status(:created)
     end
@@ -51,8 +50,8 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      student_ids = data.pluck(:student_id)
-      expect(student_ids).to eq(params[:student_ids])
+      class_member_ids = data.pluck(:student_id)
+      expect(class_member_ids).to eq(params[:class_members].pluck(:user_id))
     end
 
     it 'responds with the student JSON' do
@@ -66,7 +65,11 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with invalid params' do
-    let(:invalid_params) { { class_member: { student_ids: ' ' } } }
+    let(:invalid_params) do
+      {
+        class_members: [{ invalid_key: SecureRandom.uuid }]
+      }
+    end
 
     before do
       authenticated_in_hydra_as(owner)
@@ -75,7 +78,7 @@ RSpec.describe 'Creating a class member', type: :request do
 
     it 'responds 422 Unprocessable Entity when params are missing' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:bad_request)
     end
 
     it 'responds 422 Unprocessable Entity when params are invalid' do
