@@ -5,6 +5,7 @@ module SchoolMember
     SchoolMember = Struct.new(:id, :name, :username, :email, :type)
 
     class << self
+      # rubocop:disable Metrics/CyclomaticComplexity
       def call(school:, token:)
         response = OperationResponse.new
         response[:school_members] = []
@@ -38,6 +39,7 @@ module SchoolMember
         end
         response
       end
-    end
+      # rubocop:disable Metrics/CyclomaticComplexity
+    enable
   end
 end
