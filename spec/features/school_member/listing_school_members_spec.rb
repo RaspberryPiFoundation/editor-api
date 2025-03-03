@@ -29,7 +29,7 @@ RSpec.describe 'Listing school members', type: :request do
     get("/api/schools/#{school.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.size).to eq(4)
+    expect(data.size).to eq(5)
   end
 
   it 'responds with the correct student ids' do
@@ -51,7 +51,8 @@ RSpec.describe 'Listing school members', type: :request do
       {
         id: students[0].id,
         username: students[0].username,
-        name: students[0].name
+        name: students[0].name,
+        type: 'student'
       }
     )
   end
@@ -73,26 +74,20 @@ RSpec.describe 'Listing school members', type: :request do
       {
         id: teacher.id,
         name: teacher.name,
-        email: teacher.email
+        email: teacher.email,
+        type: 'teacher'
       }
     )
-  end
-
-  it 'responds with teachers at the top' do
-    get("/api/schools/#{school.id}/members", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data[0][:teacher]).to be_truthy
   end
 
   it 'responds with students in alphabetical order by name ascending' do
     get("/api/schools/#{school.id}/members", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    student_names = data.pluck(:student).compact.pluck(:name)
-    sorted_student_names = student_names.sort
+    names = data.map { |member| member.values.first[:name] }
+    sorted_names = names.sort
 
-    expect(student_names).to eq(sorted_student_names)
+    expect(names).to eq(sorted_names)
   end
 
   it 'creates the school owner safeguarding flag' do
