@@ -64,7 +64,7 @@ module Api
     private
 
     def class_member_params
-      params.require(:class_member).permit(:student_id)
+      params.require(:class_member).permit(:user_id, :type)
     end
 
     def create_batch_params
