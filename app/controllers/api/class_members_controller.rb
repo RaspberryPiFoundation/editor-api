@@ -24,6 +24,7 @@ module Api
       user_ids = [class_member_params[:user_id]]
       result = ClassMember::Create.call(school_class: @school_class, user_ids:, token: current_user.token)
       pp 'the result is', result
+      pp 'the result success is', result.success?
 
       if result.success?
         @class_member = result[:class_members].first

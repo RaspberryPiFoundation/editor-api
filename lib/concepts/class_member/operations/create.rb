@@ -16,7 +16,8 @@ module ClassMember
         create_class_teachers(school_class:, teachers:, response:)
 
         invalid_user_ids = user_ids - students.map(&:id) - teachers.map(&:id)
-        invalid_user_ids.each { |user_id| handle_class_member_error(user_id, school_class.school, response) }
+        fail_operation = invalid_user_ids == user_ids
+        invalid_user_ids.each { |user_id| handle_class_member_error(user_id, school_class.school, response, fail_operation) }
 
         response
       rescue StandardError => e
@@ -73,8 +74,9 @@ module ClassMember
         response[:errors][teacher.id] = "Error creating class member for teacher #{teacher.id}: #{errors}"
       end
 
-      def handle_class_member_error(user_id, school, response)
+      def handle_class_member_error(user_id, school, response, fail_operation)
         response[:errors][user_id] = "Error creating class member for user #{user_id}: User '#{user_id}' does not have the 'school-teacher' or 'school-student' role for organisation '#{school.id}'"
+        response.failure! if fail_operation
       end
     end
   end
