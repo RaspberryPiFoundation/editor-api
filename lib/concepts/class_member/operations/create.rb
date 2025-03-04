@@ -7,7 +7,7 @@ module ClassMember
         response = OperationResponse.new
         response[:class_members] = []
         response[:errors] = {}
-        raise ArgumentError, 'No valid students provided' if students.blank?
+        raise ArgumentError, 'No valid school members provided' if students.blank? && teachers.blank?
 
         create_class_teachers(school_class:, teachers:, response:)
         create_class_students(school_class:, students:, response:)

@@ -58,7 +58,7 @@ RSpec.describe ClassMember::Create, type: :unit do
 
       it 'returns the error message in the operation response' do
         response = described_class.call(school_class:, students:)
-        expect(response[:error]).to match(/No valid students provided/)
+        expect(response[:error]).to match(/No valid school members provided/)
       end
 
       it 'sent the exception to Sentry' do

@@ -8,12 +8,13 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:school) { create(:school) }
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }
+  let(:another_teacher) { create(:teacher, school:) }
   let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
-      class_members: students.map { |student| { user_id: student.id, type: 'student' } }
-    }
+      class_members: [{ user_id: another_teacher.id, type: 'teacher' }] + students.map { |student| { user_id: student.id, type: 'student' } }
+  }
   end
 
   context 'with valid params' do
@@ -26,6 +27,7 @@ RSpec.describe 'Creating a class member', type: :request do
     before do
       authenticated_in_hydra_as(owner)
       stub_profile_api_list_school_students(school:, student_attributes:)
+      stub_user_info_api_for(another_teacher)
     end
 
     it 'responds 201 Created' do
@@ -43,14 +45,14 @@ RSpec.describe 'Creating a class member', type: :request do
     it 'responds with the class members JSON array' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
-      expect(data.size).to eq(3)
+      expect(data.size).to eq(4)
     end
 
     it 'responds with the class member JSON' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      class_member_ids = data.pluck(:student_id)
+      class_member_ids = data.map { |member| member[:student_id] || member[:teacher_id] }
       expect(class_member_ids).to eq(params[:class_members].pluck(:user_id))
     end
 
@@ -90,7 +92,7 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:error]).to match(/No valid students provided/)
+      expect(data[:error]).to match(/No valid school members provided/)
     end
 
     it 'responds 401 Unauthorized when no token is given' do
