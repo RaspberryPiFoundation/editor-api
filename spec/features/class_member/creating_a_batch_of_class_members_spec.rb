@@ -24,6 +24,10 @@ RSpec.describe 'Creating a class member', type: :request do
       end
     end
 
+    let(:teacher_attributes) do
+      [{ id: another_teacher.id, name: another_teacher.name, email: another_teacher.email }]
+    end
+
     before do
       authenticated_in_hydra_as(owner)
       stub_profile_api_list_school_students(school:, student_attributes:)
@@ -56,13 +60,13 @@ RSpec.describe 'Creating a class member', type: :request do
       expect(class_member_ids).to eq(params[:class_members].pluck(:user_id))
     end
 
-    it 'responds with the student JSON' do
+    it 'responds with the teacher/student JSON' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      response_students = data.pluck(:student)
+      response_members = data.map { |member| member[:student] || member[:teacher] }
 
-      expect(response_students).to eq(student_attributes)
+      expect(response_members).to eq(teacher_attributes + student_attributes)
     end
   end
 
