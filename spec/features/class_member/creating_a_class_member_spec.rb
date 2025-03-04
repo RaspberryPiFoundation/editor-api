@@ -9,7 +9,6 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:student) { create(:student, school:, name: 'School Student', username: 'school-student') }
   let(:teacher) { create(:teacher, school:) }
   let(:another_teacher) { create(:teacher, school:) }
-  let(:owner) { create(:owner, school:) }
 
   let(:student_params) do
     {
@@ -21,6 +20,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   before do
+    owner = create(:owner, school:)
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(student)
   end
@@ -72,17 +72,12 @@ RSpec.describe 'Creating a class member', type: :request do
         }
       end
 
-      let(:teacher_attributes) { { id: another_teacher.id, name: another_teacher.name, email: another_teacher.email } }
-
       before do
-        # authenticated_in_hydra_as(teacher)
-        # stub_profile_api_list_school_teachers(school:, teacher_attributes: [teacher_attributes])
         stub_user_info_api_for(another_teacher)
       end
 
       it 'responds 201 Created' do
         post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: teacher_params)
-        pp response
         expect(response).to have_http_status(:created)
       end
 
@@ -105,7 +100,7 @@ RSpec.describe 'Creating a class member', type: :request do
         data = JSON.parse(response.body, symbolize_names: true)
 
         response_teacher = data[:class_member][:teacher]
-
+        teacher_attributes = { id: another_teacher.id, name: another_teacher.name, email: another_teacher.email }
         expect(response_teacher).to eq(teacher_attributes)
       end
     end

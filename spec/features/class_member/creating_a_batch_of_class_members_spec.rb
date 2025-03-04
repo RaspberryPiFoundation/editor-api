@@ -9,12 +9,11 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:another_teacher) { create(:teacher, school:) }
-  let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
       class_members: [{ user_id: another_teacher.id, type: 'teacher' }] + students.map { |student| { user_id: student.id, type: 'student' } }
-  }
+    }
   end
 
   context 'with valid params' do
@@ -24,12 +23,8 @@ RSpec.describe 'Creating a class member', type: :request do
       end
     end
 
-    let(:teacher_attributes) do
-      [{ id: another_teacher.id, name: another_teacher.name, email: another_teacher.email }]
-    end
-
     before do
-      authenticated_in_hydra_as(owner)
+      authenticated_in_hydra_as(teacher)
       stub_profile_api_list_school_students(school:, student_attributes:)
       stub_user_info_api_for(another_teacher)
     end
@@ -65,7 +60,7 @@ RSpec.describe 'Creating a class member', type: :request do
       data = JSON.parse(response.body, symbolize_names: true)
 
       response_members = data.map { |member| member[:student] || member[:teacher] }
-
+      teacher_attributes = [{ id: another_teacher.id, name: another_teacher.name, email: another_teacher.email }]
       expect(response_members).to eq(teacher_attributes + student_attributes)
     end
   end
@@ -78,7 +73,7 @@ RSpec.describe 'Creating a class member', type: :request do
     end
 
     before do
-      authenticated_in_hydra_as(owner)
+      authenticated_in_hydra_as(teacher)
       stub_profile_api_list_school_students(school:, student_attributes: [])
     end
 
