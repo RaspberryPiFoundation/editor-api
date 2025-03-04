@@ -4,7 +4,6 @@ json.call(
   class_member,
   :id,
   :school_class_id,
-  # :user_id,
   :created_at,
   :updated_at
 )
