@@ -93,8 +93,7 @@ RSpec.describe ClassMember::Create, type: :unit do
     end
 
     context 'with a student from a different school' do
-      let(:different_school) { create(:school) }
-      let(:different_school_student) { create(:student, school: different_school) }
+      let(:different_school_student) { create(:student, school: create(:school)) }
 
       context 'with non existent students' do
         let(:students) { [different_school_student] }
