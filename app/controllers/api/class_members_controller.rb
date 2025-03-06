@@ -22,7 +22,7 @@ module Api
     def create
       user_ids = [class_member_params[:user_id]]
       user_type = class_member_params[:type]
-      if %w[teacher owner].include?(user_type)
+      if user_type == 'teacher'
         teachers = SchoolTeacher::List.call(school: @school, teacher_ids: user_ids)
         students = { school_students: [] }
       else
@@ -40,7 +40,7 @@ module Api
     end
 
     def create_batch
-      teacher_objects = create_batch_params.select { |user| %w[teacher owner].include?(user[:type]) }
+      teacher_objects = create_batch_params.select { |user| user[:type] == 'teacher' }
       student_objects = create_batch_params.select { |user| teacher_objects.pluck(:user_id).exclude?(user[:user_id]) }
       teacher_ids = teacher_objects.pluck(:user_id)
       student_ids = student_objects.pluck(:user_id)
