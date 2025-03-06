@@ -40,10 +40,11 @@ module Api
     end
 
     def create_batch
-      teacher_objects = create_batch_params.select { |user| user[:type] == 'teacher' }
-      student_objects = create_batch_params.select { |user| teacher_objects.pluck(:user_id).exclude?(user[:user_id]) }
-      teacher_ids = teacher_objects.pluck(:user_id)
+      # Teacher objects needs to be the compliment of student objects so that every user creation is attempted and validated.
+      student_objects = create_batch_params.select { |user| user[:type] == 'student' }
+      teacher_objects = create_batch_params.select { |user| student_objects.pluck(:user_id).exclude?(user[:user_id]) }
       student_ids = student_objects.pluck(:user_id)
+      teacher_ids = teacher_objects.pluck(:user_id)
 
       students = list_students(@school, current_user.token, student_ids)
       teachers = list_teachers(@school, teacher_ids)

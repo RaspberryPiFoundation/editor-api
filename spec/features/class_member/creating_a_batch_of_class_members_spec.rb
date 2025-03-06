@@ -66,15 +66,17 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with invalid params' do
+    unknown_user_id = SecureRandom.uuid
+
     let(:invalid_params) do
       {
-        class_members: [{ invalid_key: SecureRandom.uuid }]
+        class_members: [{ user_id: unknown_user_id }]
       }
     end
 
     before do
       authenticated_in_hydra_as(teacher)
-      stub_profile_api_list_school_students(school:, student_attributes: [])
+      stub_user_info_api_for_unknown_users(user_id: unknown_user_id)
     end
 
     it 'responds 422 Unprocessable Entity when params are missing' do
