@@ -67,6 +67,7 @@ class UploadJob < ApplicationJob
           Rails.logger.warn "Build skipped for #{project[:name]}"
           next
         end
+
         project_importer = ProjectImporter.new(**project)
         project_importer.import!
       end
