@@ -134,7 +134,7 @@ class UploadJob < ApplicationJob
       mime_type = file_mime_type(file)
 
       case mime_type
-      when /text/
+      when /text/ || /application\/javascript/
         categories[:components] << component(file)
       when /image/
         categories[:images] << media(file, project_dir, locale, repository, owner)
