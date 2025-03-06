@@ -36,7 +36,7 @@ class FilesystemProject
         mime_type = file_mime_type(file)
 
         case mime_type
-        when /text/ || /application\/javascript/
+        when %r{text|application/javascript}
           categories[:components] << component(file, dir)
         when /image/
           categories[:images] << media(file, dir)

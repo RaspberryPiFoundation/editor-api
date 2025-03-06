@@ -70,6 +70,33 @@ RSpec.describe UploadJob do
                       }
                     },
                     {
+                      name: 'index.html',
+                      extension: '.html',
+                      object: {
+                        __typename: 'Blob',
+                        text: '<h1>Hello world!</h1>',
+                        isBinary: false
+                      }
+                    },
+                    {
+                      name: 'styles.css',
+                      extension: '.css',
+                      object: {
+                        __typename: 'Blob',
+                        text: ".h1 {\n  color: red;\n}\n",
+                        isBinary: false
+                      }
+                    },
+                    {
+                      name: 'script.js',
+                      extension: '.js',
+                      object: {
+                        __typename: 'Blob',
+                        text: "console.log('Hello, world!')",
+                        isBinary: false
+                      }
+                    },
+                    {
                       name: 'project_config.yml',
                       extension: '.yml',
                       object: {
@@ -100,6 +127,24 @@ RSpec.describe UploadJob do
           extension: 'py',
           content: "#!/bin/python3\n\nfrom p5 import *\nfrom random import randint, seed\n\n# Include global variables here\n\n\ndef setup():\n# Put code to run once here\n\n\ndef draw():\n# Put code to run every frame here\n\n  \n# Keep this to run your code\nrun()\n",
           default: true
+        },
+        {
+          name: 'index',
+          extension: 'html',
+          content: '<h1>Hello world!</h1>',
+          default: false
+        },
+        {
+          name: 'styles',
+          extension: 'css',
+          content: ".h1 {\n  color: red;\n}\n",
+          default: false
+        },
+        {
+          name: 'script',
+          extension: 'js',
+          content: "console.log('Hello, world!')",
+          default: false
         }
       ],
       images: [

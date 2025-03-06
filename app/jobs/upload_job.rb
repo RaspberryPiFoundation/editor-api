@@ -67,7 +67,6 @@ class UploadJob < ApplicationJob
           Rails.logger.warn "Build skipped for #{project[:name]}"
           next
         end
-
         project_importer = ProjectImporter.new(**project)
         project_importer.import!
       end
@@ -134,7 +133,7 @@ class UploadJob < ApplicationJob
       mime_type = file_mime_type(file)
 
       case mime_type
-      when /text/ || /application\/javascript/
+      when %r{text|application/javascript}
         categories[:components] << component(file)
       when /image/
         categories[:images] << media(file, project_dir, locale, repository, owner)
