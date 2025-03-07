@@ -62,8 +62,6 @@ class SchoolClass < ApplicationRecord
   end
 
   def code_is_unique(code)
-    pp 'is the code present?', code.present?
-    pp 'is the code unique?', SchoolClass.where(code: code).none?
     code.present? && SchoolClass.where(code: code).none?
   end
 end

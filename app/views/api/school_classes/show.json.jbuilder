@@ -8,6 +8,7 @@ json.call(
   :description,
   :school_id,
   :name,
+  :code,
   :created_at,
   :updated_at
 )
