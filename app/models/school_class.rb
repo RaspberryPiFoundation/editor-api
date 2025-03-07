@@ -43,7 +43,7 @@ class SchoolClass < ApplicationRecord
   def assign_class_code
     5.times do
       self.code = ForEducationCodeGenerator.generate
-      return if code_is_unique(self.code)
+      return if code_is_unique(code)
     end
 
     raise SchoolClass::Error, 'Unable to generate a unique school class code'
@@ -62,6 +62,6 @@ class SchoolClass < ApplicationRecord
   end
 
   def code_is_unique(code)
-    code.present? && SchoolClass.where(code: code).none?
+    code.present? && SchoolClass.where(code:).none?
   end
 end
