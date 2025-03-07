@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SchoolCodeGenerator
+class ForEducationCodeGenerator
   MAX_CODE = 1_000_000
 
   def self.generate

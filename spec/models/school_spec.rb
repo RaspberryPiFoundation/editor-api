@@ -309,14 +309,14 @@ RSpec.describe School do
     end
 
     it 'uses the school code generator to generates and set the code' do
-      allow(SchoolCodeGenerator).to receive(:generate).and_return('00-00-00')
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return('00-00-00')
       school.verify!
       expect(school.code).to eq('00-00-00')
     end
 
     it 'retries 5 times if the school code is not unique' do
       school.verify!
-      allow(SchoolCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
       another_school = create(:school)
       another_school.verify!
       expect(another_school.code).to eq('00-00-00')
@@ -324,7 +324,7 @@ RSpec.describe School do
 
     it 'raises exception if unique code cannot be generated in 5 retries' do
       school.verify!
-      allow(SchoolCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
       another_school = create(:school)
       expect { another_school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
     end
