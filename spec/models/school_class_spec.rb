@@ -63,6 +63,42 @@ RSpec.describe SchoolClass, versioning: true do
       school_class.name = ' '
       expect(school_class).to be_invalid
     end
+
+    it 'assigns class code before validating' do
+      school_class.code = nil
+      school_class.valid?
+      expect(school_class.code).to match(/\d\d-\d\d-\d\d/)
+    end
+
+    it 'requires a unique class code within the same school' do
+      school_class.save!
+      school_class_with_duplicate_code = build(:school_class, school: school_class.school, code: school_class.code)
+      school_class_with_duplicate_code.valid?
+      expect(school_class_with_duplicate_code.errors[:code]).to include('has already been taken')
+    end
+
+    it 'permits a duplicate class code in different schools' do
+      school_class.save!
+      school_class_with_duplicate_code = build(:school_class, school: build(:school), code: school_class.code)
+      expect(school_class_with_duplicate_code).to be_valid
+    end
+
+    it 'requires a valid class code format' do
+      school_class.code = 'invalid'
+      expect(school_class).to be_invalid
+    end
+
+    it 'accepts a valid class code format' do
+      school_class.code = '12-34-56'
+      expect(school_class).to be_valid
+    end
+
+    it 'does not allow the class code to be changed' do
+      school_class.code = '12-34-56'
+      school_class.save!
+      school_class.code = '65-43-21'
+      expect(school_class).to be_invalid
+    end
   end
 
   describe '.teachers' do
@@ -138,6 +174,36 @@ RSpec.describe SchoolClass, versioning: true do
     it 'returns an array of teacher ids' do
       school_class = create(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:)
       expect(school_class.teacher_ids).to eq([teacher.id, second_teacher.id])
+    end
+  end
+
+  describe '#assign_class_code' do
+    it 'assigns a class code if not already present' do
+      school_class = build(:school_class, code: nil, school:)
+      school_class.assign_class_code
+      expect(school_class.code).to match(/\d\d-\d\d-\d\d/)
+    end
+
+    it 'does not assign a class code if already present' do
+      school_class = build(:school_class, code: '12-34-56', school:)
+      school_class.assign_class_code
+      expect(school_class.code).to eq('12-34-56')
+    end
+
+    it 'retries 5 times if the school code is not unique within the school' do
+      school_class = create(:school_class, code: '12-34-56', school:)
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(*([school.code] * 4), '00-00-00')
+      another_school_class = create(:school_class, school: school_class.school, code: nil)
+      another_school_class.assign_class_code
+      expect(another_school_class.code).to eq('00-00-00')
+    end
+
+    it 'raises adds error if unique code cannot be generated in 5 retries' do
+      school_class = create(:school_class, code: '12-34-56', school:)
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(*([school.code] * 5))
+      another_school_class = build(:school_class, school: school_class.school, code: nil)
+      another_school_class.assign_class_code
+      expect(another_school_class.errors[:code]).to include('could not be generated')
     end
   end
 
