@@ -10,7 +10,11 @@ class SchoolClass < ApplicationRecord
   scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
 
   validates :name, presence: true
+  validates :code, uniqueness: true, presence: true, format: { with: /\d\d-\d\d-\d\d/, allow_nil: false }
+  validate :code_cannot_be_changed
   validate :school_class_has_at_least_one_teacher
+
+  before_validation :assign_class_code, on: :create
 
   has_paper_trail(
     meta: {
@@ -36,11 +40,30 @@ class SchoolClass < ApplicationRecord
     [self, User.from_userinfo(ids: teacher_ids)]
   end
 
+  def assign_class_code
+    5.times do
+      self.code = ForEducationCodeGenerator.generate
+      return if code_is_unique(self.code)
+    end
+
+    raise SchoolClass::Error, 'Unable to generate a unique school class code'
+  end
+
   private
 
   def school_class_has_at_least_one_teacher
     return if teachers.present?
 
     errors.add(:teachers, 'must have at least one teacher')
+  end
+
+  def code_cannot_be_changed
+    errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
+  end
+
+  def code_is_unique(code)
+    pp 'is the code present?', code.present?
+    pp 'is the code unique?', SchoolClass.where(code: code).none?
+    code.present? && SchoolClass.where(code: code).none?
   end
 end
