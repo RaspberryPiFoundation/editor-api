@@ -43,6 +43,8 @@ services:
     image: deltaprojects/smee-client
     platform: linux/amd64
     command: -u $SMEE_TUNNEL -t http://api:3009/github_webhooks
+    environment:
+      - SMEE_TUNNEL
 
 volumes:
   postgres-data:
