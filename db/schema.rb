@@ -234,7 +234,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_07_113710) do
     t.datetime "updated_at", null: false
     t.string "description"
     t.string "code"
-    t.index ["code"], name: "index_school_classes_on_code", unique: true
+    t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 

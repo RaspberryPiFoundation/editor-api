@@ -192,7 +192,7 @@ RSpec.describe SchoolClass, versioning: true do
 
     it 'retries 5 times if the school code is not unique within the school' do
       school_class = create(:school_class, code: '12-34-56', school:)
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return(*([school.code] * 4), '00-00-00')
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(*([school_class.code] * 4), '00-00-00')
       another_school_class = create(:school_class, school: school_class.school, code: nil)
       another_school_class.assign_class_code
       expect(another_school_class.code).to eq('00-00-00')
@@ -200,10 +200,18 @@ RSpec.describe SchoolClass, versioning: true do
 
     it 'raises adds error if unique code cannot be generated in 5 retries' do
       school_class = create(:school_class, code: '12-34-56', school:)
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return(*([school.code] * 5))
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(*([school_class.code] * 5))
       another_school_class = build(:school_class, school: school_class.school, code: nil)
       another_school_class.assign_class_code
       expect(another_school_class.errors[:code]).to include('could not be generated')
+    end
+
+    it 'does not add error if class code shared by class from another school' do
+      school_class = create(:school_class, code: '12-34-56', school:)
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school_class.code)
+      another_school_class = build(:school_class, school: build(:school), code: nil)
+      another_school_class.assign_class_code
+      expect(another_school_class.errors[:code]).to be_empty
     end
   end
 

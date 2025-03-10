@@ -45,7 +45,7 @@ class SchoolClass < ApplicationRecord
 
     5.times do
       self.code = ForEducationCodeGenerator.generate
-      return if code_is_unique(code)
+      return if code_is_unique_within_school
     end
 
     errors.add(:code, 'could not be generated')
@@ -63,7 +63,7 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
   end
 
-  def code_is_unique(code)
-    code.present? && SchoolClass.where(code:).none?
+  def code_is_unique_within_school
+    code.present? && SchoolClass.where(code:, school:).none?
   end
 end
