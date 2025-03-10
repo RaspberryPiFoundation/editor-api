@@ -77,7 +77,7 @@ RSpec.describe SchoolClass, versioning: true do
       expect(school_class_with_duplicate_code.errors[:code]).to include('has already been taken')
     end
 
-    it 'permits a duplicate class code in different schools' do
+    it 'permits a duplicate class code in a different school' do
       school_class.save!
       school_class_with_duplicate_code = build(:school_class, school: build(:school), code: school_class.code)
       expect(school_class_with_duplicate_code).to be_valid
