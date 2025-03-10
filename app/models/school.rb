@@ -54,7 +54,7 @@ class School < ApplicationRecord
   def verify!
     attempts = 0
     begin
-      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate)
+      update!(verified_at: Time.zone.now, code: ForEducationCodeGenerator.generate)
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors[:code].include?('has already been taken') && attempts <= 5
 
