@@ -9,9 +9,11 @@ module Api
 
     def index
       @class_students = @school_class.students.accessible_by(current_ability)
+      owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
       result = ClassMember::List.call(school_class: @school_class, class_students: @class_students, token: current_user.token)
 
       if result.success?
+        @school_owner_ids = owners.map(&:id)
         @class_members = result[:class_members]
         render :index, formats: [:json], status: :ok
       else
