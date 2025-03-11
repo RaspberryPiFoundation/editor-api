@@ -20,7 +20,7 @@ RSpec.describe Project::Create, type: :unit do
 
       let(:project_hash) do
         {
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           components: [{
             name: 'main',
             extension: 'py',

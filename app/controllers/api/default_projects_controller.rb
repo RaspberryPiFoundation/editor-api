@@ -5,7 +5,7 @@ module Api
     before_action :authorize_user, only: %i[create]
 
     def show
-      data = if params[:type] == 'html'
+      data = if params[:type] == Project::Types::HTML
                html_project
              else
                python_project
@@ -23,7 +23,7 @@ module Api
 
     def create
       identifier = PhraseIdentifier.generate
-      @project = Project.new(identifier:, project_type: 'python')
+      @project = Project.new(identifier:, project_type: Project::Types::PYTHON)
       @project.components << Component.new(python_component)
       @project.save
 
@@ -38,7 +38,7 @@ module Api
 
     def python_project
       {
-        type: 'python',
+        type: Project::Types::PYTHON,
         components: [
           { lang: 'py', name: 'main',
             content: "import turtle\nt = turtle.Turtle()\nt.forward(100)\nprint(\"Oh yeah!\")" }
@@ -53,7 +53,7 @@ module Api
       CON
 
       {
-        type: 'html',
+        type: Project::Types::HTML,
         components: [
           { lang: 'html', name: 'index', content: },
           { lang: 'css', name: 'style', content: "h1 {\n  color: blue;\n}" },

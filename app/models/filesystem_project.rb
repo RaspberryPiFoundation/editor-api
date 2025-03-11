@@ -15,7 +15,7 @@ class FilesystemProject
       categorized_files = categorize_files(files, dir)
 
       project_importer = ProjectImporter.new(name: proj_config['NAME'], identifier: proj_config['IDENTIFIER'],
-                                             type: proj_config['TYPE'] || 'python',
+                                             type: proj_config['TYPE'] || Project::Types::PYTHON,
                                              locale: proj_config['LOCALE'] || 'en', **categorized_files)
       project_importer.import!
     end

@@ -119,7 +119,7 @@ RSpec.describe UploadJob do
     {
       name: "Don't Collide!",
       identifier: 'dont-collide-starter',
-      type: 'python',
+      type: Project::Types::PYTHON,
       locale: 'ja-JP',
       components: [
         {
