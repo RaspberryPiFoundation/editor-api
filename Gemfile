@@ -39,6 +39,7 @@ gem 'scout_apm'
 gem 'sentry-rails'
 
 group :development, :test do
+  gem 'awesome_print'
   gem 'bullet'
   gem 'debug'
   gem 'dotenv-rails'
@@ -56,7 +57,6 @@ group :development, :test do
 end
 
 group :development do
-  gem 'awesome_print'
   gem 'rails-erd'
   gem 'ruby-lsp', '~> 0.17.7'
   gem 'ruby-lsp-rails'

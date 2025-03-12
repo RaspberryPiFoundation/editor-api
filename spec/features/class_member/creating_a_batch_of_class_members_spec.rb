@@ -19,7 +19,7 @@ RSpec.describe 'Creating a class member', type: :request do
   context 'with valid params' do
     let(:student_attributes) do
       students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
+        { id: student.id, name: student.name, username: student.username, type: 'student' }
       end
     end
 
@@ -60,7 +60,7 @@ RSpec.describe 'Creating a class member', type: :request do
       data = JSON.parse(response.body, symbolize_names: true)
 
       response_members = data.map { |member| member[:student] || member[:teacher] }
-      teacher_attributes = [{ id: another_teacher.id, name: another_teacher.name, email: another_teacher.email }]
+      teacher_attributes = [{ id: another_teacher.id, name: another_teacher.name, email: another_teacher.email, type: 'teacher' }]
       expect(response_members).to eq(teacher_attributes + student_attributes)
     end
   end
