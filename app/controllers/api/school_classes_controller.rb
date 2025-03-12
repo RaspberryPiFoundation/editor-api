@@ -5,6 +5,7 @@ module Api
     before_action :authorize_user
     before_action :load_school
     before_action :load_school_class, only: %i[show update destroy]
+    # before_action :load_school_class
 
     def index
       school_classes = @school.classes.accessible_by(current_ability)
@@ -59,7 +60,7 @@ module Api
                 else
                   School.find(params[:school_id])
                 end
-      authorize! params[:action].to_sym, @school
+      authorize! :read, @school
     end
 
     def load_school_class
@@ -68,6 +69,7 @@ module Api
                       else
                         @school.classes.find(params[:id])
                       end
+      # pp 'authorizing for action', params[:action].to_sym
       authorize! params[:action].to_sym, @school_class
     end
 
