@@ -24,12 +24,12 @@ module Api
     def create
       user_ids = [class_member_params[:user_id]]
       user_type = class_member_params[:type]
-      if user_type == 'teacher'
-        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: user_ids)
-        students = { school_students: [] }
-      else
+      if user_type == 'student'
         teachers = { school_teachers: [] }
         students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: user_ids)
+      else
+        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: user_ids)
+        students = { school_students: [] }
       end
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
