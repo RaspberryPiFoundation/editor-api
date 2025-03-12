@@ -3,8 +3,8 @@
 module Api
   class SchoolClassesController < ApiController
     before_action :authorize_user
-    load_and_authorize_resource :school
-    load_and_authorize_resource :school_class, through: :school, through_association: :classes
+    before_action :load_school
+    before_action :load_school_class, only: %i[show update destroy]
 
     def index
       school_classes = @school.classes.accessible_by(current_ability)
@@ -52,6 +52,24 @@ module Api
     end
 
     private
+
+    def load_school
+      @school = if params[:school_id].match?(/\d\d-\d\d-\d\d/)
+                  School.find_by(code: params[:school_id])
+                else
+                  School.find(params[:school_id])
+                end
+      authorize! params[:action].to_sym, @school
+    end
+
+    def load_school_class
+      @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
+                        @school.classes.find_by(code: params[:id])
+                      else
+                        @school.classes.find(params[:id])
+                      end
+      authorize! params[:action].to_sym, @school_class
+    end
 
     def school_class_params
       # A school teacher may only create classes they own.
