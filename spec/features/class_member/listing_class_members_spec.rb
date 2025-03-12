@@ -66,7 +66,7 @@ RSpec.describe 'Listing class members', type: :request do
         id: students[0].id,
         username: students[0].username,
         name: students[0].name,
-        type: "student"
+        type: 'student'
       }
     )
   end
@@ -97,7 +97,7 @@ RSpec.describe 'Listing class members', type: :request do
         id: teacher.id,
         name: teacher.name,
         email: teacher.email,
-        type: "teacher"
+        type: 'teacher'
       }
     )
   end
