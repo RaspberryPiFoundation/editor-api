@@ -64,7 +64,7 @@ module Api
     def load_project
       project_loader = ProjectLoader.new(params[:id], [params[:locale]])
       @project = if action_name == 'show'
-                   project_loader.load(include_images: true)
+                   project_loader.load(include_images: true, only_scratch: params[:project_type] == Project::Types::SCRATCH)
                  else
                    project_loader.load
                  end
