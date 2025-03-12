@@ -110,7 +110,7 @@ RSpec.describe 'Creating a class member', type: :request do
     let(:invalid_params) { { class_member: { user_id: SecureRandom.uuid } } }
 
     before do
-      stub_profile_api_list_school_students(school:, student_attributes: [])
+      stub_user_info_api_for_unknown_users(user_id: invalid_params[:class_member][:user_id])
     end
 
     it 'responds 400 Bad Request when params are missing' do
