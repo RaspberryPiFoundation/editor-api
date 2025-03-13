@@ -3,9 +3,8 @@
 module Api
   class SchoolClassesController < ApiController
     before_action :authorize_user
-    before_action :load_school
-    before_action :load_school_class, only: %i[show update destroy]
-    # before_action :load_school_class
+    before_action :load_and_authorize_school
+    before_action :load_and_authorize_school_class
 
     def index
       school_classes = @school.classes.accessible_by(current_ability)
@@ -54,7 +53,7 @@ module Api
 
     private
 
-    def load_school
+    def load_and_authorize_school
       @school = if params[:school_id].match?(/\d\d-\d\d-\d\d/)
                   School.find_by(code: params[:school_id])
                 else
@@ -63,14 +62,18 @@ module Api
       authorize! :read, @school
     end
 
-    def load_school_class
-      @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
-                        @school.classes.find_by(code: params[:id])
-                      else
-                        @school.classes.find(params[:id])
-                      end
-      # pp 'authorizing for action', params[:action].to_sym
-      authorize! params[:action].to_sym, @school_class
+    def load_and_authorize_school_class
+      if ['index', 'create'].include?(params[:action])
+        authorize! params[:action].to_sym, SchoolClass
+      else
+        @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
+                          @school.classes.find_by(code: params[:id])
+                        else
+                          @school.classes.find(params[:id])
+                        end
+        # pp 'authorizing for action', params[:action].to_sym
+        authorize! params[:action].to_sym, @school_class
+      end
     end
 
     def school_class_params
