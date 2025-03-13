@@ -24,12 +24,14 @@ module Api
     def create
       user_ids = [class_member_params[:user_id]]
       user_type = class_member_params[:type]
-      if user_type == 'teacher'
-        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: user_ids)
-        students = { school_students: [] }
-      else
+      owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
+      @school_owner_ids = owners.map(&:id)
+      if user_type == 'student'
         teachers = { school_teachers: [] }
         students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: user_ids)
+      else
+        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: user_ids)
+        students = { school_students: [] }
       end
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
@@ -42,6 +44,9 @@ module Api
     end
 
     def create_batch
+      owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
+      @school_owner_ids = owners.map(&:id)
+
       # Teacher objects needs to be the compliment of student objects so that every user creation is attempted and validated.
       student_objects = create_batch_params.select { |user| user[:type] == 'student' }
       teacher_objects = create_batch_params.select { |user| student_objects.pluck(:user_id).exclude?(user[:user_id]) }
