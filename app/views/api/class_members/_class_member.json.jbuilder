@@ -15,7 +15,13 @@ if class_member.respond_to?(:student)
   end
 elsif class_member.respond_to?(:teacher)
   json.teacher_id(class_member.teacher_id)
-  json.set! :teacher do
-    json.partial! '/api/school_teachers/school_teacher', teacher: class_member.teacher
+  if @school_owner_ids.include?(class_member.teacher_id)
+    json.set! :owner do
+      json.partial! '/api/school_owners/school_owner', owner: class_member.teacher
+    end
+  else
+    json.set! :teacher do
+      json.partial! '/api/school_teachers/school_teacher', teacher: class_member.teacher
+    end
   end
 end
