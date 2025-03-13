@@ -24,6 +24,8 @@ module Api
     def create
       user_ids = [class_member_params[:user_id]]
       user_type = class_member_params[:type]
+      owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
+      @school_owner_ids = owners.map(&:id)
       if user_type == 'student'
         teachers = { school_teachers: [] }
         students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: user_ids)
