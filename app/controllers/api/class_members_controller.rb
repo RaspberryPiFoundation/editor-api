@@ -46,7 +46,7 @@ module Api
     def create_batch
       owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
       @school_owner_ids = owners.map(&:id)
-      
+
       # Teacher objects needs to be the compliment of student objects so that every user creation is attempted and validated.
       student_objects = create_batch_params.select { |user| user[:type] == 'student' }
       teacher_objects = create_batch_params.select { |user| student_objects.pluck(:user_id).exclude?(user[:user_id]) }
