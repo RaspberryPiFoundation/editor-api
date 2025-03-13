@@ -8,16 +8,6 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:school) { create(:school) }
   let(:student) { create(:student, school:, name: 'School Student', username: 'school-student') }
   let(:teacher) { create(:teacher, school:) }
-  let(:another_teacher) { create(:teacher, school:) }
-
-  let(:student_params) do
-    {
-      class_member: {
-        user_id: student.id,
-        type: 'student'
-      }
-    }
-  end
 
   before do
     owner = create(:owner, school:)
@@ -27,6 +17,14 @@ RSpec.describe 'Creating a class member', type: :request do
 
   context 'with valid params' do
     context 'when new class member is a student' do
+      let(:student_params) do
+        {
+          class_member: {
+            user_id: student.id,
+            type: 'student'
+          }
+        }
+      end
       let(:student_attributes) { { id: student.id, name: student.name, username: student.username, type: 'student' } }
 
       before do
@@ -63,6 +61,7 @@ RSpec.describe 'Creating a class member', type: :request do
     end
 
     context 'when new class member is a teacher' do
+      let(:another_teacher) { create(:teacher, school:) }
       let(:teacher_params) do
         {
           class_member: {
@@ -104,6 +103,52 @@ RSpec.describe 'Creating a class member', type: :request do
         expect(response_teacher).to eq(teacher_attributes)
       end
     end
+
+    context 'when new class member is an owner' do
+      let(:owner) { create(:owner, school:) }
+      let(:owner_teacher) { create(:teacher, school:, id: owner.id, name: owner.name, email: owner.email) }
+
+      let(:owner_params) do
+        {
+          class_member: {
+            user_id: owner.id,
+            type: 'owner'
+          }
+        }
+      end
+
+      before do
+        stub_user_info_api_for(owner_teacher)
+      end
+
+      it 'responds 201 Created' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: owner_params)
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'responds 201 Created when the user is a school-teacher' do
+        authenticated_in_hydra_as(teacher)
+
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: owner_params)
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'responds with the class member JSON' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: owner_params)
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:class_member][:teacher_id]).to eq(owner.id)
+      end
+
+      it 'responds with the teacher JSON' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: owner_params)
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        response_teacher = data[:class_member][:owner]
+        owner_attributes = { id: owner.id, name: owner.name, email: owner.email, type: 'owner' }
+        expect(response_teacher).to eq(owner_attributes)
+      end
+    end
   end
 
   context 'with invalid params' do
@@ -129,34 +174,45 @@ RSpec.describe 'Creating a class member', type: :request do
 
       expect(data[:error]).to match(/No valid school members provided/)
     end
+  end
+
+  context 'when the user is not authorized' do
+    let(:student_params) do
+      {
+        class_member: {
+          user_id: student.id,
+          type: 'student'
+        }
+      }
+    end
 
     it 'responds 401 Unauthorized when no token is given' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", params: student_params)
       expect(response).to have_http_status(:unauthorized)
     end
-  end
 
-  it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school = create(:school, id: SecureRandom.uuid)
-    school_class.update!(school_id: school.id)
+    it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+      school = create(:school, id: SecureRandom.uuid)
+      school_class.update!(school_id: school.id)
 
-    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
-    expect(response).to have_http_status(:forbidden)
-  end
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+      expect(response).to have_http_status(:forbidden)
+    end
 
-  it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    teacher = create(:teacher, school:)
-    authenticated_in_hydra_as(teacher)
+    it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+      teacher = create(:teacher, school:)
+      authenticated_in_hydra_as(teacher)
 
-    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
-    expect(response).to have_http_status(:forbidden)
-  end
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+      expect(response).to have_http_status(:forbidden)
+    end
 
-  it 'responds 403 Forbidden when the user is a school-student' do
-    student = create(:student, school:)
-    authenticated_in_hydra_as(student)
+    it 'responds 403 Forbidden when the user is a school-student' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
 
-    post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
-    expect(response).to have_http_status(:forbidden)
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 end
