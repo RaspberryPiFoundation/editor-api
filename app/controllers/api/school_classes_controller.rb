@@ -71,7 +71,7 @@ module Api
                         else
                           @school.classes.find(params[:id])
                         end
-        # pp 'authorizing for action', params[:action].to_sym
+
         authorize! params[:action].to_sym, @school_class
       end
     end
