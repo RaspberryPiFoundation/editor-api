@@ -14,93 +14,192 @@ RSpec.describe 'Showing a school class', type: :request do
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
 
-  it 'responds 200 OK' do
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:ok)
+  context 'when school and class ids are provided' do
+    it 'responds 200 OK' do
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'responds 200 OK when the user is the class teacher' do
+      authenticated_in_hydra_as(teacher)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'responds 200 OK when the user is a student in the class' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'responds with the school class JSON' do
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:name]).to eq('Test School Class')
+    end
+
+    it 'includes the school class code in the response' do
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:code]).to eq(school_class.code)
+    end
+
+    it 'responds with the teacher JSON' do
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:teachers].first[:name]).to eq('School Teacher')
+    end
+
+    it "responds with nil attributes for the teacher if their user profile doesn't exist" do
+      stub_user_info_api_for_unknown_users(user_id: teacher.id)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:teacher_name]).to be_nil
+    end
+
+    it 'responds 404 Not Found when no school exists' do
+      get("/api/schools/not-a-real-id/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'responds 404 Not Found when no school class exists' do
+      get("/api/schools/#{school.id}/classes/not-a-real-id", headers:)
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it 'responds 401 Unauthorized when no token is given' do
+      get "/api/schools/#{school.id}/classes/#{school_class.id}"
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+      school = create(:school, id: SecureRandom.uuid)
+      school_class.update!(school_id: school.id)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+      teacher = create(:teacher, school:)
+      authenticated_in_hydra_as(teacher)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the user is not a school-student for the class' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
-  it 'responds 200 OK when the user is the class teacher' do
-    authenticated_in_hydra_as(teacher)
+  context 'when school and class codes are provided' do
+    before do
+      school.verify!
+    end
 
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:ok)
-  end
+    it 'responds 200 OK' do
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:ok)
+    end
 
-  it 'responds 200 OK when the user is a student in the class' do
-    student = create(:student, school:)
-    authenticated_in_hydra_as(student)
-    create(:class_student, school_class:, student_id: student.id)
+    it 'responds 200 OK when the user is the class teacher' do
+      authenticated_in_hydra_as(teacher)
 
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:ok)
-  end
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:ok)
+    end
 
-  it 'responds with the school class JSON' do
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
+    it 'responds 200 OK when the user is a student in the class' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
 
-    expect(data[:name]).to eq('Test School Class')
-  end
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:ok)
+    end
 
-  it 'includes the school class code in the response' do
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
+    it 'responds with the school class JSON' do
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:code]).to eq(school_class.code)
-  end
+      expect(data[:name]).to eq('Test School Class')
+    end
 
-  it 'responds with the teacher JSON' do
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
+    it 'includes the school class code in the response' do
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teachers].first[:name]).to eq('School Teacher')
-  end
+      expect(data[:code]).to eq(school_class.code)
+    end
 
-  it "responds with nil attributes for the teacher if their user profile doesn't exist" do
-    stub_user_info_api_for_unknown_users(user_id: teacher.id)
+    it 'responds with the teacher JSON' do
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
 
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
+      expect(data[:teachers].first[:name]).to eq('School Teacher')
+    end
 
-    expect(data[:teacher_name]).to be_nil
-  end
+    it "responds with nil attributes for the teacher if their user profile doesn't exist" do
+      stub_user_info_api_for_unknown_users(user_id: teacher.id)
 
-  it 'responds 404 Not Found when no school exists' do
-    get("/api/schools/not-a-real-id/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:not_found)
-  end
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
 
-  it 'responds 404 Not Found when no school class exists' do
-    get("/api/schools/#{school.id}/classes/not-a-real-id", headers:)
-    expect(response).to have_http_status(:not_found)
-  end
+      expect(data[:teacher_name]).to be_nil
+    end
 
-  it 'responds 401 Unauthorized when no token is given' do
-    get "/api/schools/#{school.id}/classes/#{school_class.id}"
-    expect(response).to have_http_status(:unauthorized)
-  end
+    it 'responds 404 Not Found when no school exists' do
+      get("/api/schools/not-a-real-code/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:not_found)
+    end
 
-  it 'responds 403 Forbidden when the user is a school-owner for a different school' do
-    school = create(:school, id: SecureRandom.uuid)
-    school_class.update!(school_id: school.id)
+    it 'responds 404 Not Found when no school class exists' do
+      get("/api/schools/#{school.code}/classes/not-a-real-code", headers:)
+      expect(response).to have_http_status(:not_found)
+    end
 
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:forbidden)
-  end
+    it 'responds 401 Unauthorized when no token is given' do
+      get "/api/schools/#{school.code}/classes/#{school_class.code}"
+      expect(response).to have_http_status(:unauthorized)
+    end
 
-  it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
-    teacher = create(:teacher, school:)
-    authenticated_in_hydra_as(teacher)
+    it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+      school = create(:school, id: SecureRandom.uuid)
+      school.verify!
+      school_class.update!(school_id: school.id)
 
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:forbidden)
-  end
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
 
-  it 'responds 403 Forbidden when the user is not a school-student for the class' do
-    student = create(:student, school:)
-    authenticated_in_hydra_as(student)
+    it 'responds 403 Forbidden when the user is not the school-teacher for the class' do
+      teacher = create(:teacher, school:)
+      authenticated_in_hydra_as(teacher)
 
-    get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
-    expect(response).to have_http_status(:forbidden)
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the user is not a school-student for the class' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 end
