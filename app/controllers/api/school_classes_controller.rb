@@ -63,7 +63,7 @@ module Api
     end
 
     def load_and_authorize_school_class
-      if ['index', 'create'].include?(params[:action])
+      if %w[index create].include?(params[:action])
         authorize! params[:action].to_sym, SchoolClass
       else
         @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
