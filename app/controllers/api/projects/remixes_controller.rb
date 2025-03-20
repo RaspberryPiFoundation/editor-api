@@ -14,6 +14,7 @@ module Api
 
       def show
         @project = Project.find_by!(remixed_from_id: project.id, user_id: current_user&.id)
+        authorize! :show, @project
 
         render '/api/projects/show', formats: [:json]
       end

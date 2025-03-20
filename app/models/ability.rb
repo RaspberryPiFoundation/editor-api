@@ -30,6 +30,8 @@ class Ability
   end
 
   def define_authenticated_non_student_abilities(user)
+    pp 'are they a student?'
+    pp user&.student?
     return if user&.student?
 
     # Any authenticated user can create a school. They agree to become the school-owner.
@@ -95,7 +97,7 @@ class Ability
     can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
-    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
+    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(visibility: 'students').select(:id)).pluck(:id))
     can(%i[read context], Project, lesson: { school_id: school.id, visibility: "students", school_class: { students: { student_id: user.id } } })
     can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
