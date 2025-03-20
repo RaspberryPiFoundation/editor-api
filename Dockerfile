@@ -31,11 +31,11 @@ FROM builder AS dev-container
 RUN apt-get update \
   && apt-get install --yes --no-install-recommends sudo git vim zsh ssh curl less
 RUN sh -c "$(curl -L https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" -- \
-    -t robbyrussell \
-    -p git -p docker-compose -p yarn \
-    -p https://github.com/zsh-users/zsh-autosuggestions \
-    # -p https://github.com/marlonrichert/zsh-autocomplete \
-    -p https://github.com/unixorn/fzf-zsh-plugin
+  -t robbyrussell \
+  -p git -p docker-compose -p yarn \
+  -p https://github.com/zsh-users/zsh-autosuggestions \
+  -p https://github.com/marlonrichert/zsh-autocomplete \
+  -p https://github.com/unixorn/fzf-zsh-plugin
 RUN chsh -s $(which zsh) ${USER}
 
 # Slim application image without development dependencies
