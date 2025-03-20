@@ -34,7 +34,6 @@ Rails.application.routes.draw do
 
     resources :projects, only: %i[index show update destroy create] do
       get :finished, on: :member, to: 'school_projects#show_finished'
-      get :context , on: :member, to: 'projects#context'
       put :finished, on: :member, to: 'school_projects#set_finished'
       resource :remix, only: %i[show create], controller: 'projects/remixes'
       resources :remixes, only: %i[index], controller: 'projects/remixes'
