@@ -85,7 +85,7 @@ class Ability
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
-    can(%i[read update], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read update context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read], Project,
         remixed_from_id: Project.where(school_id: school.id, remixed_from_id: nil, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
   end
@@ -96,7 +96,7 @@ class Ability
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
-    can(%i[read], Project, lesson: { school_id: school.id, school_class: { students: { student_id: user.id } } })
+    can(%i[read context], Project, lesson: { school_id: school.id, school_class: { students: { student_id: user.id } } })
     can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
