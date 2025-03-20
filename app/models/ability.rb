@@ -96,7 +96,7 @@ class Ability
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
-    can(%i[read context], Project, lesson: { school_id: school.id, school_class: { students: { student_id: user.id } } })
+    can(%i[read context], Project, lesson: { school_id: school.id, visibility: "students", school_class: { students: { student_id: user.id } } })
     can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
