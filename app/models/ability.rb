@@ -60,7 +60,7 @@ class Ability
     can(%i[read update destroy], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[read create update destroy], SchoolClass, school: { id: school.id })
-    can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
@@ -85,7 +85,7 @@ class Ability
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
-    can(%i[read update context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read], Project,
         remixed_from_id: Project.where(school_id: school.id, remixed_from_id: nil, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
   end
@@ -96,7 +96,7 @@ class Ability
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(visibility: 'students').select(:id)).pluck(:id))
-    can(%i[read context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
+    can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
     can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 

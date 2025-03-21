@@ -52,7 +52,7 @@ module Api
       head :ok
     end
 
-    def context
+    def show_context
       render :context, formats: [:json]
     end
 
