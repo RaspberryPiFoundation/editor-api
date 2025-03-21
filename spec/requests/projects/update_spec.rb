@@ -128,7 +128,7 @@ RSpec.describe 'Project update requests' do
 
   context 'when authed user is a student and the project is remixed from a lesson project' do
     let(:teacher) { create(:teacher, school:) }
-    let(:lesson_project) { create(:project, school:, locale: nil, user_id: teacher.id, lesson: create(:lesson, visibility: "students")) }
+    let(:lesson_project) { create(:project, school:, locale: nil, user_id: teacher.id, lesson: create(:lesson, visibility: 'students')) }
     let(:project) { create(:project, school:, locale: nil, user_id: student.id, remixed_from_id: lesson_project.id) }
     let(:params) { { project: { components: [] } } }
     let(:school) { create(:school) }
