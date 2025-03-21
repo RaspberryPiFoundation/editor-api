@@ -30,8 +30,6 @@ class Ability
   end
 
   def define_authenticated_non_student_abilities(user)
-    Rails.logger.debug 'are they a student?'
-    Rails.logger.debug user&.student?
     return if user&.student?
 
     # Any authenticated user can create a school. They agree to become the school-owner.
