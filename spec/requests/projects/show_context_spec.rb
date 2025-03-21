@@ -119,7 +119,6 @@ RSpec.describe 'Project context requests' do
 
       context 'when loading context of a lesson project that is visible to students' do
         it 'returns success response' do
-          pp project.lesson.visibility
           get("/api/projects/#{project.identifier}/context", headers:)
 
           expect(response).to have_http_status(:ok)
