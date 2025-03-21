@@ -80,12 +80,12 @@ RSpec.describe 'Creating a project', type: :request do
       expect(response).to have_http_status(:created)
     end
 
-    it 'responds 201 Created when the user is a school-student for the school' do
+    it 'responds 403 Forbidden when the user is a school-student for the school' do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
-      expect(response).to have_http_status(:created)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it 'sets the lesson user to the specified user for school-owner users' do
