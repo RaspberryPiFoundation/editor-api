@@ -52,6 +52,7 @@ module Api
       head :ok
     end
 
+    # Returns the identifier, school_id, lesson_id, and class_id of the project so the full context can be loaded
     def show_context
       render :context, formats: [:json]
     end
