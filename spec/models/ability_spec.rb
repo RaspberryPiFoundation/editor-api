@@ -139,7 +139,8 @@ RSpec.describe Ability do
       end
     end
 
-    context 'with a teachers project where the lesson is visible to students' do
+    # rubocop:disable RSpec/MultipleMemoizedHelpers
+    context "with a teacher's project where the lesson is visible to students" do
       let(:user) { create(:user) }
       let(:school) { create(:school) }
       let(:teacher) { create(:teacher, school:) }
@@ -265,7 +266,7 @@ RSpec.describe Ability do
 
     # TODO: Handle other visibilities
 
-    context 'with a remix of a teachers project' do
+    context "with a remix of a teacher's project" do
       let(:school) { create(:school) }
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
@@ -334,6 +335,7 @@ RSpec.describe Ability do
       end
     end
   end
+  # rubocop:enable RSpec/MultipleMemoizedHelpers
 
   describe 'Component' do
     let(:starter_project_component) { build(:component, project: starter_project) }
