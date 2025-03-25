@@ -140,7 +140,7 @@ RSpec.describe Ability do
     end
 
     # rubocop:disable RSpec/MultipleMemoizedHelpers
-    context 'with a teachers project where the lesson is visible to students' do
+    context "with a teacher's project where the lesson is visible to students" do
       let(:user) { create(:user) }
       let(:school) { create(:school) }
       let(:teacher) { create(:teacher, school:) }
@@ -154,6 +154,7 @@ RSpec.describe Ability do
         end
 
         it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
         it { is_expected.not_to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
@@ -166,6 +167,7 @@ RSpec.describe Ability do
         end
 
         it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
         it { is_expected.to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
@@ -179,6 +181,7 @@ RSpec.describe Ability do
         end
 
         it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
         it { is_expected.not_to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
@@ -191,6 +194,69 @@ RSpec.describe Ability do
         end
 
         it { is_expected.not_to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:show_context, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
+      end
+    end
+
+    context 'with a teachers project where the lesson is not visible to students' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+      let(:teacher) { create(:teacher, school:) }
+      let(:school_class) { build(:school_class, school:, teacher_ids: [teacher.id]) }
+      let(:lesson) { build(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'teachers') }
+      let!(:project) { build(:project, school:, lesson:, user_id: teacher.id) }
+
+      context 'when user is a school owner' do
+        before do
+          create(:owner_role, user_id: user.id, school:)
+        end
+
+        it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.to be_able_to(:show_context, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
+      end
+
+      context 'when user is a school teacher' do
+        before do
+          create(:teacher_role, user_id: user.id, school:)
+        end
+
+        it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.to be_able_to(:show_context, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
+      end
+
+      context 'when user is a school student and belongs to the teachers class' do
+        before do
+          create(:student_role, user_id: user.id, school:)
+          create(:class_student, school_class:, student_id: user.id)
+        end
+
+        it { is_expected.not_to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:show_context, project) }
+        it { is_expected.not_to be_able_to(:create, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
+        it { is_expected.not_to be_able_to(:destroy, project) }
+      end
+
+      context 'when user is a school student and does not belong to the teachers class' do
+        before do
+          create(:student_role, user_id: user.id, school:)
+        end
+
+        it { is_expected.not_to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
         it { is_expected.not_to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
@@ -200,7 +266,7 @@ RSpec.describe Ability do
 
     # TODO: Handle other visibilities
 
-    context 'with a remix of a teachers project' do
+    context "with a remix of a teacher's project" do
       let(:school) { create(:school) }
       let(:student) { create(:student, school:) }
       let(:teacher) { create(:teacher, school:) }
@@ -219,6 +285,19 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.to be_able_to(:set_finished, remixed_project.school_project) }
+      end
+
+      context 'when user is a student and the lesson is not visible to students' do
+        let(:user) { student }
+
+        before do
+          lesson.update(visibility: 'teachers')
+        end
+
+        it { is_expected.not_to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:create, remixed_project) }
+        it { is_expected.not_to be_able_to(:update, remixed_project) }
+        it { is_expected.not_to be_able_to(:destroy, remixed_project) }
       end
 
       context 'when user is teacher that does not own the orginal project' do
