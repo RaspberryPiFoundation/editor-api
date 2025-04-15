@@ -64,7 +64,8 @@ module Api
         :creator_department,
         :creator_agree_authority,
         :creator_agree_terms_and_conditions,
-        :creator_agree_to_ux_contact
+        :creator_agree_to_ux_contact,
+        :creator_agree_responsible_safeguarding
       )
     end
   end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_03_07_113710) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_15_133546) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -269,6 +269,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_03_07_113710) do
     t.boolean "creator_agree_terms_and_conditions"
     t.string "code"
     t.boolean "creator_agree_to_ux_contact", default: false
+    t.boolean "creator_agree_responsible_safeguarding", default: true
     t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true
