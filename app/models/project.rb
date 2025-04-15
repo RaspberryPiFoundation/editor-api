@@ -35,6 +35,9 @@ class Project < ApplicationRecord
   default_scope -> { where.not(project_type: Types::SCRATCH) }
 
   scope :internal_projects, -> { where(user_id: nil) }
+  scope :only_scratch, lambda { |only_scratch|
+    only_scratch ? unscoped.where(project_type: Project::Types::SCRATCH) : self
+  }
 
   has_paper_trail(
     if: ->(p) { p&.school_id },
