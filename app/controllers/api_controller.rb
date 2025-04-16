@@ -4,6 +4,7 @@ class ApiController < ActionController::API
   class ::ParameterError < StandardError; end
 
   include Identifiable
+  include ProjectScoping
 
   rescue_from ActionController::ParameterMissing, with: -> { bad_request }
   rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
