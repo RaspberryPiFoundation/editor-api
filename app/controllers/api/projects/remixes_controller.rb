@@ -36,16 +36,12 @@ module Api
       private
 
       def project
-        @project ||= project_scope.find_by!(identifier: params[:project_id])
+        @project ||= Current.project_scope.find_by!(identifier: params[:project_id])
       end
 
       def load_and_authorize_remix
-        @project = project_scope.find_by!(remixed_from_id: project.id, user_id: current_user&.id)
+        @project = Current.project_scope.find_by!(remixed_from_id: project.id, user_id: current_user&.id)
         authorize! :show, @project
-      end
-
-      def project_scope
-        Project.only_scratch(params[:project_type] == Project::Types::SCRATCH)
       end
 
       def remix_params
