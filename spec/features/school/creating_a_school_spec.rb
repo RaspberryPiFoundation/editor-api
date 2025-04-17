@@ -21,7 +21,8 @@ RSpec.describe 'Creating a school', type: :request do
         country_code: 'GB',
         creator_agree_authority: true,
         creator_agree_terms_and_conditions: true,
-        creator_agree_to_ux_contact: true
+        creator_agree_to_ux_contact: true,
+        creator_agree_responsible_safeguarding: true
       }
     }
   end
