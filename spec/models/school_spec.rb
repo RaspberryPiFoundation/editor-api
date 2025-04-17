@@ -187,6 +187,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'requires creator_agree_responsible_safeguarding to be true' do
+      school.creator_agree_responsible_safeguarding = false
+      expect(school).to be_invalid
+    end
+
     it 'does not require creator_agree_to_ux_contact to be true' do
       school.creator_agree_to_ux_contact = false
       expect(school).to be_valid
