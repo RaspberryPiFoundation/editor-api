@@ -29,6 +29,13 @@ namespace :projects do
         project_type: Project::Types::SCRATCH,
         name: '10 Block Mission',
         user_id: nil
+      },
+      {
+        identifier: 'blank-scratch-starter',
+        locale: 'en',
+        project_type: Project::Types::SCRATCH,
+        name: 'Blank Scratch Starter',
+        user_id: nil
       }
     ]
     projects.each do |attributes|
