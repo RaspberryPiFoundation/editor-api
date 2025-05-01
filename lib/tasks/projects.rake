@@ -17,6 +17,13 @@ namespace :projects do
         user_id: nil
       },
       {
+        identifier: 'dialogue-in-scratch',
+        locale: 'en',
+        project_type: Project::Types::SCRATCH,
+        name: 'Dialogue in Scratch',
+        user_id: nil
+      },
+      {
         identifier: 'ten-block-mission',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
