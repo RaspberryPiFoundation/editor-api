@@ -25,12 +25,13 @@ namespace :projects do
       }
     ]
     projects.each do |attributes|
+      identifier = attributes[:identifier]
       if Project.unscoped.exists?(attributes.slice(:identifier, :locale))
-        puts 'Scratch project already exists'
+        puts "Scratch project with identifier '#{identifier}' already exists"
       elsif Project.create(attributes)
-        puts 'Scratch project created successfully'
+        puts "Scratch project with identifier '#{identifier}' created successfully"
       else
-        puts 'Scratch project creation failed'
+        puts "Scratch project with identifier '#{identifier}' creation failed"
       end
     end
   end
