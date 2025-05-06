@@ -36,6 +36,20 @@ namespace :projects do
         project_type: Project::Types::SCRATCH,
         name: 'Blank Scratch Starter',
         user_id: nil
+      },
+      {
+        identifier: 'lets-explore-scratch',
+        locale: 'en',
+        project_type: Project::Types::SCRATCH,
+        name: "Let's Explore Scratch",
+        user_id: nil
+      },
+      {
+        identifier: 'transforming-sprites',
+        locale: 'en',
+        project_type: Project::Types::SCRATCH,
+        name: 'Transforming Sprites',
+        user_id: nil
       }
     ]
     projects.each do |attributes|
