@@ -323,6 +323,7 @@ RSpec.describe Project, versioning: true do
   describe 'default scope' do
     let!(:python_project) { create(:project, project_type: Project::Types::PYTHON) }
     let!(:html_project) { create(:project, project_type: Project::Types::HTML) }
+    let!(:scratch_project) { create(:project, project_type: Project::Types::SCRATCH) }
     let!(:project_with_unknown_type) { create(:project, project_type: 'unknown') }
 
     it 'includes python projects' do
@@ -331,6 +332,10 @@ RSpec.describe Project, versioning: true do
 
     it 'includes html projects' do
       expect(described_class.all).to include(html_project)
+    end
+
+    it 'includes scratch projects' do
+      expect(described_class.all).to include(scratch_project)
     end
 
     it 'includes projects with unknown type' do
