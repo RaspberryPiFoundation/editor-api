@@ -34,7 +34,7 @@ class Project < ApplicationRecord
 
   scope :internal_projects, -> { where(user_id: nil) }
   scope :only_scratch, lambda { |only_scratch|
-    only_scratch ? Project.all.where(project_type: Project::Types::SCRATCH) : self
+    only_scratch ? Project.where(project_type: Project::Types::SCRATCH) : self
   }
 
   has_paper_trail(
