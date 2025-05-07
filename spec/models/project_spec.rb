@@ -362,6 +362,10 @@ RSpec.describe Project, versioning: true do
         expect(projects_in_scope).to include(html_project)
       end
 
+      it 'includes scratch projects' do
+        expect(projects_in_scope).to include(scratch_project)
+      end
+
       it 'includes projects with unknown type' do
         expect(projects_in_scope).to include(project_with_unknown_type)
       end
