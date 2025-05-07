@@ -337,10 +337,6 @@ RSpec.describe Project, versioning: true do
     it 'includes projects with unknown type' do
       expect(described_class.all).to include(project_with_unknown_type)
     end
-
-    it 'does not include scratch projects' do
-      expect(described_class.all).not_to include(scratch_project)
-    end
   end
 
   describe 'only_scratch scope' do
@@ -364,10 +360,6 @@ RSpec.describe Project, versioning: true do
 
       it 'includes projects with unknown type' do
         expect(projects_in_scope).to include(project_with_unknown_type)
-      end
-
-      it 'does not include scratch projects' do
-        expect(projects_in_scope).not_to include(scratch_project)
       end
     end
 

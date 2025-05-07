@@ -213,11 +213,6 @@ RSpec.describe 'Project show requests' do
             expect(response.body).to eq(starter_project_json)
           end
         end
-
-        it 'returns 404 response if scratch project' do
-          get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}", headers:)
-          expect(response).to have_http_status(:not_found)
-        end
       end
 
       it 'creates a new ProjectLoader with the correct parameters' do

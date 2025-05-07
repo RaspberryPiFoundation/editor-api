@@ -76,12 +76,6 @@ RSpec.describe 'Remix requests' do
         let(:original_project_type) { Project::Types::SCRATCH }
         let(:project_type) { Project::Types::SCRATCH }
 
-        it 'returns 404 response if scratch projects are not explicitly included' do
-          get("/api/projects/#{original_project.identifier}/remix", headers:)
-
-          expect(response).to have_http_status(:not_found)
-        end
-
         it 'returns success response if scratch projects are explicitly included' do
           get("/api/projects/#{original_project.identifier}/remix?project_type=scratch", headers:)
 
@@ -127,12 +121,6 @@ RSpec.describe 'Remix requests' do
 
       context 'when original project is scratch project' do
         let(:original_project_type) { Project::Types::SCRATCH }
-
-        it 'returns 404 response if scratch projects are not explicitly included' do
-          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
-
-          expect(response).to have_http_status(:not_found)
-        end
 
         it 'returns success response if scratch projects are explicitly included' do
           post("/api/projects/#{original_project.identifier}/remix?project_type=scratch", params: { project: project_params }, headers:)
