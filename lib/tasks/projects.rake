@@ -54,8 +54,19 @@ namespace :projects do
     ]
     projects.each do |attributes|
       identifier = attributes[:identifier]
-      if Project.only_scratch(true).exists?(attributes.slice(:identifier, :locale))
+      project = Project.only_scratch(true).find_by(attributes.slice(:identifier, :locale))
+      if project.present?
         puts "Scratch project with identifier '#{identifier}' already exists"
+        project.assign_attributes(attributes.except(:identifier, :locale))
+        if project.changed?
+          if project.save
+            puts "Scratch project with identifier '#{identifier}' updated successfully"
+          else
+            puts "Scratch project with identifier '#{identifier}' update failed"
+          end
+        else
+          puts "Scratch project with identifier '#{identifier}' has not changed"
+        end
       elsif Project.create(attributes)
         puts "Scratch project with identifier '#{identifier}' created successfully"
       else
