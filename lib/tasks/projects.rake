@@ -27,7 +27,7 @@ namespace :projects do
         identifier: 'ten-block-mission',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: '10 Block Mission',
+        name: 'Ten Block Mission',
         user_id: nil
       },
       {
