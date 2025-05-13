@@ -13,7 +13,7 @@ namespace :projects do
         identifier: 'experience-cs-example',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: 'Experience CS Example',
+        name: 'Experience CS example',
         user_id: nil
       },
       {
@@ -27,28 +27,28 @@ namespace :projects do
         identifier: 'ten-block-mission',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: 'Ten Block Mission',
+        name: 'Ten block mission',
         user_id: nil
       },
       {
         identifier: 'blank-scratch-starter',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: 'Blank Scratch Starter',
+        name: 'Blank Scratch starter',
         user_id: nil
       },
       {
         identifier: 'lets-explore-scratch',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: "Let's Explore Scratch",
+        name: "Let's explore Scratch",
         user_id: nil
       },
       {
         identifier: 'transforming-sprites',
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: 'Transforming Sprites',
+        name: 'Transforming sprites',
         user_id: nil
       }
     ]
