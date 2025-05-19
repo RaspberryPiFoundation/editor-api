@@ -22,3 +22,6 @@ json.roles(roles) if include_roles
 
 include_code = local_assigns.fetch(:code, false)
 json.code(school.code) if include_code
+
+include_user_origin = local_assigns.fetch(:user_origin, false)
+json.user_origin(school.user_origin) if include_user_origin
