@@ -66,7 +66,7 @@ module Api
         :creator_agree_terms_and_conditions,
         :creator_agree_to_ux_contact,
         :creator_agree_responsible_safeguarding,
-        user_origin: %i[for_education experience_cs]
+        user_origin: School.user_origins.keys
       )
     end
   end
