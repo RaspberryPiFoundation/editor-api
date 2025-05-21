@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a public project', type: :request do
-  let(:creator) { build(:user) }
+  let(:creator) { build(:experience_cs_admin_user) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:params) do
     {
@@ -37,6 +37,15 @@ RSpec.describe 'Creating a public project', type: :request do
         name: 'Test Project'
       }
     )
+  end
+
+  context 'when creator is not an experience-cs admin' do
+    let(:creator) { build(:user) }
+
+    it 'responds 403 Forbidden' do
+      post('/api/public_projects', headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   it 'responds 400 Bad Request when params are malformed' do

@@ -5,6 +5,7 @@ module Api
     before_action :authorize_user
 
     def create
+      authorize! :create, :public_project
       result = PublicProject::Create.call(project_hash: project_params)
 
       if result.success?

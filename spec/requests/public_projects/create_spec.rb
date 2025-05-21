@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Create public project requests' do
   let(:project) { create(:project) }
-  let(:creator) { build(:user) }
+  let(:creator) { build(:experience_cs_admin_user) }
   let(:params) { { project: { identifier: 'not-blank' } } }
 
   context 'when auth is correct' do
