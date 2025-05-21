@@ -11,6 +11,10 @@ FactoryBot.define do
       roles { 'editor-admin' }
     end
 
+    factory :experience_cs_admin_user do
+      roles { 'experience-cs-admin' }
+    end
+
     factory :student do
       email { nil }
       username { Faker::Internet.username }

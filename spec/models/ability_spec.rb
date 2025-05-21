@@ -29,6 +29,8 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
+
+      it { is_expected.not_to be_able_to(:create, :public_project) }
     end
 
     context 'with a standard user' do
@@ -56,6 +58,8 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, another_project) }
         it { is_expected.not_to be_able_to(:destroy, another_project) }
       end
+
+      it { is_expected.not_to be_able_to(:create, :public_project) }
     end
 
     context 'with a teacher' do
@@ -83,6 +87,8 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, another_project) }
         it { is_expected.not_to be_able_to(:destroy, another_project) }
       end
+
+      it { is_expected.not_to be_able_to(:create, :public_project) }
     end
 
     context 'with an owner' do
@@ -110,6 +116,8 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, another_project) }
         it { is_expected.not_to be_able_to(:destroy, another_project) }
       end
+
+      it { is_expected.not_to be_able_to(:create, :public_project) }
     end
 
     context 'with a student' do
@@ -137,6 +145,14 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, another_project) }
         it { is_expected.not_to be_able_to(:destroy, another_project) }
       end
+
+      it { is_expected.not_to be_able_to(:create, :public_project) }
+    end
+
+    context 'with an experience-cs admin' do
+      let(:user) { build(:experience_cs_admin_user) }
+
+      it { is_expected.to be_able_to(:create, :public_project) }
     end
 
     # rubocop:disable RSpec/MultipleMemoizedHelpers
