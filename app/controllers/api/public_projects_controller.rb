@@ -18,7 +18,7 @@ module Api
     private
 
     def project_params
-      params.fetch(:project, {}).permit(:identifier, :locale, :project_type, :name)
+      params.require(:project).permit(:identifier, :locale, :project_type, :name)
     end
   end
 end

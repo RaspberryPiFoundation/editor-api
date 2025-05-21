@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Create public project requests' do
   let(:project) { create(:project) }
   let(:creator) { build(:user) }
+  let(:params) { { project: { identifier: 'not-blank' } } }
 
   context 'when auth is correct' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -19,7 +20,7 @@ RSpec.describe 'Create public project requests' do
       end
 
       it 'returns success' do
-        post('/api/public_projects', headers:)
+        post('/api/public_projects', headers:, params:)
 
         expect(response).to have_http_status(:created)
       end
@@ -35,7 +36,7 @@ RSpec.describe 'Create public project requests' do
       end
 
       it 'returns error' do
-        post('/api/public_projects', headers:)
+        post('/api/public_projects', headers:, params:)
 
         expect(response).to have_http_status(:unprocessable_entity)
       end
@@ -44,7 +45,7 @@ RSpec.describe 'Create public project requests' do
 
   context 'when no token is given' do
     it 'returns unauthorized' do
-      post('/api/public_projects')
+      post('/api/public_projects', params:)
 
       expect(response).to have_http_status(:unauthorized)
     end
