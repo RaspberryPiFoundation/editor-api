@@ -20,7 +20,7 @@ class Project < ApplicationRecord
 
   accepts_nested_attributes_for :components
 
-  before_validation :check_unique_not_null, on: :create
+  before_validation :generate_identifier, on: :create
   before_validation :create_school_project_if_needed
 
   validates :identifier, presence: true, uniqueness: { scope: :locale }
@@ -81,7 +81,7 @@ class Project < ApplicationRecord
 
   private
 
-  def check_unique_not_null
+  def generate_identifier
     self.identifier ||= PhraseIdentifier.generate
   end
 
