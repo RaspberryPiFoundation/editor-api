@@ -311,6 +311,18 @@ RSpec.describe User do
     end
   end
 
+  describe '#experience_cs_admin?' do
+    it 'returns true if the user has the experience-cs-admin role in Hydra' do
+      user = build(:experience_cs_admin_user)
+      expect(user).to be_experience_cs_admin
+    end
+
+    it 'returns false if the user does not have the experience-cs-admin role in Hydra' do
+      user = build(:user, roles: 'another-admin')
+      expect(user).not_to be_experience_cs_admin
+    end
+  end
+
   describe '#school_roles' do
     subject(:user) { build(:user) }
 
