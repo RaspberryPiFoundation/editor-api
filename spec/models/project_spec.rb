@@ -154,7 +154,7 @@ RSpec.describe Project, versioning: true do
     end
   end
 
-  describe 'check_unique_not_null' do
+  describe 'generate_identifier' do
     let(:saved_project) { create(:project) }
 
     it 'generates an identifier if nil' do
