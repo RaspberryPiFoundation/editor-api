@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module PublicProject
+class PublicProject
   class Create
     class << self
       def call(project_hash:)
