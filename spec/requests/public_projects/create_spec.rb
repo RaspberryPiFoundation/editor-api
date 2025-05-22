@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Create public project requests' do
   let(:project) { create(:project) }
   let(:creator) { build(:experience_cs_admin_user) }
-  let(:params) { { project: { identifier: 'not-blank' } } }
+  let(:params) { { project: { project_type: Project::Types::SCRATCH } } }
 
   context 'when auth is correct' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }

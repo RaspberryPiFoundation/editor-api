@@ -48,13 +48,18 @@ RSpec.describe 'Creating a public project', type: :request do
     end
   end
 
+  it 'responds 403 Forbidden when project type is not scratch' do
+    post('/api/public_projects', headers:, params: { project: { project_type: Project::Types::PYTHON } })
+    expect(response).to have_http_status(:forbidden)
+  end
+
   it 'responds 400 Bad Request when params are malformed' do
     post('/api/public_projects', headers:, params: { project: {} })
     expect(response).to have_http_status(:bad_request)
   end
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
-    post('/api/public_projects', headers:, params: { project: { identifier: 'not-empty' } })
+    post('/api/public_projects', headers:, params: { project: { project_type: Project::Types::SCRATCH } })
     expect(response).to have_http_status(:unprocessable_entity)
   end
 
