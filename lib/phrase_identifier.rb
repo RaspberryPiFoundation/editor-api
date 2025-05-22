@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class PhraseIdentifier
+  PATTERN = /\A[a-z0-9]+(-[a-z0-9]+)*\z/
+
   class Error < RuntimeError
   end
 

@@ -4,6 +4,24 @@ require 'rails_helper'
 require 'phrase_identifier'
 
 RSpec.describe PhraseIdentifier do
+  describe 'PATTERN' do
+    subject(:pattern) { described_class::PATTERN }
+
+    it { is_expected.to match('abc-def-ghi') }
+    it { is_expected.to match('123-456-789') }
+    it { is_expected.to match('a2c-d5f-g8i') }
+
+    it { is_expected.not_to match('Abc-def-ghi') }
+    it { is_expected.not_to match('Abc-def-GHI') }
+    it { is_expected.not_to match('abc--def-ghi') }
+    it { is_expected.not_to match('-abc-def-ghi') }
+    it { is_expected.not_to match('abc-def-ghi-') }
+    it { is_expected.not_to match('abc def-ghi') }
+    it { is_expected.not_to match(' abc-def-ghi') }
+    it { is_expected.not_to match('abc-def-ghi ') }
+    it { is_expected.not_to match('abc_def_ghi') }
+  end
+
   describe '#generate' do
     subject(:generate) { described_class.generate }
 
@@ -16,6 +34,14 @@ RSpec.describe PhraseIdentifier do
       end
 
       it { is_expected.to match phrase_regex }
+    end
+
+    context 'when using the default words.txt file' do
+      it 'returns identifiers conforming to the expected pattern' do
+        10.times do
+          expect(generate).to match(described_class::PATTERN)
+        end
+      end
     end
 
     context 'when there are no available combinations' do
