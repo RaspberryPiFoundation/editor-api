@@ -5,9 +5,10 @@ class PublicProject
 
   attr_reader :project
 
-  delegate :identifier, to: :project
+  delegate :identifier, :name, to: :project
 
   validates :identifier, format: { with: PhraseIdentifier::PATTERN, allow_blank: true }
+  validates :name, presence: true
 
   def initialize(project)
     @project = project

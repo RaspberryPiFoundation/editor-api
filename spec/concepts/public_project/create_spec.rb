@@ -7,12 +7,13 @@ RSpec.describe PublicProject::Create, type: :unit do
     subject(:create_project) { described_class.call(project_hash:) }
 
     let(:identifier) { 'foo-bar-baz' }
+    let(:name) { 'Foo bar baz' }
     let(:project_hash) do
       {
         identifier:,
         locale: 'en',
         project_type: Project::Types::SCRATCH,
-        name: 'Foo bar baz'
+        name:
       }
     end
 
@@ -65,6 +66,18 @@ RSpec.describe PublicProject::Create, type: :unit do
 
       it 'returns error message' do
         expect(create_project[:error]).to eq('Error creating project: Validation failed: Identifier is invalid')
+      end
+    end
+
+    context 'when name is blank' do
+      let(:name) { '' }
+
+      it 'returns failure' do
+        expect(create_project.failure?).to be(true)
+      end
+
+      it 'returns error message' do
+        expect(create_project[:error]).to eq("Error creating project: Validation failed: Name can't be blank")
       end
     end
   end
