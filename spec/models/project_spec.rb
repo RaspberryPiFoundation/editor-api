@@ -160,6 +160,14 @@ RSpec.describe Project, versioning: true do
       project.valid?
       expect(project.identifier).not_to be_nil
     end
+
+    context 'when skip_identifier_generation is true' do
+      it 'does not generate an identifier if nil' do
+        project = build(:project, identifier: nil, skip_identifier_generation: true)
+        project.valid?
+        expect(project.identifier).to be_nil
+      end
+    end
   end
 
   describe 'create_school_project_if_needed' do
