@@ -6,7 +6,9 @@ module PublicProject
       def call(project_hash:)
         response = OperationResponse.new
 
-        project = Project.new(project_hash)
+        project = Project.new(project_hash).tap do |p|
+          p.skip_identifier_generation = true
+        end
         project.save!
 
         response[:project] = project

@@ -28,10 +28,9 @@ RSpec.describe PublicProject::Create, type: :unit do
     end
 
     context 'when creation fails' do
+      let(:project_hash) { {} }
+
       before do
-        mock_project = instance_double(Project)
-        allow(mock_project).to receive(:save!).and_raise('Some error')
-        allow(Project).to receive(:new).and_return(mock_project)
         allow(Sentry).to receive(:capture_exception)
       end
 
@@ -39,13 +38,21 @@ RSpec.describe PublicProject::Create, type: :unit do
         expect(create_project.failure?).to be(true)
       end
 
-      it 'returns error message' do
-        expect(create_project[:error]).to eq('Error creating project: Some error')
-      end
-
       it 'sent the exception to Sentry' do
         create_project
         expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+      end
+    end
+
+    context 'when identifier is blank' do
+      let(:identifier) { nil }
+
+      it 'returns failure' do
+        expect(create_project.failure?).to be(true)
+      end
+
+      it 'returns error message' do
+        expect(create_project[:error]).to eq("Error creating project: Validation failed: Identifier can't be blank")
       end
     end
   end
