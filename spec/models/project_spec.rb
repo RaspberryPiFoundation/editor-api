@@ -155,11 +155,10 @@ RSpec.describe Project, versioning: true do
   end
 
   describe 'generate_identifier' do
-    let(:saved_project) { create(:project) }
-
     it 'generates an identifier if nil' do
-      unsaved_project = build(:project, identifier: nil)
-      expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
+      project = build(:project, identifier: nil)
+      project.valid?
+      expect(project.identifier).not_to be_nil
     end
   end
 
