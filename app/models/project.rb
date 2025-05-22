@@ -7,6 +7,8 @@ class Project < ApplicationRecord
     SCRATCH = 'scratch'
   end
 
+  attr_accessor :skip_identifier_generation
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
@@ -20,7 +22,7 @@ class Project < ApplicationRecord
 
   accepts_nested_attributes_for :components
 
-  before_validation :generate_identifier, on: :create
+  before_validation :generate_identifier, on: :create, unless: :skip_identifier_generation
   before_validation :create_school_project_if_needed
 
   validates :identifier, presence: true, uniqueness: { scope: :locale }
