@@ -55,5 +55,17 @@ RSpec.describe PublicProject::Create, type: :unit do
         expect(create_project[:error]).to eq("Error creating project: Validation failed: Identifier can't be blank")
       end
     end
+
+    context 'when identifier is in invalid format' do
+      let(:identifier) { 'FooBarBaz' }
+
+      it 'returns failure' do
+        expect(create_project.failure?).to be(true)
+      end
+
+      it 'returns error message' do
+        expect(create_project[:error]).to eq('Error creating project: Validation failed: Identifier is invalid')
+      end
+    end
   end
 end
