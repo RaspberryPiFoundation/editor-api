@@ -39,6 +39,15 @@ RSpec.describe 'Creating a public project', type: :request do
     )
   end
 
+  it 'does not set user_id on project even if one is supplied' do
+    user_id = SecureRandom.uuid
+
+    post('/api/public_projects', headers:, params: params.merge(user_id:))
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data).to include(user_id: nil)
+  end
+
   context 'when creator is not an experience-cs admin' do
     let(:creator) { build(:user) }
 
