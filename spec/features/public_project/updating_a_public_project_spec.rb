@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a public project', type: :request do
   let(:creator) { build(:user) }
-  let(:project) { create(:project) }
+  let(:project) { create(:project, locale: 'en') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:params) { { project: { identifier: 'new-identifier', name: 'New name' } } }
 

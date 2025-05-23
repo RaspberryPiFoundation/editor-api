@@ -32,7 +32,9 @@ module Api
     private
 
     def load_project
-      @project = Project.find_by!(identifier: params[:id])
+      loader = ProjectLoader.new(params[:id], [params[:locale]])
+      @project = loader.load
+      raise ActiveRecord::RecordNotFound if @project.blank?
     end
 
     def create_params

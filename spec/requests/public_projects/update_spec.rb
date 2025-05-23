@@ -3,7 +3,9 @@
 require 'rails_helper'
 
 RSpec.describe 'Update public project requests' do
-  let(:project) { create(:project) }
+  let(:locale) { 'fr' }
+  let(:project_loader) { instance_double(ProjectLoader) }
+  let(:project) { create(:project, locale: 'en') }
   let(:creator) { build(:user) }
   let(:params) { { project: { identifier: 'new-identifier', name: 'New name' } } }
 
@@ -14,9 +16,24 @@ RSpec.describe 'Update public project requests' do
       before do
         authenticated_in_hydra_as(creator)
 
+        allow(ProjectLoader).to receive(:new).and_return(project_loader)
+        allow(project_loader).to receive(:load).and_return(project)
+
         response = OperationResponse.new
         response[:project] = project
         allow(PublicProject::Update).to receive(:call).and_return(response)
+      end
+
+      it 'builds ProjectLoader with identifier & locale' do
+        put("/api/public_projects/#{project.identifier}?locale=#{locale}", headers:, params:)
+
+        expect(ProjectLoader).to have_received(:new).with(project.identifier, [locale])
+      end
+
+      it 'uses ProjectLoader#load to find the project based on identifier & locale' do
+        put("/api/public_projects/#{project.identifier}?locale=#{locale}", headers:, params:)
+
+        expect(project_loader).to have_received(:load)
       end
 
       it 'returns success' do
