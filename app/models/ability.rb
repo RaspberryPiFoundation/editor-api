@@ -103,7 +103,10 @@ class Ability
   end
 
   def define_experience_cs_admin_abilities(user)
-    can :create, :public_project if user.experience_cs_admin?
+    return unless user.experience_cs_admin?
+
+    can :create, :public_project
+    can :update, :public_project
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
