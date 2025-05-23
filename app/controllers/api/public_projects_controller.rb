@@ -4,7 +4,7 @@ module Api
   class PublicProjectsController < ApiController
     before_action :authorize_user
     before_action :restrict_project_type, only: %i[create]
-    before_action :load_project, only: %i[update]
+    before_action :load_project, only: %i[update destroy]
     before_action :restrict_to_public_projects, only: %i[update]
 
     def create
@@ -28,6 +28,14 @@ module Api
         render 'api/projects/show', formats: [:json]
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def destroy
+      if @project.destroy
+        head :ok
+      else
+        head :unprocessable_entity
       end
     end
 

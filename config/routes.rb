@@ -41,7 +41,7 @@ Rails.application.routes.draw do
       resource :images, only: %i[show create], controller: 'projects/images'
     end
 
-    resources :public_projects, only: %i[create update]
+    resources :public_projects, only: %i[create update destroy]
 
     resource :project_errors, only: %i[create]
 
