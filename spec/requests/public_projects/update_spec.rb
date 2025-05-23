@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Update public project requests' do
   let(:locale) { 'fr' }
   let(:project_loader) { instance_double(ProjectLoader) }
-  let(:project) { create(:project, locale: 'en') }
+  let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH) }
   let(:creator) { build(:user) }
   let(:params) { { project: { identifier: 'new-identifier', name: 'New name' } } }
 
@@ -25,19 +25,19 @@ RSpec.describe 'Update public project requests' do
       end
 
       it 'builds ProjectLoader with identifier & locale' do
-        put("/api/public_projects/#{project.identifier}?locale=#{locale}", headers:, params:)
+        put("/api/public_projects/#{project.identifier}?project_type=scratch&locale=#{locale}", headers:, params:)
 
         expect(ProjectLoader).to have_received(:new).with(project.identifier, [locale])
       end
 
       it 'uses ProjectLoader#load to find the project based on identifier & locale' do
-        put("/api/public_projects/#{project.identifier}?locale=#{locale}", headers:, params:)
+        put("/api/public_projects/#{project.identifier}?project_type=scratch&locale=#{locale}", headers:, params:)
 
         expect(project_loader).to have_received(:load)
       end
 
       it 'returns success' do
-        put("/api/public_projects/#{project.identifier}", headers:, params:)
+        put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params:)
 
         expect(response).to have_http_status(:success)
       end
@@ -53,7 +53,7 @@ RSpec.describe 'Update public project requests' do
       end
 
       it 'returns error' do
-        put("/api/public_projects/#{project.identifier}", headers:, params:)
+        put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params:)
 
         expect(response).to have_http_status(:unprocessable_entity)
       end
@@ -62,7 +62,7 @@ RSpec.describe 'Update public project requests' do
 
   context 'when no token is given' do
     it 'returns unauthorized' do
-      put("/api/public_projects/#{project.identifier}", headers:, params:)
+      put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params:)
 
       expect(response).to have_http_status(:unauthorized)
     end
