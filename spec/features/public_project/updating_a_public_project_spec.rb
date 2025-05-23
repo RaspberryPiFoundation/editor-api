@@ -25,6 +25,33 @@ RSpec.describe 'Updating a public project', type: :request do
     expect(data).to include(identifier: 'new-identifier', name: 'New name')
   end
 
+  it 'does not change locale on project even if one is supplied' do
+    locale = 'fr'
+
+    put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params: params.merge(locale:))
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data).to include(locale: 'en')
+  end
+
+  it 'does not change project_type on project even if one is supplied' do
+    project_type = Project::Types::PYTHON
+
+    put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params: params.merge(project_type:))
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data).to include(project_type: Project::Types::SCRATCH)
+  end
+
+  it 'does not set user_id on project even if one is supplied' do
+    user_id = SecureRandom.uuid
+
+    put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params: params.merge(user_id:))
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data).to include(user_id: nil)
+  end
+
   context 'when creator is not an experience-cs admin' do
     let(:creator) { build(:user) }
 
