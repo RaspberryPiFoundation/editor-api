@@ -67,6 +67,7 @@ class Ability
     can(%i[read create create_batch update destroy], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
+    can(%i[remix], Lesson)
   end
 
   def define_school_teacher_abilities(user:, school:)
@@ -81,6 +82,7 @@ class Ability
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
+    can(%i[remix], Lesson)
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
