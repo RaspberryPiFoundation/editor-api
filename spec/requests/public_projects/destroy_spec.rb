@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Destroy public project requests' do
   let(:locale) { 'fr' }
   let(:project_loader) { instance_double(ProjectLoader) }
-  let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH) }
+  let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH, user_id: nil) }
   let(:destroyer) { build(:experience_cs_admin_user) }
 
   context 'when auth is correct' do

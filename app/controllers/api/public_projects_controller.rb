@@ -5,7 +5,7 @@ module Api
     before_action :authorize_user
     before_action :restrict_project_type, only: %i[create]
     before_action :load_project, only: %i[update destroy]
-    before_action :restrict_to_public_projects, only: %i[update]
+    before_action :restrict_to_public_projects, only: %i[update destroy]
 
     def create
       authorize! :create, :public_project
