@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Destroy public project requests' do
   let(:locale) { 'fr' }
   let(:project_loader) { instance_double(ProjectLoader) }
-  let(:project) { create(:project, locale: 'en') }
+  let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH) }
   let(:destroyer) { build(:experience_cs_admin_user) }
 
   context 'when auth is correct' do
@@ -24,19 +24,19 @@ RSpec.describe 'Destroy public project requests' do
       end
 
       it 'builds ProjectLoader with identifier & locale' do
-        delete("/api/public_projects/#{project.identifier}?locale=#{locale}", headers:)
+        delete("/api/public_projects/#{project.identifier}?project_type=scratch&locale=#{locale}", headers:)
 
         expect(ProjectLoader).to have_received(:new).with(project.identifier, [locale])
       end
 
       it 'uses ProjectLoader#load to find the project based on identifier & locale' do
-        delete("/api/public_projects/#{project.identifier}?locale=#{locale}", headers:)
+        delete("/api/public_projects/#{project.identifier}?project_type=scratch&locale=#{locale}", headers:)
 
         expect(project_loader).to have_received(:load)
       end
 
       it 'returns success' do
-        delete("/api/public_projects/#{project.identifier}", headers:)
+        delete("/api/public_projects/#{project.identifier}?project_type=scratch", headers:)
 
         expect(response).to have_http_status(:success)
       end
@@ -50,7 +50,7 @@ RSpec.describe 'Destroy public project requests' do
       end
 
       it 'returns error' do
-        delete("/api/public_projects/#{project.identifier}", headers:)
+        delete("/api/public_projects/#{project.identifier}?project_type=scratch", headers:)
 
         expect(response).to have_http_status(:unprocessable_entity)
       end
@@ -59,7 +59,7 @@ RSpec.describe 'Destroy public project requests' do
 
   context 'when no token is given' do
     it 'returns unauthorized' do
-      delete("/api/public_projects/#{project.identifier}")
+      delete("/api/public_projects/#{project.identifier}?project_type=scratch")
 
       expect(response).to have_http_status(:unauthorized)
     end
