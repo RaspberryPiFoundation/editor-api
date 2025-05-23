@@ -32,6 +32,8 @@ module Api
     end
 
     def destroy
+      authorize! :update, :public_project
+
       if @project.destroy
         head :ok
       else

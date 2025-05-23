@@ -6,7 +6,7 @@ RSpec.describe 'Destroy public project requests' do
   let(:locale) { 'fr' }
   let(:project_loader) { instance_double(ProjectLoader) }
   let(:project) { create(:project, locale: 'en') }
-  let(:destroyer) { build(:user) }
+  let(:destroyer) { build(:experience_cs_admin_user) }
 
   context 'when auth is correct' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Destroying a public project', type: :request do
-  let(:destroyer) { build(:user) }
+  let(:destroyer) { build(:experience_cs_admin_user) }
   let(:project) { create(:project, locale: 'en') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
@@ -24,6 +24,15 @@ RSpec.describe 'Destroying a public project', type: :request do
   it 'responds 401 Unauthorized when no token is given' do
     delete("/api/public_projects/#{project.identifier}")
     expect(response).to have_http_status(:unauthorized)
+  end
+
+  context 'when destroyer is not an experience-cs admin' do
+    let(:destroyer) { build(:user) }
+
+    it 'responds 403 Forbidden' do
+      delete("/api/public_projects/#{project.identifier}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   it 'responds 404 Not Found when project is not found' do
