@@ -4,7 +4,8 @@ require 'rails_helper'
 
 RSpec.describe 'Updating a public project', type: :request do
   let(:creator) { build(:experience_cs_admin_user) }
-  let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH) }
+  let(:user_id) { nil }
+  let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH, user_id:) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:params) { { project: { identifier: 'new-identifier', name: 'New name' } } }
 
@@ -41,6 +42,15 @@ RSpec.describe 'Updating a public project', type: :request do
   it 'responds 401 Unauthorized when no token is given' do
     put("/api/public_projects/#{project.identifier}?project_type=scratch", params:)
     expect(response).to have_http_status(:unauthorized)
+  end
+
+  context 'when project is not public' do
+    let(:user_id) { SecureRandom.uuid }
+
+    it 'responds 403 Forbidden' do
+      put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   it 'responds 404 Not Found when project is not found' do

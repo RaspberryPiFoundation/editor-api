@@ -5,6 +5,7 @@ module Api
     before_action :authorize_user
     before_action :restrict_project_type, only: %i[create]
     before_action :load_project, only: %i[update]
+    before_action :restrict_to_public_projects, only: %i[update]
 
     def create
       authorize! :create, :public_project
@@ -51,6 +52,12 @@ module Api
       return if project_type == Project::Types::SCRATCH
 
       raise CanCan::AccessDenied.new("#{project_type} not yet supported", :create, :public_project)
+    end
+
+    def restrict_to_public_projects
+      return if @project.user_id.blank?
+
+      raise CanCan::AccessDenied.new('Cannot update non-public project', :update, :public_project)
     end
   end
 end
