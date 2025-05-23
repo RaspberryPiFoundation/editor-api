@@ -6,6 +6,7 @@ module Api
     before_action :restrict_project_type, only: %i[create]
     before_action :load_project, only: %i[update destroy]
     before_action :restrict_to_public_projects, only: %i[update destroy]
+    before_action :prevent_destruction_of_public_project_with_remixes, only: %i[destroy]
 
     def create
       authorize! :create, :public_project
@@ -68,6 +69,12 @@ module Api
       return if @project.user_id.blank?
 
       raise CanCan::AccessDenied.new('Cannot update non-public project', :update, :public_project)
+    end
+
+    def prevent_destruction_of_public_project_with_remixes
+      return if @project.remixes.none?
+
+      raise CanCan::AccessDenied.new('Cannot destroy public project with remixes', :update, :public_project)
     end
   end
 end

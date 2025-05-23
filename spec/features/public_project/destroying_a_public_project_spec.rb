@@ -45,6 +45,17 @@ RSpec.describe 'Destroying a public project', type: :request do
     end
   end
 
+  context 'when project has one or more remixes' do
+    before do
+      project.remixes.create!(attributes_for(:project))
+    end
+
+    it 'responds 403 Forbidden' do
+      delete("/api/public_projects/#{project.identifier}?project_type=scratch", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
+
   it 'responds 404 Not Found when project is not found' do
     delete('/api/public_projects/another-identifier?project_type=scratch', headers:)
     expect(response).to have_http_status(:not_found)
