@@ -84,4 +84,9 @@ RSpec.describe 'Updating a public project', type: :request do
     put('/api/public_projects/another-identifier?project_type=scratch', headers:, params:)
     expect(response).to have_http_status(:not_found)
   end
+
+  it 'responds 422 Unprocessable Entity when params are invalid' do
+    put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params: { project: { name: '' } })
+    expect(response).to have_http_status(:unprocessable_entity)
+  end
 end

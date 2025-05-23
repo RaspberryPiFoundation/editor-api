@@ -43,5 +43,41 @@ RSpec.describe PublicProject::Update, type: :unit do
         expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
     end
+
+    context 'when identifier is blank' do
+      let(:new_identifier) { nil }
+
+      it 'returns failure' do
+        expect(update_project.failure?).to be(true)
+      end
+
+      it 'returns error message' do
+        expect(update_project[:error]).to eq("Error updating project: Validation failed: Identifier can't be blank")
+      end
+    end
+
+    context 'when identifier is in invalid format' do
+      let(:new_identifier) { 'FooBarBaz' }
+
+      it 'returns failure' do
+        expect(update_project.failure?).to be(true)
+      end
+
+      it 'returns error message' do
+        expect(update_project[:error]).to eq('Error updating project: Validation failed: Identifier is invalid')
+      end
+    end
+
+    context 'when name is blank' do
+      let(:new_name) { '' }
+
+      it 'returns failure' do
+        expect(update_project.failure?).to be(true)
+      end
+
+      it 'returns error message' do
+        expect(update_project[:error]).to eq("Error updating project: Validation failed: Name can't be blank")
+      end
+    end
   end
 end

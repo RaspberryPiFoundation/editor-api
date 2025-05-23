@@ -7,9 +7,10 @@ class PublicProject
         response = OperationResponse.new
 
         project.assign_attributes(update_hash)
-        project.save!
+        public_project = PublicProject.new(project)
+        public_project.save!
 
-        response[:project] = project
+        response[:project] = public_project.project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
