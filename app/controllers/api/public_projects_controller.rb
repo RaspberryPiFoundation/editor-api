@@ -19,6 +19,7 @@ module Api
     end
 
     def update
+      authorize! :update, :public_project
       result = PublicProject::Update.call(project: @project, update_hash: update_params)
 
       if result.success?

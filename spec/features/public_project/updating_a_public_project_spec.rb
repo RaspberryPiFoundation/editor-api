@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Updating a public project', type: :request do
-  let(:creator) { build(:user) }
+  let(:creator) { build(:experience_cs_admin_user) }
   let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH) }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:params) { { project: { identifier: 'new-identifier', name: 'New name' } } }
@@ -22,6 +22,15 @@ RSpec.describe 'Updating a public project', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data).to include(identifier: 'new-identifier', name: 'New name')
+  end
+
+  context 'when creator is not an experience-cs admin' do
+    let(:creator) { build(:user) }
+
+    it 'responds 403 Forbidden' do
+      put("/api/public_projects/#{project.identifier}?project_type=scratch", headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   it 'responds 400 Bad Request when params are malformed' do

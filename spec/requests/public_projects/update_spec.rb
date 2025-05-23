@@ -6,7 +6,7 @@ RSpec.describe 'Update public project requests' do
   let(:locale) { 'fr' }
   let(:project_loader) { instance_double(ProjectLoader) }
   let(:project) { create(:project, locale: 'en', project_type: Project::Types::SCRATCH) }
-  let(:creator) { build(:user) }
+  let(:creator) { build(:experience_cs_admin_user) }
   let(:params) { { project: { identifier: 'new-identifier', name: 'New name' } } }
 
   context 'when auth is correct' do
