@@ -23,7 +23,7 @@ json.array!(@lessons_with_users) do |lesson, user|
       :identifier,
       :project_type
     )
-    json.project.finished(lesson.project.finished) if lesson.project.remixed_from_id.present?
+    # json.project.finished(lesson.project.finished) if lesson.project.remixed_from_id.present?
   end
 
   json.user_name(user&.name)

@@ -60,7 +60,7 @@ class Project
           proj.remixed_from_id = original_project.id
           proj.remix_origin = remix_origin
           proj.lesson_id = nil # Only the original can have a lesson id
-          proj.school_id = params[:school_id]
+          proj.school_id = params[:school_id] || original_project.school_id
         end
       end
     end
