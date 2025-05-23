@@ -107,6 +107,7 @@ class Ability
 
     can :create, :public_project
     can :update, :public_project
+    can :destroy, :public_project
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
