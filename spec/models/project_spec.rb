@@ -154,12 +154,19 @@ RSpec.describe Project, versioning: true do
     end
   end
 
-  describe 'check_unique_not_null' do
-    let(:saved_project) { create(:project) }
-
+  describe 'generate_identifier' do
     it 'generates an identifier if nil' do
-      unsaved_project = build(:project, identifier: nil)
-      expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
+      project = build(:project, identifier: nil)
+      project.valid?
+      expect(project.identifier).not_to be_nil
+    end
+
+    context 'when skip_identifier_generation is true' do
+      it 'does not generate an identifier if nil' do
+        project = build(:project, identifier: nil, skip_identifier_generation: true)
+        project.valid?
+        expect(project.identifier).to be_nil
+      end
     end
   end
 

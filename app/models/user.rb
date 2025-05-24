@@ -51,7 +51,15 @@ class User
   end
 
   def admin?
-    (roles&.to_s&.split(',')&.map(&:strip) || []).include?('editor-admin')
+    parsed_roles.include?('editor-admin')
+  end
+
+  def experience_cs_admin?
+    parsed_roles.include?('experience-cs-admin')
+  end
+
+  def parsed_roles
+    roles&.to_s&.split(',')&.map(&:strip) || []
   end
 
   def ==(other)
