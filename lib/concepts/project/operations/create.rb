@@ -3,10 +3,10 @@
 class Project
   class Create
     class << self
-      def call(project_hash:)
+      def call(project_hash:, current_user:)
         response = OperationResponse.new
 
-        project = build_project(project_hash)
+        project = build_project(project_hash, current_user)
         project.save!
 
         response[:project] = project
@@ -19,7 +19,7 @@ class Project
 
       private
 
-      def build_project(project_hash)
+      def build_project(project_hash, _current_user)
         new_project = Project.new(project_hash.except(:components))
         new_project.components.build(project_hash[:components])
         new_project

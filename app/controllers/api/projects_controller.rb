@@ -27,7 +27,7 @@ module Api
     end
 
     def create
-      result = Project::Create.call(project_hash: project_params)
+      result = Project::Create.call(project_hash: project_params, current_user:)
 
       if result.success?
         @project = result[:project]
