@@ -144,6 +144,7 @@ RSpec.describe Ability do
 
       it { is_expected.to be_able_to(:create, starter_project) }
       it { is_expected.to be_able_to(:update, starter_project) }
+      it { is_expected.to be_able_to(:destroy, starter_project) }
     end
 
     # rubocop:disable RSpec/MultipleMemoizedHelpers
