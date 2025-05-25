@@ -3,11 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
+  let(:generated_identifier) { 'word1-word2-word3' }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
   let(:owner) { create(:owner, school:) }
-
   let(:params) do
     {
       project: {
@@ -21,12 +21,19 @@ RSpec.describe 'Creating a project', type: :request do
 
   before do
     authenticated_in_hydra_as(teacher)
-    mock_phrase_generation
+    mock_phrase_generation(generated_identifier)
   end
 
   it 'responds 201 Created' do
     post('/api/projects', headers:, params:)
     expect(response).to have_http_status(:created)
+  end
+
+  it 'generates an identifier for the project' do
+    post('/api/projects', headers:, params:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:identifier]).to eq(generated_identifier)
   end
 
   it 'responds with the project JSON' do
