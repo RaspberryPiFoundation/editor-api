@@ -3,11 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
-  before do
-    authenticated_in_hydra_as(teacher)
-    mock_phrase_generation
-  end
-
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
@@ -22,6 +17,11 @@ RSpec.describe 'Creating a project', type: :request do
         ]
       }
     }
+  end
+
+  before do
+    authenticated_in_hydra_as(teacher)
+    mock_phrase_generation
   end
 
   it 'responds 201 Created' do
