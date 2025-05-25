@@ -207,4 +207,48 @@ RSpec.describe 'Creating a project', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  context 'when the user is an Experience CS admin' do
+    let(:experience_cs_admin) { create(:experience_cs_admin_user) }
+    let(:params) do
+      {
+        project: {
+          name: 'Test Project',
+          locale: 'fr',
+          project_type: Project::Types::SCRATCH,
+          components: []
+        }
+      }
+    end
+
+    before do
+      authenticated_in_hydra_as(experience_cs_admin)
+    end
+
+    it 'responds 201 Created' do
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'sets the project name to the specified value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:name]).to eq('Test Project')
+    end
+
+    it 'sets the project locale to the specified value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:locale]).to eq('fr')
+    end
+
+    it 'sets the project type to the specified value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:project_type]).to eq(Project::Types::SCRATCH)
+    end
+  end
 end

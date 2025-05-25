@@ -139,6 +139,12 @@ RSpec.describe Ability do
       end
     end
 
+    context 'with an experience-cs admin' do
+      let(:user) { build(:experience_cs_admin_user) }
+
+      it { is_expected.to be_able_to(:create, starter_project) }
+    end
+
     # rubocop:disable RSpec/MultipleMemoizedHelpers
     context "with a teacher's project where the lesson is visible to students" do
       let(:user) { create(:user) }
