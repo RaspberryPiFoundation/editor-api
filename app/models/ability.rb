@@ -106,6 +106,7 @@ class Ability
     return unless user&.experience_cs_admin?
 
     can :create, Project
+    can :update, Project
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
