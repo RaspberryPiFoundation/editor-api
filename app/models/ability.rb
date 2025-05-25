@@ -14,6 +14,8 @@ class Ability
       define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
       define_school_owner_abilities(school:) if user.school_owner?(school)
     end
+
+    define_experience_cs_admin_abilities(user)
   end
 
   private
@@ -98,6 +100,12 @@ class Ability
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(visibility: 'students').select(:id)).pluck(:id))
     can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
     can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
+  end
+
+  def define_experience_cs_admin_abilities(user)
+    return unless user&.experience_cs_admin?
+
+    can :create, Project
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
