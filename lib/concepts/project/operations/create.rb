@@ -5,8 +5,11 @@ class Project
     class << self
       def call(project_hash:)
         response = OperationResponse.new
-        response[:project] = build_project(project_hash)
-        response[:project].save!
+
+        project = build_project(project_hash)
+        project.save!
+
+        response[:project] = project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -17,8 +20,8 @@ class Project
       private
 
       def build_project(project_hash)
-        identifier = PhraseIdentifier.generate
-        new_project = Project.new(project_hash.except(:components).merge(identifier:))
+        project_hash[:identifier] = PhraseIdentifier.generate
+        new_project = Project.new(project_hash.except(:components))
         new_project.components.build(project_hash[:components])
         new_project
       end
