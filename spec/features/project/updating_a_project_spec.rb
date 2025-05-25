@@ -3,12 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Updating a project', type: :request do
-  before do
-    authenticated_in_hydra_as(owner)
-
-    create(:component, project:, name: 'main', extension: 'py', content: 'print("hi")')
-  end
-
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let!(:project) { create(:project, name: 'Test Project', user_id: owner.id) }
   let(:owner) { create(:owner, school:) }
@@ -23,6 +17,12 @@ RSpec.describe 'Updating a project', type: :request do
         ]
       }
     }
+  end
+
+  before do
+    authenticated_in_hydra_as(owner)
+
+    create(:component, project:, name: 'main', extension: 'py', content: 'print("hi")')
   end
 
   it 'responds 200 OK' do
