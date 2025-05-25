@@ -29,8 +29,9 @@ RSpec.describe 'Creating a project', type: :request do
     expect(response).to have_http_status(:created)
   end
 
-  it 'generates an identifier for the project' do
-    post('/api/projects', headers:, params:)
+  it 'generates an identifier for the project even if another identifier is specified' do
+    params_with_identifier = { project: { identifier: 'test-identifier', components: [] } }
+    post('/api/projects', headers:, params: params_with_identifier)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:identifier]).to eq(generated_identifier)
@@ -213,6 +214,7 @@ RSpec.describe 'Creating a project', type: :request do
     let(:params) do
       {
         project: {
+          identifier: 'test-project',
           name: 'Test Project',
           locale: 'fr',
           project_type: Project::Types::SCRATCH,
@@ -228,6 +230,13 @@ RSpec.describe 'Creating a project', type: :request do
     it 'responds 201 Created' do
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
+    end
+
+    it 'sets the project identifier to the specified (not the generated) value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:identifier]).to eq('test-project')
     end
 
     it 'sets the project name to the specified value' do
