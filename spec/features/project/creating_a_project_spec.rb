@@ -218,6 +218,7 @@ RSpec.describe 'Creating a project', type: :request do
           name: 'Test Project',
           locale: 'fr',
           project_type: Project::Types::SCRATCH,
+          user_id: nil,
           components: []
         }
       }
@@ -258,6 +259,13 @@ RSpec.describe 'Creating a project', type: :request do
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:project_type]).to eq(Project::Types::SCRATCH)
+    end
+
+    it 'sets the project user_id to the specified value (i.e. nil to represent a public project)' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:user_id]).to be_nil
     end
   end
 end
