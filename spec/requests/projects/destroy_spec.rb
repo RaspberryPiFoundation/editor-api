@@ -37,7 +37,7 @@ RSpec.describe 'Project delete requests' do
       end
     end
 
-    context 'when experience-cs admin deleting a Scratch starter project' do
+    context 'when an Experience CS admin destroys a starter Scratch project' do
       let(:project) do
         create(
           :project, {
