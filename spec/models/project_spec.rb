@@ -323,8 +323,8 @@ RSpec.describe Project, versioning: true do
   describe 'default scope' do
     let!(:python_project) { create(:project, project_type: Project::Types::PYTHON) }
     let!(:html_project) { create(:project, project_type: Project::Types::HTML) }
-    let!(:project_with_unknown_type) { create(:project, project_type: 'unknown') }
     let!(:scratch_project) { create(:project, project_type: Project::Types::SCRATCH) }
+    let!(:project_with_unknown_type) { create(:project, project_type: 'unknown') }
 
     it 'includes python projects' do
       expect(described_class.all).to include(python_project)
@@ -334,12 +334,12 @@ RSpec.describe Project, versioning: true do
       expect(described_class.all).to include(html_project)
     end
 
-    it 'includes projects with unknown type' do
-      expect(described_class.all).to include(project_with_unknown_type)
+    it 'includes scratch projects' do
+      expect(described_class.all).to include(scratch_project)
     end
 
-    it 'does not include scratch projects' do
-      expect(described_class.all).not_to include(scratch_project)
+    it 'includes projects with unknown type' do
+      expect(described_class.all).to include(project_with_unknown_type)
     end
   end
 
@@ -362,12 +362,12 @@ RSpec.describe Project, versioning: true do
         expect(projects_in_scope).to include(html_project)
       end
 
-      it 'includes projects with unknown type' do
-        expect(projects_in_scope).to include(project_with_unknown_type)
+      it 'includes scratch projects' do
+        expect(projects_in_scope).to include(scratch_project)
       end
 
-      it 'does not include scratch projects' do
-        expect(projects_in_scope).not_to include(scratch_project)
+      it 'includes projects with unknown type' do
+        expect(projects_in_scope).to include(project_with_unknown_type)
       end
     end
 
