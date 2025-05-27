@@ -209,7 +209,7 @@ RSpec.describe 'Creating a project', type: :request do
     end
   end
 
-  context 'when the user is an Experience CS admin' do
+  context 'when an Experience CS admin creates a starter Scratch project' do
     let(:experience_cs_admin) { create(:experience_cs_admin_user) }
     let(:params) do
       {

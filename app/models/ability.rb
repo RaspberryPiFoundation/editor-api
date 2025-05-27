@@ -105,9 +105,7 @@ class Ability
   def define_experience_cs_admin_abilities(user)
     return unless user&.experience_cs_admin?
 
-    can :create, Project
-    can :update, Project
-    can :destroy, Project
+    can %i[read create update destroy], Project, user_id: nil
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
