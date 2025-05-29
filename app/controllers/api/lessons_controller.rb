@@ -44,9 +44,7 @@ module Api
     def create_from_project
       remix_origin = request.origin || request.referer
 
-      puts("lesson_params: #{lesson_params}")
-
-      result = Lesson::CreateFromProject.call(lesson_params: lesson_params, remix_origin:)
+      result = Lesson::CreateFromProject.call(lesson_params:, remix_origin:)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
