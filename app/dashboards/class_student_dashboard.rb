@@ -2,7 +2,7 @@
 
 require 'administrate/base_dashboard'
 
-class LessonDashboard < Administrate::BaseDashboard
+class ClassStudentDashboard < Administrate::BaseDashboard
   # ATTRIBUTE_TYPES
   # a hash that describes the type of each of the model's fields.
   #
@@ -10,19 +10,8 @@ class LessonDashboard < Administrate::BaseDashboard
   # which determines how the attribute is displayed
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
-    school: Field::BelongsTo,
-    school_class: Field::BelongsTo,
-    parent: Field::BelongsTo,
-    copies: Field::HasMany,
-    project: Field::HasOne,
-    id: Field::String,
-    copied_from_id: Field::String,
-    user_id: Field::String,
-    name: Field::String,
-    description: Field::String,
-    visibility: Field::String,
-    due_date: Field::DateTime,
-    archived_at: Field::DateTime,
+    school_class: Field::HasOne,
+    student_id: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -33,27 +22,15 @@ class LessonDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
-    name
-    school_class
-    copies
+    student_id
+    created_at
+    updated_at
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
-    school
-    school_class
-    project
-    parent
-    copies
-    id
-    copied_from_id
-    user_id
-    name
-    description
-    visibility
-    due_date
-    archived_at
+    student_id_changed
     created_at
     updated_at
   ].freeze
@@ -61,7 +38,11 @@ class LessonDashboard < Administrate::BaseDashboard
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
-  FORM_ATTRIBUTES = %i[].freeze
+  FORM_ATTRIBUTES = %i[
+    school_class
+    created_at
+    updated_at
+  ].freeze
 
   # COLLECTION_FILTERS
   # a hash that defines filters that can be used while searching via the search
@@ -75,10 +56,10 @@ class LessonDashboard < Administrate::BaseDashboard
   #   }.freeze
   COLLECTION_FILTERS = {}.freeze
 
-  # Overwrite this method to customize how lessons are displayed
+  # Overwrite this method to customize how school classes are displayed
   # across all pages of the admin dashboard.
   #
-  def display_resource(lesson)
-    lesson.name
-  end
+  # def display_resource(school_class)
+  #   "SchoolClass ##{school_class.id}"
+  # end
 end

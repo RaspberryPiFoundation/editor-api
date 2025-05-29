@@ -20,3 +20,9 @@ en:
       reopen_school:
         success: "Successfully reopened."
         error: "There was an error reopening the school"
+  activerecord:
+    attributes:
+      school:
+        user_origin_values:
+          for_education: "Code Editor for Education"
+          experience_cs: "Experience CS"

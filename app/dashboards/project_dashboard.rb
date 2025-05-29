@@ -11,7 +11,7 @@ class ProjectDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     id: Field::String,
-    components: Field::HasMany,
+    # components: Field::HasMany,
     identifier: Field::String,
     images: Field::ActiveStorage.with_options(
       direct_upload: true,
@@ -37,14 +37,12 @@ class ProjectDashboard < Administrate::BaseDashboard
     name
     identifier
     project_type
-    updated_at
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     id
-    components
     identifier
     locale
     name
@@ -82,7 +80,7 @@ class ProjectDashboard < Administrate::BaseDashboard
     "Project ##{project.name}"
   end
 
-  def permitted_attributes
-    super + [images: []]
-  end
+  # def permitted_attributes
+  #   super + [images: []]
+  # end
 end
