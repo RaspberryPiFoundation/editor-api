@@ -4,7 +4,7 @@ module Api
   class LessonsController < ApiController
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
-    load_and_authorize_resource :lesson
+    load_and_authorize_resource :lesson, except: [:create_from_project]
 
     def index
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
@@ -32,6 +32,21 @@ module Api
 
     def create_copy
       result = Lesson::CreateCopy.call(lesson: @lesson, lesson_params:)
+
+      if result.success?
+        @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def create_from_project
+      remix_origin = request.origin || request.referer
+
+      puts("lesson_params: #{lesson_params}")
+
+      result = Lesson::CreateFromProject.call(lesson_params: lesson_params, remix_origin:)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
@@ -86,6 +101,7 @@ module Api
         :description,
         :visibility,
         :due_date,
+        :project_identifier,
         {
           project_attributes: [
             :name,
