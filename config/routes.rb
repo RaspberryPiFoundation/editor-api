@@ -61,6 +61,7 @@ Rails.application.routes.draw do
 
     resources :lessons, only: %i[index create show update destroy] do
       post :copy, on: :member, to: 'lessons#create_copy'
+      post :remix, on: :collection, to: 'lessons#create_lesson_with_remix'
     end
 
     resources :teacher_invitations, param: :token, only: :show do
