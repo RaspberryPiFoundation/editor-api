@@ -61,7 +61,7 @@ module Api
     def update
       # TODO: Consider removing user_id from the lesson_params for update so users can update other users' lessons without changing ownership
       # OR consider dropping user_id on lessons and using teacher id/ids on the class instead
-      result = Lesson::Update.call(lesson: @lesson, lesson_params:)
+      result = Lesson::Update.call(lesson: @lesson, lesson_params: base_params)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user

@@ -44,7 +44,7 @@ RSpec.describe 'Archiving a lesson', type: :request do
   end
 
   it "responds 403 Forbidden when the user is not the lesson's owner" do
-    lesson.update!(user_id: SecureRandom.uuid)
+    authenticated_in_hydra_as(teacher)
 
     delete("/api/lessons/#{lesson.id}", headers:)
     expect(response).to have_http_status(:forbidden)
