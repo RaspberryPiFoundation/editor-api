@@ -31,6 +31,7 @@ class Project < ApplicationRecord
   validate :project_with_instructions_must_belong_to_school
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
+  validate :lesson_id_cannot_be_changed
 
   default_scope -> { where.not(project_type: Types::SCRATCH) }
 
@@ -141,5 +142,11 @@ class Project < ApplicationRecord
     return unless school_id && school_project && school_id != school_project.school_id
 
     errors.add(:school_project, 'School project school_id must match project school_id')
+  end
+
+  def lesson_id_cannot_be_changed
+    return unless lesson_id_changed? && lesson_id_was.present?
+
+    errors.add(:lesson_id, 'cannot be changed once set')
   end
 end

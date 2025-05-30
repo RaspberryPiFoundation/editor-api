@@ -41,10 +41,27 @@ module Api
       end
     end
 
+    def create_from_project
+      # authorize the project
+      if lesson_params[:project_identifier].present?
+        project = Project.find_by(identifier: lesson_params[:project_identifier])
+        authorize! :update, project if project
+      end
+
+      result = Lesson::CreateFromProject.call(lesson_params:)
+
+      if result.success?
+        @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     def update
       # TODO: Consider removing user_id from the lesson_params for update so users can update other users' lessons without changing ownership
       # OR consider dropping user_id on lessons and using teacher id/ids on the class instead
-      result = Lesson::Update.call(lesson: @lesson, lesson_params:)
+      result = Lesson::Update.call(lesson: @lesson, lesson_params: base_params)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
@@ -86,6 +103,7 @@ module Api
         :description,
         :visibility,
         :due_date,
+        :project_identifier,
         {
           project_attributes: [
             :name,
