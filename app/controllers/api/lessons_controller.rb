@@ -4,7 +4,7 @@ module Api
   class LessonsController < ApiController
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
-    load_and_authorize_resource :lesson, except: [:create_from_project]
+    load_and_authorize_resource :lesson
 
     def index
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
@@ -43,6 +43,12 @@ module Api
 
     def create_from_project
       remix_origin = request.origin || request.referer
+
+      # authorize the project if it exists
+      if lesson_params[:project_identifier].present?
+        project = Project.find_by(identifier: lesson_params[:project_identifier])
+        authorize! :update, project if project
+      end
 
       result = Lesson::CreateFromProject.call(lesson_params:, remix_origin:)
 

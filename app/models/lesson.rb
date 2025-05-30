@@ -17,6 +17,8 @@ class Lesson < ApplicationRecord
 
   validate :user_has_the_school_owner_or_school_teacher_role_for_the_school
   validate :user_is_the_school_teacher_for_the_school_class
+  validate :project_belongs_to_the_same_school
+  validate :project_belongs_to_the_same_user
 
   scope :archived, -> { where.not(archived_at: nil) }
   scope :unarchived, -> { where(archived_at: nil) }
@@ -73,5 +75,17 @@ class Lesson < ApplicationRecord
     return if !school_class || school_class.teacher_ids.include?(user_id)
 
     errors.add(:user, "'#{user_id}' is not the 'school-teacher' for school_class '#{school_class.id}'")
+  end
+
+  def project_belongs_to_the_same_school
+    return unless project && school && project.school_id != school.id
+
+    errors.add(:project, "must belong to the same school (#{school.id}) as the lesson (#{id})")
+  end
+
+  def project_belongs_to_the_same_user
+    return unless project && user_id && project.user_id != user_id
+
+    errors.add(:project, "must belong to the same user (#{user_id}) as the lesson (#{id})")
   end
 end

@@ -67,7 +67,6 @@ class Ability
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
-    can(%i[create_from_project], Lesson)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
   end
@@ -84,7 +83,9 @@ class Ability
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
-    can(%i[create_from_project], Lesson)
+    can(%i[create_from_project], Lesson) do |lesson|
+      school_teacher_can_manage_lesson?(user:, school:, lesson:) && school_teacher_can_manage_project?(user:, school:, project: lesson.project)
+    end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)

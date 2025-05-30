@@ -11,7 +11,7 @@ class Lesson
       rescue StandardError => e
         Sentry.capture_exception(e)
         errors = response[:lesson].errors.full_messages.join(',')
-        response[:error] = "Error creating remix of lesson: #{errors}"
+        response[:error] = "Error creating lesson from project: #{errors}"
         response
       end
 
