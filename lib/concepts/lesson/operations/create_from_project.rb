@@ -3,9 +3,9 @@
 class Lesson
   class CreateFromProject
     class << self
-      def call(lesson_params:, remix_origin:)
+      def call(lesson_params:)
         response = OperationResponse.new
-        response[:lesson] = build_lesson_from_project(lesson_params, remix_origin)
+        response[:lesson] = build_lesson_from_project(lesson_params)
         response[:lesson].save!
         response
       rescue StandardError => e
@@ -17,7 +17,7 @@ class Lesson
 
       private
 
-      def build_lesson_from_project(lesson_params, _remix_origin)
+      def build_lesson_from_project(lesson_params)
         project = Project.find_by(identifier: lesson_params[:project_identifier])
         lesson = Lesson.new(
           name: project.name

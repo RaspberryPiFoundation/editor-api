@@ -78,9 +78,9 @@ class Lesson < ApplicationRecord
   end
 
   def project_belongs_to_the_same_school
-    return unless project && school && project.school_id != school.id
+    return unless (project && (school || project&.school) && project&.school_id != school&.id)
 
-    errors.add(:project, "must belong to the same school (#{school.id}) as the lesson (#{id})")
+    errors.add(:project, "must belong to the same school (#{school&.id}) as the lesson (#{id})")
   end
 
   def project_belongs_to_the_same_user

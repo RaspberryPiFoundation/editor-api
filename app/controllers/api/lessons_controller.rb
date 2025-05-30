@@ -42,15 +42,13 @@ module Api
     end
 
     def create_from_project
-      remix_origin = request.origin || request.referer
-
-      # authorize the project if it exists
+      # authorize the project
       if lesson_params[:project_identifier].present?
         project = Project.find_by(identifier: lesson_params[:project_identifier])
         authorize! :update, project if project
       end
 
-      result = Lesson::CreateFromProject.call(lesson_params:, remix_origin:)
+      result = Lesson::CreateFromProject.call(lesson_params:)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
