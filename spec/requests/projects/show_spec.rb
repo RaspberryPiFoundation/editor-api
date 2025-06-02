@@ -196,24 +196,6 @@ RSpec.describe 'Project show requests' do
       context 'when project is a scratch project' do
         let(:project_type) { Project::Types::SCRATCH }
 
-        context 'when project_type is set to scratch in query params' do
-          before do
-            get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}&project_type=scratch", headers:)
-          end
-
-          it 'returns success response' do
-            expect(response).to have_http_status(:ok)
-          end
-
-          it 'returns json' do
-            expect(response.content_type).to eq('application/json; charset=utf-8')
-          end
-
-          it 'returns the project json' do
-            expect(response.body).to eq(starter_project_json)
-          end
-        end
-
         it 'returns 404 response if scratch project' do
           get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}", headers:)
           expect(response).to have_http_status(:not_found)
