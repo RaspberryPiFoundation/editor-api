@@ -32,8 +32,6 @@ class Project < ApplicationRecord
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
 
-  default_scope -> { where.not(project_type: Types::SCRATCH) }
-
   scope :internal_projects, -> { where(user_id: nil) }
 
   has_paper_trail(

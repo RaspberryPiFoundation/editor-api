@@ -193,15 +193,6 @@ RSpec.describe 'Project show requests' do
         expect(response).to have_http_status(:not_found)
       end
 
-      context 'when project is a scratch project' do
-        let(:project_type) { Project::Types::SCRATCH }
-
-        it 'returns 404 response if scratch project' do
-          get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}", headers:)
-          expect(response).to have_http_status(:not_found)
-        end
-      end
-
       it 'creates a new ProjectLoader with the correct parameters' do
         allow(ProjectLoader).to receive(:new).and_call_original
         get("/api/projects/#{starter_project.identifier}?locale=#{starter_project.locale}", headers:)
