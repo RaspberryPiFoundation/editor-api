@@ -67,7 +67,6 @@ class Ability
     can(%i[read create create_batch update destroy], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
-    can(%i[remix], Lesson)
   end
 
   def define_school_teacher_abilities(user:, school:)
@@ -82,7 +81,10 @@ class Ability
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
-    can(%i[remix], Lesson)
+    can(%i[remix], Lesson) do |lesson|
+      pp 'checking user can remix lesson'
+      school_teacher_can_remix_lesson?(user:, school:, lesson:)
+    end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
@@ -114,5 +116,11 @@ class Ability
     is_my_lesson = project.lesson && project.lesson.user_id == user.id
 
     is_my_project && (is_my_lesson || !project.lesson)
+  end
+
+  def school_teacher_can_remix_lesson?(user:, school:, lesson:)
+    pp 'the original project is ', Project.find(lesson.project.remixed_from_id).identifier
+    original_project_is_public = Project.find(lesson.project.remixed_from_id).user_id.nil?
+    school_teacher_can_manage_lesson?(user:, school:, lesson:) && original_project_is_public
   end
 end

@@ -3,8 +3,8 @@
 module Api
   class LessonsController < ApiController
     before_action :authorize_user, except: %i[index show]
-    before_action :verify_school_class_belongs_to_school, only: :create
-    load_and_authorize_resource :lesson, except: [:create_lesson_with_remix]
+    before_action :verify_school_class_belongs_to_school, only: %i[create remix]
+    load_and_authorize_resource :lesson
 
     def index
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
@@ -41,15 +41,17 @@ module Api
       end
     end
 
-    def create_lesson_with_remix
+    def remix
       remix_origin = request.origin || request.referer
-
-      puts("lesson_params: #{lesson_params}")
+      # project = Project.find_by(identifier: lesson_params[:project_identifier])
+      # authorize! project
 
       result = Lesson::CreateRemix.call(lesson_params: lesson_params, remix_origin:)
 
       if result.success?
-        @lesson_with_user = result[:lesson].with_user
+        @lesson = result[:lesson]
+        # authorize! :remix, @lesson
+        @lesson_with_user = @lesson.with_user
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
