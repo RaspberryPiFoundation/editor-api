@@ -3,7 +3,7 @@
 module Api
   class LessonsController < ApiController
     before_action :authorize_user, except: %i[index show]
-    before_action :verify_school_class_belongs_to_school, only: :create
+    before_action :verify_school_class_belongs_to_school, only: %i[create remix]
     load_and_authorize_resource :lesson
 
     def index
@@ -35,6 +35,23 @@ module Api
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def remix
+      remix_origin = request.origin || request.referer
+      # project = Project.find_by(identifier: lesson_params[:project_identifier])
+      # authorize! project
+
+      result = Lesson::CreateRemix.call(lesson_params: lesson_params, remix_origin:)
+
+      if result.success?
+        @lesson = result[:lesson]
+        # authorize! :remix, @lesson
+        @lesson_with_user = @lesson.with_user
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -75,7 +92,14 @@ module Api
     end
 
     def lesson_params
+      puts("base_params: #{base_params}")
       base_params.merge(user_id: current_user.id)
+    end
+
+    def remix_lesson_params
+      lesson_params.merge(params.fetch(:lesson, {}).permit(
+                            { project_attributes: [:identifier] }
+                          ))
     end
 
     def base_params
@@ -86,6 +110,7 @@ module Api
         :description,
         :visibility,
         :due_date,
+        :project_identifier,
         {
           project_attributes: [
             :name,
