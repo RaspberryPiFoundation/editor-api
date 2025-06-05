@@ -29,7 +29,8 @@ class SchoolDashboard < Administrate::BaseDashboard
     verified_at: Field::DateTime,
     rejected_at: Field::DateTime,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime
+    updated_at: Field::DateTime,
+    user_origin: EnumField
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -39,6 +40,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
     name
+    user_origin
     reference
     country_code
     created_at
@@ -50,6 +52,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     name
+    user_origin
     creator
     creator_role
     creator_department

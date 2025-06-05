@@ -5,7 +5,7 @@ module Admin
     before_action :set_host_for_local_storage
 
     def scoped_resource
-      resource_class.internal_projects
+      action_name == 'index' ? resource_class.internal_projects : resource_class.all
     end
 
     def destroy_image
