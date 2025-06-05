@@ -15,7 +15,7 @@ RSpec.describe Ability do
       let(:user) { nil }
 
       context 'with a starter project' do
-        it { is_expected.not_to be_able_to(:index, starter_project) }
+        it { is_expected.to be_able_to(:index, starter_project) }
         it { is_expected.to be_able_to(:show, starter_project) }
         it { is_expected.not_to be_able_to(:create, starter_project) }
         it { is_expected.not_to be_able_to(:update, starter_project) }
@@ -36,7 +36,7 @@ RSpec.describe Ability do
       let(:another_project) { build(:project) }
 
       context 'with a starter project' do
-        it { is_expected.not_to be_able_to(:index, starter_project) }
+        it { is_expected.to be_able_to(:index, starter_project) }
         it { is_expected.to be_able_to(:show, starter_project) }
         it { is_expected.not_to be_able_to(:create, starter_project) }
         it { is_expected.not_to be_able_to(:update, starter_project) }
@@ -63,7 +63,7 @@ RSpec.describe Ability do
       let(:another_project) { build(:project) }
 
       context 'with a starter project' do
-        it { is_expected.not_to be_able_to(:index, starter_project) }
+        it { is_expected.to be_able_to(:index, starter_project) }
         it { is_expected.to be_able_to(:show, starter_project) }
         it { is_expected.not_to be_able_to(:create, starter_project) }
         it { is_expected.not_to be_able_to(:update, starter_project) }
@@ -90,7 +90,7 @@ RSpec.describe Ability do
       let(:another_project) { build(:project) }
 
       context 'with a starter project' do
-        it { is_expected.not_to be_able_to(:index, starter_project) }
+        it { is_expected.to be_able_to(:index, starter_project) }
         it { is_expected.to be_able_to(:show, starter_project) }
         it { is_expected.not_to be_able_to(:create, starter_project) }
         it { is_expected.not_to be_able_to(:update, starter_project) }
@@ -117,7 +117,7 @@ RSpec.describe Ability do
       let(:another_project) { build(:project) }
 
       context 'with a starter project' do
-        it { is_expected.not_to be_able_to(:index, starter_project) }
+        it { is_expected.to be_able_to(:index, starter_project) }
         it { is_expected.to be_able_to(:show, starter_project) }
         it { is_expected.not_to be_able_to(:create, starter_project) }
         it { is_expected.not_to be_able_to(:update, starter_project) }

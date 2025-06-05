@@ -4,7 +4,7 @@ require 'project_loader'
 
 module Api
   class ProjectsController < ApiController
-    before_action :authorize_user, only: %i[create update index destroy]
+    before_action :authorize_user, only: %i[create update destroy]
     before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
