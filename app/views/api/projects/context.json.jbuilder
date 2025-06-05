@@ -3,6 +3,7 @@
 json.call(
   @project,
   :identifier,
+  :project_type,
   :school_id,
   :lesson_id
 )
