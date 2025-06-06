@@ -24,7 +24,7 @@ class Ability
     return if user&.student?
 
     # Anyone can view projects not owned by a user or a school.
-    can :show, Project, user_id: nil, school_id: nil
+    can :read, Project, user_id: nil, school_id: nil
     can :show, Component, project: { user_id: nil, school_id: nil }
 
     # Anyone can read publicly shared lessons.
