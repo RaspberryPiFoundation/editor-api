@@ -124,7 +124,8 @@ RSpec.describe Project::CreateRemix, type: :unit do
 
       it 'persists the new component' do
         remixed_project = create_remix[:project]
-        expect(remixed_project.components.first.attributes.symbolize_keys).to include(new_component_params)
+        new_component = remixed_project.components.find { |c| c.name == new_component_params[:name] }
+        expect(new_component.attributes.symbolize_keys).to include(new_component_params)
       end
     end
 
