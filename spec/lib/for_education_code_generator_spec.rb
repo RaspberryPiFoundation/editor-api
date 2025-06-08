@@ -5,9 +5,7 @@ require 'rails_helper'
 RSpec.describe ForEducationCodeGenerator do
   describe '.generate' do
     it 'uses Random#rand to generate a random number up to the maximum' do
-      random = instance_double(Random)
-      allow(random).to receive(:rand).with(ForEducationCodeGenerator::MAX_CODE).and_return(123)
-      allow(Random).to receive(:new).and_return(random)
+      allow(described_class.random).to receive(:rand).with(ForEducationCodeGenerator::MAX_CODE).and_return(123)
 
       expect(described_class.generate).to eq('00-01-23')
     end
