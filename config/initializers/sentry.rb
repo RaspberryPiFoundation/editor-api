@@ -7,3 +7,15 @@ Sentry.init do |config|
 
   config.traces_sample_rate = 0.5
 end
+
+module Sentry
+  module Overrides
+    def capture_exception(exception, **options, &)
+      warn "[Sentry stub] #{exception.class}: #{exception.message}"
+      warn exception.backtrace.join("\n") if exception.backtrace
+      super
+    end
+  end
+end
+
+Sentry.singleton_class.prepend(Sentry::Overrides) unless Sentry.configuration.sending_allowed?
