@@ -20,7 +20,7 @@ GraphQL/ObjectDescription:
     - app/graphql/types/query_type.rb
 
 RSpec/NestedGroups:
-  Max: 5
+  Max: 4
 
 RSpec/DescribeClass:
   Exclude:

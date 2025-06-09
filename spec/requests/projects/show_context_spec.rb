@@ -22,6 +22,7 @@ RSpec.describe 'Project context requests' do
       let(:project_context_json) do
         {
           identifier: project.identifier,
+          project_type: project.project_type,
           school_id: project.school_id,
           lesson_id: project.lesson_id,
           class_id: project.lesson.school_class_id
@@ -57,6 +58,7 @@ RSpec.describe 'Project context requests' do
       let(:another_teacher_project_context_json) do
         {
           identifier: another_teacher_project.identifier,
+          project_type: another_teacher_project.project_type,
           school_id: another_teacher_project.school_id,
           lesson_id: another_teacher_project.lesson_id,
           class_id: another_teacher_project.lesson.school_class_id
@@ -102,6 +104,7 @@ RSpec.describe 'Project context requests' do
     let(:project_context_json) do
       {
         identifier: project.identifier,
+        project_type: project.project_type,
         school_id: project.school_id,
         lesson_id: project.lesson_id,
         class_id: project.lesson.school_class_id

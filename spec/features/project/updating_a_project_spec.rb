@@ -67,12 +67,12 @@ RSpec.describe 'Updating a project', type: :request do
     end
 
     it 'responds 200 OK' do
-      put("/api/projects/#{project.identifier}?project_type=scratch", headers:, params:)
+      put("/api/projects/#{project.identifier}", headers:, params:)
       expect(response).to have_http_status(:success)
     end
 
     it 'sets the project name to the specified value' do
-      put("/api/projects/#{project.identifier}?project_type=scratch", headers:, params:)
+      put("/api/projects/#{project.identifier}", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:name]).to eq('Test Project')

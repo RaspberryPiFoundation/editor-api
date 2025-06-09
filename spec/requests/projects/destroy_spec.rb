@@ -55,8 +55,8 @@ RSpec.describe 'Project delete requests' do
 
       it 'deletes the project' do
         expect do
-          delete("/api/projects/#{project.identifier}?project_type=scratch", headers:)
-        end.to change(Project.unscoped, :count).by(-1)
+          delete("/api/projects/#{project.identifier}", headers:)
+        end.to change(Project, :count).by(-1)
       end
     end
   end
