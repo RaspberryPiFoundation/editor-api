@@ -37,6 +37,7 @@ class ProjectDashboard < Administrate::BaseDashboard
     name
     identifier
     project_type
+    updated_at
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
