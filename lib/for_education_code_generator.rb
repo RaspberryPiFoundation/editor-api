@@ -3,8 +3,12 @@
 class ForEducationCodeGenerator
   MAX_CODE = 1_000_000
 
+  cattr_accessor :random
+
+  self.random ||= Random.new
+
   def self.generate
-    number = Random.new.rand(MAX_CODE)
+    number = random.rand(MAX_CODE)
     code = format('%06d', number)
 
     code.match(/(\d\d)(\d\d)(\d\d)/) do |m|
