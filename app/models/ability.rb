@@ -82,7 +82,6 @@ class Ability
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
     can(%i[remix], Lesson) do |lesson|
-      pp 'checking user can remix lesson'
       school_teacher_can_remix_lesson?(user:, school:, lesson:)
     end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
