@@ -3,8 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'Remix requests' do
-  let!(:original_project) { create(:project, project_type: original_project_type) }
-  let(:original_project_type) { Project::Types::PYTHON }
+  let!(:original_project) { create(:project) }
   let(:project_params) do
     {
       name: original_project.name,
@@ -54,10 +53,8 @@ RSpec.describe 'Remix requests' do
     end
 
     describe '#show' do
-      let(:project_type) { Project::Types::PYTHON }
-
       before do
-        create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id, project_type:)
+        create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id)
       end
 
       it 'returns success response' do
@@ -70,23 +67,6 @@ RSpec.describe 'Remix requests' do
         get('/api/projects/no-such-project/remix', headers:)
 
         expect(response).to have_http_status(:not_found)
-      end
-
-      context 'when original project and remix are scratch projects' do
-        let(:original_project_type) { Project::Types::SCRATCH }
-        let(:project_type) { Project::Types::SCRATCH }
-
-        it 'returns 404 response if scratch projects are not explicitly included' do
-          get("/api/projects/#{original_project.identifier}/remix", headers:)
-
-          expect(response).to have_http_status(:not_found)
-        end
-
-        it 'returns success response if scratch projects are explicitly included' do
-          get("/api/projects/#{original_project.identifier}/remix?project_type=scratch", headers:)
-
-          expect(response).to have_http_status(:ok)
-        end
       end
     end
 
@@ -122,22 +102,6 @@ RSpec.describe 'Remix requests' do
           post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
 
           expect(response.body).to eq({ error: 'Something went wrong' }.to_json)
-        end
-      end
-
-      context 'when original project is scratch project' do
-        let(:original_project_type) { Project::Types::SCRATCH }
-
-        it 'returns 404 response if scratch projects are not explicitly included' do
-          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
-
-          expect(response).to have_http_status(:not_found)
-        end
-
-        it 'returns success response if scratch projects are explicitly included' do
-          post("/api/projects/#{original_project.identifier}/remix?project_type=scratch", params: { project: project_params }, headers:)
-
-          expect(response).to have_http_status(:ok)
         end
       end
     end

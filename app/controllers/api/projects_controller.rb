@@ -27,7 +27,7 @@ module Api
     end
 
     def create
-      result = Project::Create.call(project_hash: project_params)
+      result = Project::Create.call(project_hash: project_params, current_user:)
 
       if result.success?
         @project = result[:project]
@@ -80,8 +80,8 @@ module Api
     end
 
     def project_params
-      if school_owner?
-        # A school owner must specify who the project user is.
+      if school_owner? || current_user&.experience_cs_admin?
+        # A school owner or an Experience CS admin must specify who the project user is.
         base_params
       else
         # A school teacher may only create projects they own.

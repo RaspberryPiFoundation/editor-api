@@ -139,6 +139,32 @@ RSpec.describe Ability do
       end
     end
 
+    context 'with an experience-cs admin' do
+      let(:user) { build(:experience_cs_admin_user, id: user_id) }
+      let(:another_project) { build(:project) }
+
+      context 'with a starter project' do
+        it { is_expected.to be_able_to(:read, starter_project) }
+        it { is_expected.to be_able_to(:create, starter_project) }
+        it { is_expected.to be_able_to(:update, starter_project) }
+        it { is_expected.to be_able_to(:destroy, starter_project) }
+      end
+
+      context 'with own project' do
+        it { is_expected.to be_able_to(:read, project) }
+        it { is_expected.to be_able_to(:create, project) }
+        it { is_expected.to be_able_to(:update, project) }
+        it { is_expected.to be_able_to(:destroy, project) }
+      end
+
+      context 'with another user\'s project' do
+        it { is_expected.not_to be_able_to(:read, another_project) }
+        it { is_expected.not_to be_able_to(:create, another_project) }
+        it { is_expected.not_to be_able_to(:update, another_project) }
+        it { is_expected.not_to be_able_to(:destroy, another_project) }
+      end
+    end
+
     # rubocop:disable RSpec/MultipleMemoizedHelpers
     context "with a teacher's project where the lesson is visible to students" do
       let(:user) { create(:user) }

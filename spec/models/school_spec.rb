@@ -242,6 +242,15 @@ RSpec.describe School do
       school.update(code: '00-00-00')
       expect(school.errors[:code]).to include('cannot be changed after verification')
     end
+
+    it 'requires a user_origin' do
+      school.user_origin = nil
+      expect(school).to be_invalid
+    end
+
+    it 'sets the user_origin to for_education by default' do
+      expect(school.user_origin).to eq('for_education')
+    end
   end
 
   describe '#creator' do

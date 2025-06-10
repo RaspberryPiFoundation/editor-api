@@ -54,7 +54,7 @@ namespace :projects do
     ]
     projects.each do |attributes|
       identifier = attributes[:identifier]
-      project = Project.only_scratch(true).find_by(attributes.slice(:identifier, :locale))
+      project = Project.find_by(attributes.slice(:identifier, :locale, :project_type))
       if project.present?
         puts "Scratch project with identifier '#{identifier}' already exists"
         project.assign_attributes(attributes.except(:identifier, :locale))
