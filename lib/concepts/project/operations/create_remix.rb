@@ -43,6 +43,7 @@ class Project
         end
 
         (params[:components] || original_project.components).each do |x|
+          pp 'using original project components' if params[:components].nil?
           remix.components.build(x.slice(:name, :extension, :content))
         end
 
