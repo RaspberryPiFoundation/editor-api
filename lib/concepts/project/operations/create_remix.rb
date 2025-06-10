@@ -30,7 +30,6 @@ class Project
 
       def create_remix(original_project, params, user_id, remix_origin)
         remix = format_project(original_project, params, user_id, remix_origin)
-        puts("remix: #{remix}")
         original_project.images.each do |image|
           remix.images.attach(image.blob)
         end
@@ -46,7 +45,6 @@ class Project
         (params[:components] || original_project.components).each do |x|
           remix.components.build(x.slice(:name, :extension, :content))
         end
-        pp(remix)
 
         remix
       end

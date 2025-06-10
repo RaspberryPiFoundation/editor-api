@@ -46,11 +46,11 @@ module Api
       project = Project.find_by(identifier: lesson_params[:project_identifier])
       authorize! :show, project
 
-      lesson  = Lesson.new(lesson_params.except(:project_identifier))
+      lesson = Lesson.new(lesson_params.except(:project_identifier))
       lesson.project = Project.new(remixed_from_id: project.id) if project
       authorize! :remix, lesson
 
-      result = Lesson::CreateRemix.call(lesson_params: lesson_params, remix_origin:)
+      result = Lesson::CreateRemix.call(lesson_params:, remix_origin:)
 
       if result.success?
         @lesson = result[:lesson]
@@ -95,7 +95,6 @@ module Api
     end
 
     def lesson_params
-      puts("base_params: #{base_params}")
       base_params.merge(user_id: current_user.id)
     end
 

@@ -126,7 +126,6 @@ class Ability
   end
 
   def school_teacher_can_remix_lesson?(user:, school:, lesson:)
-    pp 'the original project is ', Project.find(lesson.project.remixed_from_id).identifier
     original_project_is_public = Project.find(lesson.project.remixed_from_id).user_id.nil?
     school_teacher_can_manage_lesson?(user:, school:, lesson:) && original_project_is_public
   end

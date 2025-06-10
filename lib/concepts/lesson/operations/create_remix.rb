@@ -11,7 +11,6 @@ class Lesson
           response
         rescue StandardError => e
           Sentry.capture_exception(e)
-          pp(e)
           errors = response[:lesson].errors.full_messages.join(',')
           response[:error] = "Error creating remix of lesson: #{errors}"
           response
@@ -32,10 +31,10 @@ class Lesson
 
       def build_project_remix(original_project, lesson_params, remix_origin)
         response = Project::CreateRemix.call(
-          params: {school_id: lesson_params[:school_id]},
+          params: { school_id: lesson_params[:school_id] },
           user_id: lesson_params[:user_id],
-          original_project: original_project,
-          remix_origin: remix_origin
+          original_project:,
+          remix_origin:
         )
         response[:project]
       end
