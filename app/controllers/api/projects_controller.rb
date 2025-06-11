@@ -76,7 +76,11 @@ module Api
     end
 
     def load_projects
-      @projects = Project.where(user_id: current_user&.id).order(updated_at: :desc)
+      @projects = if current_user&.experience_cs_admin? && params[:all_public] == 'true'
+                    Project.where(user_id: nil, school_id: nil).order(updated_at: :desc)
+                  else
+                    Project.where(user_id: current_user&.id).order(updated_at: :desc)
+                  end
     end
 
     def project_params

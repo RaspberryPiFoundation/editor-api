@@ -88,4 +88,46 @@ RSpec.describe 'Project index requests' do
       expect(response).to have_http_status(:unauthorized)
     end
   end
+
+  context 'when user is logged in as an experience cs admin' do
+    let(:exp_cs_admin) { create(:experience_cs_admin_user) }
+
+    before do
+      # create project owned by user
+      create_list(:project, 1, user_id: exp_cs_admin.id)
+
+      # create public projects
+      create_list(:project, 3, user_id: nil)
+
+      authenticated_in_hydra_as(exp_cs_admin)
+    end
+
+    it 'returns success response' do
+      get('/api/projects', headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns projects owned by the user' do
+      get('/api/projects', headers:)
+      returned = response.parsed_body
+
+      expect(returned.length).to eq(1)
+    end
+
+    context 'when the \'all_public\' param is present' do
+      let(:params) { { all_public: true } }
+
+      it 'returns success response' do
+        get('/api/projects', headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns all public projects' do
+        get('/api/projects', params:, headers:)
+        returned = response.parsed_body
+
+        expect(returned.length).to eq(3)
+      end
+    end
+  end
 end
