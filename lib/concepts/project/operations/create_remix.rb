@@ -11,7 +11,7 @@ class Project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = I18n.t('errors.project.remixing.cannot_save')
+        response[:error] = "#{I18n.t('errors.project.remixing.cannot_save')}: #{e.message}"
         response
       end
 

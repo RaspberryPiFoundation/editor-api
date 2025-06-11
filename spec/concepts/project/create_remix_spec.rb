@@ -183,8 +183,9 @@ RSpec.describe Project::CreateRemix, type: :unit do
 
     context 'when the remix params contain only a school' do
       let(:school) { create(:school) }
+      let(:teacher) { create(:teacher, school:) }
       let!(:remix_params) { { school_id: school.id } }
-      subject!(:create_remix) { described_class.call(params: remix_params, user_id: user_id, original_project: original_project, remix_origin: remix_origin) }
+      subject!(:create_remix) { described_class.call(params: remix_params, user_id: teacher.id, original_project: original_project, remix_origin: remix_origin) }
 
       it 'sets the name to the original project name' do
         remixed_project = create_remix[:project]
@@ -196,14 +197,14 @@ RSpec.describe Project::CreateRemix, type: :unit do
         expect(remixed_project.school_id).to eq(school.id)
       end
 
-      fit 'creates components from the original project' do
-        pp original_project.components.count
-        pp remix_params
-        expect { create_remix }.to change(Component, :count).by(original_project.components.count)
-        # expect { create_remix }.to change(Project, :count).by(1)
-      end
+      # fit 'creates components from the original project' do
+      #   pp original_project.components.count
+      #   pp remix_params
+      #   # expect { create_remix }.to change(Component, :count).by(original_project.components.count)
+      #   expect { create_remix }.to change(Project, :count).by(1)
+      # end
 
-      fit 'copies the components from the original project' do
+      it 'copies the components from the original project' do
         remixed_project = create_remix[:project]
         expect(remixed_project.components.map { |c| component_props(c) }).to match_array(
           original_project.components.map { |c| component_props(c) }
