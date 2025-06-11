@@ -9,12 +9,13 @@ class Ability
     return unless user
 
     define_authenticated_non_student_abilities(user)
-
     user.schools.each do |school|
       define_school_student_abilities(user:, school:) if user.school_student?(school)
       define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
       define_school_owner_abilities(school:) if user.school_owner?(school)
     end
+
+    define_experience_cs_admin_abilities(user)
   end
 
   private
@@ -61,8 +62,8 @@ class Ability
     can(%i[read update destroy], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[read create update destroy], SchoolClass, school: { id: school.id })
-    can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    can(%i[read create create_batch destroy], ClassMember, school_class: { school: { id: school.id } })
+    can(%i[read show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create create_batch update destroy], :school_student)
@@ -74,9 +75,8 @@ class Ability
     can(%i[read], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[create], SchoolClass, school: { id: school.id })
-    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
-    can(%i[read create create_batch destroy], ClassMember,
-        school_class: { school: { id: school.id }, teacher_id: user.id })
+    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teachers: { teacher_id: user.id })
+    can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id }, teachers: { teacher_id: user.id } })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
@@ -87,35 +87,32 @@ class Ability
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
-    can(%i[read update], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read], Project,
-        remixed_from_id: Project.where(user_id: user.id, school_id: school.id, remixed_from_id: nil).pluck(:id))
+        remixed_from_id: Project.where(school_id: school.id, remixed_from_id: nil, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
   end
 
   def define_school_student_abilities(user:, school:)
     can(%i[read], School, id: school.id)
-    can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
+    can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
-    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
-    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
-    can(%i[read], Project, lesson: { school_id: school.id, school_class: { members: { student_id: user.id } } })
-    can(%i[toggle_finished], Project) do |project|
-      school_student_can_toggle_finished?(user:, school:, project:)
-    end
+    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
+    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(visibility: 'students').select(:id)).pluck(:id))
+    can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
+    can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
-  def school_student_can_toggle_finished?(user:, school:, project:)
-    is_my_project = project.user_id == user.id && project.school_id == school.id
-    is_a_remix = project.remixed_from_id.present?
+  def define_experience_cs_admin_abilities(user)
+    return unless user&.experience_cs_admin?
 
-    is_my_project && is_a_remix
+    can %i[read create update destroy], Project, user_id: nil
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
     is_my_lesson = lesson.school_id == school.id && lesson.user_id == user.id
-    is_my_class = lesson.school_class && lesson.school_class.teacher_id == user.id
+    is_my_class = lesson.school_class&.teacher_ids&.include?(user.id)
 
-    is_my_lesson && (is_my_class || !lesson.school_class)
+    is_my_class || (is_my_lesson && !lesson.school_class)
   end
 
   def school_teacher_can_manage_project?(user:, school:, project:)

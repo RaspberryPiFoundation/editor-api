@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
+ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -43,14 +43,24 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "class_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "class_students", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_class_id", null: false
     t.uuid "student_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_class_id", "student_id"], name: "index_class_members_on_school_class_id_and_student_id", unique: true
-    t.index ["school_class_id"], name: "index_class_members_on_school_class_id"
-    t.index ["student_id"], name: "index_class_members_on_student_id"
+    t.index ["school_class_id", "student_id"], name: "index_class_students_on_school_class_id_and_student_id", unique: true
+    t.index ["school_class_id"], name: "index_class_students_on_school_class_id"
+    t.index ["student_id"], name: "index_class_students_on_student_id"
+  end
+
+  create_table "class_teachers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_class_id", null: false
+    t.uuid "teacher_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_class_id", "teacher_id"], name: "index_class_teachers_on_school_class_id_and_teacher_id", unique: true
+    t.index ["school_class_id"], name: "index_class_teachers_on_school_class_id"
+    t.index ["teacher_id"], name: "index_class_teachers_on_teacher_id"
   end
 
   create_table "components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -198,7 +208,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
     t.string "remix_origin"
     t.uuid "school_id"
     t.uuid "lesson_id"
-    t.boolean "finished"
     t.text "instructions"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
@@ -220,13 +229,23 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
 
   create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_id", null: false
-    t.uuid "teacher_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "description"
-    t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
+    t.string "code"
+    t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "school_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id"
+    t.uuid "project_id", null: false
+    t.boolean "finished", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_school_projects_on_project_id"
+    t.index ["school_id"], name: "index_school_projects_on_school_id"
   end
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -250,6 +269,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
     t.boolean "creator_agree_terms_and_conditions"
     t.string "code"
     t.boolean "creator_agree_to_ux_contact", default: false
+    t.boolean "creator_agree_responsible_safeguarding", default: true
+    t.integer "user_origin", default: 0
     t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true
@@ -287,7 +308,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "class_members", "school_classes"
+  add_foreign_key "class_students", "school_classes"
+  add_foreign_key "class_teachers", "school_classes"
   add_foreign_key "components", "projects"
   add_foreign_key "lessons", "lessons", column: "copied_from_id"
   add_foreign_key "lessons", "school_classes"
@@ -297,6 +319,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_01_09_140005) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "school_projects", "projects"
+  add_foreign_key "school_projects", "schools"
   add_foreign_key "teacher_invitations", "schools"
   add_foreign_key "user_jobs", "good_jobs"
 end

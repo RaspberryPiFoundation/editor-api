@@ -5,7 +5,7 @@ require 'project_loader'
 module Api
   class ProjectsController < ApiController
     before_action :authorize_user, only: %i[create update index destroy]
-    before_action :load_project, only: %i[show update toggle_finished destroy]
+    before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
     before_action :verify_lesson_belongs_to_school, only: :create
@@ -22,25 +22,16 @@ module Api
         @user = project_with_user[1]
       end
 
+      @project.user_id = @current_user.id if class_teacher?(@project)
       render :show, formats: [:json]
     end
 
     def create
-      result = Project::Create.call(project_hash: project_params)
+      result = Project::Create.call(project_hash: project_params, current_user:)
 
       if result.success?
         @project = result[:project]
         render :show, formats: [:json], status: :created
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
-    end
-
-    def toggle_finished
-      result = Project::ToggleFinished.call(project: @project)
-
-      if result.success?
-        head :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
@@ -59,6 +50,11 @@ module Api
     def destroy
       @project.destroy
       head :ok
+    end
+
+    # Returns the identifier, school_id, lesson_id, and class_id of the project so the full context can be loaded
+    def show_context
+      render :context, formats: [:json]
     end
 
     private
@@ -84,8 +80,8 @@ module Api
     end
 
     def project_params
-      if school_owner?
-        # A school owner must specify who the project user is.
+      if school_owner? || current_user&.experience_cs_admin?
+        # A school owner or an Experience CS admin must specify who the project user is.
         base_params
       else
         # A school teacher may only create projects they own.
@@ -105,12 +101,18 @@ module Api
         :instructions,
         {
           components: %i[id name extension content index default]
-        }
+        },
+        parent: {},
+        image_list: []
       )
     end
 
     def school_owner?
       school && current_user.school_owner?(school)
+    end
+
+    def class_teacher?(project)
+      project.lesson_id.present? && project.lesson.school_class.present? && project.lesson.school_class.teacher_ids.include?(current_user.id)
     end
 
     def school

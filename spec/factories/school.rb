@@ -10,10 +10,11 @@ FactoryBot.define do
     creator_id { SecureRandom.uuid }
     creator_agree_authority { true }
     creator_agree_terms_and_conditions { true }
+    creator_agree_responsible_safeguarding { true }
   end
 
   factory :verified_school, parent: :school do
     verified_at { Time.current }
-    code { SchoolCodeGenerator.generate }
+    code { ForEducationCodeGenerator.generate }
   end
 end

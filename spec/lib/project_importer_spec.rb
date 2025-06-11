@@ -7,7 +7,7 @@ RSpec.describe ProjectImporter do
     described_class.new(
       name: 'My amazing project',
       identifier: 'my-amazing-project',
-      type: 'python',
+      type: Project::Types::PYTHON,
       locale: 'ja-JP',
       components: [
         { name: 'main', extension: 'py', content: 'print(\'hello\')', default: true },
@@ -15,6 +15,12 @@ RSpec.describe ProjectImporter do
       ],
       images: [
         { filename: 'my-amazing-image.png', io: File.open('spec/fixtures/files/test_image_1.png') }
+      ],
+      videos: [
+        { filename: 'my-amazing-video.mp4', io: File.open('spec/fixtures/files/test_video_1.mp4') }
+      ],
+      audio: [
+        { filename: 'my-amazing-audio.mp3', io: File.open('spec/fixtures/files/test_audio_1.mp3') }
       ]
     )
   end
@@ -49,6 +55,16 @@ RSpec.describe ProjectImporter do
       importer.import!
       expect(project.images.count).to eq(1)
     end
+
+    it 'creates the project videos' do
+      importer.import!
+      expect(project.videos.count).to eq(1)
+    end
+
+    it 'creates the project audio' do
+      importer.import!
+      expect(project.audio.count).to eq(1)
+    end
   end
 
   context 'when the project already exists in the database' do
@@ -58,6 +74,8 @@ RSpec.describe ProjectImporter do
         :with_default_component,
         :with_components,
         :with_attached_image,
+        :with_attached_video,
+        :with_attached_audio,
         component_count: 2,
         identifier: 'my-amazing-project',
         locale: 'ja-JP'
@@ -86,6 +104,14 @@ RSpec.describe ProjectImporter do
 
     it 'updates images' do
       expect { importer.import! }.to change { project.reload.images[0].filename.to_s }.to('my-amazing-image.png')
+    end
+
+    it 'updates videos' do
+      expect { importer.import! }.to change { project.reload.videos[0].filename.to_s }.to('my-amazing-video.mp4')
+    end
+
+    it 'updates audio' do
+      expect { importer.import! }.to change { project.reload.audio[0].filename.to_s }.to('my-amazing-audio.mp3')
     end
   end
 end

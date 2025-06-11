@@ -3,13 +3,14 @@
 require 'rails_helper'
 
 RSpec.describe UploadJob do
+  include ActiveJob::TestHelper
+
   around do |example|
     ClimateControl.modify GITHUB_AUTH_TOKEN: 'secret', GITHUB_WEBHOOK_REF: 'branches/whatever' do
       example.run
     end
   end
 
-  ActiveJob::Base.queue_adapter = :test
   let(:graphql_response) do
     GraphQL::Client::Response.new(raw_response, data: UploadJob::ProjectContentQuery.new(raw_response['data'], GraphQL::Client::Errors.new))
   end
@@ -42,11 +43,56 @@ RSpec.describe UploadJob do
                       }
                     },
                     {
+                      name: 'music.mp3',
+                      extension: '.mp3',
+                      object: {
+                        __typename: 'Blob',
+                        text: nil,
+                        isBinary: true
+                      }
+                    },
+                    {
+                      name: 'video.mp4',
+                      extension: '.mp4',
+                      object: {
+                        __typename: 'Blob',
+                        text: nil,
+                        isBinary: true
+                      }
+                    },
+                    {
                       name: 'main.py',
                       extension: '.py',
                       object: {
                         __typename: 'Blob',
                         text: "#!/bin/python3\n\nfrom p5 import *\nfrom random import randint, seed\n\n# Include global variables here\n\n\ndef setup():\n# Put code to run once here\n\n\ndef draw():\n# Put code to run every frame here\n\n  \n# Keep this to run your code\nrun()\n",
+                        isBinary: false
+                      }
+                    },
+                    {
+                      name: 'index.html',
+                      extension: '.html',
+                      object: {
+                        __typename: 'Blob',
+                        text: '<h1>Hello world!</h1>',
+                        isBinary: false
+                      }
+                    },
+                    {
+                      name: 'styles.css',
+                      extension: '.css',
+                      object: {
+                        __typename: 'Blob',
+                        text: ".h1 {\n  color: red;\n}\n",
+                        isBinary: false
+                      }
+                    },
+                    {
+                      name: 'script.js',
+                      extension: '.js',
+                      object: {
+                        __typename: 'Blob',
+                        text: "console.log('Hello, world!')",
                         isBinary: false
                       }
                     },
@@ -73,7 +119,7 @@ RSpec.describe UploadJob do
     {
       name: "Don't Collide!",
       identifier: 'dont-collide-starter',
-      type: 'python',
+      type: Project::Types::PYTHON,
       locale: 'ja-JP',
       components: [
         {
@@ -81,6 +127,24 @@ RSpec.describe UploadJob do
           extension: 'py',
           content: "#!/bin/python3\n\nfrom p5 import *\nfrom random import randint, seed\n\n# Include global variables here\n\n\ndef setup():\n# Put code to run once here\n\n\ndef draw():\n# Put code to run every frame here\n\n  \n# Keep this to run your code\nrun()\n",
           default: true
+        },
+        {
+          name: 'index',
+          extension: 'html',
+          content: '<h1>Hello world!</h1>',
+          default: false
+        },
+        {
+          name: 'styles',
+          extension: 'css',
+          content: ".h1 {\n  color: red;\n}\n",
+          default: false
+        },
+        {
+          name: 'script',
+          extension: 'js',
+          content: "console.log('Hello, world!')",
+          default: false
         }
       ],
       images: [
@@ -88,12 +152,20 @@ RSpec.describe UploadJob do
           filename: 'astronaut1.png',
           io: instance_of(StringIO)
         }
+      ],
+      videos: [
+        {
+          filename: 'video.mp4',
+          io: instance_of(StringIO)
+        }
+      ],
+      audio: [
+        {
+          filename: 'music.mp3',
+          io: instance_of(StringIO)
+        }
       ]
     }
-  end
-
-  before do
-    stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
   end
 
   context 'with the build flag undefined' do
@@ -102,6 +174,10 @@ RSpec.describe UploadJob do
     before do
       allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
       allow(ProjectImporter).to receive(:new).and_call_original
+
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
     end
 
     it 'enqueues the job' do
@@ -156,6 +232,10 @@ RSpec.describe UploadJob do
     let(:raw_response) { modifiable_response.deep_dup }
 
     before do
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/astronaut1.png').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/music.mp3').to_return(status: 200, body: '', headers: {})
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/dont-collide-starter/video.mp4').to_return(status: 200, body: '', headers: {})
+
       project_dir_entry = raw_response['data']['repository']['object']['entries'].find do |entry|
         entry['name'] == 'dont-collide-starter'
       end
@@ -172,6 +252,36 @@ RSpec.describe UploadJob do
 
     it 'saves the project to the database' do
       expect { described_class.perform_now(payload) }.to change(Project, :count).by(1)
+    end
+  end
+
+  context 'when GitHub returns nothing for the locale' do
+    let(:raw_response) { { data: { repository: nil } } }
+
+    before do
+      allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
+    end
+
+    it 'raises DataNotFoundError' do
+      expect do
+        described_class.perform_now(payload)
+      end.to raise_error(DataNotFoundError)
+    end
+  end
+
+  context 'when locale is unsupported' do
+    let(:raw_response) { { data: { repository: nil } } }
+    let(:bad_payload) do
+      { repository: { name: 'my-amazing-repo', owner: { name: 'me' } }, commits: [{ added: ['unsupported-locale/code/dont-collide-starter/main.py'], modified: [], removed: [] }] }
+    end
+
+    before do
+      allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
+    end
+
+    it 'does not request data from Github' do
+      described_class.perform_now(bad_payload)
+      expect(GithubApi::Client).not_to have_received(:query)
     end
   end
 end

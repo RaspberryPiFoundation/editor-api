@@ -3,9 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe Project::Create, type: :unit do
-  subject(:create_project) { described_class.call(project_hash:) }
+  subject(:create_project) { described_class.call(project_hash:, current_user:) }
 
-  let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
+  let(:current_user) { create(:user) }
+  let(:user_id) { current_user.id }
 
   before do
     mock_phrase_generation
@@ -16,11 +17,11 @@ RSpec.describe Project::Create, type: :unit do
     let(:project_hash) { ActionController::Parameters.new({}).merge(user_id:) }
 
     context 'with valid content' do
-      subject(:create_project_with_content) { described_class.call(project_hash:) }
+      subject(:create_project_with_content) { described_class.call(project_hash:, current_user:) }
 
       let(:project_hash) do
         {
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           components: [{
             name: 'main',
             extension: 'py',

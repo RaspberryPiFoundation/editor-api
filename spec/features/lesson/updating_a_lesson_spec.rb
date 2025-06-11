@@ -71,7 +71,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
     it 'responds 200 OK when assigning the lesson to a school class' do
       authenticated_in_hydra_as(teacher)
-      school_class = create(:school_class, school:, teacher_id: teacher.id)
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -105,7 +105,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school class' do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
 
     before do
@@ -120,7 +120,7 @@ RSpec.describe 'Updating a lesson', type: :request do
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
       school = create(:school, id: SecureRandom.uuid)
       teacher = create(:teacher, school:)
-      school_class = create(:school_class, school:, teacher_id: teacher.id)
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)

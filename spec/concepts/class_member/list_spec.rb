@@ -7,8 +7,8 @@ RSpec.describe ClassMember::List, type: :unit do
   let(:school) { create(:school) }
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }
-  let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
-  let(:class_members) { school_class.members }
+  let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
+  let(:class_students) { school_class.students }
 
   let(:student_ids) { students.map(&:id) }
   let(:teacher_ids) { [teacher.id] }
@@ -16,7 +16,7 @@ RSpec.describe ClassMember::List, type: :unit do
   context 'with students and a teacher' do
     before do
       student_ids.each do |student_id|
-        create(:class_member, school_class:, student_id:)
+        create(:class_student, school_class:, student_id:)
       end
 
       student_attributes = students.map do |student|
@@ -27,29 +27,29 @@ RSpec.describe ClassMember::List, type: :unit do
     end
 
     it 'returns a successful operation response' do
-      response = described_class.call(school_class:, class_members:, token:)
+      response = described_class.call(school_class:, class_students:, token:)
       expect(response.success?).to be(true)
     end
 
     it 'returns class members in the operation response' do
-      response = described_class.call(school_class:, class_members:, token:)
-      expect(response[:class_members].count { |member| member.is_a?(ClassMember) }).to eq(3)
+      response = described_class.call(school_class:, class_students:, token:)
+      expect(response[:class_members].count { |member| member.is_a?(ClassStudent) }).to eq(3)
     end
 
     it 'returns the teacher in the operation response' do
-      response = described_class.call(school_class:, class_members:, token:)
+      response = described_class.call(school_class:, class_students:, token:)
       expect(response[:class_members].count { |member| member.is_a?(User) }).to eq(1)
     end
 
     it 'contains the expected students' do
-      response = described_class.call(school_class:, class_members:, token:)
-      class_members.each do |class_member|
-        expect(response[:class_members].map(&:id)).to include(class_member.id)
+      response = described_class.call(school_class:, class_students:, token:)
+      class_students.each do |class_student|
+        expect(response[:class_members].map(&:id)).to include(class_student.id)
       end
     end
 
     it 'contains the expected teacher' do
-      response = described_class.call(school_class:, class_members:, token:)
+      response = described_class.call(school_class:, class_students:, token:)
       expect(response[:class_members].map(&:id)).to include(teacher.id)
     end
   end
@@ -63,7 +63,7 @@ RSpec.describe ClassMember::List, type: :unit do
     it 'captures and handles errors' do
       allow(SchoolStudent::List).to receive(:call).and_raise(StandardError.new('forced error'))
 
-      response = described_class.call(school_class:, class_members:, token:)
+      response = described_class.call(school_class:, class_students:, token:)
 
       expect(response[:error]).to eq('Error listing class members: forced error')
       expect(Sentry).to have_received(:capture_exception).with(instance_of(StandardError))
@@ -74,7 +74,7 @@ RSpec.describe ClassMember::List, type: :unit do
       allow(SchoolStudent::List).to receive(:call).and_return({ school_students: [] })
       allow(SchoolTeacher::List).to receive(:call).and_return({ school_teachers: [] })
 
-      response = described_class.call(school_class:, class_members:, token:)
+      response = described_class.call(school_class:, class_students:, token:)
 
       expect(response[:class_members]).to eq([])
     end

@@ -2,7 +2,18 @@
 
 FactoryBot.define do
   factory :school_class do
-    teacher_id { SecureRandom.uuid }
     sequence(:name) { |n| "Class #{n}" }
+    code { ForEducationCodeGenerator.generate }
+
+    transient do
+      teacher_ids { [SecureRandom.uuid] }
+    end
+
+    after(:build) do |school_class, evaluator|
+      teachers = evaluator.teacher_ids.map do |teacher_id|
+        build(:class_teacher, school_class:, teacher_id:)
+      end
+      school_class.teachers = teachers
+    end
   end
 end

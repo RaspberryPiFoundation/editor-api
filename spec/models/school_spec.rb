@@ -9,8 +9,8 @@ RSpec.describe School do
 
   describe 'associations' do
     it 'has many classes' do
-      create(:school_class, school:, teacher_id: teacher.id)
-      create(:school_class, school:, teacher_id: teacher.id)
+      create(:school_class, school:, teacher_ids: [teacher.id])
+      create(:school_class, school:, teacher_ids: [teacher.id])
       expect(school.classes.size).to eq(2)
     end
 
@@ -34,22 +34,26 @@ RSpec.describe School do
     end
 
     context 'when a school is destroyed' do
-      let!(:school_class) { create(:school_class, school:, teacher_id: teacher.id) }
+      let!(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
       let!(:lesson_2) { create(:lesson, user_id: teacher.id, school:) }
       let!(:project) { create(:project, user_id: student.id, school:) }
       let!(:role) { create(:role, school:) }
 
       before do
-        create(:class_member, school_class:, student_id: student.id)
+        create(:class_student, school_class:, student_id: student.id)
       end
 
       it 'also destroys school classes to avoid making them invalid' do
         expect { school.destroy! }.to change(SchoolClass, :count).by(-1)
       end
 
-      it 'also destroys class members to avoid making them invalid' do
-        expect { school.destroy! }.to change(ClassMember, :count).by(-1)
+      it 'also destroys class students to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassStudent, :count).by(-1)
+      end
+
+      it 'also destroys class teachers to avoid making them invalid' do
+        expect { school.destroy! }.to change(ClassTeacher, :count).by(-1)
       end
 
       it 'does not destroy lessons' do
@@ -183,6 +187,11 @@ RSpec.describe School do
       expect(school).to be_invalid
     end
 
+    it 'requires creator_agree_responsible_safeguarding to be true' do
+      school.creator_agree_responsible_safeguarding = false
+      expect(school).to be_invalid
+    end
+
     it 'does not require creator_agree_to_ux_contact to be true' do
       school.creator_agree_to_ux_contact = false
       expect(school).to be_valid
@@ -232,6 +241,15 @@ RSpec.describe School do
       school.verify!
       school.update(code: '00-00-00')
       expect(school.errors[:code]).to include('cannot be changed after verification')
+    end
+
+    it 'requires a user_origin' do
+      school.user_origin = nil
+      expect(school).to be_invalid
+    end
+
+    it 'sets the user_origin to for_education by default' do
+      expect(school.user_origin).to eq('for_education')
     end
   end
 
@@ -305,14 +323,14 @@ RSpec.describe School do
     end
 
     it 'uses the school code generator to generates and set the code' do
-      allow(SchoolCodeGenerator).to receive(:generate).and_return('00-00-00')
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return('00-00-00')
       school.verify!
       expect(school.code).to eq('00-00-00')
     end
 
     it 'retries 5 times if the school code is not unique' do
       school.verify!
-      allow(SchoolCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
       another_school = create(:school)
       another_school.verify!
       expect(another_school.code).to eq('00-00-00')
@@ -320,7 +338,7 @@ RSpec.describe School do
 
     it 'raises exception if unique code cannot be generated in 5 retries' do
       school.verify!
-      allow(SchoolCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
       another_school = create(:school)
       expect { another_school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
     end

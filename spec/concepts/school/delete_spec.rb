@@ -4,10 +4,10 @@ require 'rails_helper'
 
 RSpec.describe School::Delete, type: :unit do
   before do
-    create(:class_member, student_id: student.id, school_class:)
+    create(:class_student, student_id: student.id, school_class:)
   end
 
-  let(:school_class) { build(:school_class, teacher_id: teacher.id, school:) }
+  let(:school_class) { build(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:school_id) { school.id }
   let(:student) { create(:student, school:) }
@@ -26,8 +26,12 @@ RSpec.describe School::Delete, type: :unit do
     expect { described_class.call(school_id:) }.to change(SchoolClass, :count).by(-1)
   end
 
-  it 'deletes class members in the school' do
-    expect { described_class.call(school_id:) }.to change(ClassMember, :count).by(-1)
+  it 'deletes class students in the school' do
+    expect { described_class.call(school_id:) }.to change(ClassStudent, :count).by(-1)
+  end
+
+  it 'deletes class teachers in the school' do
+    expect { described_class.call(school_id:) }.to change(ClassTeacher, :count).by(-1)
   end
 
   context 'when deletion fails' do

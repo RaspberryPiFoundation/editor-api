@@ -277,6 +277,28 @@ RSpec.describe User do
     end
   end
 
+  describe '#parsed_roles' do
+    it 'returns array of role names when roles is set to comma-separated string' do
+      user = build(:user, roles: 'role-1,role-2')
+      expect(user.parsed_roles).to eq(%w[role-1 role-2])
+    end
+
+    it 'strips leading & trailing spaces from role names' do
+      user = build(:user, roles: ' role-1 , role-2 ')
+      expect(user.parsed_roles).to eq(%w[role-1 role-2])
+    end
+
+    it 'returns empty array when roles is set to empty string' do
+      user = build(:user, roles: '')
+      expect(user.parsed_roles).to eq([])
+    end
+
+    it 'returns empty array when roles is set to nil' do
+      user = build(:user, roles: nil)
+      expect(user.parsed_roles).to eq([])
+    end
+  end
+
   describe '#admin?' do
     it 'returns true if the user has the editor-admin role in Hydra' do
       user = build(:user, roles: 'editor-admin')
@@ -287,15 +309,17 @@ RSpec.describe User do
       user = build(:user, roles: 'another-editor-admin')
       expect(user).not_to be_admin
     end
+  end
 
-    it 'returns false if roles are empty in Hydra' do
-      user = build(:user, roles: '')
-      expect(user).not_to be_admin
+  describe '#experience_cs_admin?' do
+    it 'returns true if the user has the experience-cs-admin role in Hydra' do
+      user = build(:experience_cs_admin_user)
+      expect(user).to be_experience_cs_admin
     end
 
-    it 'returns false if roles are nil in Hydra' do
-      user = build(:user, roles: nil)
-      expect(user).not_to be_admin
+    it 'returns false if the user does not have the experience-cs-admin role in Hydra' do
+      user = build(:user, roles: 'another-admin')
+      expect(user).not_to be_experience_cs_admin
     end
   end
 

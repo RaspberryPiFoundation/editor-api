@@ -3,16 +3,11 @@
 require 'rails_helper'
 
 RSpec.describe 'Creating a project', type: :request do
-  before do
-    authenticated_in_hydra_as(teacher)
-    mock_phrase_generation
-  end
-
+  let(:generated_identifier) { 'word1-word2-word3' }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school) }
   let(:owner) { create(:owner, school:) }
-
   let(:params) do
     {
       project: {
@@ -24,9 +19,22 @@ RSpec.describe 'Creating a project', type: :request do
     }
   end
 
+  before do
+    authenticated_in_hydra_as(teacher)
+    mock_phrase_generation(generated_identifier)
+  end
+
   it 'responds 201 Created' do
     post('/api/projects', headers:, params:)
     expect(response).to have_http_status(:created)
+  end
+
+  it 'generates an identifier for the project even if another identifier is specified' do
+    params_with_identifier = { project: { identifier: 'test-identifier', components: [] } }
+    post('/api/projects', headers:, params: params_with_identifier)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:identifier]).to eq(generated_identifier)
   end
 
   it 'responds with the project JSON' do
@@ -80,12 +88,12 @@ RSpec.describe 'Creating a project', type: :request do
       expect(response).to have_http_status(:created)
     end
 
-    it 'responds 201 Created when the user is a school-student for the school' do
+    it 'responds 403 Forbidden when the user is a school-student for the school' do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
 
       post('/api/projects', headers:, params:)
-      expect(response).to have_http_status(:created)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it 'sets the lesson user to the specified user for school-owner users' do
@@ -198,6 +206,66 @@ RSpec.describe 'Creating a project', type: :request do
 
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:forbidden)
+    end
+  end
+
+  context 'when an Experience CS admin creates a starter Scratch project' do
+    let(:experience_cs_admin) { create(:experience_cs_admin_user) }
+    let(:params) do
+      {
+        project: {
+          identifier: 'test-project',
+          name: 'Test Project',
+          locale: 'fr',
+          project_type: Project::Types::SCRATCH,
+          user_id: nil,
+          components: []
+        }
+      }
+    end
+
+    before do
+      authenticated_in_hydra_as(experience_cs_admin)
+    end
+
+    it 'responds 201 Created' do
+      post('/api/projects', headers:, params:)
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'sets the project identifier to the specified (not the generated) value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:identifier]).to eq('test-project')
+    end
+
+    it 'sets the project name to the specified value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:name]).to eq('Test Project')
+    end
+
+    it 'sets the project locale to the specified value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:locale]).to eq('fr')
+    end
+
+    it 'sets the project type to the specified value' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:project_type]).to eq(Project::Types::SCRATCH)
+    end
+
+    it 'sets the project user_id to the specified value (i.e. nil to represent a public project)' do
+      post('/api/projects', headers:, params:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data[:user_id]).to be_nil
     end
   end
 end

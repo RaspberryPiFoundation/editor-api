@@ -5,8 +5,11 @@ class School < ApplicationRecord
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
   has_many :roles, dependent: :nullify
+  has_many :school_projects, dependent: :nullify
 
   VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,63}(\.[a-z]{2,63})*(/.*)?\z}ix
+
+  enum :user_origin, %i[for_education experience_cs], default: :for_education, validate: true
 
   validates :name, presence: true
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
@@ -17,6 +20,7 @@ class School < ApplicationRecord
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
+  validates :creator_agree_responsible_safeguarding, presence: true, acceptance: true
   validates :rejected_at, absence: { if: proc { |school| school.verified? } }
   validates :verified_at, absence: { if: proc { |school| school.rejected? } }
   validates :code,
@@ -53,7 +57,7 @@ class School < ApplicationRecord
   def verify!
     attempts = 0
     begin
-      update!(verified_at: Time.zone.now, code: SchoolCodeGenerator.generate)
+      update!(verified_at: Time.zone.now, code: ForEducationCodeGenerator.generate)
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors[:code].include?('has already been taken') && attempts <= 5
 

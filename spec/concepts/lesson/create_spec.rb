@@ -14,7 +14,7 @@ RSpec.describe Lesson::Create, type: :unit do
       school_id: school.id,
       project_attributes: {
         name: 'Hello world project',
-        project_type: 'python',
+        project_type: Project::Types::PYTHON,
         components: [
           { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
         ]
@@ -86,7 +86,7 @@ RSpec.describe Lesson::Create, type: :unit do
       {
         project_attributes: {
           name: 'Hello world project',
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           components: [
             { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
           ]

@@ -70,7 +70,13 @@
         "ninoseki.vscode-mogami"
       ],
       "settings": {
-        "terminal.integrated.defaultProfile.linux": "zsh"
+        "terminal.integrated.defaultProfile.linux": "zsh",
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit"
+        },
+        "rubyLsp.enabledFeatures": {
+          "diagnostics": true
+        }
       }
     }
   }

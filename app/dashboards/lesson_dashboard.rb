@@ -14,7 +14,7 @@ class LessonDashboard < Administrate::BaseDashboard
     school_class: Field::BelongsTo,
     parent: Field::BelongsTo,
     copies: Field::HasMany,
-    projects: Field::HasMany,
+    project: Field::HasOne,
     id: Field::String,
     copied_from_id: Field::String,
     user_id: Field::String,
@@ -33,9 +33,8 @@ class LessonDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
-    school
+    name
     school_class
-    parent
     copies
   ].freeze
 
@@ -44,9 +43,9 @@ class LessonDashboard < Administrate::BaseDashboard
   SHOW_PAGE_ATTRIBUTES = %i[
     school
     school_class
+    project
     parent
     copies
-    projects
     id
     copied_from_id
     user_id
@@ -62,20 +61,7 @@ class LessonDashboard < Administrate::BaseDashboard
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
-  FORM_ATTRIBUTES = %i[
-    school
-    school_class
-    parent
-    copies
-    projects
-    copied_from_id
-    user_id
-    name
-    description
-    visibility
-    due_date
-    archived_at
-  ].freeze
+  FORM_ATTRIBUTES = %i[].freeze
 
   # COLLECTION_FILTERS
   # a hash that defines filters that can be used while searching via the search
@@ -92,7 +78,7 @@ class LessonDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how lessons are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(lesson)
-  #   "Lesson ##{lesson.id}"
-  # end
+  def display_resource(lesson)
+    lesson.name
+  end
 end

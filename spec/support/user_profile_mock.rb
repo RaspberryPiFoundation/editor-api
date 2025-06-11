@@ -31,7 +31,8 @@ module UserProfileMock
       id_field => user_type ? "#{user_type}:#{user.id}" : user.id,
       name: user.name,
       email: user.email,
-      username: user.username
+      username: user.username,
+      roles: user.roles
     }
   end
 

@@ -7,7 +7,7 @@ module Api
     authorize_resource :school_owner, class: false
 
     def index
-      result = SchoolOwner::List.call(school: @school, token: current_user.token)
+      result = SchoolOwner::List.call(school: @school)
 
       if result.success?
         @school_owners = result[:school_owners]

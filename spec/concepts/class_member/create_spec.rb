@@ -3,30 +3,42 @@
 require 'rails_helper'
 
 RSpec.describe ClassMember::Create, type: :unit do
-  let!(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+  let!(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }
+  let(:teachers) { [create(:teacher, school:), create(:teacher, school:)] }
 
   let(:student_ids) { students.map(&:id) }
 
   it 'returns a successful operation response' do
-    response = described_class.call(school_class:, students:)
+    response = described_class.call(school_class:, students:, teachers:)
     expect(response.success?).to be(true)
   end
 
-  it 'creates a school class' do
-    expect { described_class.call(school_class:, students:) }.to change(ClassMember, :count).by(3)
+  it 'creates class students' do
+    expect { described_class.call(school_class:, students:, teachers:) }.to change(ClassStudent, :count).by(3)
+  end
+
+  it 'creates class teachers' do
+    expect { described_class.call(school_class:, students:, teachers:) }.to change(ClassTeacher, :count).by(2)
   end
 
   it 'returns a class members JSON array' do
-    response = described_class.call(school_class:, students:)
-    expect(response[:class_members].size).to eq(3)
+    response = described_class.call(school_class:, students:, teachers:)
+    expect(response[:class_members].size).to eq(5)
   end
 
-  it 'returns class members in the operation response' do
-    response = described_class.call(school_class:, students:)
-    expect(response[:class_members]).to all(be_a(ClassMember))
+  it 'returns class students in the operation response' do
+    response = described_class.call(school_class:, students:, teachers:)
+    class_students_count = response[:class_members].count { |member| member.is_a?(ClassStudent) }
+    expect(class_students_count).to eq(3)
+  end
+
+  it 'returns class teachers in the operation response' do
+    response = described_class.call(school_class:, students:, teachers:)
+    class_teachers_count = response[:class_members].count { |member| member.is_a?(ClassTeacher) }
+    expect(class_teachers_count).to eq(2)
   end
 
   it 'assigns the school_class' do
@@ -35,8 +47,16 @@ RSpec.describe ClassMember::Create, type: :unit do
   end
 
   it 'assigns the student_id' do
-    response = described_class.call(school_class:, students:)
-    expect(response[:class_members].map(&:student_id)).to match_array(student_ids)
+    response = described_class.call(school_class:, students:, teachers:)
+    response_students = response[:class_members].select { |member| member.is_a?(ClassStudent) }
+    expect(response_students.map(&:student_id)).to match_array(student_ids)
+  end
+
+  it 'assigns the teacher_id' do
+    teacher_ids = teachers.map(&:id)
+    response = described_class.call(school_class:, students:, teachers:)
+    response_teachers = response[:class_members].select { |member| member.is_a?(ClassTeacher) }
+    expect(response_teachers.map(&:teacher_id)).to match_array(teacher_ids)
   end
 
   context 'when creations fail' do
@@ -44,38 +64,42 @@ RSpec.describe ClassMember::Create, type: :unit do
       allow(Sentry).to receive(:capture_exception)
     end
 
-    context 'with malformed students' do
+    context 'with malformed members' do
       let(:students) { nil }
+      let(:teachers) { nil }
 
-      it 'does not create a class member' do
-        expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
+      it 'does not create a class student' do
+        expect { described_class.call(school_class:, students:, teachers:) }.not_to change(ClassStudent, :count)
+      end
+
+      it 'does not create a class teacher' do
+        expect { described_class.call(school_class:, students:, teachers:) }.not_to change(ClassTeacher, :count)
       end
 
       it 'returns a failed operation response' do
-        response = described_class.call(school_class:, students:)
+        response = described_class.call(school_class:, students:, teachers:)
         expect(response.failure?).to be(true)
       end
 
       it 'returns the error message in the operation response' do
-        response = described_class.call(school_class:, students:)
-        expect(response[:error]).to match(/No valid students provided/)
+        response = described_class.call(school_class:, students:, teachers:)
+        expect(response[:error]).to match(/No valid school members provided/)
       end
 
       it 'sent the exception to Sentry' do
-        described_class.call(school_class:, students:)
+        described_class.call(school_class:, students:, teachers:)
         expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
     end
 
     context 'with a student from a different school' do
-      let(:different_school) { create(:school) }
-      let(:different_school_student) { create(:student, school: different_school) }
+      let(:different_school_student) { create(:student, school: create(:school)) }
 
       context 'with non existent students' do
         let(:students) { [different_school_student] }
 
         it 'does not create a class member' do
-          expect { described_class.call(school_class:, students:) }.not_to change(ClassMember, :count)
+          expect { described_class.call(school_class:, students:) }.not_to change(ClassStudent, :count)
         end
 
         it 'returns a successful operation response' do
@@ -103,37 +127,52 @@ RSpec.describe ClassMember::Create, type: :unit do
         let(:new_students) { students + [different_school_student] }
 
         it 'returns a successful operation response' do
-          response = described_class.call(school_class:, students: new_students)
+          response = described_class.call(school_class:, students: new_students, teachers:)
           expect(response.success?).to be(true)
         end
 
         it 'returns a class members JSON array' do
-          response = described_class.call(school_class:, students: new_students)
-          expect(response[:class_members].size).to eq(3)
+          response = described_class.call(school_class:, students: new_students, teachers:)
+          expect(response[:class_members].size).to eq(5)
         end
 
-        it 'returns class members in the operation response' do
-          response = described_class.call(school_class:, students: new_students)
-          expect(response[:class_members]).to all(be_a(ClassMember))
+        it 'returns class students in the operation response' do
+          response = described_class.call(school_class:, students: new_students, teachers:)
+          class_students_count = response[:class_members].count { |member| member.is_a?(ClassStudent) }
+          expect(class_students_count).to eq(3)
+        end
+
+        it 'returns class teachers in the operation response' do
+          response = described_class.call(school_class:, students: new_students, teachers:)
+          class_teachers_count = response[:class_members].count { |member| member.is_a?(ClassTeacher) }
+          expect(class_teachers_count).to eq(2)
         end
 
         it 'assigns the school_class' do
-          response = described_class.call(school_class:, students: new_students)
+          response = described_class.call(school_class:, students: new_students, teachers:)
           expect(response[:class_members]).to all(have_attributes(school_class:))
         end
 
         it 'assigns the successful students' do
-          response = described_class.call(school_class:, students: new_students)
-          expect(response[:class_members].map(&:student_id)).to match_array(student_ids)
+          response = described_class.call(school_class:, students: new_students, teachers:)
+          response_students = response[:class_members].select { |member| member.is_a?(ClassStudent) }
+          expect(response_students.map(&:student_id)).to match_array(student_ids)
+        end
+
+        it 'assigns the successful teachers' do
+          teacher_ids = teachers.map(&:id)
+          response = described_class.call(school_class:, students: new_students, teachers:)
+          response_teachers = response[:class_members].select { |member| member.is_a?(ClassTeacher) }
+          expect(response_teachers.map(&:teacher_id)).to match_array(teacher_ids)
         end
 
         it 'returns the error messages in the operation response' do
-          response = described_class.call(school_class:, students: new_students)
+          response = described_class.call(school_class:, students: new_students, teachers:)
           expect(response[:errors][different_school_student.id]).to eq("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
         it 'sent the exception to Sentry' do
-          described_class.call(school_class:, students: new_students)
+          described_class.call(school_class:, students: new_students, teachers:)
           expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
         end
       end

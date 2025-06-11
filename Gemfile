@@ -19,6 +19,7 @@ gem 'globalid'
 gem 'good_job', '~> 4.3'
 gem 'graphql'
 gem 'graphql-client'
+gem 'i18n'
 gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
@@ -38,6 +39,7 @@ gem 'scout_apm'
 gem 'sentry-rails'
 
 group :development, :test do
+  gem 'awesome_print'
   gem 'bullet'
   gem 'debug'
   gem 'dotenv-rails'
@@ -55,7 +57,6 @@ group :development, :test do
 end
 
 group :development do
-  gem 'awesome_print'
   gem 'rails-erd'
   gem 'ruby-lsp', '~> 0.17.7'
   gem 'ruby-lsp-rails'

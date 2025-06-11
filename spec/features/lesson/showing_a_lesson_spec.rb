@@ -107,7 +107,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -123,7 +123,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
-      create(:class_member, school_class:, student_id: student.id)
+      create(:class_student, school_class:, student_id: student.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)

@@ -11,10 +11,10 @@ class SchoolClassDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     school: Field::BelongsTo,
-    members: Field::HasMany,
+    teachers: Field::HasMany,
+    students: Field::HasMany,
     lessons: Field::HasMany,
     id: Field::String,
-    teacher_id: Field::String,
     name: Field::String,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
@@ -26,21 +26,19 @@ class SchoolClassDashboard < Administrate::BaseDashboard
   # By default, it's limited to four items to reduce clutter on index pages.
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
-    school
-    members
+    name
     lessons
-    id
   ].freeze
 
   # SHOW_PAGE_ATTRIBUTES
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     school
-    members
     lessons
-    id
-    teacher_id
+    teachers
+    students
     name
+    id
     created_at
     updated_at
   ].freeze
@@ -48,11 +46,7 @@ class SchoolClassDashboard < Administrate::BaseDashboard
   # FORM_ATTRIBUTES
   # an array of attributes that will be displayed
   # on the model's form (`new` and `edit`) pages.
-  FORM_ATTRIBUTES = %i[
-    school
-    teacher_id
-    name
-  ].freeze
+  FORM_ATTRIBUTES = %i[].freeze
 
   # COLLECTION_FILTERS
   # a hash that defines filters that can be used while searching via the search
@@ -69,7 +63,7 @@ class SchoolClassDashboard < Administrate::BaseDashboard
   # Overwrite this method to customize how school classes are displayed
   # across all pages of the admin dashboard.
   #
-  # def display_resource(school_class)
-  #   "SchoolClass ##{school_class.id}"
-  # end
+  def display_resource(school_class)
+    school_class.name
+  end
 end
