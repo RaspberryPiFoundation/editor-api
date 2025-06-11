@@ -11,14 +11,14 @@ class Project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = I18n.t('errors.project.remixing.cannot_save')
+        response[:error] = "#{I18n.t('errors.project.remixing.cannot_save')}: #{e.message}"
         response
       end
 
       private
 
       def validate_params(response, params, user_id, original_project, remix_origin)
-        valid = params[:identifier].present? && user_id.present? && original_project.present? && remix_origin.present?
+        valid = (params[:identifier].present? || original_project.identifier.present?) && user_id.present? && original_project.present? && remix_origin.present?
         response[:error] = I18n.t('errors.project.remixing.invalid_params') unless valid
       end
 
@@ -30,7 +30,6 @@ class Project
 
       def create_remix(original_project, params, user_id, remix_origin)
         remix = format_project(original_project, params, user_id, remix_origin)
-
         original_project.images.each do |image|
           remix.images.attach(image.blob)
         end
@@ -43,7 +42,8 @@ class Project
           remix.audio.attach(audio_file.blob)
         end
 
-        params[:components].each do |x|
+        (params[:components] || original_project.components).each do |x|
+          pp 'using original project components' if params[:components].nil?
           remix.components.build(x.slice(:name, :extension, :content))
         end
 
@@ -54,11 +54,12 @@ class Project
         original_project.dup.tap do |proj|
           proj.identifier = PhraseIdentifier.generate
           proj.locale = nil
-          proj.name = params[:name]
+          proj.name = params[:name] || original_project.name
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
           proj.remix_origin = remix_origin
           proj.lesson_id = nil # Only the original can have a lesson id
+          proj.school_id = params[:school_id] || original_project.school_id
         end
       end
     end

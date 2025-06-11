@@ -110,6 +110,20 @@ RSpec.describe Lesson do
       lesson.visibility = 'invalid'
       expect(lesson).to be_invalid
     end
+
+    it 'requires original project to be public if project is a remix' do
+      original_project = create(:project, user_id: SecureRandom.uuid)
+      lesson.project.remixed_from_id = original_project.id
+
+      expect(lesson).to be_invalid
+    end
+
+    it 'is valid with a remixed project from a public project' do
+      original_project = create(:project, user_id: nil)
+      lesson.project.remixed_from_id = original_project.id
+
+      expect(lesson).to be_valid
+    end
   end
 
   describe '.archived' do
