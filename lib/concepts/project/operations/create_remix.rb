@@ -34,6 +34,16 @@ class Project
         original_project.images.each do |image|
           remix.images.attach(image.blob)
         end
+        params[:image_list].each do |image|
+          if image[:content].present?
+            remix.images.attach(io: StringIO.new(image[:content].pack('C*')), filename: image[:filename])
+          end
+        end
+
+        original_project.images.each do |image|
+          existing_image = remix.images.find { |img| img.filename.to_s == image.filename.to_s }
+          remix.images.attach(image.blob) unless existing_image
+        end
 
         original_project.videos.each do |video|
           remix.videos.attach(video.blob)
