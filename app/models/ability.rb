@@ -83,13 +83,16 @@ class Ability
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
+    can(%i[create_from_project], Lesson) do |lesson|
+      school_teacher_can_manage_lesson?(user:, school:, lesson:) && school_teacher_can_manage_project?(user:, school:, project: lesson.project)
+    end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
     can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
     can(%i[read], Project,
-        remixed_from_id: Project.where(school_id: school.id, remixed_from_id: nil, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
+        remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id))).pluck(:id))
   end
 
   def define_school_student_abilities(user:, school:)
