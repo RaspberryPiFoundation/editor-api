@@ -12,12 +12,11 @@ RSpec.describe 'Project index requests' do
 
   before do
     create_list(:project, 2, user_id: owner.id)
+    create_list(:project, 2, user_id: nil)
   end
 
   context 'when user is logged in' do
     before do
-      # create non user projects
-      create_list(:project, 2)
       authenticated_in_hydra_as(owner)
     end
 
@@ -82,10 +81,26 @@ RSpec.describe 'Project index requests' do
     end
   end
 
-  context 'when no token is given' do
-    it 'returns unauthorized' do
-      get '/api/projects'
-      expect(response).to have_http_status(:unauthorized)
+  context 'when not logged in' do
+    before do
+      unauthenticated_in_hydra
+    end
+
+    it 'returns success response' do
+      get('/api/projects', headers:)
+      expect(response).to have_http_status(:ok)
+    end
+
+    it 'returns correct number of projects' do
+      get('/api/projects', headers:)
+      returned = response.parsed_body
+      expect(returned.length).to eq(2)
+    end
+
+    it 'returns starter projects' do
+      get('/api/projects', headers:)
+      returned = response.parsed_body
+      expect(returned.all? { |proj| proj['user_id'].nil? }).to be(true)
     end
   end
 end
