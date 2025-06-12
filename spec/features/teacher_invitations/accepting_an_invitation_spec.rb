@@ -155,6 +155,27 @@ RSpec.describe 'Accepting an invitations', type: :request do
         end
       end
 
+      context 'when inviation email and account email differ only in casing' do
+        let(:invitation_email) { user.email.upcase }
+
+        it 'responds 200 OK' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+          expect(response).to have_http_status(:ok)
+        end
+
+        it 'gives the user the teacher role for the school to which they have been invited' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+          expect(user).to be_school_teacher(school)
+        end
+
+        it 'sets the accepted_at timestamp on the invitation' do
+          freeze_time(with_usec: false) do
+            put("/api/teacher_invitations/#{token}/accept", headers:)
+            expect(invitation.reload.accepted_at).to eq(Time.current)
+          end
+        end
+      end
+
       context 'when invitation has already been accepted' do
         let(:original_accepted_at) { 1.week.ago.noon }
 

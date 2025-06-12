@@ -29,7 +29,7 @@ module Api
     end
 
     def ensure_invitation_email_matches_user_email
-      return if @invitation.email_address == current_user.email
+      return if @invitation.email_address.casecmp?(current_user.email)
 
       render json: { error: 'Invitation email does not match user email' }, status: :forbidden
     end
