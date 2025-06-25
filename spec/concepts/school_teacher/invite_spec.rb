@@ -16,6 +16,11 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
     expect(response.success?).to be(true)
   end
 
+  it 'does not return an error in operation response' do
+    response = described_class.call(school:, school_teacher_params:, token:)
+    expect(response[:error]).to be_blank
+  end
+
   it 'creates a TeacherInvitation' do
     expect { described_class.call(school:, school_teacher_params:, token:) }.to change(TeacherInvitation, :count)
   end

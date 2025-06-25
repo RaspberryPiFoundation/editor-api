@@ -3,5 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe SchoolProject do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it { is_expected.to belong_to(:school) }
+  it { is_expected.to belong_to(:project) }
 end
