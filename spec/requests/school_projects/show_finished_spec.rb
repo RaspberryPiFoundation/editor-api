@@ -20,10 +20,6 @@ RSpec.describe 'School project finished requests' do
     }.to_json
   end
 
-  before do
-    stub_profile_api_list_school_students(school:, student_attributes: [{ name: 'Joe Bloggs' }])
-  end
-
   context 'when the user is a student' do
     before do
       authenticated_in_hydra_as(student)
