@@ -52,5 +52,15 @@ RSpec.describe 'School project finished requests' do
         expect(response).to have_http_status(:forbidden)
       end
     end
+
+    context 'when project does not exist' do
+      before do
+        get('/api/projects/does-not-exist/finished', headers:)
+      end
+
+      it 'returns not found response' do
+        expect(response).to have_http_status(:not_found)
+      end
+    end
   end
 end
