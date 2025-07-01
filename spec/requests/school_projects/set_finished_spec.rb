@@ -80,4 +80,14 @@ RSpec.describe 'School project finished requests' do
       expect(teacher_project.school_project.finished).to be_falsey
     end
   end
+
+  context 'when project does not exist' do
+    before do
+      put('/api/projects/does-not-exist/finished', headers:, params: { finished: false })
+    end
+
+    it 'returns not found response' do
+      expect(response).to have_http_status(:not_found)
+    end
+  end
 end
