@@ -8,7 +8,6 @@ RSpec.describe SchoolOwner::List, type: :unit do
   let(:owner_ids) { [owner.id] }
 
   before do
-    stub_profile_api_list_school_owners(user_id: owner.id)
     stub_user_info_api_for(owner)
   end
 
