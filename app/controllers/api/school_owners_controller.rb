@@ -17,16 +17,6 @@ module Api
       end
     end
 
-    def create
-      result = SchoolOwner::Invite.call(school: @school, school_owner_params:, token: current_user.token)
-
-      if result.success?
-        head :created
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
-    end
-
     def destroy
       result = SchoolOwner::Remove.call(school: @school, owner_id: params[:id], token: current_user.token)
 
@@ -35,12 +25,6 @@ module Api
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
-    end
-
-    private
-
-    def school_owner_params
-      params.require(:school_owner).permit(:email_address)
     end
   end
 end
