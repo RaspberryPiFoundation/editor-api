@@ -53,10 +53,6 @@ class ProfileApiClient
       School.new(**response.body)
     end
 
-    def list_school_owners(*)
-      {}
-    end
-
     def invite_school_owner(*)
       {}
     end
