@@ -3,10 +3,6 @@
 module ProfileApiMock
   # TODO: Replace with WebMock HTTP stubs once the profile API has been built.
 
-  def stub_profile_api_remove_school_owner
-    allow(ProfileApiClient).to receive(:remove_school_owner)
-  end
-
   def stub_profile_api_remove_school_teacher
     allow(ProfileApiClient).to receive(:remove_school_teacher)
   end

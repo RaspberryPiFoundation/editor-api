@@ -16,15 +16,5 @@ module Api
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
-
-    def destroy
-      result = SchoolOwner::Remove.call(school: @school, owner_id: params[:id], token: current_user.token)
-
-      if result.success?
-        head :no_content
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
-    end
   end
 end
