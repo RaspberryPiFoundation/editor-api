@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require 'base64'
 
 class Project
   class CreateRemix
@@ -35,8 +36,11 @@ class Project
           remix.images.attach(image.blob)
         end
         params[:image_list].each do |image|
+          pp 'checking images'
+          pp image
           if image[:content].present?
-            remix.images.attach(io: StringIO.new(image[:content].pack('C*')), filename: image[:filename])
+            pp 'updating image'
+            remix.images.attach(io: StringIO.new(image[:content]), filename: image[:filename])
           end
         end
 
