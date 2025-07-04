@@ -109,7 +109,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     it 'returns the expected error codes' do
       response = described_class.call(school:, school_students_params:, token:, user_id:)
       expect(response[:error]).to eq(
-        { 'student-to-create' => ["isUniqueInBatch", "isComplex", "notEmpty"], 'another-student-to-create-2' => ["minLength", "notEmpty"] }
+        { 'student-to-create' => %w[isUniqueInBatch isComplex notEmpty], 'another-student-to-create-2' => %w[minLength notEmpty] }
       )
     end
   end

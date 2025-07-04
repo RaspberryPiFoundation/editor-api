@@ -65,10 +65,9 @@ module SchoolStudent
       def handle_student422_error(errors)
         formatted_errors = errors.each_with_object({}) do |error, hash|
           username = error['username'] || error['path']
-          field = error['path'].split('.').last
 
           hash[username] ||= []
-          hash[username] << error['errorCode'] || error['message']
+          hash[username] << (error['errorCode'] || error['message'])
 
           # Ensure uniqueness to avoid repeat errors with duplicate usernames
           hash[username] = hash[username].uniq
