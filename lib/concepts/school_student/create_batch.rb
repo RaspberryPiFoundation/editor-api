@@ -30,7 +30,7 @@ module SchoolStudent
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = e
+        response[:error] = e.to_s
         response[:error_type] = :standard_error
         response
       end
@@ -53,8 +53,6 @@ module SchoolStudent
         decrypted_students = decrypt_students(students)
         ProfileApiClient.create_school_students(token:, students: decrypted_students, school_id: school.id, preflight: true)
       rescue ProfileApiClient::Student422Error => e
-        pp 'the errors are:'
-        pp e.errors
         handle_student422_error(e.errors)
       end
 

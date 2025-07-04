@@ -9,7 +9,7 @@ module SchoolStudent
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = e
+        response[:error] = e.to_s
         response
       end
 
