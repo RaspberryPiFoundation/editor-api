@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'base64'
 
 class Project
@@ -36,12 +37,7 @@ class Project
           remix.images.attach(image.blob)
         end
         params[:image_list].each do |image|
-          pp 'checking images'
-          pp image
-          if image[:content].present?
-            pp 'updating image'
-            remix.images.attach(io: StringIO.new(Base64.decode64(image[:content])), filename: image[:filename])
-          end
+          remix.images.attach(io: StringIO.new(Base64.decode64(image[:content])), filename: image[:filename]) if image[:content].present?
         end
 
         original_project.images.each do |image|

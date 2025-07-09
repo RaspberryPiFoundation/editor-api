@@ -54,7 +54,7 @@ module Api
                       :videos,
                       :audio,
                       :instructions,
-                      image_list: [:filename, :url, :content],
+                      image_list: %i[filename url content],
                       components: %i[id name extension content index])
       end
     end

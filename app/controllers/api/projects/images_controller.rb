@@ -22,8 +22,8 @@ module Api
         @project = Project.find_by!(identifier: params[:project_id])
         authorize! :update, @project
 
-        puts params[:image]
-        puts 'the filename is ' + params[:image].original_filename
+        Rails.logger.debug params[:image]
+        Rails.logger.debug { "the filename is #{params[:image].original_filename}" }
         existing_image = @project.images.find { |i| i.blob.filename == params[:image].original_filename }
         existing_image.purge
         @project.images.attach(params[:image])
