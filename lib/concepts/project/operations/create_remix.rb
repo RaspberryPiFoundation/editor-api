@@ -12,7 +12,7 @@ class Project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = I18n.t('errors.project.remixing.cannot_save')
+        response[:error] = "#{I18n.t('errors.project.remixing.cannot_save')}: #{e.message}"
         response
       end
 
@@ -40,7 +40,7 @@ class Project
           pp image
           if image[:content].present?
             pp 'updating image'
-            remix.images.attach(io: StringIO.new(image[:content]), filename: image[:filename])
+            remix.images.attach(io: StringIO.new(Base64.decode64(image[:content])), filename: image[:filename])
           end
         end
 
