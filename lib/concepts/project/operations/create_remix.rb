@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'base64'
+
 class Project
   class CreateRemix
     class << self
@@ -11,7 +13,7 @@ class Project
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = I18n.t('errors.project.remixing.cannot_save')
+        response[:error] = "#{I18n.t('errors.project.remixing.cannot_save')}: #{e.message}"
         response
       end
 
@@ -31,8 +33,13 @@ class Project
       def create_remix(original_project, params, user_id, remix_origin)
         remix = format_project(original_project, params, user_id, remix_origin)
 
-        original_project.images.each do |image|
-          remix.images.attach(image.blob)
+        params[:image_list].each do |image|
+          if image[:content].present?
+            remix.images.attach(io: extract_image_io(image), filename: image[:filename])
+          else
+            existing_image = find_existing_image(image, original_project)
+            remix.images.attach(existing_image.blob) if existing_image
+          end
         end
 
         original_project.videos.each do |video|
@@ -60,6 +67,14 @@ class Project
           proj.remix_origin = remix_origin
           proj.lesson_id = nil # Only the original can have a lesson id
         end
+      end
+
+      def extract_image_io(image)
+        StringIO.new(Base64.decode64(image[:content]))
+      end
+
+      def find_existing_image(image, original_project)
+        original_project.images.find { |img| img.filename.to_s == image[:filename].to_s }
       end
     end
   end
