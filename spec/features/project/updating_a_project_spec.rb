@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Updating a project', type: :request do
-  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:project_type) { Project::Types::PYTHON }
   let(:user_id) { owner.id }
   let!(:project) { create(:project, name: 'Test Project', user_id:, locale: 'en', project_type:) }
@@ -77,5 +76,11 @@ RSpec.describe 'Updating a project', type: :request do
 
       expect(data[:name]).to eq('Test Project')
     end
+  end
+
+  private
+
+  def headers
+    { Authorization: UserProfileMock::TOKEN }
   end
 end
