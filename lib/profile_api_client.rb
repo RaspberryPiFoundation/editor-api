@@ -53,22 +53,6 @@ class ProfileApiClient
       School.new(**response.body)
     end
 
-    def list_school_owners(*)
-      {}
-    end
-
-    def invite_school_owner(*)
-      {}
-    end
-
-    def remove_school_owner(*)
-      {}
-    end
-
-    def remove_school_teacher(*)
-      {}
-    end
-
     def school_student(token:, school_id:, student_id:)
       response = connection(token).get("/api/v1/schools/#{school_id}/students/#{student_id}")
 

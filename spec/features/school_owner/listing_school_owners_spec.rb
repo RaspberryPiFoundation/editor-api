@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Listing school owners', type: :request do
   before do
     authenticated_in_hydra_as(owner)
-    stub_profile_api_list_school_owners(user_id: owner.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

@@ -14,7 +14,6 @@ RSpec.describe 'Project context requests' do
 
     before do
       authenticated_in_hydra_as(teacher)
-      stub_profile_api_list_school_students(school:, student_attributes: [{ name: 'Joe Bloggs' }])
     end
 
     context 'when loading own project context' do
