@@ -10,12 +10,12 @@ RSpec.describe 'POST /test/reseed' do
   before do
     Rails.application.load_tasks
     host! 'test-editor-api.raspberrypi.org'
-    # ENV['RESEED_API_KEY'] = 'my_test_api_key'
+    ENV['RESEED_API_KEY'] = 'my_test_api_key'
   end
 
-  # after do
-  #   ENV.delete('RESEED_API_KEY')
-  # end
+  after do
+    ENV.delete('RESEED_API_KEY')
+  end
 
   it 'returns OK' do
     request
@@ -56,9 +56,9 @@ RSpec.describe 'POST /test/reseed' do
   context 'when the RESEED_API_KEY is not set in the environment' do
     let(:headers) { { 'X-RESEED-API-KEY' => '' } }
 
-    # before do
-    #   ENV.delete('RESEED_API_KEY')
-    # end
+    before do
+      ENV.delete('RESEED_API_KEY')
+    end
 
     it 'returns not found' do
       request
