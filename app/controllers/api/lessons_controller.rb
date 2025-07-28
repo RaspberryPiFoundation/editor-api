@@ -3,8 +3,8 @@
 module Api
   class LessonsController < ApiController
     before_action :authorize_user, except: %i[index show]
-    before_action :verify_school_class_belongs_to_school, only: :create
-    load_and_authorize_resource :lesson
+    before_action :verify_school_class_belongs_to_school, only: %i[create remix]
+    load_and_authorize_resource :lesson, except: :remix
 
     def index
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
@@ -35,6 +35,26 @@ module Api
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def remix
+      remix_origin = request.origin || request.referer
+      project = Project.find_by(identifier: lesson_params[:project_identifier])
+      authorize! :show, project
+
+      lesson = Lesson.new(lesson_params.except(:project_identifier))
+      lesson.project = Project.new(remixed_from_id: project.id) if project
+      authorize! :remix, lesson
+
+      result = Lesson::CreateRemix.call(lesson_params:, remix_origin:)
+
+      if result.success?
+        @lesson = result[:lesson]
+        @lesson_with_user = @lesson.with_user
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
@@ -78,6 +98,12 @@ module Api
       base_params.merge(user_id: current_user.id)
     end
 
+    def remix_lesson_params
+      lesson_params.merge(params.fetch(:lesson, {}).permit(
+                            { project_attributes: [:identifier] }
+                          ))
+    end
+
     def base_params
       params.fetch(:lesson, {}).permit(
         :school_id,
@@ -86,6 +112,7 @@ module Api
         :description,
         :visibility,
         :due_date,
+        :project_identifier,
         {
           project_attributes: [
             :name,
