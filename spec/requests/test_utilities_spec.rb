@@ -99,7 +99,7 @@ RSpec.describe 'POST /test/reseed' do
 
     it 'does not destroy test seeds' do
       request
-      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke) 
+      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke)
     end
 
     it 'does not recreate test seeds' do
