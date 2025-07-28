@@ -8,6 +8,9 @@ RSpec.describe 'POST /test/reseed' do
   let(:headers) { { 'X-RESEED-API-KEY' => ENV.fetch('RESEED_API_KEY', nil) } }
 
   before do
+    allow(Rake::Task['test_seeds:destroy']).to receive(:invoke)
+    allow(Rake::Task['test_seeds:create']).to receive(:invoke)
+
     host! 'test-editor-api.raspberrypi.org'
     ENV['RESEED_API_KEY'] = 'my_test_api_key'
   end
@@ -33,13 +36,13 @@ RSpec.describe 'POST /test/reseed' do
   end
 
   it 'destroys the test seeds' do
-    expect(Rake::Task['test_seeds:destroy']).to receive(:invoke).and_call_original
     request
+    expect(Rake::Task['test_seeds:destroy']).to have_received(:invoke)
   end
 
   it 'recreates the test seeds' do
-    expect(Rake::Task['test_seeds:create']).to receive(:invoke).and_call_original
     request
+    expect(Rake::Task['test_seeds:create']).to have_received(:invoke)
   end
 
   context 'when the host is not allowed' do
@@ -53,13 +56,13 @@ RSpec.describe 'POST /test/reseed' do
     end
 
     it 'does not destroy test seeds' do
-      expect(Rake::Task['test_seeds:destroy']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke)
     end
 
     it 'does not recreate test seeds' do
-      expect(Rake::Task['test_seeds:create']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
     end
   end
 
@@ -76,13 +79,13 @@ RSpec.describe 'POST /test/reseed' do
     end
 
     it 'does not destroy test seeds' do
-      expect(Rake::Task['test_seeds:destroy']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke)
     end
 
     it 'does not recreate test seeds' do
-      expect(Rake::Task['test_seeds:create']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
     end
   end
 
@@ -95,13 +98,13 @@ RSpec.describe 'POST /test/reseed' do
     end
 
     it 'does not destroy test seeds' do
-      expect(Rake::Task['test_seeds:destroy']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke) 
     end
 
     it 'does not recreate test seeds' do
-      expect(Rake::Task['test_seeds:create']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
     end
   end
 
@@ -117,13 +120,13 @@ RSpec.describe 'POST /test/reseed' do
     end
 
     it 'does not destroy test seeds' do
-      expect(Rake::Task['test_seeds:destroy']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke)
     end
 
     it 'does not recreate test seeds' do
-      expect(Rake::Task['test_seeds:create']).not_to receive(:invoke)
       request
+      expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
     end
   end
 end
