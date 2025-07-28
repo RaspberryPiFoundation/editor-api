@@ -8,9 +8,19 @@ RSpec.describe 'POST /test/reseed' do
   let(:headers) { { 'X-RESEED-API-KEY' => ENV.fetch('RESEED_API_KEY', nil) } }
 
   before do
-    Rails.application.load_tasks
     host! 'test-editor-api.raspberrypi.org'
     ENV['RESEED_API_KEY'] = 'my_test_api_key'
+  end
+
+  around do |example|
+    DatabaseCleaner.clean_with(:truncation)
+    DatabaseCleaner.strategy = :transaction
+
+    DatabaseCleaner.cleaning do
+      Rails.application.load_tasks
+      example.run
+      Rake::Task.clear
+    end
   end
 
   after do
