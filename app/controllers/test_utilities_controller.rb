@@ -5,6 +5,8 @@ class TestUtilitiesController < ApplicationController
   ALLOWED_HOSTS = ['test-editor-api.raspberrypi.org', 'localhost'].freeze
 
   def reseed
+    abort('Not permitted to reseed in production') if Rails.env.production?
+    
     if reseed_allowed?
       Rails.application.load_tasks
       Rake::Task['test_seeds:destroy'].invoke
