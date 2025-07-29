@@ -6,7 +6,7 @@ class TestUtilitiesController < ApplicationController
 
   def reseed
     abort('Not permitted to reseed in production') if Rails.env.production?
-    
+
     if reseed_allowed?
       Rails.application.load_tasks
       Rake::Task['test_seeds:destroy'].invoke
