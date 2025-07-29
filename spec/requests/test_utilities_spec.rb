@@ -108,25 +108,32 @@ RSpec.describe 'POST /test/reseed' do
     end
   end
 
+  # rubocop:disable Lint/SuppressedException
   context 'when requested in production' do
     before do
       allow(Rails.env).to receive(:test?).and_return(false)
       allow(Rails.env).to receive(:production?).and_return(true)
     end
 
-    it 'returns not found' do
-      request
-      expect(response).to be_not_found
+    it 'throws an error' do
+      expect { request }.to raise_error(RuntimeError, 'Not permitted to reseed in production')
     end
 
     it 'does not destroy test seeds' do
-      request
+      begin
+        request
+      rescue RuntimeError
+      end
       expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke)
     end
 
     it 'does not recreate test seeds' do
-      request
+      begin
+        request
+      rescue RuntimeError
+      end
       expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
     end
   end
+  # rubocop:enable Lint/SuppressedException
 end
