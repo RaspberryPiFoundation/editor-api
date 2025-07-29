@@ -5,10 +5,7 @@ class TestUtilitiesController < ApplicationController
   ALLOWED_HOSTS = ['test-editor-api.raspberrypi.org', 'localhost'].freeze
 
   def reseed
-    if ENV['RESEED_API_KEY'].present? &&
-       request.headers['X-RESEED-API-KEY'] == ENV['RESEED_API_KEY'] &&
-       (Rails.env.development? || Rails.env.test?) &&
-       ALLOWED_HOSTS.include?(request.host)
+    if reseed_allowed?
       Rails.application.load_tasks
       Rake::Task['test_seeds:destroy'].invoke
       Rake::Task['test_seeds:create'].invoke
@@ -16,5 +13,23 @@ class TestUtilitiesController < ApplicationController
     else
       head :not_found
     end
+  end
+
+  private
+
+  def reseed_allowed?
+    api_key_valid? && environment_allowed? && host_allowed?
+  end
+
+  def api_key_valid?
+    ENV['RESEED_API_KEY'].present? && request.headers['X-RESEED-API-KEY'] == ENV['RESEED_API_KEY']
+  end
+
+  def environment_allowed?
+    Rails.env.development? || Rails.env.test?
+  end
+
+  def host_allowed?
+    ALLOWED_HOSTS.include?(request.host)
   end
 end

@@ -23,7 +23,9 @@ Rails.application.routes.draw do
     root to: 'projects#index'
   end
 
-  post '/test/reseed', to: 'test_utilities#reseed'
+  if Rails.env.development? || Rails.env.test?
+    post '/test/reseed', to: 'test_utilities#reseed'
+  end
 
   post '/graphql', to: 'graphql#execute'
   mount GraphiQL::Rails::Engine, at: '/graphql', graphql_path: '/graphql#execute' unless Rails.env.production?
