@@ -28,15 +28,11 @@ class TestUtilitiesController < ApplicationController
   private
 
   def reseed_allowed?
-    api_key_valid? && environment_allowed? && host_allowed?
+    api_key_valid? && host_allowed?
   end
 
   def api_key_valid?
     ENV['RESEED_API_KEY'].present? && request.headers['X-RESEED-API-KEY'] == ENV['RESEED_API_KEY']
-  end
-
-  def environment_allowed?
-    Rails.env.development? || Rails.env.test?
   end
 
   def host_allowed?

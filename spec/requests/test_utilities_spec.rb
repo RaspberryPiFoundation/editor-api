@@ -107,26 +107,4 @@ RSpec.describe 'POST /test/reseed' do
       expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
     end
   end
-
-  context 'when requested in production' do
-    before do
-      allow(Rails.env).to receive(:test?).and_return(false)
-      allow(Rails.env).to receive(:production?).and_return(true)
-    end
-
-    it 'returns not found' do
-      request
-      expect(response).to be_not_found
-    end
-
-    it 'does not destroy test seeds' do
-      request
-      expect(Rake::Task['test_seeds:destroy']).not_to have_received(:invoke)
-    end
-
-    it 'does not recreate test seeds' do
-      request
-      expect(Rake::Task['test_seeds:create']).not_to have_received(:invoke)
-    end
-  end
 end
