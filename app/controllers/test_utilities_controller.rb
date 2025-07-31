@@ -17,8 +17,10 @@ class TestUtilitiesController < ApplicationController
       pp 'reseed was allowed'
       Rails.application.load_tasks
       pp 'destroying seeds...'
+      Rake::Task['test_seeds:destroy'].reenable
       Rake::Task['test_seeds:destroy'].invoke
       pp 'creating seeds...'
+      Rake::Task['test_seeds:create'].reenable
       Rake::Task['test_seeds:create'].invoke
       pp 'success!'
       render json: { message: 'Database reseeded successfully.' }, status: :ok
