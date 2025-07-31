@@ -4,6 +4,8 @@ class TestUtilitiesController < ApplicationController
   skip_before_action :verify_authenticity_token
   ALLOWED_HOSTS = ['test-editor-api.raspberrypi.org', 'localhost'].freeze
 
+  Rails.application.load_tasks unless Rake::Task.task_defined?('test_seeds:destroy')
+
   def reseed
     # rubocop:disable Rails/Output
     pp 'api_key_valid?', api_key_valid?
@@ -15,7 +17,6 @@ class TestUtilitiesController < ApplicationController
 
     if reseed_allowed?
       pp 'reseed was allowed'
-      Rails.application.load_tasks
       pp 'destroying seeds...'
       Rake::Task['test_seeds:destroy'].execute
       pp 'creating seeds...'
