@@ -64,6 +64,10 @@ class School < ApplicationRecord
       attempts += 1
       retry
     end
+
+    SalesforceSyncJob.perform_later(id)
+
+    true
   end
 
   def reject
