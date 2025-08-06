@@ -57,34 +57,31 @@ RSpec.describe 'for_education', type: :task do
 
   describe ':seed_a_school_with_lessons_and_students' do
     let(:task) { Rake::Task['for_education:seed_a_school_with_lessons_and_students'] }
+    let(:school) { School.find_by(creator_id:) }
 
     before do
       task.invoke
     end
 
     it 'creates a verified school' do
-      expect(School.find_by(creator_id:).verified_at).to be_truthy
+      expect(school.verified_at).to be_truthy
     end
 
     it 'creates a school class' do
-      school = School.find_by(creator_id:)
       expect(SchoolClass.where(school_id: school.id)).to exist
     end
 
     it 'adds two lessons to the school' do
-      school = School.find_by(creator_id:)
       lesson = Lesson.where(school_id: school.id)
       expect(lesson.length).to eq(2)
     end
 
     it 'adds two projects' do
-      school = School.find_by(creator_id:)
       lesson = Lesson.where(school_id: school.id)
       expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(2)
     end
 
     it 'assigns a teacher' do
-      school = School.find_by(creator_id:)
       expect(Role.teacher.where(user_id: teacher_id, school_id: school.id)).to exist
     end
 
@@ -94,7 +91,7 @@ RSpec.describe 'for_education', type: :task do
 
     # rubocop:disable RSpec/MultipleExpectations
     it 'assigns students' do
-      school_id = School.find_by(creator_id:).id
+      school_id = school.id
       school_class_id = SchoolClass.find_by(school_id:).id
       expect(Role.student.where(user_id: student_1, school_id:)).to exist
       expect(ClassStudent.where(student_id: student_1, school_class_id:)).to exist
