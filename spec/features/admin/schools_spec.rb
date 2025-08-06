@@ -40,6 +40,10 @@ RSpec.describe 'Schools', type: :request do
       expect(response.body).to include(I18n.t('administrate.actions.reject_school'))
     end
 
+    it 'does not include a link to search for this school by its ZIP code in the NCES public schools database' do
+      expect(response.body).not_to include('Search for this school in the NCES database')
+    end
+
     describe 'when the school is verified' do
       let(:verified_at) { Time.zone.now }
       let(:code) { '00-00-00' }
@@ -70,6 +74,17 @@ RSpec.describe 'Schools', type: :request do
 
       it 'includes link to reopen school' do
         expect(response.body).to include(I18n.t('administrate.actions.reopen_school'))
+      end
+    end
+
+    describe 'when the school is in the United States and has a postal code' do
+      before do
+        school.update(country_code: 'US', postal_code: '90210')
+        get admin_school_path(school)
+      end
+
+      it 'includes a link to search for this school by its ZIP code in the NCES public schools database' do
+        expect(response.body).to include('Search for this school in the NCES database')
       end
     end
   end
