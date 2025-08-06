@@ -66,15 +66,22 @@ RSpec.describe 'for_education', type: :task do
       expect(School.find_by(creator_id:).verified_at).to be_truthy
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
-    it 'creates lessons with projects' do
+    it 'creates a school class' do
       school = School.find_by(creator_id:)
       expect(SchoolClass.where(school_id: school.id)).to exist
+    end
+
+    it 'adds two lessons to the school' do
+      school = School.find_by(creator_id:)
       lesson = Lesson.where(school_id: school.id)
       expect(lesson.length).to eq(2)
+    end
+
+    it 'adds two projects' do
+      school = School.find_by(creator_id:)
+      lesson = Lesson.where(school_id: school.id)
       expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(2)
     end
-    # rubocop:enable RSpec/MultipleExpectations
 
     it 'assigns a teacher' do
       school = School.find_by(creator_id:)
