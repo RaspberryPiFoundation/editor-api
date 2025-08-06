@@ -60,6 +60,7 @@ RSpec.describe 'for_education', type: :task do
     let(:school) { School.find_by(creator_id:) }
 
     before do
+      Rake::Task['for_education:destroy_seed_data'].invoke
       task.invoke
     end
 
