@@ -43,6 +43,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     user_origin
     reference
     country_code
+    administrative_area
     created_at
     verified_at
     rejected_at
