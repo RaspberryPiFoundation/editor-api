@@ -20,7 +20,12 @@ RSpec.describe Project::CreateRemix, type: :unit do
           extension: component.extension,
           content: 'some updated component content'
         }
-      ]
+      ],
+      image_list: original_project.images.map do |image|
+        {
+          filename: image.filename.to_s
+      }
+    end
     }
   end
 
