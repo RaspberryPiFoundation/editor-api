@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'project_loader'
+
 module Types
   class QueryType < Types::BaseObject
     # Add `node(id: ID!) and `nodes(ids: [ID!]!)`
