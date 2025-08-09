@@ -351,6 +351,10 @@ RSpec.describe School do
       school.rejected_at = Time.zone.now
       expect { school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
     end
+
+    it 'enqueues SalesforceSyncJob with the school id' do
+      expect { school.verify! }.to have_enqueued_job(SalesforceSyncJob).with(school.id)
+    end
   end
 
   describe '#format_uk_postal_code' do

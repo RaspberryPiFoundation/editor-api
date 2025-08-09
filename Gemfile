@@ -35,6 +35,7 @@ gem 'postmark-rails'
 gem 'puma', '~> 6'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
+gem 'restforce', '~> 8.0'
 gem 'scout_apm'
 gem 'sentry-rails'
 
