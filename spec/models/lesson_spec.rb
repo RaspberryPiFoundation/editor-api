@@ -68,8 +68,19 @@ RSpec.describe Lesson do
       expect(lesson).to be_invalid
     end
 
+    it 'requires the user id to match the user_id on the project' do
+      lesson.project = build(:project, user_id: SecureRandom.uuid)
+      expect(lesson).to be_invalid
+    end
+
+    it 'requires the project to belong to the same school as the lesson' do
+      lesson.project = build(:project, school: create(:school))
+      expect(lesson).to be_invalid
+    end
+
     context 'when the lesson has a school' do
       before do
+        lesson.project.update!(school:)
         lesson.update!(school:)
       end
 
@@ -84,6 +95,7 @@ RSpec.describe Lesson do
 
     context 'when the lesson has a school_class' do
       before do
+        lesson.project.update!(school:)
         lesson.update!(school_class: create(:school_class, teacher_ids: [teacher.id], school:))
       end
 
