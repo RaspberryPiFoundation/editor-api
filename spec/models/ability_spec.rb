@@ -507,4 +507,67 @@ RSpec.describe Ability do
       it { is_expected.not_to be_able_to(:read, :school_member) }
     end
   end
+
+  describe 'SchoolClass' do
+    let(:school) { create(:school) }
+    let(:other_school) { create(:school) }
+    let(:teacher) { create(:teacher, school: school) }
+    let(:owner) { create(:owner, school: school) }
+    let(:other_teacher) { create(:teacher, school: other_school) }
+    let(:own_school_class_saved) { create(:school_class, school: school, teacher_ids: [teacher.id]) }
+    let(:other_school_class_saved) { create(:school_class, school: other_school, teacher_ids: [other_teacher.id]) }
+
+    context 'when user is a school student' do
+      let(:user) { create(:student, school: school) }
+      let(:own_school_class) { SchoolClass.new(school: school) }
+      let(:other_school_class) { SchoolClass.new(school: other_school) }
+
+      it { is_expected.not_to be_able_to(:create, own_school_class) }
+      it { is_expected.not_to be_able_to(:import, own_school_class) }
+      it { is_expected.not_to be_able_to(:read, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:create, other_school_class) }
+      it { is_expected.not_to be_able_to(:import, other_school_class) }
+      it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
+    end
+
+    context 'when user is a school teacher' do
+      let(:user) { teacher }
+
+      let(:own_school_class) { SchoolClass.new(school: school) }
+      let(:other_school_class) { SchoolClass.new(school: other_school) }
+
+      it { is_expected.to be_able_to(:create, own_school_class) }
+      it { is_expected.to be_able_to(:import, own_school_class) }
+      it { is_expected.not_to be_able_to(:create, other_school_class) }
+      it { is_expected.not_to be_able_to(:import, other_school_class) }
+      it { is_expected.to be_able_to(:read, own_school_class_saved) }
+      it { is_expected.to be_able_to(:update, own_school_class_saved) }
+      it { is_expected.to be_able_to(:destroy, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
+    end
+
+    context 'when user is a school owner' do
+      let(:user) { owner }
+
+      let(:own_school_class) { SchoolClass.new(school: school) }
+      let(:other_school_class) { SchoolClass.new(school: other_school) }
+
+      it { is_expected.to be_able_to(:create, own_school_class) }
+      it { is_expected.to be_able_to(:import, own_school_class) }
+      it { is_expected.to be_able_to(:read, own_school_class_saved) }
+      it { is_expected.to be_able_to(:update, own_school_class_saved) }
+      it { is_expected.to be_able_to(:destroy, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:create, other_school_class) }
+      it { is_expected.not_to be_able_to(:import, other_school_class) }
+      it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
+        end
+      end
 end

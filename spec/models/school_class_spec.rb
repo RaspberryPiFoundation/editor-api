@@ -99,6 +99,66 @@ RSpec.describe SchoolClass, versioning: true do
       school_class.code = '65-43-21'
       expect(school_class).to be_invalid
     end
+
+    it 'allows import_origin to be nil' do
+      school_class.import_origin = nil
+      school_class.import_id = nil
+      expect(school_class).to be_valid
+    end
+
+    it 'allows import_origin to be google_classroom' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = 'classroom_123'
+      expect(school_class).to be_valid
+    end
+
+    it 'does not allow invalid import_origin values' do
+      expect { school_class.import_origin = :invalid_origin }.to raise_error(ArgumentError)
+    end
+
+    it 'requires import_id when import_origin is set' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = nil
+      expect(school_class).to be_invalid
+      expect(school_class.errors[:import_id]).to include("can't be blank")
+    end
+
+    it 'allows import_id to be nil when import_origin is nil' do
+      school_class.import_origin = nil
+      school_class.import_id = nil
+      expect(school_class).to be_valid
+    end
+
+    it 'requires unique import_id within the same school and import_origin' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = 'classroom_123'
+      school_class.save!
+
+      duplicate_school_class = build(:school_class,
+        teacher_ids: [teacher.id],
+        school: school_class.school,
+        import_origin: :google_classroom,
+        import_id: 'classroom_123'
+      )
+
+      expect(duplicate_school_class).to be_invalid
+      expect(duplicate_school_class.errors[:import_id]).to include('has already been taken')
+    end
+
+    it 'permits duplicate import_id in different schools' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = 'classroom_123'
+      school_class.save!
+
+      different_school_class = build(:school_class,
+        teacher_ids: [teacher.id],
+        school: create(:school),
+        import_origin: :google_classroom,
+        import_id: 'classroom_123'
+      )
+
+      expect(different_school_class).to be_valid
+    end
   end
 
   describe '.teachers' do

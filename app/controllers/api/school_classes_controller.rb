@@ -29,6 +29,17 @@ module Api
       end
     end
 
+    def import
+      result = SchoolClass::Create.call(school: @school, school_class_params: school_class_import_params, current_user:, validate_context: :import)
+
+      if result.success?
+        @school_class_with_teachers = result[:school_class].with_teachers
+        render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     def update
       school_class = @school.classes.find(params[:id])
       result = SchoolClass::Update.call(school_class:, school_class_params:)
@@ -63,7 +74,7 @@ module Api
     end
 
     def load_and_authorize_school_class
-      if %w[index create].include?(params[:action])
+      if %w[index create import].include?(params[:action])
         authorize! params[:action].to_sym, SchoolClass
       else
         @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
@@ -79,6 +90,10 @@ module Api
     def school_class_params
       # A school teacher may only create classes they own.
       params.require(:school_class).permit(:name, :description)
+    end
+
+    def school_class_import_params
+       params.require(:school_class).permit(:name, :description, :import_origin, :import_id)
     end
 
     def school_owner?
