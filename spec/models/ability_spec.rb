@@ -165,7 +165,6 @@ RSpec.describe Ability do
       end
     end
 
-    # rubocop:disable RSpec/MultipleMemoizedHelpers
     context "with a teacher's project where the lesson is visible to students" do
       let(:user) { create(:user) }
       let(:school) { create(:school) }
@@ -361,7 +360,6 @@ RSpec.describe Ability do
       end
     end
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers
 
   describe 'Component' do
     let(:starter_project_component) { build(:component, project: starter_project) }
@@ -568,6 +566,6 @@ RSpec.describe Ability do
       it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
       it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
       it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
-        end
-      end
+    end
+  end
 end

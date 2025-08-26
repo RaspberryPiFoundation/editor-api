@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './seeds_helper'
+require_relative 'seeds_helper'
 
 Rails.logger = Logger.new($stdout) unless Rails.env.test?
 

@@ -7,12 +7,10 @@ class TestUtilitiesController < ApplicationController
   Rails.application.load_tasks if Rake::Task.tasks.empty?
 
   def reseed
-    # rubocop:disable Rails/Output
     if reseed_allowed?
       Rake::Task['test_seeds:destroy'].execute
       Rake::Task['test_seeds:create'].execute
       render json: { message: 'Database reseeded successfully.' }, status: :ok
-      # rubocop:enable Rails/Output
     else
       head :not_found
     end

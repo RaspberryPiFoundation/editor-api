@@ -16,7 +16,7 @@ class SchoolClass < ApplicationRecord
   validate :code_cannot_be_changed
   validate :school_class_has_at_least_one_teacher
 
-  enum :import_origin, %i[google_classroom], allow_nil: true
+  enum :import_origin, { google_classroom: 0 }, allow_nil: true
 
   validates :import_origin, presence: true, on: :import
   validates :import_id, uniqueness: { scope: %i[school_id import_origin] }, if: -> { import_origin.present? }

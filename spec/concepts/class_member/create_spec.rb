@@ -7,7 +7,7 @@ RSpec.describe ClassMember::Create, type: :unit do
   let(:school) { create(:school) }
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }
-  let(:teachers) { [create(:teacher, school:), create(:teacher, school:)] }
+  let(:teachers) { Array.new(2) { create(:teacher, school:) } }
 
   let(:student_ids) { students.map(&:id) }
 

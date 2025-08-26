@@ -102,17 +102,17 @@ RSpec.describe School do
 
     it 'requires a name' do
       school.name = ' '
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires a website' do
       school.website = ' '
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires a creator_id' do
       school.creator_id = nil
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires a unique creator_id' do
@@ -124,7 +124,7 @@ RSpec.describe School do
 
     it 'rejects a badly formed url for website' do
       school.website = 'http://.example.com'
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'accepts a url with a multi-part TLD' do
@@ -144,27 +144,27 @@ RSpec.describe School do
       school.save!
 
       duplicate_school = build(:school, reference: 'urn-123')
-      expect(duplicate_school).to be_invalid
+      expect(duplicate_school).not_to be_valid
     end
 
     it 'requires an address_line_1' do
       school.address_line_1 = ' '
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires a municipality' do
       school.municipality = ' '
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires a country_code' do
       school.country_code = ' '
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it "requires an 'ISO 3166-1 alpha-2' country_code" do
       school.country_code = 'GBR'
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'does not require a creator_role' do
@@ -179,17 +179,17 @@ RSpec.describe School do
 
     it 'requires creator_agree_authority to be true' do
       school.creator_agree_authority = false
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires creator_agree_terms_and_conditions to be true' do
       school.creator_agree_terms_and_conditions = false
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'requires creator_agree_responsible_safeguarding to be true' do
       school.creator_agree_responsible_safeguarding = false
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'does not require creator_agree_to_ux_contact to be true' do
@@ -245,7 +245,7 @@ RSpec.describe School do
 
     it 'requires a user_origin' do
       school.user_origin = nil
-      expect(school).to be_invalid
+      expect(school).not_to be_valid
     end
 
     it 'sets the user_origin to for_education by default' do

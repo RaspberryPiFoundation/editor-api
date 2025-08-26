@@ -23,7 +23,6 @@ RSpec.describe 'for_education', type: :task do
       create(:lesson, school_id: school.id, user_id: creator_id)
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it 'destroys all seed data' do
       task.invoke
       expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
@@ -34,7 +33,6 @@ RSpec.describe 'for_education', type: :task do
       expect(Lesson.where(school_id: school.id)).not_to exist
       expect(Project.where(school_id: school.id)).not_to exist
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 
   describe ':seed_an_unverified_school' do
@@ -90,7 +88,6 @@ RSpec.describe 'for_education', type: :task do
       expect(ClassTeacher.where(teacher_id: creator_id).length).to eq(1)
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it 'assigns students' do
       school_id = school.id
       school_class_id = SchoolClass.find_by(school_id:).id
@@ -99,6 +96,5 @@ RSpec.describe 'for_education', type: :task do
       expect(Role.student.where(user_id: student_2, school_id:)).to exist
       expect(ClassStudent.where(student_id: student_2, school_class_id:)).to exist
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 end

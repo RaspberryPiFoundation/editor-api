@@ -75,7 +75,7 @@ class Project
       end
 
       def overwrite_component_attributes(response, component_params)
-        component = response[:project].components.select { |c| c.id == component_params[:id] }.first
+        component = response[:project].components.find { |c| c.id == component_params[:id] }
         component.assign_attributes(component_params)
       end
 

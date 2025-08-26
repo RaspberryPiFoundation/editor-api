@@ -15,12 +15,10 @@ RSpec.describe SchoolTeacher::List, type: :unit do
         stub_user_info_api_for_users(teacher_ids, users: teachers)
       end
 
-      # rubocop:disable RSpec/MultipleExpectations
       it 'returns a successful response with school teachers' do
         expect(response[:school_teachers]).to eq(teachers)
         expect(response[:error]).to be_nil
       end
-      # rubocop:enable RSpec/MultipleExpectations
     end
 
     context 'when passing teacher_ids' do
@@ -30,12 +28,10 @@ RSpec.describe SchoolTeacher::List, type: :unit do
         stub_user_info_api_for(teachers[1])
       end
 
-      # rubocop:disable RSpec/MultipleExpectations
       it 'returns a successful response with school teachers' do
         expect(response[:school_teachers].first.id).to eq(teachers[1].id)
         expect(response[:error]).to be_nil
       end
-      # rubocop:enable RSpec/MultipleExpectations
     end
   end
 
@@ -49,7 +45,6 @@ RSpec.describe SchoolTeacher::List, type: :unit do
       allow(Sentry).to receive(:capture_exception)
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it 'captures the exception and returns an error response' do
       # Call the method to ensure the error is raised and captured
       response
@@ -57,6 +52,5 @@ RSpec.describe SchoolTeacher::List, type: :unit do
       expect(response[:school_teachers]).to be_nil
       expect(response[:error]).to eq(error_message)
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 end
