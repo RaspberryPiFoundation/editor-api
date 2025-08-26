@@ -43,7 +43,6 @@ RSpec.describe SchoolMember::List, type: :unit do
       allow(Sentry).to receive(:capture_exception)
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it 'captures and handles errors' do
       allow(SchoolStudent::List).to receive(:call).and_raise(StandardError.new('forced error'))
 
@@ -52,7 +51,6 @@ RSpec.describe SchoolMember::List, type: :unit do
       expect(response[:error]).to eq('Error listing school members: forced error')
       expect(Sentry).to have_received(:capture_exception).with(instance_of(StandardError))
     end
-    # rubocop:enable RSpec/MultipleExpectations
 
     it 'returns an empty array when no ids match' do
       allow(SchoolStudent::List).to receive(:call).and_return({ school_students: [] })

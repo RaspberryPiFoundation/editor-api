@@ -31,7 +31,6 @@ RSpec.describe SchoolOwner::List, type: :unit do
       allow(Sentry).to receive(:capture_exception)
     end
 
-    # rubocop:disable RSpec/MultipleExpectations
     it 'captures the exception and returns an error response' do
       # Call the method to ensure the error is raised and captured
       response
@@ -39,6 +38,5 @@ RSpec.describe SchoolOwner::List, type: :unit do
       expect(response[:school_owners]).to be_nil
       expect(response[:error]).to eq(error_message)
     end
-    # rubocop:enable RSpec/MultipleExpectations
   end
 end

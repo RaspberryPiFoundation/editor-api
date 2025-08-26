@@ -60,12 +60,12 @@ RSpec.describe Lesson do
 
     it 'requires a user_id' do
       lesson.user_id = ' '
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     it 'requires a UUID user_id' do
       lesson.user_id = 'invalid'
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     context 'when the lesson has a school' do
@@ -78,7 +78,7 @@ RSpec.describe Lesson do
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
         student = create(:student, school:)
         lesson.user_id = student.id
-        expect(lesson).to be_invalid
+        expect(lesson).not_to be_valid
       end
     end
 
@@ -92,23 +92,23 @@ RSpec.describe Lesson do
       it 'requires that the user that is a school-teacher for the school_class' do
         owner = create(:owner, school:)
         lesson.user_id = owner.id
-        expect(lesson).to be_invalid
+        expect(lesson).not_to be_valid
       end
     end
 
     it 'requires a name' do
       lesson.name = ' '
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     it 'requires a visibility' do
       lesson.visibility = ' '
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     it "requires a visibility that is either 'private', 'teachers', 'students' or 'public'" do
       lesson.visibility = 'invalid'
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
   end
 

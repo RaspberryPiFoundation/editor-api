@@ -91,8 +91,7 @@ RSpec.describe 'mutation UpdateComponent() { ... }' do
       context 'when component update fails' do
         before do
           errors = instance_double(ActiveModel::Errors, full_messages: ['An error message'])
-          allow(component).to receive(:save).and_return(false)
-          allow(component).to receive(:errors).and_return(errors)
+          allow(component).to receive_messages(save: false, errors: errors)
           allow(GlobalID).to receive(:find).and_return(component)
         end
 
