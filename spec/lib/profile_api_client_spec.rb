@@ -484,7 +484,6 @@ RSpec.describe ProfileApiClient do
     end
   end
 
-  # rubocop:disable RSpec/MultipleMemoizedHelpers
   describe '.update_school_student' do
     let(:username) { 'username' }
     let(:password) { 'password' }
@@ -589,7 +588,6 @@ RSpec.describe ProfileApiClient do
       described_class.update_school_student(token:, username:, password:, name:, school_id: school.id, student_id: student.id)
     end
   end
-  # rubocop:enable RSpec/MultipleMemoizedHelpers
 
   describe '.school_student' do
     let(:school) { build(:school, id: SecureRandom.uuid) }

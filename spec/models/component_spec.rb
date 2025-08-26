@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Component, versioning: true do
+RSpec.describe Component, :versioning do
   subject { build(:component) }
 
   it { is_expected.to belong_to(:project) }

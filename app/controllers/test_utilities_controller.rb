@@ -7,23 +7,10 @@ class TestUtilitiesController < ApplicationController
   Rails.application.load_tasks if Rake::Task.tasks.empty?
 
   def reseed
-    # rubocop:disable Rails/Output
-    pp 'api_key_valid?', api_key_valid?
-    pp 'api_key_present?', ENV['RESEED_API_KEY'].present?
-    pp 'api_key_correct?', request.headers['X-RESEED-API-KEY'] == ENV['RESEED_API_KEY']
-    pp 'host_allowed?', host_allowed?
-    pp 'host', request.host
-    pp 'reseed_allowed?', reseed_allowed?
-
     if reseed_allowed?
-      pp 'reseed was allowed'
-      pp 'destroying seeds...'
       Rake::Task['test_seeds:destroy'].execute
-      pp 'creating seeds...'
       Rake::Task['test_seeds:create'].execute
-      pp 'success!'
       render json: { message: 'Database reseeded successfully.' }, status: :ok
-      # rubocop:enable Rails/Output
     else
       head :not_found
     end

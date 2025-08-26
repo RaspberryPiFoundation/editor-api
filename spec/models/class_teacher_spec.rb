@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe ClassTeacher, versioning: true do
+RSpec.describe ClassTeacher, :versioning do
   before do
     stub_user_info_api_for(teacher)
   end
@@ -36,28 +36,28 @@ RSpec.describe ClassTeacher, versioning: true do
 
     it 'requires a school_class' do
       class_teacher.school_class = nil
-      expect(class_teacher).to be_invalid
+      expect(class_teacher).not_to be_valid
     end
 
     it 'requires a teacher_id' do
       class_teacher.teacher_id = ' '
-      expect(class_teacher).to be_invalid
+      expect(class_teacher).not_to be_valid
     end
 
     it 'requires a UUID teacher_id' do
       class_teacher.teacher_id = 'invalid'
-      expect(class_teacher).to be_invalid
+      expect(class_teacher).not_to be_valid
     end
 
     it 'requires teacher to have the school-teacher role for the school' do
       class_teacher.teacher = student
-      expect(class_teacher).to be_invalid
+      expect(class_teacher).not_to be_valid
     end
 
     it 'requires a unique teacher_id within the school_class' do
       class_teacher.save!
       duplicate = build(:class_teacher, teacher_id: class_teacher.teacher_id, school_class: class_teacher.school_class)
-      expect(duplicate).to be_invalid
+      expect(duplicate).not_to be_valid
     end
   end
 

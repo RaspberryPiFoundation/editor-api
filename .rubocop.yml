@@ -1,7 +1,12 @@
 ---
 require:
   - rubocop-graphql
+plugins:
+  - rubocop-rails
   - rubocop-capybara
+  - rubocop-performance
+  - rubocop-rspec_rails
+  - rubocop-factory_bot
 inherit_from:
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-base.yml
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rails.yml
@@ -28,9 +33,15 @@ RSpec/DescribeClass:
     - "spec/graphql/mutations/**"
 
 RSpec/MultipleMemoizedHelpers:
-  Max: 8
+  Max: 15
 
 RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/IndexedLet:
   Enabled: false
 
 Metrics/BlockLength:
@@ -45,3 +56,9 @@ Layout/LineLength:
 Naming/VariableNumber:
   EnforcedStyle: snake_case
   AllowedIdentifiers: sha256, X-Hub-Signature-256
+
+Style/SafeNavigationChainLength:
+  Enabled: false
+
+Rails/EnvLocal:
+  Enabled: false

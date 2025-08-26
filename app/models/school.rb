@@ -9,7 +9,7 @@ class School < ApplicationRecord
 
   VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,63}(\.[a-z]{2,63})*(/.*)?\z}ix
 
-  enum :user_origin, %i[for_education experience_cs], default: :for_education, validate: true
+  enum :user_origin, { for_education: 0, experience_cs: 1 }, default: :for_education, validate: true
 
   validates :name, presence: true
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
