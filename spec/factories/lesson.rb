@@ -10,7 +10,7 @@ FactoryBot.define do
       project_name { name }
     end
 
-    association :project, factory: :project
+    project factory: %i[project]
 
     after(:build) do |lesson, evaluator|
       lesson.project.user_id = lesson.user_id
