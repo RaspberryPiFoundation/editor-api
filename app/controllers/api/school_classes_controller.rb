@@ -93,7 +93,7 @@ module Api
     end
 
     def school_class_import_params
-       params.require(:school_class).permit(:name, :description, :import_origin, :import_id)
+      params.require(:school_class).permit(:name, :description, :import_origin, :import_id)
     end
 
     def school_owner?

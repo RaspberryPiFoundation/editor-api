@@ -566,6 +566,6 @@ RSpec.describe Ability do
       it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
       it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
       it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
-        end
-      end
+    end
+  end
 end

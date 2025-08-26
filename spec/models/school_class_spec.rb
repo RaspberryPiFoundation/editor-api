@@ -100,12 +100,6 @@ RSpec.describe SchoolClass, :versioning do
       expect(school_class).not_to be_valid
     end
 
-    it 'allows import_origin to be nil' do
-      school_class.import_origin = nil
-      school_class.import_id = nil
-      expect(school_class).to be_valid
-    end
-
     it 'allows import_origin to be google_classroom' do
       school_class.import_origin = :google_classroom
       school_class.import_id = 'classroom_123'
@@ -119,7 +113,7 @@ RSpec.describe SchoolClass, :versioning do
     it 'requires import_id when import_origin is set' do
       school_class.import_origin = :google_classroom
       school_class.import_id = nil
-      expect(school_class).to be_invalid
+      expect(school_class).not_to be_valid
       expect(school_class.errors[:import_id]).to include("can't be blank")
     end
 
@@ -135,13 +129,12 @@ RSpec.describe SchoolClass, :versioning do
       school_class.save!
 
       duplicate_school_class = build(:school_class,
-        teacher_ids: [teacher.id],
-        school: school_class.school,
-        import_origin: :google_classroom,
-        import_id: 'classroom_123'
-      )
+                                     teacher_ids: [teacher.id],
+                                     school: school_class.school,
+                                     import_origin: :google_classroom,
+                                     import_id: 'classroom_123')
 
-      expect(duplicate_school_class).to be_invalid
+      expect(duplicate_school_class).not_to be_valid
       expect(duplicate_school_class.errors[:import_id]).to include('has already been taken')
     end
 
@@ -151,11 +144,10 @@ RSpec.describe SchoolClass, :versioning do
       school_class.save!
 
       different_school_class = build(:school_class,
-        teacher_ids: [teacher.id],
-        school: create(:school),
-        import_origin: :google_classroom,
-        import_id: 'classroom_123'
-      )
+                                     teacher_ids: [teacher.id],
+                                     school: create(:school),
+                                     import_origin: :google_classroom,
+                                     import_id: 'classroom_123')
 
       expect(different_school_class).to be_valid
     end

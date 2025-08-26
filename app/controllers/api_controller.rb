@@ -36,6 +36,6 @@ class ApiController < ActionController::API
   end
 
   def parser_error
-    render json: { error: "Malformed JSON or invalid request body." }, status: :bad_request
+    render json: { error: 'Malformed JSON or invalid request body.' }, status: :bad_request
   end
 end

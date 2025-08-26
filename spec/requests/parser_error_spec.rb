@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-describe 'APIController malformed JSON error handling', type: :request do
+describe 'APIController malformed JSON error handling' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
@@ -20,8 +20,8 @@ describe 'APIController malformed JSON error handling', type: :request do
   it 'returns a JSON error message and 400 status for malformed JSON' do
     malformed_json = '{ "school": { "name": "A new school" }, }'
     post '/api/schools', params: malformed_json, headers: headers.merge(json_headers)
-    expect(response.status).to eq(400)
+    expect(response).to have_http_status(:bad_request)
     expect(response.content_type).to include('application/json')
-    expect(JSON.parse(response.body)['error']).to eq('Malformed JSON or invalid request body.')
+    expect(response.parsed_body['error']).to eq('Malformed JSON or invalid request body.')
   end
 end
