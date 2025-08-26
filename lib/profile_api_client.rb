@@ -33,7 +33,7 @@ class ProfileApiClient
       @response_headers = response.headers
       @response_body = response.body
 
-      super "Unexpected response from Profile API (status code #{response.status})"
+      super("Unexpected response from Profile API (status code #{response.status})")
     end
   end
 

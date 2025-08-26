@@ -3,10 +3,12 @@
 class SchoolClass
   class Create
     class << self
-      def call(school:, school_class_params:, current_user:)
+      def call(school:, school_class_params:, current_user:, validate_context: nil)
         response = OperationResponse.new
         response[:school_class] = build_class(school, school_class_params, current_user)
-        response[:school_class].save!
+        # validate_context allows us to specify a custom validation context (e.g. :import)
+        # when saving the model, so only the relevant validations run.
+        response[:school_class].save!(context: validate_context)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)

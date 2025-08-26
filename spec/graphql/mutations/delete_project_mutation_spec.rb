@@ -74,8 +74,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
       context 'when project delete fails' do
         before do
           errors = instance_double(ActiveModel::Errors, full_messages: ['An error message'])
-          allow(project).to receive(:destroy).and_return(false)
-          allow(project).to receive(:errors).and_return(errors)
+          allow(project).to receive_messages(destroy: false, errors: errors)
           allow(GlobalID).to receive(:find).and_return(project)
         end
 
