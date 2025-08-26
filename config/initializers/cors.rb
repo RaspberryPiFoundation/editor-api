@@ -8,7 +8,7 @@ require Rails.root.join('lib/origin_parser')
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do
     # localhost and test domain origins
-    origins(%r{https?://localhost([:0-9]*)$}) if Rails.env.local?
+    origins(%r{https?://localhost([:0-9]*)$}) if Rails.env.development? || Rails.env.test? # rubocop:disable Rails/EnvLocal
 
     standard_cors_options
   end
