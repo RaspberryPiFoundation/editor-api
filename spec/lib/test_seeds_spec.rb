@@ -38,6 +38,7 @@ RSpec.describe 'test_seeds', type: :task do
     let(:task) { Rake::Task['test_seeds:create'] }
 
     before do
+      task.reenable
       task.invoke
     end
 
