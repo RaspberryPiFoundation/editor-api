@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Project, versioning: true do
+RSpec.describe Project, :versioning do
   let(:school) { create(:school) }
 
   describe 'associations' do
@@ -44,7 +44,7 @@ RSpec.describe Project, versioning: true do
 
     it 'is invalid if no user or locale' do
       invalid_project = build(:project, locale: nil, user_id: nil)
-      expect(invalid_project).to be_invalid
+      expect(invalid_project).not_to be_valid
     end
 
     it 'is valid if user but no locale' do
@@ -54,12 +54,12 @@ RSpec.describe Project, versioning: true do
 
     it 'is invalid if school_id but no school project' do
       invalid_project = build(:project, school_id: SecureRandom.uuid)
-      expect(invalid_project).to be_invalid
+      expect(invalid_project).not_to be_valid
     end
 
     it 'is invalid if school_id and school project with different school_id' do
       invalid_project = build(:project, school_id: SecureRandom.uuid, school_project: build(:school_project, school_id: SecureRandom.uuid))
-      expect(invalid_project).to be_invalid
+      expect(invalid_project).not_to be_valid
     end
 
     it 'is valid if school_id and school project with matching school_id' do
@@ -75,7 +75,7 @@ RSpec.describe Project, versioning: true do
       lesson = create(:lesson, school:, school_class:, user_id: teacher.id)
       invalid_project = build(:project, school:, lesson:, user_id: SecureRandom.uuid)
 
-      expect(invalid_project).to be_invalid
+      expect(invalid_project).not_to be_valid
     end
 
     context 'with same identifier and same user as existing project' do
@@ -83,7 +83,7 @@ RSpec.describe Project, versioning: true do
 
       it 'is invalid if identifier in use by same user in the same locale' do
         new_project = build(:project, identifier:, user_id:, locale: project.locale)
-        expect(new_project).to be_invalid
+        expect(new_project).not_to be_valid
       end
 
       it 'is valid if identifier only in use by the user in the another locale' do
@@ -97,12 +97,12 @@ RSpec.describe Project, versioning: true do
 
       it 'is invalid if identifier in use by another user in same locale' do
         new_project = build(:project, identifier:, user_id:, locale: project.locale)
-        expect(new_project).to be_invalid
+        expect(new_project).not_to be_valid
       end
 
       it 'is invalid if identifier in use in another locale by another user' do
         new_project = build(:project, identifier:, user_id:, locale: 'another_locale')
-        expect(new_project).to be_invalid
+        expect(new_project).not_to be_valid
       end
     end
 
@@ -113,7 +113,7 @@ RSpec.describe Project, versioning: true do
 
       it 'requires that the user that has a role within the school' do
         project.user_id = SecureRandom.uuid
-        expect(project).to be_invalid
+        expect(project).not_to be_valid
       end
     end
 
@@ -131,7 +131,7 @@ RSpec.describe Project, versioning: true do
 
       it 'fails if the user is the owner of the lesson' do
         project.user_id = SecureRandom.uuid
-        expect(project).to be_invalid
+        expect(project).not_to be_valid
       end
 
       it 'succeeds if the user is the owner of the lesson' do
@@ -142,14 +142,14 @@ RSpec.describe Project, versioning: true do
         create(:class_student, school_class:, student_id: teacher.id)
 
         project.user_id = student.id
-        expect(project).to be_invalid
+        expect(project).not_to be_valid
       end
 
       it 'suceeds if the user is a member of the lesson' do
         create(:class_student, school_class:, student_id: student.id)
 
         project.user_id = student.id
-        expect(project).to be_invalid
+        expect(project).not_to be_valid
       end
     end
   end

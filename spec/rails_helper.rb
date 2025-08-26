@@ -17,7 +17,7 @@ require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
 require 'webmock/rspec'
 
-Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
+Rails.root.glob('spec/support/**/*.rb').each { |f| require f }
 
 require 'paper_trail/frameworks/rspec'
 
@@ -115,7 +115,7 @@ RSpec.configure do |config|
     puts "Running tests against the database: #{db_config.database}"
   end
 
-  config.before(:each, js: true, type: :system) do
+  config.before(:each, :js, type: :system) do
     # We need to allow net connect at this stage to allow WebDrivers to update
     # or Capybara to talk to selenium etc.
     WebMock.allow_net_connect!

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require_relative './seeds_helper'
+require_relative 'seeds_helper'
 
 # rubocop:disable Rails/Output
 namespace :test_seeds do
@@ -9,7 +9,6 @@ namespace :test_seeds do
   desc 'Destroy existing data'
   task destroy: :environment do
     ActiveRecord::Base.transaction do
-      pp 'Destroying existing seeds...'
       Rails.logger.info 'Destroying existing seeds...'
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
       teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
@@ -34,7 +33,6 @@ namespace :test_seeds do
       # Destroy the school
       School.find(school_id).destroy
 
-      pp 'Done...'
       Rails.logger.info 'Done...'
     rescue StandardError => e
       pp "Failed: #{e.message}"

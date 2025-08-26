@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe Role do
-  describe 'validations', versioning: true do
+  describe 'validations', :versioning do
     subject(:role) { build(:role) }
 
     it 'has a valid default factory' do
@@ -16,17 +16,17 @@ RSpec.describe Role do
 
     it 'requires a school' do
       role.school = nil
-      expect(role).to be_invalid
+      expect(role).not_to be_valid
     end
 
     it 'requires a user_id' do
       role.user_id = nil
-      expect(role).to be_invalid
+      expect(role).not_to be_valid
     end
 
     it 'requires a role' do
       role.role = nil
-      expect(role).to be_invalid
+      expect(role).not_to be_valid
     end
 
     it 'requires a valid role' do
@@ -36,7 +36,7 @@ RSpec.describe Role do
     it 'requires role to be unique for the combination of user and school' do
       role.save
       duplicate_role = build(:role, school: role.school, user_id: role.user_id, role: role.role)
-      expect(duplicate_role).to be_invalid
+      expect(duplicate_role).not_to be_valid
     end
 
     it 'enables auditing' do
@@ -54,7 +54,7 @@ RSpec.describe Role do
 
       it 'prevents an owner role being created for the user and school' do
         role = build(:owner_role, user_id: user.id, school:)
-        expect(role).to be_invalid
+        expect(role).not_to be_valid
       end
 
       it 'adds a message to explain why the owner role cannot be created' do
@@ -65,7 +65,7 @@ RSpec.describe Role do
 
       it 'prevents a teacher role being created for the user and school' do
         role = build(:teacher_role, user_id: user.id, school:)
-        expect(role).to be_invalid
+        expect(role).not_to be_valid
       end
 
       it 'adds a message to explain why the teacher role cannot be created' do
@@ -89,7 +89,7 @@ RSpec.describe Role do
 
       it 'prevents a student role being created for the user and school' do
         role = build(:student_role, user_id: user.id, school:)
-        expect(role).to be_invalid
+        expect(role).not_to be_valid
       end
 
       it 'adds a message to explain why the student role cannot be created' do
@@ -113,7 +113,7 @@ RSpec.describe Role do
 
       it 'prevents a student role being created for the user and school' do
         role = build(:student_role, user_id: user.id, school:)
-        expect(role).to be_invalid
+        expect(role).not_to be_valid
       end
 
       it 'adds a message to explain why the student role cannot be created' do
@@ -134,7 +134,7 @@ RSpec.describe Role do
 
       it 'prevents a student role being created for the user and school' do
         role = build(:student_role, user_id: user.id, school:)
-        expect(role).to be_invalid
+        expect(role).not_to be_valid
       end
 
       it 'adds a message to explain why the student role cannot be created' do
@@ -155,7 +155,7 @@ RSpec.describe Role do
 
       it 'prevents the user from having a role within a different school' do
         role = build(:role, user_id: user.id, school: school_2)
-        expect(role).to be_invalid
+        expect(role).not_to be_valid
       end
 
       it 'adds a message to explain that a user can only have roles within a single school' do

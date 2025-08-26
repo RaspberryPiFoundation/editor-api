@@ -6,7 +6,17 @@ FactoryBot.define do
     sequence(:name) { |n| "Lesson #{n}" }
     description { 'Description' }
     visibility { 'teachers' }
-    project { create(:project, user_id:, name:) }
+    transient do
+      project_name { name }
+    end
+
+    association :project, factory: :project
+
+    after(:build) do |lesson, evaluator|
+      lesson.project.user_id = lesson.user_id
+      lesson.project.name = evaluator.project_name
+      lesson.project.identifier = "#{lesson.name.parameterize}-#{lesson.user_id}"
+    end
 
     trait :with_project_components do
       transient do
