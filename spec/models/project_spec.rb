@@ -123,33 +123,34 @@ RSpec.describe Project, :versioning do
       let(:student) { create(:student, school:) }
       let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
 
-      before do
-        lesson = create(:lesson, school:, school_class:, user_id: teacher.id)
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
 
+      before do
         project.update!(lesson:, school:, user_id: lesson.user_id, identifier: 'something')
       end
 
-      it 'fails if the user is the owner of the lesson' do
+      it 'is valid if the user is the owner of the lesson' do
+        project.user_id = lesson.user_id
+        expect(project).to be_valid
+      end
+
+      it 'is invalid if the user is neither the owner nor a class member' do
         project.user_id = SecureRandom.uuid
         expect(project).not_to be_valid
       end
 
-      it 'succeeds if the user is the owner of the lesson' do
-        expect(project).to be_valid
-      end
-
-      it 'fails if the user is not a member of the lesson' do
-        create(:class_student, school_class:, student_id: teacher.id)
-
+      it 'is invalid if the user is not a member of the lesson' do
+        # Ensure student is not a class member
         project.user_id = student.id
         expect(project).not_to be_valid
       end
 
-      it 'suceeds if the user is a member of the lesson' do
+      it 'is valid if the user is a member of the lesson' do
+        # Ensure the student is a class member
         create(:class_student, school_class:, student_id: student.id)
-
         project.user_id = student.id
-        expect(project).not_to be_valid
+        project.identifier = 'unique-student-identifier'
+        expect(project).to be_valid
       end
     end
   end
