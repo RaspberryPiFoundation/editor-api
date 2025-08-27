@@ -19,6 +19,8 @@ class SchoolClass < ApplicationRecord
   enum :import_origin, { google_classroom: 0 }, allow_nil: true
 
   validates :import_origin, presence: true, on: :import
+  validate :import_origin_must_be_valid, on: :import
+
   validates :import_id, uniqueness: { scope: %i[school_id import_origin] }, if: -> { import_origin.present? }
   validates :import_id, presence: true, if: -> { import_origin.present? }
 
@@ -51,7 +53,7 @@ class SchoolClass < ApplicationRecord
 
     5.times do
       self.code = ForEducationCodeGenerator.generate
-      return if code_is_unique_within_school
+      return if code_is_unique_within_school?
     end
 
     errors.add(:code, 'could not be generated')
@@ -69,7 +71,15 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
   end
 
-  def code_is_unique_within_school
+  def code_is_unique_within_school?
     code.present? && SchoolClass.where(code:, school:).none?
+  end
+
+  # Validate import origin, necessary as the enum is only required in the import context (precluding us from using the standard enum validation)
+  def import_origin_must_be_valid
+    raw_value = import_origin_before_type_cast
+    return unless raw_value.present? && !self.class.import_origins.key?(raw_value.to_s)
+
+    errors.add(:import_origin, 'is not a valid import_origin')
   end
 end

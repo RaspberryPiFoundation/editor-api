@@ -44,7 +44,7 @@ RSpec.describe 'Importing a school class', type: :request do
     params_missing_id[:school_class].delete(:import_id)
     post(import_url, headers:, params: params_missing_id)
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(JSON.parse(response.body)['error'].to_s).to include("Import can't be blank")
+    expect(JSON.parse(response.body)['error'].to_s).to include("Import id can't be blank")
   end
 
   it 'returns 422 if both import_origin and import_id are missing' do
@@ -54,5 +54,25 @@ RSpec.describe 'Importing a school class', type: :request do
     post(import_url, headers:, params: params_missing_both)
     expect(response).to have_http_status(:unprocessable_entity)
     expect(JSON.parse(response.body)['error'].to_s).to include("Import origin can't be blank")
+  end
+
+  it 'returns 422 if import_origin is invalid and returns correct error in JSON' do
+    params_invalid_enum = base_import_params.deep_dup
+    params_invalid_enum[:school_class][:import_origin] = 'not_a_valid_origin'
+    post(import_url, headers:, params: params_invalid_enum)
+    expect(response).to have_http_status(:unprocessable_entity)
+    error_json = JSON.parse(response.body)
+    expect(error_json['error'].to_s).to include('is not a valid import_origin')
+  end
+
+  it 'prevents importing two classes with the same import_id for the same school' do
+    # First import should succeed
+    post(import_url, headers:, params: base_import_params)
+    expect(response).to have_http_status(:created)
+
+    # Second import with the same import_id should fail
+    post(import_url, headers:, params: base_import_params)
+    expect(response).to have_http_status(:unprocessable_entity)
+    expect(JSON.parse(response.body)['error'].to_s).to include('Import id has already been taken')
   end
 end
