@@ -62,9 +62,8 @@ end
 
 group :development do
   gem 'rails-erd'
-  gem 'ruby-lsp', '~> 0.17.7'
-  gem 'ruby-lsp-rails'
-  gem 'ruby-lsp-rspec'
+  gem 'ruby-lsp', require: false
+  gem 'ruby-lsp-rspec', '~> 0.1.27', require: false
 end
 
 group :test do

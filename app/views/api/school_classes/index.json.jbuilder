@@ -8,7 +8,9 @@ json.array!(@school_classes_with_teachers) do |school_class, teachers|
     :school_id,
     :name,
     :created_at,
-    :updated_at
+    :updated_at,
+    :import_origin,
+    :import_id
   )
 
   json.teachers(teachers) do |teacher|

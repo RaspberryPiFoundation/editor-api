@@ -18,3 +18,7 @@ en:
       email_address: "'%<value>s' is invalid"
     school_student:
       not_empty: "You must supply a %{field}"
+  activerecord:
+    attributes:
+      school_class:
+        import_id: "Import id"

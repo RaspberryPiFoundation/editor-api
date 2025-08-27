@@ -9,12 +9,20 @@ class SchoolClass < ApplicationRecord
 
   scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
 
-  before_validation :assign_class_code, on: :create
+  before_validation :assign_class_code, on: %i[create import]
 
   validates :name, presence: true
   validates :code, uniqueness: { scope: :school_id }, presence: true, format: { with: /\d\d-\d\d-\d\d/, allow_nil: false }
   validate :code_cannot_be_changed
   validate :school_class_has_at_least_one_teacher
+
+  enum :import_origin, { google_classroom: 0 }, allow_nil: true
+
+  validates :import_origin, presence: true, on: :import
+  validate :import_origin_must_be_valid, on: :import
+
+  validates :import_id, uniqueness: { scope: %i[school_id import_origin] }, if: -> { import_origin.present? }
+  validates :import_id, presence: true, if: -> { import_origin.present? }
 
   has_paper_trail(
     meta: {
@@ -45,7 +53,7 @@ class SchoolClass < ApplicationRecord
 
     5.times do
       self.code = ForEducationCodeGenerator.generate
-      return if code_is_unique_within_school
+      return if code_is_unique_within_school?
     end
 
     errors.add(:code, 'could not be generated')
@@ -63,7 +71,15 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
   end
 
-  def code_is_unique_within_school
+  def code_is_unique_within_school?
     code.present? && SchoolClass.where(code:, school:).none?
+  end
+
+  # Validate import origin, necessary as the enum is only required in the import context (precluding us from using the standard enum validation)
+  def import_origin_must_be_valid
+    raw_value = import_origin_before_type_cast
+    return unless raw_value.present? && !self.class.import_origins.key?(raw_value.to_s)
+
+    errors.add(:import_origin, 'is not a valid import_origin')
   end
 end
