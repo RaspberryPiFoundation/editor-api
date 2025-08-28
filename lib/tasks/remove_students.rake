@@ -33,6 +33,20 @@ namespace :remove_students do
       exit 1
     end
 
+    puts "\n===================="
+    puts "Student removal options summary\n"
+    puts "SCHOOL: #{school.name} (#{school.id})"
+    puts "REMOVE_FROM_PROFILE: #{remove_from_profile}"
+    puts "Students to remove: #{students.size}"
+    puts "====================\n\n"
+    puts "Please confirm deletion of #{students.size} user(s), and that recent Postgres backups have been captured for all services affected (https://devcenter.heroku.com/articles/heroku-postgres-backups#manual-backups)"
+    print 'Are you sure you want to continue? (yes/no): '
+    confirmation = $stdin.gets.strip.downcase
+    unless confirmation == 'yes'
+      puts 'Aborted. No students were removed.'
+      exit 0
+    end
+
     service = StudentRemovalService.new(
       students: students,
       school: school,
@@ -51,7 +65,7 @@ namespace :remove_students do
     end
 
     puts "\n===================="
-    puts "Student removal summary\n"
+    puts "Student removal results summary\n"
     puts "SCHOOL: #{school.name} (#{school.id})"
     puts "REMOVE_FROM_PROFILE: #{remove_from_profile}"
     puts '===================='
