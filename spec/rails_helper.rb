@@ -41,7 +41,7 @@ require 'paper_trail/frameworks/rspec'
 begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
-  puts e.to_s.strip
+  Rails.logger.debug e.to_s.strip
   exit 1
 end
 RSpec.configure do |config|
@@ -111,8 +111,8 @@ RSpec.configure do |config|
 
   config.before(:suite) do
     db_config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
-    puts "Running tests in environment: #{Rails.env}"
-    puts "Running tests against the database: #{db_config.database}"
+    Rails.logger.debug { "Running tests in environment: #{Rails.env}" }
+    Rails.logger.debug { "Running tests against the database: #{db_config.database}" }
   end
 
   config.before(:each, :js, type: :system) do

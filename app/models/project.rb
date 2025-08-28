@@ -107,16 +107,16 @@ class Project < ApplicationRecord
     no_lesson = !lesson
     no_school_class = lesson && !lesson.school_class
 
-    return if no_lesson || no_school_class || user_is_class_student || user_is_class_teacher
+    return if no_lesson || no_school_class || user_is_class_student? || user_is_class_teacher?
 
     errors.add(:user, "'#{user_id}' is not a class member or the owner of the lesson '#{lesson_id}'")
   end
 
-  def user_is_class_student
+  def user_is_class_student?
     lesson&.school_class&.students&.exists?(student_id: user_id)
   end
 
-  def user_is_class_teacher
+  def user_is_class_teacher?
     lesson&.school_class&.teachers&.exists?(teacher_id: user_id)
   end
 
