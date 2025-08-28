@@ -42,7 +42,7 @@ begin
   ActiveRecord::Migration.maintain_test_schema!
 rescue ActiveRecord::PendingMigrationError => e
   Rails.logger.debug e.to_s.strip
-  exit 1 # rubocop:disable Rails/Exit
+  exit 1
 end
 RSpec.configure do |config|
   # If you're not using ActiveRecord, or you'd prefer not to run each of your

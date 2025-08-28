@@ -61,3 +61,7 @@ Style/SafeNavigationChainLength:
 
 Rails/EnvLocal:
   Enabled: false
+
+Rails/Exit:
+  Exclude:
+    - "spec/rails_helper.rb"
