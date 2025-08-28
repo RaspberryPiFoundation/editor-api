@@ -1,12 +1,11 @@
 ---
-require:
-  - rubocop-graphql
 plugins:
   - rubocop-rails
   - rubocop-capybara
   - rubocop-performance
   - rubocop-rspec_rails
   - rubocop-factory_bot
+  - rubocop-graphql
 inherit_from:
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-base.yml
   - https://raspberrypifoundation.github.io/digital-engineering/configs/rubocop-rails.yml
