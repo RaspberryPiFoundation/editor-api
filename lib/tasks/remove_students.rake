@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 require_relative '../../app/services/student_removal_service'
-# return unless Rails.env.development?
-
 require 'csv'
 
 namespace :remove_students do
