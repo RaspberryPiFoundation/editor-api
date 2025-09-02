@@ -19,7 +19,7 @@ class ApiController < ActionController::API
   end
 
   def authorize_user
-    head :unauthorized unless current_user # 401 status
+    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
   end
 
   def denied(exception)

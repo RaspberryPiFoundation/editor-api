@@ -134,6 +134,14 @@ RSpec.describe ApiController do
 
         expect(response).to have_http_status(:unauthorized)
       end
+
+      it 'responds with JSON including error message' do
+        get '/test'
+
+        expect(response.parsed_body).to include(
+          'error' => 'Unauthorized'
+        )
+      end
     end
   end
 end
