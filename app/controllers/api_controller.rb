@@ -30,7 +30,7 @@ class ApiController < ActionController::API
     render json: { error: "#{exception.class}: #{exception.message}" }, status: :not_found
   end
 
-  def unprocessable
-    head :unprocessable_entity # 422 status
+  def unprocessable(exception)
+    render json: { error: "#{exception.class}: #{exception.message}" }, status: :unprocessable_entity
   end
 end

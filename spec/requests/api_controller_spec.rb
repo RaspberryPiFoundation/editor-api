@@ -93,13 +93,21 @@ RSpec.describe ApiController do
 
   context 'when ParameterError is raised' do
     before do
-      test_controller.error = ParameterError.new
+      test_controller.error = ParameterError.new('foo')
     end
 
     it 'responds with 422 Unprocessable entity status code' do
       get '/test'
 
       expect(response).to have_http_status(:unprocessable_entity)
+    end
+
+    it 'responds with JSON including exception class & message' do
+      get '/test'
+
+      expect(response.parsed_body).to include(
+        'error' => 'ParameterError: foo'
+      )
     end
   end
 
