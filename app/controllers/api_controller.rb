@@ -26,8 +26,8 @@ class ApiController < ActionController::API
     head :forbidden # 403 status
   end
 
-  def not_found
-    head :not_found # 404 status
+  def not_found(exception)
+    render json: { error: "#{exception.class}: #{exception.message}" }, status: :not_found
   end
 
   def unprocessable
