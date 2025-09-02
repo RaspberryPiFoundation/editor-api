@@ -5,6 +5,7 @@ class ApiController < ActionController::API
 
   include Identifiable
 
+  rescue_from StandardError, with: :internal_server_error
   rescue_from ActionController::ParameterMissing, with: :bad_request
   rescue_from ActiveRecord::RecordNotFound, with: :not_found
   rescue_from CanCan::AccessDenied, with: :denied
@@ -32,6 +33,11 @@ class ApiController < ActionController::API
 
   def unprocessable(exception)
     render_error_as_json(exception, :unprocessable_entity)
+  end
+
+  def internal_server_error(exception)
+    Sentry.capture_exception(exception)
+    render_error_as_json(exception, :internal_server_error)
   end
 
   def render_error_as_json(exception, status)
