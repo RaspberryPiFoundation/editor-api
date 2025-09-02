@@ -22,8 +22,8 @@ class ApiController < ActionController::API
     head :unauthorized unless current_user # 401 status
   end
 
-  def denied
-    head :forbidden # 403 status
+  def denied(exception)
+    render json: { error: "#{exception.class}: #{exception.message}" }, status: :forbidden
   end
 
   def not_found(exception)
