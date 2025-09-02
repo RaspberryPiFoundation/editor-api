@@ -53,13 +53,21 @@ RSpec.describe ApiController do
 
   context 'when ActiveRecord::RecordNotFound is raised' do
     before do
-      test_controller.error = ActiveRecord::RecordNotFound.new
+      test_controller.error = ActiveRecord::RecordNotFound.new('foo')
     end
 
     it 'responds with 404 Not Found status code' do
       get '/test'
 
       expect(response).to have_http_status(:not_found)
+    end
+
+    it 'responds with JSON including exception class & message' do
+      get '/test'
+
+      expect(response.parsed_body).to include(
+        'error' => 'ActiveRecord::RecordNotFound: foo'
+      )
     end
   end
 
