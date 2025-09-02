@@ -111,6 +111,35 @@ RSpec.describe ApiController do
     end
   end
 
+  context 'when an unhandled exception is raised' do
+    let(:error) { RuntimeError.new('foo') }
+
+    before do
+      test_controller.error = error
+      allow(Sentry).to receive(:capture_exception)
+    end
+
+    it 'reports exception to Sentry' do
+      get '/test'
+
+      expect(Sentry).to have_received(:capture_exception).with(error)
+    end
+
+    it 'responds with 500 Internal server error status code' do
+      get '/test'
+
+      expect(response).to have_http_status(:internal_server_error)
+    end
+
+    it 'responds with JSON including exception class & message' do
+      get '/test'
+
+      expect(response.parsed_body).to include(
+        'error' => 'RuntimeError: foo'
+      )
+    end
+  end
+
   context 'when authorize_user is called' do
     before do
       test_controller.authorize_user_required = true
