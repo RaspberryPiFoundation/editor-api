@@ -15,7 +15,7 @@ class ApiController < ActionController::API
   private
 
   def bad_request(exception)
-    render json: { error: "#{exception.class}: #{exception.message}" }, status: :bad_request
+    render_error_as_json(exception, :bad_request)
   end
 
   def authorize_user
@@ -23,14 +23,18 @@ class ApiController < ActionController::API
   end
 
   def denied(exception)
-    render json: { error: "#{exception.class}: #{exception.message}" }, status: :forbidden
+    render_error_as_json(exception, :forbidden)
   end
 
   def not_found(exception)
-    render json: { error: "#{exception.class}: #{exception.message}" }, status: :not_found
+    render_error_as_json(exception, :not_found)
   end
 
   def unprocessable(exception)
-    render json: { error: "#{exception.class}: #{exception.message}" }, status: :unprocessable_entity
+    render_error_as_json(exception, :unprocessable_entity)
+  end
+
+  def render_error_as_json(exception, status)
+    render json: { error: "#{exception.class}: #{exception.message}" }, status:
   end
 end
