@@ -14,8 +14,8 @@ class ApiController < ActionController::API
 
   private
 
-  def bad_request
-    head :bad_request # 400 status
+  def bad_request(exception)
+    render json: { error: "#{exception.class}: #{exception.message}" }, status: :bad_request
   end
 
   def authorize_user

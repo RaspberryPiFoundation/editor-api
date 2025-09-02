@@ -41,6 +41,14 @@ RSpec.describe ApiController do
 
       expect(response).to have_http_status(:bad_request)
     end
+
+    it 'responds with JSON including exception class & message' do
+      get '/test'
+
+      expect(response.parsed_body).to include(
+        'error' => 'ActionController::ParameterMissing: param is missing or the value is empty: foo'
+      )
+    end
   end
 
   context 'when ActiveRecord::RecordNotFound is raised' do
