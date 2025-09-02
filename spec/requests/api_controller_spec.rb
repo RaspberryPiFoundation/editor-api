@@ -73,13 +73,21 @@ RSpec.describe ApiController do
 
   context 'when CanCan::AccessDenied is raised' do
     before do
-      test_controller.error = CanCan::AccessDenied.new
+      test_controller.error = CanCan::AccessDenied.new('foo')
     end
 
     it 'responds with 403 Forbidden status code' do
       get '/test'
 
       expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds with JSON including exception class & message' do
+      get '/test'
+
+      expect(response.parsed_body).to include(
+        'error' => 'CanCan::AccessDenied: foo'
+      )
     end
   end
 
