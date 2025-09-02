@@ -5,10 +5,10 @@ class ApiController < ActionController::API
 
   include Identifiable
 
-  rescue_from ActionController::ParameterMissing, with: -> { bad_request }
-  rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
-  rescue_from CanCan::AccessDenied, with: -> { denied }
-  rescue_from ParameterError, with: -> { unprocessable }
+  rescue_from ActionController::ParameterMissing, with: :bad_request
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from CanCan::AccessDenied, with: :denied
+  rescue_from ParameterError, with: :unprocessable
 
   before_action :set_paper_trail_whodunnit
 
