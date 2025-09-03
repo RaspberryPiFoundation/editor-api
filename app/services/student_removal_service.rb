@@ -1,42 +1,63 @@
 # frozen_string_literal: true
 
 class StudentRemovalService
-  def initialize(students:, school:, remove_from_profile: false, token: nil)
-    @students = students
+  class NoSchoolError < StandardError; end
+  class NoClassesError < StandardError; end
+  class StudentHasProjectsError < StandardError; end
+  class NoopError < StandardError; end
+
+  def initialize(school:, remove_from_profile: false, token: nil, raise_on_noop: false)
     @school = school
     @remove_from_profile = remove_from_profile
     @token = token
+    @raise_on_noop = raise_on_noop
   end
 
-  # Returns an array of hashes, one per student, with details of what was removed
-  def remove_students
-    results = []
-    @students.each do |user_id|
-      result = { user_id: }
-      begin
-        # Skip if student has projects
-        projects = Project.where(user_id: user_id)
-        result[:skipped] = true if projects.length.positive?
+  # rubocop:disable Metrics/CyclomaticComplexity
+  def remove_student(student_id)
+    raise NoSchoolError, 'School not found' if @school.nil?
+    raise NoClassesError, 'School has no classes' if @school.classes.empty?
+    raise StudentHasProjectsError, 'Student has existing projects' if Project.exists?(user_id: student_id)
 
-        unless result[:skipped]
-          ActiveRecord::Base.transaction do
-            # Remove from classes
-            class_assignments = ClassStudent.where(student_id: user_id)
-            class_assignments.destroy_all
+    ActiveRecord::Base.transaction do
+      roles_destroyed = remove_roles(student_id)
+      classes_destroyed = remove_from_classes(student_id)
+      remove_from_profile(student_id) if should_remove_from_profile?
 
-            # Remove roles
-            roles = Role.student.where(user_id: user_id)
-            roles.destroy_all
-          end
-
-          # Remove from profile if requested
-          ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id) if @remove_from_profile && @token.present?
-        end
-      rescue StandardError => e
-        result[:error] = "#{e.class}: #{e.message}"
-      end
-      results << result
+      raise NoopError, 'Student has no roles or class assignments to remove' if roles_destroyed.zero? && classes_destroyed.zero? && should_raise_on_noop?
     end
-    results
+  end
+  # rubocop:enable Metrics/CyclomaticComplexity
+
+  private
+
+  def remove_from_classes(student_id)
+    ClassStudent.where(
+      school_class_id: @school.classes.pluck(:id),
+      student_id: student_id
+    ).destroy_all.length
+  end
+
+  def remove_roles(student_id)
+    Role.student.where(
+      user_id: student_id,
+      school_id: @school.id
+    ).destroy_all.length
+  end
+
+  def remove_from_profile(student_id)
+    ProfileApiClient.delete_school_student(
+      token: @token,
+      school_id: @school.id,
+      student_id: student_id
+    )
+  end
+
+  def should_remove_from_profile?
+    @remove_from_profile && @token.present?
+  end
+
+  def should_raise_on_noop?
+    @raise_on_noop && !should_remove_from_profile?
   end
 end
