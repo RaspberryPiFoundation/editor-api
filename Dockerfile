@@ -1,4 +1,4 @@
-FROM ruby:3.2-slim-bullseye as base
+FROM ruby:3.2-slim-bullseye AS base
 RUN gem install bundler \
   && apt-get update \
   && apt-get upgrade --yes \
