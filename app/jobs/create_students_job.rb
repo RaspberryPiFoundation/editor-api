@@ -32,13 +32,13 @@ class CreateStudentsJob < ApplicationJob
     perform_limit: 1
   )
 
-  def self.attempt_perform_later(school_id:, students:, token:, user_id:, batch_id:)
-    job = perform_later(school_id:, students:, token:, batch_id:)
+  def self.attempt_perform_later(school_id:, students:, token:, user_id:)
+    job = perform_later(school_id:, students:, token:)
     UserJob.create!(user_id:, good_job_id: job.job_id) unless job.nil?
     job
   end
 
-  def perform(school_id:, students:, token:, batch_id:)
+  def perform(school_id:, students:, token:)
     decrypted_students = students.map do |student|
       {
         name: student[:name],

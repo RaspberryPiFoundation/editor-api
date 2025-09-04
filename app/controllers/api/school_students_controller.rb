@@ -8,6 +8,12 @@ module Api
 
     before_action :create_safeguarding_flags
 
+    def school_students_params
+      params.require(:school_students).map do |student|
+        student.permit(:name, :username, :password)
+      end
+    end
+
     def index
       result = SchoolStudent::List.call(school: @school, token: current_user.token)
 
@@ -32,12 +38,34 @@ module Api
     end
 
     def create_batch
-      result = SchoolStudent::CreateBatch.call(
-        school: @school, school_students_params:, token: current_user.token, user_id: current_user.id
-      )
+      # Set the maximum batch size to the limit imposed by Profile
+      max_batch_size = 50
+      students = school_students_params
 
-      if result.success?
-        @job_id = result[:job_id]
+      # Ensure that nil values are empty strings, else Profile will swallow validations
+      students = students.map do |student|
+        student.transform_values { |value| value.nil? ? '' : value }
+      end
+
+      # Do validation here for the entire batch in one go
+      validation_result = ProfileApiClient.validate_school_students(token: current_user.token, students: students, school_id: @school.id)
+
+      @batch_job_ids = []
+      students.each_slice(max_batch_size) do |student_batch|
+        result = SchoolStudent::CreateBatch.call(
+          school: @school, school_students_params: student_batch, token: current_user.token, user_id: current_user.id
+        )
+
+        # TODO: This error handling isn't entirely right.
+        if result.success?
+          @batch_job_ids << result[:job_id]
+          puts @batch_job_ids
+        else
+          puts "We got an error: #{result}"
+        end
+      end
+
+      if not @batch_job_ids.empty?
         render :create_batch, formats: [:json], status: :accepted
       else
         render json: { error: result[:error], error_type: result[:error_type] }, status: :unprocessable_entity

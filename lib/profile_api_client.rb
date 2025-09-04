@@ -93,8 +93,33 @@ class ProfileApiClient
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
+    def validate_school_students(token:, students:, school_id:)
+      return nil if token.blank?
+      students = Array(students)
+      endpoint = "/api/v1/schools/#{school_id}/students/preflight-student-upload"
+      response = connection(token).post(endpoint) do |request|
+        request.body = {students: students}.to_json
+        request.headers['Content-Type'] = 'application/json'
+      end
+
+      raise UnexpectedResponse, response unless response.status == 200
+    rescue Faraday::BadRequestError => e
+      raw_error = JSON.parse(e.response_body)
+      puts raw_error
+      raise Student422Error, 'An unknown error occurred'
+
+    end
+
     def create_school_students(token:, students:, school_id:, preflight: false)
       return nil if token.blank?
+
+      if preflight
+        ActiveSupport::Deprecation.warn(
+          "Calling ProfileApiClient#create_school_students with preflight = true is deprecated." \
+          "Call ProfileApiClient#validate_school_students instead.",
+          caller
+        )
+      end
 
       students = Array(students)
       endpoint = "/api/v1/schools/#{school_id}/students"
