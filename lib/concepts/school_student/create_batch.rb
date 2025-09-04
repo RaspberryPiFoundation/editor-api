@@ -16,9 +16,9 @@ module SchoolStudent
 
   class CreateBatch
     class << self
-      def call(school:, school_students_params:, token:, user_id:)
+      def call(school:, school_students_params:, token:, user_id:, batch_id:)
         response = OperationResponse.new
-        response[:job_id] = create_batch(school, school_students_params, token, user_id)
+        response[:job_id] = create_batch(school, school_students_params, token, user_id, batch_id)
         response
       rescue ValidationError => e
         response[:error] = e.errors
@@ -37,15 +37,15 @@ module SchoolStudent
 
       private
 
-      def create_batch(school, students, token, user_id)
+      def create_batch(school, students, token, user_id, batch_id)
         # Ensure that nil values are empty strings, else Profile will swallow validations
         students = students.map do |student|
           student.transform_values { |value| value.nil? ? '' : value }
         end
 
-        validate(school:, students:, token:)
+        #validate(school:, students:, token:)
 
-        job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
+        job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:, batch_id:)
         job&.job_id
       end
 
