@@ -10,15 +10,9 @@ class SchoolClass
         # when saving the model, so only the relevant validations run.
         response[:school_class].save!(context: validate_context)
         response
-      rescue ArgumentError => e
-        # Handle invalid enum assignment gracefully, as we can't rely on the standard validation
-        raise unless e.message.include?('is not a valid')
-
-        response[:error] = "Error creating school class: #{e.message}"
-        response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        errors = response[:school_class].errors.full_messages.join(',')
+        errors = response[:school_class]&.errors&.full_messages&.join(',') || e.message
         response[:error] = "Error creating school class: #{errors}"
         response
       end

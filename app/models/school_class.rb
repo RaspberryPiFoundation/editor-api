@@ -16,10 +16,12 @@ class SchoolClass < ApplicationRecord
   validate :code_cannot_be_changed
   validate :school_class_has_at_least_one_teacher
 
+  # Adding `validate:true` would conflict with `allow_nil: true` (since nil is not an allowable value in the enum)
+  # so we have to add custom validation that only validates non-nil values (`import_origin_must_be_valid_if_present()`)
   enum :import_origin, { google_classroom: 0 }, allow_nil: true
 
   validates :import_origin, presence: true, on: :import
-  validate :import_origin_must_be_valid, on: :import
+  validate :import_origin_must_be_valid_if_present
 
   validates :import_id, uniqueness: { scope: %i[school_id import_origin] }, if: -> { import_origin.present? }
   validates :import_id, presence: true, if: -> { import_origin.present? }
@@ -75,11 +77,12 @@ class SchoolClass < ApplicationRecord
     code.present? && SchoolClass.where(code:, school:).none?
   end
 
-  # Validate import origin, necessary as the enum is only required in the import context (precluding us from using the standard enum validation)
-  def import_origin_must_be_valid
-    raw_value = import_origin_before_type_cast
-    return unless raw_value.present? && !self.class.import_origins.key?(raw_value.to_s)
+  def import_origin_must_be_valid_if_present
+    return if import_origin.nil?
 
-    errors.add(:import_origin, 'is not a valid import_origin')
+    raw_value = import_origin_before_type_cast
+    return if self.class.import_origins.key?(raw_value.to_s)
+
+    errors.add(:import_origin, 'is not included in the list')
   end
 end
