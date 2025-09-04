@@ -4,7 +4,7 @@ This repo is a Rails 7.1 exposing REST and GraphQL APIs for the Raspberry Pi Fou
 
 Architecture and boundaries
 - HTTP surfaces: REST under `app/controllers/api/**` (responses via jbuilder in `app/views/api/**`) and GraphQL at `/graphql` (schema in `app/graphql/**`).
-- AuthN: Browser/session via OmniAuth (OIDC to Hydra) in `config/initializers/omniauth.rb` and `AuthController`; API token via `Authorization: Bearer <token>` with lookup in `Identifiable#identify_user` → `User.from_token` → `HydraPublicApiClient`.
+- Authentication: Browser/session via OmniAuth (OIDC to Hydra) in `config/initializers/omniauth.rb` and `AuthController`; API token via `Authorization: Bearer <token>` with lookup in `Identifiable#identify_user` → `User.from_token` → `HydraPublicApiClient`.
 - AuthZ: `cancancan` in `app/models/ability.rb`. Permissions differ for students/teachers/owners/admin. Use `load_and_authorize_resource` in controllers and `Types::ProjectType.authorized?` plus `GraphqlController` context `current_ability` for GraphQL.
 - Domain: `Project` (+ `Component`) with attachments (`images/videos/audio` via Active Storage). Higher-level operations live under `lib/concepts/**` (e.g., `Project::Create`, `Project::Update`, `Project::CreateRemix`). Prefer calling these from controllers/mutations.
 - Jobs: GoodJob (`config/initializers/good_job.rb`, Procfile `worker`). Admin UI is mounted at `/admin/good_job` and gated by `AuthenticationHelper#current_user.admin?`.
