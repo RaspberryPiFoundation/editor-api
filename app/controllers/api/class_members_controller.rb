@@ -39,7 +39,7 @@ module Api
         @class_member = result[:class_members].first
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: result.slice(:error, :errors), status: :unprocessable_entity
       end
     end
 
@@ -62,7 +62,7 @@ module Api
         @class_members = result[:class_members]
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: result.slice(:error, :errors), status: :unprocessable_entity
       end
     end
 
