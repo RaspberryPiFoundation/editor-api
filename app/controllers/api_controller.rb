@@ -9,7 +9,6 @@ class ApiController < ActionController::API
   rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
   rescue_from CanCan::AccessDenied, with: -> { denied }
   rescue_from ParameterError, with: -> { unprocessable }
-  rescue_from ActionDispatch::Http::Parameters::ParseError, with: -> { parser_error }
 
   before_action :set_paper_trail_whodunnit
 
@@ -33,9 +32,5 @@ class ApiController < ActionController::API
 
   def unprocessable
     head :unprocessable_entity # 422 status
-  end
-
-  def parser_error
-    render json: { error: 'Malformed JSON or invalid request body.' }, status: :bad_request
   end
 end
