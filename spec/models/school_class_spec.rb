@@ -107,7 +107,9 @@ RSpec.describe SchoolClass, :versioning do
     end
 
     it 'does not allow invalid import_origin values' do
-      expect { school_class.import_origin = :invalid_origin }.to raise_error(ArgumentError)
+      school_class.import_origin = 'bad_origin'
+      expect(school_class).not_to be_valid
+      expect(school_class.errors[:import_origin]).to include('is not included in the list')
     end
 
     it 'requires import_id when import_origin is set' do

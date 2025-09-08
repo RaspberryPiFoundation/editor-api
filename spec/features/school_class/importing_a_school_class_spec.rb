@@ -62,7 +62,7 @@ RSpec.describe 'Importing a school class', type: :request do
     post(import_url, headers:, params: params_invalid_enum)
     expect(response).to have_http_status(:unprocessable_entity)
     error_json = JSON.parse(response.body)
-    expect(error_json['error'].to_s).to include('is not a valid import_origin')
+    expect(error_json['error'].to_s).to include('Import origin is not included in the list')
   end
 
   it 'prevents importing two classes with the same import_id for the same school' do
