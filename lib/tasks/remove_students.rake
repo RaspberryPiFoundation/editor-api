@@ -13,7 +13,7 @@ namespace :remove_students do
     remove_from_profile = ENV.fetch('REMOVE_FROM_PROFILE', 'false') == 'true'
     token = ENV.fetch('TOKEN', nil)
 
-    school = School.find_by(id: school_id)
+    school = School.find(school_id)
     if school.nil?
       Rails.logger.error 'Please provide a valid school ID with SCHOOL_ID=your_school_id'
       exit 1
