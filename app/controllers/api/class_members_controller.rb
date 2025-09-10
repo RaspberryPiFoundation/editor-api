@@ -59,8 +59,7 @@ module Api
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
       if result.success?
-        @class_members = result[:class_members]
-        render :show, formats: [:json], status: :created
+        render json: result[:class_members].map { |m| { success: true, user_id: m.user_id } }
       else
         render json: result.slice(:error, :errors), status: :unprocessable_entity
       end
