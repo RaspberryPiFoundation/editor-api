@@ -52,11 +52,12 @@ module Api
       students, teachers = members_existing_in_profile
       result = ClassMember::Create.call(school_class: @school_class, students:, teachers:)
 
-      if result.success?
-        @class_members = result[:class_members]
-        render :show, formats: [:json], status: :created
+      if result.failure? && result[:error].include?('No valid school members provided')
+        render json: result, status: :unprocessable_entity
       else
-        render json: result.slice(:error, :errors), status: :unprocessable_entity
+        successful = result[:class_members].map { |m| { success: true, user_id: m.user_id } }
+        errors = result[:errors].map { |user_id, error| { success: false, user_id:, error: } }
+        render json: successful + errors
       end
     end
 
