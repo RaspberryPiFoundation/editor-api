@@ -34,12 +34,8 @@ module Api
     def create_batch
       # Set the maximum batch size to the limit imposed by Profile
       max_batch_size = 50
-      students = school_students_params
 
-      # Ensure that nil values are empty strings, else Profile will swallow validations
-      students = students.map do |student|
-        student.transform_values { |value| value.nil? ? '' : value }
-      end
+      students = normalise_student_nil_values_to_empty_strings(school_students_params)
 
       # We validate the entire batch here in one go and then, if the validation succeds,
       # feed the batch to Profile in chunks of 50.
@@ -76,6 +72,13 @@ module Api
         render json: { error: result[:error], error_type: result[:error_type] }, status: :unprocessable_entity
       else
         render :create_batch, formats: [:json], status: :accepted
+      end
+    end
+
+    def normalise_student_nil_values_to_empty_strings(students)
+      # Ensure that nil values are empty strings, else Profile will swallow validations
+      students.map do |student|
+        student.transform_values { |value| value.nil? ? '' : value }
       end
     end
 
