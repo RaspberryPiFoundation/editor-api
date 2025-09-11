@@ -111,14 +111,6 @@ class ProfileApiClient
     def create_school_students(token:, students:, school_id:, preflight: false)
       return nil if token.blank?
 
-      if preflight
-        ActiveSupport::Deprecation.warn(
-          'Calling ProfileApiClient#create_school_students with preflight = true is deprecated.' \
-          'Call ProfileApiClient#validate_school_students instead.',
-          caller
-        )
-      end
-
       students = Array(students)
       endpoint = "/api/v1/schools/#{school_id}/students"
       endpoint += '/preflight' if preflight
