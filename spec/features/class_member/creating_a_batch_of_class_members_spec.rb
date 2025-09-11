@@ -101,6 +101,45 @@ RSpec.describe 'Creating a class member', type: :request do
         end
       end
     end
+
+    context 'when adding a student who already exists in the class' do
+      let(:student) { students.first }
+      let(:params) do
+        {
+          class_members: [{ user_id: student.id, type: 'student' }]
+        }
+      end
+
+      before do
+        authenticated_in_hydra_as(teacher)
+        stub_profile_api_list_school_students(school:, student_attributes: [student_attributes.first])
+
+        ClassMember::Create.call(school_class:, students: [student])
+      end
+
+      it 'responds 200 OK' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'responds with the correct number of entries in the JSON' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
+        data = JSON.parse(response.body, symbolize_names: true)
+        pp params
+        pp data
+
+        expect(data.size).to eq(1)
+      end
+
+      it 'responds with the correct data in each entry of the JSON' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        params[:class_members].each do |class_member|
+          expect(data).to include({ success: false, user_id: class_member[:user_id] })
+        end
+      end
+    end
   end
 
   context 'with invalid params' do
@@ -117,7 +156,7 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_user_info_api_for_unknown_users(user_id: unknown_user_id)
     end
 
-    it 'responds 422 Unprocessable Entity when params are missing' do
+    it 'responds 200 Unprocessable Entity when params are missing' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:)
       expect(response).to have_http_status(:bad_request)
     end
