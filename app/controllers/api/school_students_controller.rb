@@ -8,12 +8,6 @@ module Api
 
     before_action :create_safeguarding_flags
 
-    def school_students_params
-      params.require(:school_students).map do |student|
-        student.permit(:name, :username, :password)
-      end
-    end
-
     def index
       result = SchoolStudent::List.call(school: @school, token: current_user.token)
 
@@ -47,28 +41,41 @@ module Api
         student.transform_values { |value| value.nil? ? '' : value }
       end
 
-      # Do validation here for the entire batch in one go
-      validation_result = ProfileApiClient.validate_school_students(token: current_user.token, students: students, school_id: @school.id)
+      # We validate the entire batch here in one go and then, if the validation succeds,
+      # feed the batch to Profile in chunks of 50.
+      validation_result = SchoolStudent::ValidateBatch.call(
+        school: @school, students: students, token: current_user.token
+      )
 
+      if validation_result.failure?
+        render json: {
+          error: validation_result[:error],
+          error_type: validation_result[:error_type]
+        }, status: :unprocessable_entity
+
+        return
+      end
+
+      # If we get this far, validation of the entire batch succeeded.
       @batch_job_ids = []
       students.each_slice(max_batch_size) do |student_batch|
         result = SchoolStudent::CreateBatch.call(
           school: @school, school_students_params: student_batch, token: current_user.token, user_id: current_user.id
         )
 
-        # TODO: This error handling isn't entirely right.
+        # If we were able to enqueue a job, record the job ID.
         if result.success?
           @batch_job_ids << result[:job_id]
-          puts @batch_job_ids
         else
-          puts "We got an error: #{result}"
+          Rails.logger.error("Error enqueueing batch job: #{result}")
         end
       end
 
-      if not @batch_job_ids.empty?
-        render :create_batch, formats: [:json], status: :accepted
-      else
+      # TODO: is it right that we only record an error if ZERO jobs were enqueued? Could some fail and others succeed?
+      if @batch_job_ids.empty?
         render json: { error: result[:error], error_type: result[:error_type] }, status: :unprocessable_entity
+      else
+        render :create_batch, formats: [:json], status: :accepted
       end
     end
 
