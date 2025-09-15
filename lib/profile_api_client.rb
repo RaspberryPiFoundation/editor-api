@@ -6,9 +6,11 @@ class ProfileApiClient
     owner: 'school:owner'
   }.freeze
 
+  # rubocop:disable Naming/MethodName
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt)
+  # rubocop:enable Naming/MethodName
 
   class Error < StandardError; end
 
@@ -33,7 +35,7 @@ class ProfileApiClient
       @response_headers = response.headers
       @response_body = response.body
 
-      super "Unexpected response from Profile API (status code #{response.status})"
+      super("Unexpected response from Profile API (status code #{response.status})")
     end
   end
 
@@ -51,22 +53,6 @@ class ProfileApiClient
       raise UnexpectedResponse, response unless response.status == 201
 
       School.new(**response.body)
-    end
-
-    def list_school_owners(*)
-      {}
-    end
-
-    def invite_school_owner(*)
-      {}
-    end
-
-    def remove_school_owner(*)
-      {}
-    end
-
-    def remove_school_teacher(*)
-      {}
     end
 
     def school_student(token:, school_id:, student_id:)

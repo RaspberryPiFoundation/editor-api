@@ -77,7 +77,7 @@ module SeedsHelper
   end
 
   def create_lessons(user_id, school, school_class, visibility = 'students')
-    2.times.map do |i|
+    Array.new(2) do |i|
       lesson_name = "Lesson #{i + 1}: #{Faker::ProgrammingLanguage.name}"
       Lesson.find_or_create_by!(school:, school_class:, name: lesson_name, user_id:) do |lesson|
         Rails.logger.info "Seeding Lesson #{i + 1}..."

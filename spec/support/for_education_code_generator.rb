@@ -2,7 +2,7 @@
 
 RSpec.configure do |config|
   config.before(:suite) do
-    puts "ForEducationCodeGenerator randomized with seed #{config.seed}"
+    Rails.logger.debug { "ForEducationCodeGenerator randomized with seed #{config.seed}" }
     ForEducationCodeGenerator.random = Random.new(config.seed)
   end
 end

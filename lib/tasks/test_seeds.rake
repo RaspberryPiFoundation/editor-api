@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-require_relative './seeds_helper'
+require_relative 'seeds_helper'
 
+# rubocop:disable Rails/Output
 namespace :test_seeds do
   include SeedsHelper
 
@@ -34,6 +35,7 @@ namespace :test_seeds do
 
       Rails.logger.info 'Done...'
     rescue StandardError => e
+      pp "Failed: #{e.message}"
       Rails.logger.error "Failed: #{e.message}"
       raise ActiveRecord::Rollback
     end
@@ -73,3 +75,4 @@ namespace :test_seeds do
     end
   end
 end
+# rubocop:enable Rails/Output

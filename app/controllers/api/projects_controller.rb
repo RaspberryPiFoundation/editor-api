@@ -18,11 +18,11 @@ module Api
 
     def show
       if !@project.school_id.nil? && @project.lesson_id.nil?
-        project_with_user = @project.with_user(@current_user)
+        project_with_user = @project.with_user(current_user)
         @user = project_with_user[1]
       end
 
-      @project.user_id = @current_user.id if class_teacher?(@project)
+      @project.user_id = current_user.id if class_teacher?(@project)
       render :show, formats: [:json]
     end
 
@@ -38,7 +38,7 @@ module Api
     end
 
     def update
-      result = Project::Update.call(project: @project, update_hash: project_params, current_user: @current_user)
+      result = Project::Update.call(project: @project, update_hash: project_params, current_user:)
 
       if result.success?
         render :show, formats: [:json]

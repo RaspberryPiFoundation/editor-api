@@ -17,16 +17,20 @@ RSpec.describe CreateStudentsJob do
     }]
   end
 
-  before do
+  around do |example|
+    original = ActiveJob::Base.queue_adapter
     ActiveJob::Base.queue_adapter = :good_job
+    example.run
+  ensure
+    ActiveJob::Base.queue_adapter = original
+  end
 
+  before do
     stub_profile_api_create_school_students(user_ids: [user_id])
   end
 
   after do
     GoodJob::Job.delete_all
-
-    ActiveJob::Base.queue_adapter = :test
   end
 
   it 'calls ProfileApiClient' do

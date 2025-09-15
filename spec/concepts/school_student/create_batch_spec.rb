@@ -22,10 +22,6 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     ]
   end
 
-  before do
-    ActiveJob::Base.queue_adapter = :test
-  end
-
   context 'when queuing a job' do
     before do
       stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])

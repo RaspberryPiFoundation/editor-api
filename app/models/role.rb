@@ -3,7 +3,7 @@
 class Role < ApplicationRecord
   belongs_to :school
 
-  enum :role, %i[student teacher owner]
+  enum :role, { student: 0, teacher: 1, owner: 2 }
 
   validates :user_id, presence: true
   validates :role, presence: true, uniqueness: { scope: %i[school_id user_id] }

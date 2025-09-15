@@ -16,3 +16,7 @@ en:
       website: "must be a valid URL"
     invitation:
       email_address: "'%<value>s' is invalid"
+  activerecord:
+    attributes:
+      school_class:
+        import_id: "Import id"

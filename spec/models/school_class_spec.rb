@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe SchoolClass, versioning: true do
+RSpec.describe SchoolClass, :versioning do
   before do
     stub_user_info_api_for_users([teacher.id, second_teacher.id], users: [teacher, second_teacher])
   end
@@ -46,22 +46,22 @@ RSpec.describe SchoolClass, versioning: true do
 
     it 'requires a school' do
       school_class.school = nil
-      expect(school_class).to be_invalid
+      expect(school_class).not_to be_valid
     end
 
     it 'requires teacher_ids' do
       school_class_without_teacher = build(:school_class, teacher_ids: [], school:)
-      expect(school_class_without_teacher).to be_invalid
+      expect(school_class_without_teacher).not_to be_valid
     end
 
     it 'requires UUID teacher_ids' do
       school_class_with_invalid_teacher = build(:school_class, teacher_ids: ['invalid'], school:)
-      expect(school_class_with_invalid_teacher).to be_invalid
+      expect(school_class_with_invalid_teacher).not_to be_valid
     end
 
     it 'requires a name' do
       school_class.name = ' '
-      expect(school_class).to be_invalid
+      expect(school_class).not_to be_valid
     end
 
     it 'assigns class code before validating' do
@@ -85,7 +85,7 @@ RSpec.describe SchoolClass, versioning: true do
 
     it 'requires a valid class code format' do
       school_class.code = 'invalid'
-      expect(school_class).to be_invalid
+      expect(school_class).not_to be_valid
     end
 
     it 'accepts a valid class code format' do
@@ -97,7 +97,61 @@ RSpec.describe SchoolClass, versioning: true do
       school_class.code = '12-34-56'
       school_class.save!
       school_class.code = '65-43-21'
-      expect(school_class).to be_invalid
+      expect(school_class).not_to be_valid
+    end
+
+    it 'allows import_origin to be google_classroom' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = 'classroom_123'
+      expect(school_class).to be_valid
+    end
+
+    it 'does not allow invalid import_origin values' do
+      school_class.import_origin = 'bad_origin'
+      expect(school_class).not_to be_valid
+      expect(school_class.errors[:import_origin]).to include('is not included in the list')
+    end
+
+    it 'requires import_id when import_origin is set' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = nil
+      expect(school_class).not_to be_valid
+      expect(school_class.errors[:import_id]).to include("can't be blank")
+    end
+
+    it 'allows import_id to be nil when import_origin is nil' do
+      school_class.import_origin = nil
+      school_class.import_id = nil
+      expect(school_class).to be_valid
+    end
+
+    it 'requires unique import_id within the same school and import_origin' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = 'classroom_123'
+      school_class.save!
+
+      duplicate_school_class = build(:school_class,
+                                     teacher_ids: [teacher.id],
+                                     school: school_class.school,
+                                     import_origin: :google_classroom,
+                                     import_id: 'classroom_123')
+
+      expect(duplicate_school_class).not_to be_valid
+      expect(duplicate_school_class.errors[:import_id]).to include('has already been taken')
+    end
+
+    it 'permits duplicate import_id in different schools' do
+      school_class.import_origin = :google_classroom
+      school_class.import_id = 'classroom_123'
+      school_class.save!
+
+      different_school_class = build(:school_class,
+                                     teacher_ids: [teacher.id],
+                                     school: create(:school),
+                                     import_origin: :google_classroom,
+                                     import_id: 'classroom_123')
+
+      expect(different_school_class).to be_valid
     end
   end
 

@@ -80,3 +80,9 @@ as well as a link to its edit page.
     <% end %>
   </dl>
 </section>
+
+<% if page.resource.country_code == "US" && page.resource.postal_code.present? %>
+<section class="main-content__body">
+  <%= link_to "Search for this school in the NCES database", "https://nces.ed.gov/ccd/schoolsearch/school_list.asp?Search=1&Zip=#{url_encode(page.resource.postal_code)}" %>
+</section>
+<% end %>
