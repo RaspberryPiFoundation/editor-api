@@ -30,7 +30,7 @@ module SchoolStudent
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = "Error creating school students: #{e}"
+        response[:error] = e.to_s
         response[:error_type] = :standard_error
         response
       end
@@ -65,14 +65,9 @@ module SchoolStudent
       def handle_student422_error(errors)
         formatted_errors = errors.each_with_object({}) do |error, hash|
           username = error['username'] || error['path']
-          field = error['path'].split('.').last
 
           hash[username] ||= []
-          hash[username] << I18n.t(
-            "validations.school_student.#{error['errorCode'].underscore}",
-            field:,
-            default: error['message']
-          )
+          hash[username] << (error['errorCode'] || error['message'])
 
           # Ensure uniqueness to avoid repeat errors with duplicate usernames
           hash[username] = hash[username].uniq

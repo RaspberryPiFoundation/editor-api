@@ -100,14 +100,14 @@ RSpec.describe 'Creating a batch of school students', type: :request do
   it 'responds 422 Unprocessable Entity with a suitable message when params are invalid' do
     post("/api/schools/#{school.id}/students/batch", headers:, params: bad_params)
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(response.body).to include('Error creating school students: Decryption failed: iv must be 16 bytes')
+    expect(response.body).to include('Decryption failed: iv must be 16 bytes')
   end
 
   it 'responds 422 Unprocessable Entity with a JSON array of validation errors' do
     stub_profile_api_create_school_students_validation_error
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(response.body).to eq('{"error":{"student-to-create":["Username must be unique in the batch data","Password is too simple (it should not be easily guessable, \\u003ca href=\"https://my.raspberrypi.org/password-help\"\\u003eneed password help?\\u003c/a\\u003e)","You must supply a name"],"another-student-to-create-2":["Password must be at least 8 characters","You must supply a name"]},"error_type":"validation_error"}')
+    expect(response.body).to eq('{"error":{"student-to-create":["isUniqueInBatch","isComplex","notEmpty"],"another-student-to-create-2":["minLength","notEmpty"]},"error_type":"validation_error"}')
   end
 
   it 'responds 401 Unauthorized when no token is given' do

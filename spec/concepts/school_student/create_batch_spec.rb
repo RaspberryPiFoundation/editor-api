@@ -88,7 +88,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_students_params:, token:, user_id:)
       error_message = response[:error]
-      expect(error_message).to match(/Error creating school students: Decryption failed: iv must be 16 bytes/)
+      expect(error_message).to match(/Decryption failed: iv must be 16 bytes/)
     end
 
     it 'sent the exception to Sentry' do
@@ -102,10 +102,10 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
       stub_profile_api_create_school_students_validation_error
     end
 
-    it 'returns the expected formatted errors' do
+    it 'returns the expected error codes' do
       response = described_class.call(school:, school_students_params:, token:, user_id:)
       expect(response[:error]).to eq(
-        { 'student-to-create' => ['Username must be unique in the batch data', 'Password is too simple (it should not be easily guessable, <a href="https://my.raspberrypi.org/password-help">need password help?</a>)', 'You must supply a name'], 'another-student-to-create-2' => ['Password must be at least 8 characters', 'You must supply a name'] }
+        { 'student-to-create' => %w[isUniqueInBatch isComplex notEmpty], 'another-student-to-create-2' => %w[minLength notEmpty] }
       )
     end
   end

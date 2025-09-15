@@ -16,8 +16,6 @@ en:
       website: "must be a valid URL"
     invitation:
       email_address: "'%<value>s' is invalid"
-    school_student:
-      not_empty: "You must supply a %{field}"
   activerecord:
     attributes:
       school_class:
