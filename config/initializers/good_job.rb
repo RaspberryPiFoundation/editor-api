@@ -13,3 +13,8 @@ Rails.application.config.to_prepare do
     end
   end
 end
+
+Rails.application.configure do
+  # The create_students_job queue is a serial queue that allows only one job at a time.
+  config.good_job.queues = 'create_students_job:1;default:5'
+end
