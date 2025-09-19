@@ -143,7 +143,7 @@ module Api
     def school_students_params
       school_students = params.require(:school_students)
 
-      school_students.map do |student|
+      school_students.filter_map do |student|
         next if student.blank?
 
         student.permit(:username, :password, :name).to_h.with_indifferent_access
