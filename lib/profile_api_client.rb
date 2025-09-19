@@ -93,6 +93,21 @@ class ProfileApiClient
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
 
+    def validate_school_students(token:, students:, school_id:)
+      return nil if token.blank?
+
+      students = Array(students)
+      endpoint = "/api/v1/schools/#{school_id}/students/preflight-student-upload"
+      response = connection(token).post(endpoint) do |request|
+        request.body = { students: students, school_id: school_id }.to_json
+        request.headers['Content-Type'] = 'application/json'
+      end
+
+      raise UnexpectedResponse, response unless response.status == 200
+    rescue Faraday::UnprocessableEntityError => e
+      raise Student422Error, JSON.parse(e.response_body)
+    end
+
     def create_school_students(token:, students:, school_id:, preflight: false)
       return nil if token.blank?
 
