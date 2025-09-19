@@ -69,6 +69,28 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(response).to have_http_status(:accepted)
   end
 
+  it 'responds 422 when a batch already exists for this school' do
+    # Create a fake batch for the school.
+    batch_identifier = "school_id:#{school.id}"
+    GoodJob::BatchRecord.create!(
+      description: batch_identifier,
+      finished_at: nil,
+      discarded_at: nil
+    )
+
+    expect do
+      post("/api/schools/#{school.id}/students/batch", headers:, params:)
+    end.not_to change(GoodJob::BatchRecord, :count)
+    expect(response).to have_http_status(:unprocessable_entity)
+
+    active_batches = GoodJob::BatchRecord.where(
+      description: batch_identifier,
+      finished_at: nil,
+      discarded_at: nil
+    )
+    expect(active_batches.count).to eq(1)
+  end
+
   it 'responds 202 Accepted when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
