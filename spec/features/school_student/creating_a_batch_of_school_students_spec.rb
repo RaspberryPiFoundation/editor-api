@@ -6,6 +6,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
   before do
     authenticated_in_hydra_as(owner)
     stub_profile_api_create_school_students
+    stub_profile_api_validate_school_students
     stub_profile_api_create_safeguarding_flag
 
     # UserJob will fail validation as it won't find our test job, so we need to double it
@@ -68,6 +69,28 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(response).to have_http_status(:accepted)
   end
 
+  it 'responds 422 when a batch already exists for this school' do
+    # Create a fake batch for the school.
+    batch_identifier = "school_id:#{school.id}"
+    GoodJob::BatchRecord.create!(
+      description: batch_identifier,
+      finished_at: nil,
+      discarded_at: nil
+    )
+
+    expect do
+      post("/api/schools/#{school.id}/students/batch", headers:, params:)
+    end.not_to change(GoodJob::BatchRecord, :count)
+    expect(response).to have_http_status(:unprocessable_entity)
+
+    active_batches = GoodJob::BatchRecord.where(
+      description: batch_identifier,
+      finished_at: nil,
+      discarded_at: nil
+    )
+    expect(active_batches.count).to eq(1)
+  end
+
   it 'responds 202 Accepted when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
@@ -105,9 +128,18 @@ RSpec.describe 'Creating a batch of school students', type: :request do
 
   it 'responds 422 Unprocessable Entity with a JSON array of validation errors' do
     stub_profile_api_create_school_students_validation_error
+    stub_profile_api_validate_students_with_validation_error
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
     expect(response).to have_http_status(:unprocessable_entity)
-    expect(response.body).to eq('{"error":{"student-to-create":["isUniqueInBatch","isComplex","notEmpty"],"another-student-to-create-2":["minLength","notEmpty"]},"error_type":"validation_error"}')
+    expect(response.body).to eq(
+      {
+        error: {
+          'student-to-create' => %w[isUniqueInBatch isComplex notEmpty],
+          'another-student-to-create-2' => %w[minLength notEmpty]
+        },
+        error_type: 'validation_error'
+      }.to_json
+    )
   end
 
   it 'responds 401 Unauthorized when no token is given' do
