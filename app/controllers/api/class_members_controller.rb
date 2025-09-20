@@ -58,12 +58,10 @@ module Api
 
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
-      if result.success?
-        @class_members = result[:class_members]
-        render :show, formats: [:json], status: :created
-      else
-        render json: result.slice(:error, :errors), status: :unprocessable_entity
-      end
+      successful = result[:class_members].map { |m| { success: true, user_id: m.user_id } }
+      errors = result[:errors].map { |user_id, _| { success: false, user_id: } }
+
+      render json: successful + errors
     end
 
     def destroy

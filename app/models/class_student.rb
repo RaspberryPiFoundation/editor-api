@@ -18,6 +18,10 @@ class ClassStudent < ApplicationRecord
     }
   )
 
+  def user_id
+    student_id
+  end
+
   private
 
   def student_has_the_school_student_role_for_the_school

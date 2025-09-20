@@ -18,6 +18,10 @@ class ClassTeacher < ApplicationRecord
     }
   )
 
+  def user_id
+    teacher_id
+  end
+
   private
 
   def teacher_has_the_school_teacher_role_for_the_school
