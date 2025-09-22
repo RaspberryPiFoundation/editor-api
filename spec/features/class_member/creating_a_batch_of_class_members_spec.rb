@@ -119,6 +119,22 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context 'with invalid params' do
+    before do
+      authenticated_in_hydra_as(teacher)
+    end
+
+    it 'responds 400 Bad Request when params are missing' do
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:)
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'responds 400 Bad Request when params are invalid' do
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: { unknown_key: [] })
+      expect(response).to have_http_status(:bad_request)
+    end
+  end
+
+  context "with users that don't exist in Profile" do
     unknown_user_id = SecureRandom.uuid
 
     let(:invalid_params) do
@@ -132,12 +148,7 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_user_info_api_for_unknown_users(user_id: unknown_user_id)
     end
 
-    it 'responds 422 Unprocessable Entity when params are missing' do
-      post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:)
-      expect(response).to have_http_status(:bad_request)
-    end
-
-    it 'responds 422 Unprocessable Entity when params are invalid' do
+    it 'responds 422 Unprocessable Entity' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
       expect(response).to have_http_status(:unprocessable_entity)
     end
@@ -145,7 +156,6 @@ RSpec.describe 'Creating a class member', type: :request do
     it 'returns the error message in the operation response' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
       data = JSON.parse(response.body, symbolize_names: true)
-
       expect(data[:error]).to match(/No valid school members provided/)
     end
   end
