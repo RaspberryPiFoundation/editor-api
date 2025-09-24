@@ -45,7 +45,7 @@ module Api
         return
       end
 
-      students = normalise_student_nil_values_to_empty_strings(school_students_params)
+      students = StudentHelpers.normalise_nil_values_to_empty_strings(school_students_params)
 
       # We validate the entire batch here in one go and then, if the validation succeds,
       # feed the batch to Profile in chunks of 50.
@@ -106,13 +106,6 @@ module Api
       end
 
       Rails.logger.info("Batch #{batch.id} enqueued successfully with identifier #{batch_identifier}!")
-    end
-
-    def normalise_student_nil_values_to_empty_strings(students)
-      # Ensure that nil values are empty strings, else Profile will swallow validations
-      students.map do |student|
-        student.transform_values { |value| value.nil? ? '' : value }
-      end
     end
 
     def update
