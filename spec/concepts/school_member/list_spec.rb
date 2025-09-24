@@ -97,6 +97,8 @@ RSpec.describe SchoolMember::List, type: :unit do
   context 'when errors occur' do
     before do
       allow(Sentry).to receive(:capture_exception)
+      # Ensure there are students so the error path gets exercised
+      students
     end
 
     it 'captures and handles errors' do

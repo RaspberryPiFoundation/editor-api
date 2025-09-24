@@ -18,7 +18,10 @@ module SchoolMember
         students = teachers = owners = []
 
         begin
-          students_response = SchoolStudent::List.call(school:, token:).fetch(:school_students, [])
+          # Only call students API if there are actually students in the school
+          student_roles = Role.student.where(school:)
+          students_response = student_roles.any? ? SchoolStudent::List.call(school:, token:).fetch(:school_students, []) : []
+          
           teachers_response = SchoolTeacher::List.call(school:).fetch(:school_teachers, [])
           owners_response = SchoolOwner::List.call(school:).fetch(:school_owners, [])
 
