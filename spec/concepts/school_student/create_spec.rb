@@ -95,7 +95,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     it 'adds a useful error message' do
       response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to eq("Error creating school student: something's up with the username")
+      expect(response[:error]).to eq("something's up with the username")
     end
   end
 
@@ -107,7 +107,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     it 'adds a useful error message' do
       response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to eq('Error creating school student: Student not created in Profile API (status code 401)')
+      expect(response[:error]).to eq('Student not created in Profile API (status code 401)')
     end
   end
 end

@@ -20,7 +20,7 @@ class ProfileApiClient
     def initialize(errors)
       @errors = errors
       if errors.is_a?(Hash)
-        super(errors['message'])
+        super(errors['errorCode'] || errors['message'])
       else
         super()
       end
