@@ -2,6 +2,10 @@
 
 module Api
   class SchoolStudentsController < ApiController
+    # This constant is the maximum batch size we can post to
+    # profile in the create step. We can validate larger batches.
+    MAX_BATCH_CREATION_SIZE = 50
+
     before_action :authorize_user
     load_and_authorize_resource :school
     authorize_resource :school_student, class: false
@@ -87,7 +91,6 @@ module Api
     # should assume the entire student import has failed.
     def enqueue_batches(students)
       # Set the maximum batch size to the limit imposed by Profile
-      max_batch_size = 50
       batch_identifier = "school_id:#{@school.id}"
 
       # Raise if a batch is already in progress for this school.
@@ -95,7 +98,7 @@ module Api
 
       batch = GoodJob::Batch.new(description: batch_identifier)
       batch.enqueue do
-        students.each_slice(max_batch_size) do |student_batch|
+        students.each_slice(MAX_BATCH_CREATION_SIZE) do |student_batch|
           SchoolStudent::CreateBatch.call(
             school: @school, school_students_params: student_batch, token: current_user.token, user_id: current_user.id
           )
