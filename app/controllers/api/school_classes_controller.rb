@@ -120,7 +120,7 @@ module Api
       return [] unless school_class.present? && school_students.present? && school_students.any?
 
       # Extract the student objects for class member creation
-      students = school_students.map { |student_data| student_data[:student] }
+      students = school_students.pluck(:student)
       class_members_result = ClassMember::Create.call(school_class:, students:, teachers: [])
 
       # Put the errors in a more useful format for the response

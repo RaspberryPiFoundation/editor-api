@@ -192,7 +192,7 @@ RSpec.describe 'Importing a school class', type: :request do
       # Class members section should contain errors
       expect(response_data[:class_members]).to be_an(Array)
       expect(response_data[:class_members].length).to eq(1)
-      expect(response_data[:class_members].first[:success]).to eq(false)
+      expect(response_data[:class_members].first[:success]).to be(false)
       expect(response_data[:class_members].first[:student_id]).to eq('aa7b5a78-2bd7-4676-8184-318f09a7c494')
       expect(response_data[:class_members].first[:error]).to eq('Error creating class member')
     end
