@@ -12,6 +12,7 @@ module ProfileApiMock
         id: student_attrs[:id],
         username: student_attrs[:username],
         name: student_attrs[:name],
+        email: student_attrs[:email],
         createdAt: now, updatedAt: now, discardedAt: nil
       )
     end
@@ -70,5 +71,19 @@ module ProfileApiMock
 
   def stub_profile_api_create_safeguarding_flag
     allow(ProfileApiClient).to receive(:create_safeguarding_flag)
+  end
+
+  def stub_profile_api_create_school_students_sso(user_ids: [SecureRandom.uuid])
+    responses = user_ids.map { |user_id| { id: user_id, name: 'Test Student', success: true } }
+    allow(ProfileApiClient).to receive(:create_school_students_sso).and_return(responses)
+  end
+
+  def stub_profile_api_create_school_students_sso_validation_error
+    allow(ProfileApiClient).to receive(:create_school_students_sso).and_raise(
+      ProfileApiClient::Student422Error.new(
+        [{ 'path' => '0.name', 'errorCode' => 'minLength.openapi.requestValidation', 'message' => 'must NOT have fewer than 1 characters', 'location' => 'body' },
+         { 'path' => '0.email', 'errorCode' => 'minLength.openapi.requestValidation', 'message' => 'must NOT have fewer than 3 characters', 'location' => 'body' }]
+      )
+    )
   end
 end

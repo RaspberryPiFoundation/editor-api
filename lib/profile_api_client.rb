@@ -108,15 +108,24 @@ class ProfileApiClient
 
       response.body.deep_symbolize_keys
     rescue Faraday::BadRequestError => e
-      raw_error = JSON.parse(e.response_body)
-      # Profile returns an array for standard errors, and json for bulk validations
-      if raw_error.is_a?(Array)
-        raise Error, raw_error.first['message']
-      elsif raw_error['errors']
-        raise Student422Error, raw_error['errors']
-      else
-        raise Student422Error, 'An unknown error occurred'
+      handle_student_creation_error(e)
+    end
+
+    def create_school_students_sso(token:, students:, school_id:)
+      return nil if token.blank?
+
+      students = Array(students)
+      endpoint = "/api/v1/schools/#{school_id}/students/sso"
+      response = connection(token).post(endpoint) do |request|
+        request.body = students.to_json
+        request.headers['Content-Type'] = 'application/json'
       end
+
+      raise UnexpectedResponse, response unless [200, 201].include?(response.status)
+
+      response.body.map(&:deep_symbolize_keys)
+    rescue Faraday::BadRequestError => e
+      handle_student_creation_error(e)
     end
 
     def update_school_student(token:, school_id:, student_id:, name: nil, username: nil, password: nil) # rubocop:disable Metrics/ParameterLists
@@ -179,6 +188,18 @@ class ProfileApiClient
           'Authorization' => "Bearer #{token}",
           'X-API-KEY' => ENV.fetch('PROFILE_API_KEY')
         }
+      end
+    end
+
+    def handle_student_creation_error(faraday_error)
+      raw_error = JSON.parse(faraday_error.response_body)
+      # Profile returns an array for standard errors, and json for bulk validations
+      if raw_error.is_a?(Array)
+        raise Error, raw_error.first['message']
+      elsif raw_error['errors']
+        raise Student422Error, raw_error['errors']
+      else
+        raise Student422Error, 'An unknown error occurred'
       end
     end
   end
