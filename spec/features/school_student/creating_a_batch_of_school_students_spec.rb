@@ -99,6 +99,16 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(response).to have_http_status(:accepted)
   end
 
+  it 'splits students into jobs of 50 each' do
+    total_students = 169
+    students = Array.new(total_students) do |i|
+      { username: "student-#{i}", password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=', name: "Student #{i}" }
+    end
+
+    post("/api/schools/#{school.id}/students/batch", headers:, params: { school_students: students })
+    expect(CreateStudentsJob).to have_received(:attempt_perform_later).exactly((total_students.to_f / 50).ceil).times
+  end
+
   it 'does not create the school owner safeguarding flag when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
