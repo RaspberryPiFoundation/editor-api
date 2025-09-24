@@ -2,7 +2,12 @@
 
 module SchoolMember
   class List
-    SchoolMember = Struct.new(:id, :name, :username, :email, :type)
+    # TODO: This should be using the User model for consistency
+    SchoolMember = Struct.new(:id, :name, :username, :email, :type, :sso) do
+      def initialize(id, name, username, email, type, sso = nil)
+        super
+      end
+    end
 
     class << self
       # rubocop:disable Metrics/CyclomaticComplexity
@@ -18,7 +23,8 @@ module SchoolMember
           owners_response = SchoolOwner::List.call(school:).fetch(:school_owners, [])
 
           students = students_response.map do |student|
-            SchoolMember.new(student.id, student.name, student.username, nil, :student)
+            sso_student = student.email.present? && student.username.blank?
+            SchoolMember.new(student.id, student.name, student.username, student.email, :student, sso_student)
           end
           owners = owners_response.map do |owner|
             SchoolMember.new(owner.id, owner.name, nil, owner.email, :owner)

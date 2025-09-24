@@ -52,6 +52,8 @@ RSpec.describe 'Listing school members', type: :request do
         id: students[0].id,
         username: students[0].username,
         name: students[0].name,
+        email: students[0].email,
+        sso: false,
         type: 'student'
       }
     )

@@ -9,7 +9,7 @@ class ProfileApiClient
   # rubocop:disable Naming/MethodName
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
-  Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt)
+  Student = Data.define(:id, :schoolId, :name, :username, :email, :createdAt, :updatedAt, :discardedAt)
   # rubocop:enable Naming/MethodName
 
   class Error < StandardError; end

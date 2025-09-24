@@ -62,6 +62,12 @@ class User
     roles&.to_s&.split(',')&.map(&:strip) || []
   end
 
+  def sso
+    return nil unless student?
+
+    email.present? && username.blank?
+  end
+
   def ==(other)
     id == other.id
   end
