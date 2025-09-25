@@ -21,7 +21,13 @@ json.school_class do
   end
 end
 
-if @school_students.any?
+# Students section
+if @school_students_errors.present?
+  # This is the validation error case
+  json.students do
+    json.errors @school_students_errors
+  end
+else
   json.students(@school_students) do |student_item|
     json.partial! '/api/school_students/school_student', student: student_item[:student]
 
@@ -30,22 +36,16 @@ if @school_students.any?
     json.error student_item[:error]
     json.created student_item[:created]
   end
-elsif @school_students_errors.present?
-  # This is the validation error case
-  json.students do
-    json.errors @school_students_errors
-  end
 end
 
-if @class_members.any?
-  json.class_members(@class_members) do |class_member|
-    if class_member.is_a?(Hash) && class_member.key?(:success) && !class_member[:success]
-      # Add errors to the response
-      json.merge! class_member
-    else
-      json.partial! '/api/class_members/class_member', class_member: class_member
-      json.success true
-      json.error nil
-    end
+# Class members section
+json.class_members(@class_members) do |class_member|
+  if class_member.is_a?(Hash) && class_member.key?(:success) && !class_member[:success]
+    # Add errors to the response
+    json.merge! class_member
+  else
+    json.partial! '/api/class_members/class_member', class_member: class_member
+    json.success true
+    json.error nil
   end
 end

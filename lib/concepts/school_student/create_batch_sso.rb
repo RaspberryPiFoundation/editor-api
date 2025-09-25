@@ -16,6 +16,7 @@ module SchoolStudent
     class << self
       def call(school:, school_students_params:, current_user:)
         response = OperationResponse.new
+        response[:school_students] = []
         response[:school_students] = create_batch_sso(school, school_students_params, current_user.token)
         response
       rescue ValidationError => e

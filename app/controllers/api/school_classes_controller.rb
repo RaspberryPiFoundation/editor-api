@@ -111,7 +111,7 @@ module Api
       )
 
       {
-        school_students: school_students_result[:school_students] || [],
+        school_students: school_students_result[:school_students],
         errors: school_students_result[:errors]
       }
     end
