@@ -483,6 +483,15 @@ RSpec.describe ProfileApiClient do
         .with_message('The username is well dodgy')
     end
 
+    it 'handles update responses that do not include email field (e.g., for SSO students)' do
+      # This is covering a specific error seen during testing where the email was omitted
+      response = { id: 'id', schoolId: 'school-id', name: 'new-name', username: 'new-username', createdAt: '', updatedAt: '', discardedAt: '' }
+      expected = ProfileApiClient::Student.new(**response, email: nil)
+      stub_request(:patch, update_student_url)
+        .to_return(status: 200, body: response.to_json, headers: { 'content-type' => 'application/json' })
+      expect(update_school_student_response).to eq(expected)
+    end
+
     context 'when there are extraneous leading and trailing spaces in the student params' do
       let(:username) { '  username  ' }
       let(:password) { '  password  ' }

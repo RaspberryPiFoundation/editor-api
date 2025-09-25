@@ -63,6 +63,19 @@ module ProfileApiMock
 
   def stub_profile_api_update_school_student
     allow(ProfileApiClient).to receive(:update_school_student)
+
+    student = build(:profile_api_client_student, :regular)
+    allow(ProfileApiClient).to receive(:list_school_students).and_return([student])
+  end
+
+  def stub_profile_api_school_student(sso: false)
+    student = build(:profile_api_client_student, sso ? :sso : :regular)
+
+    # Update service now uses list_school_students instead of school_student
+    allow(ProfileApiClient).to receive_messages(
+      list_school_students: [student],
+      school_student: student
+    )
   end
 
   def stub_profile_api_delete_school_student
@@ -74,7 +87,10 @@ module ProfileApiMock
   end
 
   def stub_profile_api_create_school_students_sso(user_ids: [SecureRandom.uuid])
-    responses = user_ids.map { |user_id| { id: user_id, name: 'Test Student', success: true } }
+    responses = user_ids.map.with_index do |user_id, index|
+      student = build(:profile_api_client_student, :sso, id: user_id, name: "SSO Test Student #{index + 1}")
+      { id: student.id, name: student.name, success: true }
+    end
     allow(ProfileApiClient).to receive(:create_school_students_sso).and_return(responses)
   end
 

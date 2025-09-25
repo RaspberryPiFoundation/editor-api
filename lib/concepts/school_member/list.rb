@@ -40,8 +40,7 @@ module SchoolMember
         students_response = student_roles.any? ? SchoolStudent::List.call(school:, token:).fetch(:school_students, []) : []
 
         students_response.map do |student|
-          sso_student = student.email.present? && student.username.blank?
-          SchoolMember.new(student.id, student.name, student.username, student.email, :student, sso_student)
+          SchoolMember.new(student.id, student.name, student.username, student.email, :student, student.sso)
         end
       end
 

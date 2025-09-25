@@ -9,7 +9,12 @@ class ProfileApiClient
   # rubocop:disable Naming/MethodName
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
-  Student = Data.define(:id, :schoolId, :name, :username, :email, :createdAt, :updatedAt, :discardedAt)
+
+  Student = Data.define(:id, :schoolId, :name, :username, :email, :createdAt, :updatedAt, :discardedAt) do
+    def sso?
+      email.present? && username.blank?
+    end
+  end
   # rubocop:enable Naming/MethodName
 
   class Error < StandardError; end
@@ -60,7 +65,7 @@ class ProfileApiClient
 
       raise UnexpectedResponse, response unless response.status == 200
 
-      Student.new(**response.body)
+      build_student(response.body)
     end
 
     def list_school_students(token:, school_id:, student_ids:)
@@ -72,7 +77,7 @@ class ProfileApiClient
 
       raise UnexpectedResponse, response unless response.status == 200
 
-      response.body.map { |attrs| Student.new(**attrs.symbolize_keys) }
+      response.body.map { |attrs| build_student(attrs) }
     end
 
     def create_school_student(token:, username:, password:, name:, school_id:)
@@ -141,7 +146,7 @@ class ProfileApiClient
 
       raise UnexpectedResponse, response unless response.status == 200
 
-      Student.new(**response.body)
+      build_student(response.body)
     rescue Faraday::BadRequestError => e
       raise Student422Error, JSON.parse(e.response_body)['errors'].first
     end
@@ -201,6 +206,12 @@ class ProfileApiClient
       else
         raise Student422Error, 'An unknown error occurred'
       end
+    end
+
+    def build_student(attrs)
+      symbolized_attrs = attrs.symbolize_keys
+      symbolized_attrs[:email] = nil unless symbolized_attrs.key?(:email) # email is only for SSO students
+      Student.new(**symbolized_attrs)
     end
   end
 end

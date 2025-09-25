@@ -73,14 +73,14 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
       first_student_item = students[0]
       expect(first_student_item[:student]).to be_a(User)
       expect(first_student_item[:student].id).to eq(user_ids[0])
-      expect(first_student_item[:student].name).to eq('Test Student')
+      expect(first_student_item[:student].name).to eq('SSO Test Student 1')
       expect(first_student_item[:success]).to be(true)
 
       # Verify second student item
       second_student_item = students[1]
       expect(second_student_item[:student]).to be_a(User)
       expect(second_student_item[:student].id).to eq(user_ids[1])
-      expect(second_student_item[:student].name).to eq('Test Student')
+      expect(second_student_item[:student].name).to eq('SSO Test Student 2')
       expect(second_student_item[:success]).to be(true)
     end
   end
