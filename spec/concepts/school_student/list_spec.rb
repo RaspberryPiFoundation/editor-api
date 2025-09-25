@@ -10,7 +10,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
   context 'without student_ids' do
     before do
       student_attributes = students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
+        { id: student.id, name: student.name, username: student.username, email: student.email }
       end
       stub_profile_api_list_school_students(school:, student_attributes:)
     end
@@ -47,7 +47,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
 
     before do
       student_attributes = filtered_students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
+        { id: student.id, name: student.name, username: student.username, email: student.email }
       end
       stub_profile_api_list_school_students(school:, student_attributes:)
     end

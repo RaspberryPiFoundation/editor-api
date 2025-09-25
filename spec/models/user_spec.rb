@@ -417,4 +417,85 @@ RSpec.describe User do
       expect(user.schools).to eq([school])
     end
   end
+
+  describe '#sso' do
+    subject(:user) { create(:user) }
+
+    context 'when user is not a student' do
+      it 'returns nil for teachers' do
+        create(:teacher_role, school:, user_id: user.id)
+        expect(user.sso).to be_nil
+      end
+
+      it 'returns nil for owners' do
+        create(:owner_role, school:, user_id: user.id)
+        expect(user.sso).to be_nil
+      end
+
+      it 'returns nil for users with no roles' do
+        expect(user.sso).to be_nil
+      end
+    end
+
+    context 'when user is a student' do
+      before do
+        create(:student_role, school:, user_id: user.id)
+      end
+
+      context 'when student has email and no username (SSO student)' do
+        before do
+          user.email = 'student@example.com'
+          user.username = nil
+        end
+
+        it 'returns true' do
+          expect(user.sso).to be(true)
+        end
+      end
+
+      context 'when student has username and no email (standard student)' do
+        before do
+          user.email = nil
+          user.username = 'student123'
+        end
+
+        it 'returns false' do
+          expect(user.sso).to be(false)
+        end
+      end
+
+      context 'when student has both email and username' do
+        before do
+          user.email = 'student@example.com'
+          user.username = 'student123'
+        end
+
+        it 'returns false' do
+          expect(user.sso).to be(false)
+        end
+      end
+
+      context 'when student has neither email nor username' do
+        before do
+          user.email = nil
+          user.username = nil
+        end
+
+        it 'returns false' do
+          expect(user.sso).to be(false)
+        end
+      end
+
+      context 'when student has blank email and username' do
+        before do
+          user.email = ''
+          user.username = ''
+        end
+
+        it 'returns false' do
+          expect(user.sso).to be(false)
+        end
+      end
+    end
+  end
 end

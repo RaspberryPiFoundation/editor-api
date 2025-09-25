@@ -14,7 +14,7 @@ RSpec.describe 'Listing class members', type: :request do
     authenticated_in_hydra_as(owner)
 
     student_attributes = students.map do |student|
-      { id: student.id, name: student.name, username: student.username }
+      { id: student.id, name: student.name, username: student.username, email: nil }
     end
     stub_profile_api_list_school_students(school:, student_attributes:)
 
@@ -66,6 +66,8 @@ RSpec.describe 'Listing class members', type: :request do
         id: students[0].id,
         username: students[0].username,
         name: students[0].name,
+        email: students[0].email,
+        sso: false,
         type: 'student'
       }
     )

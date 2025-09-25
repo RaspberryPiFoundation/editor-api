@@ -19,6 +19,11 @@ FactoryBot.define do
       email { nil }
       username { Faker::Internet.username }
 
+      trait :sso do
+        email { Faker::Internet.email }
+        username { nil }
+      end
+
       transient do
         school { nil }
       end

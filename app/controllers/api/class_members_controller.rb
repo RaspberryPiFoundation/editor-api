@@ -41,6 +41,8 @@ module Api
       else
         render json: result.slice(:error, :errors), status: :unprocessable_entity
       end
+    rescue ArgumentError => e
+      render json: { error: e.message }, status: :unprocessable_entity
     end
 
     def create_batch

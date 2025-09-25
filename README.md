@@ -45,6 +45,8 @@ which should update the Gems in the container, without the need for rebuilding.
 
 ### Seeding
 
+Note: If running within a dev-container, remove the `docker compose run --rm api ` prefix from the cmd
+
 By default in development only, two tasks are called to seed data:
 
 `docker compose run --rm api rails projects:create_all`
@@ -62,7 +64,7 @@ For CEfE the following scenarios are modelled by the tasks:
 
 To clear CEfE data the following cmd will remove the school associated with the `jane.doe@example.com` user, and associated school data:
 
-`rails for_education:destroy_seed_data`
+`docker compose run --rm api rails for_education:destroy_seed_data`
 
 To override values, you can prefix the tasks with environment variables, for example:
 

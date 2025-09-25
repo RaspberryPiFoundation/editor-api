@@ -18,7 +18,7 @@ module SchoolStudent
       def list_students(school, token, student_ids)
         student_ids ||= Role.student.where(school:).map(&:user_id)
         ProfileApiClient.list_school_students(token:, school_id: school.id, student_ids:).map do |student|
-          User.new(student.to_h.slice(:id, :username, :name))
+          User.new(student.to_h.slice(:id, :username, :name, :email))
         end
       end
     end
