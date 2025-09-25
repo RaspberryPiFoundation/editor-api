@@ -74,15 +74,6 @@ module Api
       render :create_batch, formats: [:json], status: :accepted
     end
 
-    # This method returns true if there is an existing, unfinished, batch whose description
-    # matches the current school ID. This prevents two users enqueueing a batch for
-    # the same school, since GoodJob::Batch doesn't support a concurrency key.
-    def batch_in_progress?(identifier:)
-      GoodJob::BatchRecord.where(finished_at: nil)
-                          .where(discarded_at: nil)
-                          .exists?(description: identifier)
-    end
-
     # This method takes a large list of students to insert and enqueues a GoodJob
     # Batch to insert them, 50 at a time. We use a GoodJob::Batch to enqueue the
     # set of jobs atomically.
@@ -90,13 +81,10 @@ module Api
     # This method will throw an error if any batch fails to enqueue, so callers
     # should assume the entire student import has failed.
     def enqueue_batches(students)
-      # Set the maximum batch size to the limit imposed by Profile
-      batch_identifier = "school_id:#{@school.id}"
-
       # Raise if a batch is already in progress for this school.
-      raise ConcurrencyExceededForSchool if batch_in_progress?(identifier: batch_identifier)
+      raise ConcurrencyExceededForSchool if @school.import_in_progress?
 
-      batch = GoodJob::Batch.new(description: batch_identifier)
+      batch = GoodJob::Batch.new(description: @school.id)
       batch.enqueue do
         students.each_slice(MAX_BATCH_CREATION_SIZE) do |student_batch|
           SchoolStudent::CreateBatch.call(
@@ -104,8 +92,7 @@ module Api
           )
         end
       end
-
-      Rails.logger.info("Batch #{batch.id} enqueued successfully with identifier #{batch_identifier}!")
+      Rails.logger.info("Batch #{batch.id} enqueued successfully with identifier #{@school.id}!")
     end
 
     def update

@@ -71,9 +71,8 @@ RSpec.describe 'Creating a batch of school students', type: :request do
 
   it 'responds 422 when a batch already exists for this school' do
     # Create a fake batch for the school.
-    batch_identifier = "school_id:#{school.id}"
     GoodJob::BatchRecord.create!(
-      description: batch_identifier,
+      description: school.id,
       finished_at: nil,
       discarded_at: nil
     )
@@ -84,7 +83,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect(response).to have_http_status(:unprocessable_entity)
 
     active_batches = GoodJob::BatchRecord.where(
-      description: batch_identifier,
+      description: school.id,
       finished_at: nil,
       discarded_at: nil
     )
