@@ -25,3 +25,5 @@ json.code(school.code) if include_code
 
 include_user_origin = local_assigns.fetch(:user_origin, false)
 json.user_origin(school.user_origin) if include_user_origin
+
+json.import_in_progress school.import_in_progress?

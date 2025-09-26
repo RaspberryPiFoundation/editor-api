@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_08_25_102042) do
+ActiveRecord::Schema[7.2].define(version: 2025_09_25_135238) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -289,10 +289,9 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_25_102042) do
 
   create_table "user_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
-    t.uuid "good_job_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["user_id", "good_job_id"], name: "index_user_jobs_on_user_id_and_good_job_id", unique: true
+    t.uuid "good_job_batch_id"
   end
 
   create_table "versions", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -324,5 +323,4 @@ ActiveRecord::Schema[7.1].define(version: 2025_08_25_102042) do
   add_foreign_key "school_projects", "projects"
   add_foreign_key "school_projects", "schools"
   add_foreign_key "teacher_invitations", "schools"
-  add_foreign_key "user_jobs", "good_jobs"
 end
