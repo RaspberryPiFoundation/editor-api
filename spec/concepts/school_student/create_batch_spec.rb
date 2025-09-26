@@ -29,7 +29,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
     it 'queues CreateStudentsJob' do
       expect do
-        described_class.call(school:, school_students_params:, token:, user_id:)
+        described_class.call(school:, school_students_params:, token:)
       end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_students_params, token:)
     end
   end
@@ -43,12 +43,12 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     end
 
     it 'returns a successful operation response' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
+      response = described_class.call(school:, school_students_params:, token:)
       expect(response.success?).to be(true)
     end
 
     it 'returns the job id' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
+      response = described_class.call(school:, school_students_params:, token:)
       expect(response[:job_id]).to be_truthy
     end
   end
