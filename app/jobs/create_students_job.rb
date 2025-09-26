@@ -26,16 +26,8 @@ class CreateStudentsJob < ApplicationJob
 
   queue_as :create_students_job
 
-  # Restrict to one job per school to avoid duplicates
-  good_job_control_concurrency_with(
-    key: -> { "create_students_job_#{arguments.first[:school_id]}" },
-    perform_limit: 1
-  )
-
-  def self.attempt_perform_later(school_id:, students:, token:, user_id:)
-    job = perform_later(school_id:, students:, token:)
-    UserJob.create!(user_id:, good_job_id: job.job_id) unless job.nil?
-    job
+  def self.attempt_perform_later(school_id:, students:, token:)
+    perform_later(school_id:, students:, token:)
   end
 
   def perform(school_id:, students:, token:)

@@ -84,15 +84,17 @@ module Api
       # Raise if a batch is already in progress for this school.
       raise ConcurrencyExceededForSchool if @school.import_in_progress?
 
-      batch = GoodJob::Batch.new(description: @school.id)
-      batch.enqueue do
+      @batch = GoodJob::Batch.new(description: @school.id)
+      @batch.enqueue do
         students.each_slice(MAX_BATCH_CREATION_SIZE) do |student_batch|
           SchoolStudent::CreateBatch.call(
-            school: @school, school_students_params: student_batch, token: current_user.token, user_id: current_user.id
+            school: @school, school_students_params: student_batch, token: current_user.token
           )
         end
       end
-      Rails.logger.info("Batch #{batch.id} enqueued successfully with identifier #{@school.id}!")
+
+      UserJob.create!(user_id: current_user.id, good_job_batch_id: @batch.id)
+      Rails.logger.info("Batch #{@batch.id} enqueued successfully with school identifier #{@school.id}!")
     end
 
     def update

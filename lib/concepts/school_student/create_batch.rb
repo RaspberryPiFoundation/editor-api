@@ -7,9 +7,9 @@ module SchoolStudent
 
   class CreateBatch
     class << self
-      def call(school:, school_students_params:, token:, user_id:)
+      def call(school:, school_students_params:, token:)
         response = OperationResponse.new
-        response[:job_id] = create_batch(school, school_students_params, token, user_id)
+        response[:job_id] = create_batch(school, school_students_params, token)
         response
       rescue ConcurrencyExceededForSchool => e
         response[:error] = e
@@ -24,8 +24,8 @@ module SchoolStudent
 
       private
 
-      def create_batch(school, students, token, user_id)
-        job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
+      def create_batch(school, students, token)
+        job = CreateStudentsJob.attempt_perform_later(school_id: school.id, students:, token:)
         job&.job_id
       end
     end
