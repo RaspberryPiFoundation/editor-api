@@ -136,7 +136,7 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_students_params:, current_user:)
-      expect(response[:error]).to eq("Error creating one or more students - see 'errors' key for details")
+      expect(response[:error]).to eq('Error importing the class or creating students: Network timeout')
     end
 
     it 'returns the error type as standard_error' do
@@ -144,9 +144,9 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
       expect(response[:error_type]).to eq(:standard_error)
     end
 
-    it 'returns the detailed error message in the errors field' do
+    it 'does not include an errors field for standard errors' do
       response = described_class.call(school:, school_students_params:, current_user:)
-      expect(response[:errors]).to eq('Error importing the class or creating students: Network timeout')
+      expect(response).not_to have_key(:errors)
     end
 
     it 'sends the exception to Sentry' do

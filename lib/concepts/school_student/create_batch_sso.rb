@@ -24,8 +24,7 @@ module SchoolStudent
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = "Error creating one or more students - see 'errors' key for details"
-        response[:errors] = "Error importing the class or creating students: #{e}"
+        response[:error] = "Error importing the class or creating students: #{e}"
         response[:error_type] = :standard_error
         response
       end
