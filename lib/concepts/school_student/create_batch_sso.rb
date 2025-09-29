@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 module SchoolStudent
-  class Error < StandardError; end
-
   class ValidationError < StandardError
     attr_reader :errors
 
