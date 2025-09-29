@@ -32,16 +32,10 @@ module SchoolStudent
       private
 
       def validate_batch(school:, students:, token:)
-        decrypted_students = decrypt_students(students)
+        decrypted_students = StudentHelpers.decrypt_students(students)
         ProfileApiClient.validate_school_students(token:, students: decrypted_students, school_id: school.id)
       rescue ProfileApiClient::Student422Error => e
         handle_student422_error(e.errors)
-      end
-
-      def decrypt_students(students)
-        students.deep_dup.each do |student|
-          student[:password] = DecryptionHelpers.decrypt_password(student[:password]) if student[:password].present?
-        end
       end
 
       # This method converts the error structure returned by Profile (an array of error objects) to

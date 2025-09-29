@@ -7,4 +7,10 @@ class StudentHelpers
       student.transform_values { |value| value.nil? ? '' : value }
     end
   end
+
+  def self.decrypt_students(students)
+    students.deep_dup.each do |student|
+      student[:password] = DecryptionHelpers.decrypt_password(student[:password]) if student[:password].present?
+    end
+  end
 end
