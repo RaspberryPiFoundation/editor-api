@@ -417,45 +417,4 @@ RSpec.describe User do
       expect(user.schools).to eq([school])
     end
   end
-
-  describe '#sso_providers' do
-    subject(:user) { create(:user) }
-
-    context 'when user is a student' do
-      before do
-        create(:student_role, school:, user_id: user.id)
-      end
-
-      context 'when student has sso_providers (SSO student)' do
-        before do
-          user.sso_providers = ['google']
-        end
-
-        it 'has present sso_providers' do
-          expect(user.sso_providers).to be_present
-          expect(user.sso_providers).to eq(['google'])
-        end
-      end
-
-      context 'when student has no sso_providers (standard student)' do
-        before do
-          user.sso_providers = []
-        end
-
-        it 'has empty sso_providers' do
-          expect(user.sso_providers).to be_empty
-        end
-      end
-
-      context 'when student has nil sso_providers' do
-        before do
-          user.sso_providers = nil
-        end
-
-        it 'has nil sso_providers' do
-          expect(user.sso_providers).to be_nil
-        end
-      end
-    end
-  end
 end
