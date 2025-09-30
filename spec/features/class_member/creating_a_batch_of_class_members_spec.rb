@@ -12,7 +12,7 @@ RSpec.describe 'Creating a class member', type: :request do
   context 'with valid params' do
     let(:student_attributes) do
       students.map do |student|
-        { id: student.id, name: student.name, username: student.username, type: 'student' }
+        { id: student.id, name: student.name, username: student.username, email: student.email, sso_providers: [], type: 'student' }
       end
     end
 

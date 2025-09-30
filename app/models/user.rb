@@ -18,6 +18,7 @@ class User
     token
     username
     roles
+    sso_providers
   ].freeze
 
   attr_accessor(*ATTRIBUTES)

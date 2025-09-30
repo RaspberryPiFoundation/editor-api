@@ -23,9 +23,9 @@ module ClassMember
           return response
         end
 
-        response[:class_members] = teachers + class_students.sort do |a, b|
-          a.student.name <=> b.student.name
-        end
+        students_with_data = class_students.filter { |cs| cs.student.present? }
+        sorted_students = students_with_data.sort { |a, b| a.student.name <=> b.student.name }
+        response[:class_members] = teachers + sorted_students
 
         response
       end

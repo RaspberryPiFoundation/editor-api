@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Updating a school student', type: :request do
   before do
     authenticated_in_hydra_as(owner)
+    stub_profile_api_school_student # Add missing stub for the SSO check
     stub_profile_api_update_school_student
     stub_profile_api_create_safeguarding_flag
   end

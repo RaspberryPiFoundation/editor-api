@@ -20,7 +20,7 @@ RSpec.describe ClassMember::List, type: :unit do
       end
 
       student_attributes = students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
+        { id: student.id, name: student.name, username: student.username, email: student.email }
       end
       stub_profile_api_list_school_students(school:, student_attributes:)
       stub_user_info_api_for(teacher)
