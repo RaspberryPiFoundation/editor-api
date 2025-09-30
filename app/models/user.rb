@@ -18,7 +18,7 @@ class User
     token
     username
     roles
-    sso
+    sso_providers
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -61,16 +61,6 @@ class User
 
   def parsed_roles
     roles&.to_s&.split(',')&.map(&:strip) || []
-  end
-
-  def sso
-    return nil unless student?
-
-    # Return the sso value if exists
-    return @sso unless @sso.nil?
-
-    # Fallback for other cases
-    email.present? && username.blank?
   end
 
   def ==(other)

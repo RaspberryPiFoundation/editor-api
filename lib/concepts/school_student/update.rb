@@ -38,16 +38,14 @@ module SchoolStudent
 
         validate(username:, password:, name:)
 
-        # Prevent updating SSO students (students with email present but no username)
-        # TODO: Update to use school_student() when profile returns the email field from that endpoint
-        students = ProfileApiClient.list_school_students(
+        # Prevent updating SSO students (students with ssoProviders present)
+        student = ProfileApiClient.school_student(
+          token: token,
           school_id: school.id,
-          student_ids: [student_id],
-          token: token
+          student_id: student_id
         )
 
-        student = students.first
-        raise SSOStudentUpdateError, 'Updating SSO students is not allowed' if student.sso?
+        raise SSOStudentUpdateError, 'Updating SSO students is not allowed' if student.ssoProviders.present?
 
         ProfileApiClient.update_school_student(
           token:, school_id: school.id, student_id:, username:, password:, name:

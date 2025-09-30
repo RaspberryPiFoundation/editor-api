@@ -17,8 +17,8 @@ RSpec.describe SchoolMember::List, type: :unit do
 
     before do
       student_attributes = [
-        { id: sso_student.id, name: sso_student.name, username: sso_student.username, email: sso_student.email },
-        { id: standard_student.id, name: standard_student.name, username: standard_student.username, email: standard_student.email }
+        { id: sso_student.id, name: sso_student.name, username: sso_student.username, email: sso_student.email, ssoProviders: sso_student.sso_providers },
+        { id: standard_student.id, name: standard_student.name, username: standard_student.username, email: standard_student.email, ssoProviders: standard_student.sso_providers }
       ]
       stub_profile_api_list_school_students(school:, student_attributes:)
     end
@@ -34,23 +34,23 @@ RSpec.describe SchoolMember::List, type: :unit do
       expect(response[:school_members].map(&:id)).to include(standard_student.id)
     end
 
-    it 'sets sso to true for SSO students (email present, username blank)' do
+    it 'sets sso_providers for SSO students' do
       response = described_class.call(school:, token:)
       school_members = response[:school_members]
       sso_member = school_members.find { |m| m.id == sso_student.id }
 
-      expect(sso_member.sso).to be(true)
+      expect(sso_member.sso_providers).to be_present
       expect(sso_member.email).to be_present
       expect(sso_member.username).to be_nil
       expect(sso_member.type).to eq(:student)
     end
 
-    it 'sets sso to false for standard students (username present, email blank)' do
+    it 'sets sso_providers to empty for standard students' do
       response = described_class.call(school:, token:)
       school_members = response[:school_members]
       standard_member = school_members.find { |m| m.id == standard_student.id }
 
-      expect(standard_member.sso).to be(false)
+      expect(standard_member.sso_providers).to be_empty
       expect(standard_member.email).to be_nil
       expect(standard_member.username).to be_present
       expect(standard_member.type).to eq(:student)
@@ -67,12 +67,12 @@ RSpec.describe SchoolMember::List, type: :unit do
       expect(response[:school_members].map(&:id)).to include(teacher.id)
     end
 
-    it 'sets sso to nil for teachers (not applicable)' do
+    it 'sets sso_providers to empty for teachers' do
       response = described_class.call(school:, token:)
       school_members = response[:school_members]
       teacher_member = school_members.find { |m| m.id == teacher.id }
 
-      expect(teacher_member.sso).to be_nil
+      expect(teacher_member.sso_providers).to be_empty
       expect(teacher_member.type).to eq(:teacher)
     end
   end
@@ -84,12 +84,12 @@ RSpec.describe SchoolMember::List, type: :unit do
       stub_user_info_api_for(owner)
     end
 
-    it 'sets sso to nil for owners (not applicable)' do
+    it 'sets sso_providers to empty for owners' do
       response = described_class.call(school:, token:)
       school_members = response[:school_members]
       owner_member = school_members.find { |m| m.id == owner.id }
 
-      expect(owner_member.sso).to be_nil
+      expect(owner_member.sso_providers).to be_empty
       expect(owner_member.type).to eq(:owner)
     end
   end

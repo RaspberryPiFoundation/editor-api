@@ -67,7 +67,7 @@ RSpec.describe 'Listing class members', type: :request do
         username: students[0].username,
         name: students[0].name,
         email: students[0].email,
-        sso: false,
+        sso_providers: [],
         type: 'student'
       }
     )

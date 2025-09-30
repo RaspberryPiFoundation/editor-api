@@ -25,7 +25,7 @@ RSpec.describe 'Creating a class member', type: :request do
           }
         }
       end
-      let(:student_attributes) { { id: student.id, name: student.name, username: student.username, email: student.email, sso: false, type: 'student' } }
+      let(:student_attributes) { { id: student.id, name: student.name, username: student.username, email: student.email, sso_providers: [], type: 'student' } }
 
       before do
         stub_profile_api_list_school_students(school:, student_attributes: [student_attributes])

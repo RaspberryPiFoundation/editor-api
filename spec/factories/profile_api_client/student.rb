@@ -7,6 +7,7 @@ FactoryBot.define do
     name { Faker::Name.name }
     username { Faker::Internet.username }
     email { Faker::Internet.email }
+    ssoProviders { [] } # standard students have no SSO providers
 
     # rubocop:disable Naming/VariableNumber
     createdAt { Time.current.to_fs(:iso8601) }
@@ -20,12 +21,7 @@ FactoryBot.define do
       name { Faker::Name.name }
       username { nil } # SSO students have no username
       email { Faker::Internet.email } # but do have email
-    end
-
-    trait :regular do
-      name { Faker::Name.name }
-      username { Faker::Internet.username } # Regular students have username
-      email { Faker::Internet.email }
+      ssoProviders { ['google'] } # SSO students have SSO providers
     end
   end
 end

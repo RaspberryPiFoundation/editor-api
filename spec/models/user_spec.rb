@@ -418,82 +418,42 @@ RSpec.describe User do
     end
   end
 
-  describe '#sso' do
+  describe '#sso_providers' do
     subject(:user) { create(:user) }
-
-    context 'when user is not a student' do
-      it 'returns nil for teachers' do
-        create(:teacher_role, school:, user_id: user.id)
-        expect(user.sso).to be_nil
-      end
-
-      it 'returns nil for owners' do
-        create(:owner_role, school:, user_id: user.id)
-        expect(user.sso).to be_nil
-      end
-
-      it 'returns nil for users with no roles' do
-        expect(user.sso).to be_nil
-      end
-    end
 
     context 'when user is a student' do
       before do
         create(:student_role, school:, user_id: user.id)
       end
 
-      context 'when student has email and no username (SSO student)' do
+      context 'when student has sso_providers (SSO student)' do
         before do
-          user.email = 'student@example.com'
-          user.username = nil
+          user.sso_providers = ['google']
         end
 
-        it 'returns true' do
-          expect(user.sso).to be(true)
+        it 'has present sso_providers' do
+          expect(user.sso_providers).to be_present
+          expect(user.sso_providers).to eq(['google'])
         end
       end
 
-      context 'when student has username and no email (standard student)' do
+      context 'when student has no sso_providers (standard student)' do
         before do
-          user.email = nil
-          user.username = 'student123'
+          user.sso_providers = []
         end
 
-        it 'returns false' do
-          expect(user.sso).to be(false)
+        it 'has empty sso_providers' do
+          expect(user.sso_providers).to be_empty
         end
       end
 
-      context 'when student has both email and username' do
+      context 'when student has nil sso_providers' do
         before do
-          user.email = 'student@example.com'
-          user.username = 'student123'
+          user.sso_providers = nil
         end
 
-        it 'returns false' do
-          expect(user.sso).to be(false)
-        end
-      end
-
-      context 'when student has neither email nor username' do
-        before do
-          user.email = nil
-          user.username = nil
-        end
-
-        it 'returns false' do
-          expect(user.sso).to be(false)
-        end
-      end
-
-      context 'when student has blank email and username' do
-        before do
-          user.email = ''
-          user.username = ''
-        end
-
-        it 'returns false' do
-          expect(user.sso).to be(false)
+        it 'has nil sso_providers' do
+          expect(user.sso_providers).to be_nil
         end
       end
     end

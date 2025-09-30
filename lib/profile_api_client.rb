@@ -9,12 +9,7 @@ class ProfileApiClient
   # rubocop:disable Naming/MethodName
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
-
-  Student = Data.define(:id, :schoolId, :name, :username, :email, :createdAt, :updatedAt, :discardedAt) do
-    def sso?
-      email.present? && username.blank?
-    end
-  end
+  Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
   # rubocop:enable Naming/MethodName
 
   class Error < StandardError; end
@@ -210,7 +205,13 @@ class ProfileApiClient
 
     def build_student(attrs)
       symbolized_attrs = attrs.symbolize_keys
-      symbolized_attrs[:email] = nil unless symbolized_attrs.key?(:email) # email is only for SSO students
+
+      # As of 30/09/25 we need these defaults for backwards compatibility until profile SSO changes are released.
+      # (I was tempted to refactor this handling to be more flexible, however with major profile changes around
+      # the corner, it makes more sense to stick with this approach for now)
+      symbolized_attrs[:email] ||= nil
+      symbolized_attrs[:ssoProviders] ||= []
+
       Student.new(**symbolized_attrs)
     end
   end

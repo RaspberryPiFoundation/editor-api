@@ -421,6 +421,7 @@ RSpec.describe ProfileApiClient do
         name: 'student-name',
         username: 'student-username',
         email: 'test@example.com',
+        ssoProviders: [],
         createdAt: '2024-07-03T13:00:40.041Z',
         updatedAt: '2024-07-03T13:00:40.041Z',
         discardedAt: nil
@@ -467,7 +468,7 @@ RSpec.describe ProfileApiClient do
     end
 
     it 'returns the updated student if successful' do
-      response = { id: 'id', schoolId: 'school-id', name: 'new-name', username: 'new-username', email: 'test@example.com', createdAt: '', updatedAt: '', discardedAt: '' }
+      response = { id: 'id', schoolId: 'school-id', name: 'new-name', username: 'new-username', email: 'test@example.com', ssoProviders: [], createdAt: '', updatedAt: '', discardedAt: '' }
       expected = ProfileApiClient::Student.new(**response)
       stub_request(:patch, update_student_url)
         .to_return(status: 200, body: response.to_json, headers: { 'content-type' => 'application/json' })
@@ -486,7 +487,7 @@ RSpec.describe ProfileApiClient do
     it 'handles update responses that do not include email field (e.g., for SSO students)' do
       # This is covering a specific error seen during testing where the email was omitted
       response = { id: 'id', schoolId: 'school-id', name: 'new-name', username: 'new-username', createdAt: '', updatedAt: '', discardedAt: '' }
-      expected = ProfileApiClient::Student.new(**response, email: nil)
+      expected = ProfileApiClient::Student.new(**response, email: nil, ssoProviders: [])
       stub_request(:patch, update_student_url)
         .to_return(status: 200, body: response.to_json, headers: { 'content-type' => 'application/json' })
       expect(update_school_student_response).to eq(expected)
@@ -542,7 +543,7 @@ RSpec.describe ProfileApiClient do
     it_behaves_like 'a request that handles an unexpected response status', :get, url: -> { student_url }, status: 201
 
     it 'returns the student if successful' do
-      response = { id: student_id, schoolId: school.id, name: 'name', username: 'username', email: 'test@example.com', createdAt: '', updatedAt: '', discardedAt: '' }
+      response = { id: student_id, schoolId: school.id, name: 'name', username: 'username', email: 'test@example.com', ssoProviders: [], createdAt: '', updatedAt: '', discardedAt: '' }
       expected = ProfileApiClient::Student.new(**response)
       stub_request(:get, student_url)
         .to_return(status: 200, body: response.to_json, headers: { 'content-type' => 'application/json' })
