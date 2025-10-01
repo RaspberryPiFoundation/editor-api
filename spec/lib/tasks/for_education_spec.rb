@@ -7,11 +7,8 @@ require 'climate_control'
 RSpec.describe 'for_education', type: :task do
   let(:creator_id) { 'f83ba872-b16e-46e1-9f7d-df89d267550d' }
   let(:teacher_id) { 'ccc9b8fd-f357-4238-983d-6f87b99bdbb2' }
-
-  # Use the actual student IDs that the rake task creates (from SeedsHelper::TEST_USERS)
-  let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # jane_smith from SeedsHelper
-  let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # john_smith from SeedsHelper
-
+  let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # jane.smith from SeedsHelper
+  let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # john.smith from SeedsHelper
   let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # Use TEST_SCHOOL value so destroy works
 
   describe ':destroy_seed_data' do
