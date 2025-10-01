@@ -2,13 +2,17 @@
 
 require 'rails_helper'
 require 'rake'
+require 'climate_control'
 
 RSpec.describe 'for_education', type: :task do
-  let(:creator_id) { '583ba872-b16e-46e1-9f7d-df89d267550d' } # jane.doe@example.com
-  let(:teacher_id) { 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2' } # john.doe@example.com
-  let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # student
-  let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # student
-  let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' }
+  let(:creator_id) { 'f83ba872-b16e-46e1-9f7d-df89d267550d' }
+  let(:teacher_id) { 'ccc9b8fd-f357-4238-983d-6f87b99bdbb2' }
+
+  # Use the actual student IDs that the rake task creates (from SeedsHelper::TEST_USERS)
+  let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # jane_smith from SeedsHelper
+  let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # john_smith from SeedsHelper
+
+  let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # Use TEST_SCHOOL value so destroy works
 
   describe ':destroy_seed_data' do
     let(:task) { Rake::Task['for_education:destroy_seed_data'] }
@@ -24,7 +28,9 @@ RSpec.describe 'for_education', type: :task do
     end
 
     it 'destroys all seed data' do
-      task.invoke
+      ClimateControl.modify SEEDING_CREATOR_ID: creator_id, SEEDING_TEACHER_ID: teacher_id do
+        task.invoke
+      end
       expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
       expect(School.where(creator_id:)).not_to exist
       expect(ClassStudent.where(student_id: student_1)).not_to exist
@@ -39,7 +45,9 @@ RSpec.describe 'for_education', type: :task do
     let(:task) { Rake::Task['for_education:seed_an_unverified_school'] }
 
     it 'creates an unverified school' do
-      task.invoke
+      ClimateControl.modify SEEDING_CREATOR_ID: creator_id do
+        task.invoke
+      end
       expect(School.find_by(creator_id:).verified_at).to be_nil
     end
   end
@@ -48,7 +56,9 @@ RSpec.describe 'for_education', type: :task do
     let(:task) { Rake::Task['for_education:seed_a_verified_school'] }
 
     it 'creates a verified school' do
-      task.invoke
+      ClimateControl.modify SEEDING_CREATOR_ID: creator_id do
+        task.invoke
+      end
       expect(School.find_by(creator_id:).verified_at).to be_truthy
     end
   end
@@ -58,8 +68,9 @@ RSpec.describe 'for_education', type: :task do
     let(:school) { School.find_by(creator_id:) }
 
     before do
-      Rake::Task['for_education:destroy_seed_data'].invoke
-      task.invoke
+      ClimateControl.modify SEEDING_CREATOR_ID: creator_id, SEEDING_TEACHER_ID: teacher_id do
+        task.invoke
+      end
     end
 
     it 'creates a verified school' do
@@ -71,8 +82,8 @@ RSpec.describe 'for_education', type: :task do
     end
 
     it 'adds two lessons to the school' do
-      lesson = Lesson.where(school_id: school.id)
-      expect(lesson.length).to eq(2)
+      lessons = Lesson.where(school_id: school.id)
+      expect(lessons.count).to eq(2)
     end
 
     it 'adds two projects' do
