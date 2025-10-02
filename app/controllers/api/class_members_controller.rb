@@ -49,22 +49,15 @@ module Api
       owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
       @school_owner_ids = owners.map(&:id)
 
-      # Teacher objects needs to be the compliment of student objects so that every user creation is attempted and validated.
-      student_objects = create_batch_params.select { |user| user[:type] == 'student' }
-      teacher_objects = create_batch_params.select { |user| student_objects.pluck(:user_id).exclude?(user[:user_id]) }
-      student_ids = student_objects.pluck(:user_id)
-      teacher_ids = teacher_objects.pluck(:user_id)
+      students, teachers = members_existing_in_profile
+      result = ClassMember::Create.call(school_class: @school_class, students:, teachers:)
 
-      students = list_students(@school, current_user.token, student_ids)
-      teachers = list_teachers(@school, teacher_ids)
-
-      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
-
-      if result.success?
-        @class_members = result[:class_members]
-        render :show, formats: [:json], status: :created
+      if result.failure? && result[:error].include?('No valid school members provided')
+        render json: result, status: :unprocessable_entity
       else
-        render json: result.slice(:error, :errors), status: :unprocessable_entity
+        successful = result[:class_members].map { |m| { success: true, user_id: m.user_id } }
+        errors = result[:errors].map { |user_id, error| { success: false, user_id:, error: } }
+        render json: successful + errors
       end
     end
 
@@ -79,6 +72,19 @@ module Api
     end
 
     private
+
+    def members_existing_in_profile
+      # Teacher objects needs to be the compliment of student objects so that every user creation is attempted and validated.
+      student_objects = create_batch_params.select { |user| user[:type] == 'student' }
+      teacher_objects = create_batch_params.select { |user| student_objects.pluck(:user_id).exclude?(user[:user_id]) }
+      student_ids = student_objects.pluck(:user_id)
+      teacher_ids = teacher_objects.pluck(:user_id)
+
+      [
+        list_students(@school, current_user.token, student_ids)[:school_students],
+        list_teachers(@school, teacher_ids)[:school_teachers]
+      ]
+    end
 
     def class_member_params
       params.require(:class_member).permit(:user_id, :type)
