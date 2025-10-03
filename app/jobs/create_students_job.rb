@@ -24,37 +24,14 @@ class CreateStudentsJob < ApplicationJob
 
   include GoodJob::ActiveJobExtensions::Concurrency
 
-  queue_as :default
+  queue_as :create_students_job
 
-  # Restrict to one job per school to avoid duplicates
-  good_job_control_concurrency_with(
-    key: -> { "create_students_job_#{arguments.first[:school_id]}" },
-    total_limit: 1
-  )
-
-  def self.attempt_perform_later(school_id:, students:, token:, user_id:)
-    concurrency_key = "create_students_job_#{school_id}"
-    existing_jobs = GoodJob::Job.where(concurrency_key:, finished_at: nil)
-
-    raise ConcurrencyExceededForSchool, 'Only one job per school can be enqueued at a time.' if existing_jobs.exists?
-
-    ActiveRecord::Base.transaction do
-      job = perform_later(school_id:, students:, token:)
-      UserJob.create!(user_id:, good_job_id: job.job_id) unless job.nil?
-
-      job
-    end
+  def self.attempt_perform_later(school_id:, students:, token:)
+    perform_later(school_id:, students:, token:)
   end
 
   def perform(school_id:, students:, token:)
-    decrypted_students = students.map do |student|
-      {
-        name: student[:name],
-        username: student[:username],
-        password: DecryptionHelpers.decrypt_password(student[:password])
-      }
-    end
-
+    decrypted_students = StudentHelpers.decrypt_students(students)
     responses = ProfileApiClient.create_school_students(token:, students: decrypted_students, school_id:)
     return if responses[:created].blank?
 
