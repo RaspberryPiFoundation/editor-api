@@ -24,7 +24,7 @@ module SchoolStudent
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = "Error creating school students: #{e}"
+        response[:error] = "Error validating school students: #{e}"
         response[:error_type] = :standard_error
         response
       end

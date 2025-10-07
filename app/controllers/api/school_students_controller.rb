@@ -47,7 +47,7 @@ module Api
 
       students = StudentHelpers.normalise_nil_values_to_empty_strings(school_students_params)
 
-      # We validate the entire batch here in one go and then, if the validation succeds,
+      # We validate the entire batch here in one go and then, if the validation succeeds,
       # feed the batch to Profile in chunks of 50.
       validation_result = SchoolStudent::ValidateBatch.call(
         school: @school, students: students, token: current_user.token
