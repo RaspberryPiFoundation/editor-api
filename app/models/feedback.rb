@@ -9,6 +9,7 @@ class Feedback < ApplicationRecord
   validate :user_is_the_class_teacher_for_the_school_project
 
   def user_has_the_school_owner_or_school_teacher_role_for_the_school
+    school = school_project&.school
     return unless user_id_changed? && errors.blank? && school
 
     user = User.new(id: user_id)
@@ -19,7 +20,7 @@ class Feedback < ApplicationRecord
     errors.add(:user, msg)
   end
 
-  def user_is_the_school_teacher_for_the_school_project
+  def user_is_the_class_teacher_for_the_school_project
     school_class = school_project&.project&.parent&.lesson&.school_class
     return if !school_class || school_class.teacher_ids.include?(user_id)
 
