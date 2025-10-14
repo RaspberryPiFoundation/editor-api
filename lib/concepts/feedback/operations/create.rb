@@ -9,9 +9,6 @@ class Feedback
         response[:feedback].save!
         response
       rescue StandardError => e
-        pp 'there was an error'
-        pp 'the error was:'
-        pp e
         Sentry.capture_exception(e)
         if response[:feedback].nil?
           response[:error] = "Error creating feedback #{e}"
@@ -25,8 +22,6 @@ class Feedback
       private
 
       def build_feedback(feedback_hash)
-        puts 'building feedback from hash:'
-        puts feedback_hash.inspect
         project = Project.find_by(identifier: feedback_hash[:project_id])
         school_project = project&.school_project
         if school_project.nil?
@@ -35,9 +30,6 @@ class Feedback
         # replace identifier with school_project_id
         feedback_hash[:school_project_id] = school_project.id
         feedback_hash.delete(:project_id)
-        puts 'the feedback hash is now:'
-        puts feedback_hash.inspect
-        puts 'building feedback object'
         new_feedback = Feedback.new(feedback_hash)
         new_feedback
       end
