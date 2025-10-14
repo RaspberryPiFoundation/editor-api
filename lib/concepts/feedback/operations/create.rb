@@ -24,14 +24,12 @@ class Feedback
       def build_feedback(feedback_hash)
         project = Project.find_by(identifier: feedback_hash[:identifier])
         school_project = project&.school_project
-        if school_project.nil?
-          raise "School project not found for identifier: #{feedback_hash[:identifier]}"
-        end
+        raise "School project not found for identifier: #{feedback_hash[:identifier]}" if school_project.nil?
+
         # replace identifier with school_project_id
         feedback_hash[:school_project_id] = school_project.id
         feedback_hash.delete(:identifier)
-        new_feedback = Feedback.new(feedback_hash)
-        new_feedback
+        Feedback.new(feedback_hash)
       end
     end
   end

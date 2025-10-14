@@ -4,7 +4,6 @@ class Feedback < ApplicationRecord
   belongs_to :school_project
   validates :content, presence: true
   validates :user_id, presence: true
-  validates :school_project, presence: true
   validate :user_has_the_school_owner_or_school_teacher_role_for_the_school
   validate :parent_project_belongs_to_lesson
   validate :parent_project_belongs_to_school_class
@@ -25,6 +24,7 @@ class Feedback < ApplicationRecord
   def parent_project_belongs_to_lesson
     parent_project = school_project&.project&.parent
     return if parent_project&.lesson_id.present?
+
     msg = "Parent project '#{parent_project&.id}' does not belong to a 'lesson'"
     errors.add(:user, msg)
   end

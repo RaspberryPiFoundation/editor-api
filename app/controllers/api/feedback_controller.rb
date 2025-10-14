@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Api
   class FeedbackController < ApiController
     before_action :authorize_user
@@ -31,7 +33,7 @@ module Api
 
     def base_params
       params.fetch(:feedback, {}).permit(
-        :content,
+        :content
       ).merge(url_params)
     end
   end

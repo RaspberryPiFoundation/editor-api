@@ -43,7 +43,7 @@ RSpec.describe Feedback do
     it 'validates that the user is the class teacher for the school project' do
       school_class = create(:school_class, teacher_ids: [teacher.id], school:)
       parent_project = create(:project, user_id: teacher.id, school:, lesson: create(:lesson, school:, school_class:, user_id: teacher.id))
-      school_project = create(:school_project, school:, project: create(:project, parent: parent_project))      
+      school_project = create(:school_project, school:, project: create(:project, parent: parent_project))
       other_teacher = create(:teacher, school:)
       feedback = build(:feedback, school_project:, user_id: other_teacher.id)
       expect(feedback).not_to be_valid
