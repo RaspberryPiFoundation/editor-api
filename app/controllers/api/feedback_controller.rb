@@ -4,8 +4,6 @@ module Api
     # load_and_authorize_resource :feedback
 
     def create
-      puts "create feedback called with params: #{params.inspect}"
-      puts "params before being passed in are: #{feedback_params.inspect}"
       result = Feedback::Create.call(feedback_params:)
 
       if result.success?
@@ -21,8 +19,15 @@ module Api
     end
 
     def url_params
-      params.permit(:project_id)
+      permitted_params = params.permit(:project_id)
+      { identifier: permitted_params[:project_id] }
     end
+
+    # def school_project_params
+    #   project_params = params.permit(:project_id)
+    #   school_project = Project.find_by(identifier: project_params[:project_id])&.school_project
+    #   {school_project_id: school_project&.id}
+    # end
 
     def base_params
       params.fetch(:feedback, {}).permit(

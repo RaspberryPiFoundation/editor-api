@@ -16,7 +16,7 @@ RSpec.describe Feedback::Create, type: :unit do
     {
       content: 'Great job!',
       user_id: teacher.id,
-      project_id: student_project.identifier
+      identifier: student_project.identifier
     }
   end
 
@@ -61,7 +61,7 @@ RSpec.describe Feedback::Create, type: :unit do
       {
         content: nil,
         user_id: teacher.id,
-        project_id: rogue_project.identifier
+        identifier: rogue_project.identifier
       }
     end
 
