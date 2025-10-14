@@ -2,7 +2,7 @@
 
 FactoryBot.define do
   factory :user_job do
-    good_job
+    good_job_batch_id { nil }
     user_id { SecureRandom.uuid }
   end
 end

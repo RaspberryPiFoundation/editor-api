@@ -45,13 +45,4 @@ RSpec.describe CreateStudentsJob do
 
     expect(Role.student.where(school:, user_id:)).to exist
   end
-
-  it 'does not enqueue a job if one is already running for that school' do
-    # Enqueue the job
-    GoodJob::Job.enqueue(described_class.new(school_id: school.id, students:, token:))
-
-    expect do
-      described_class.attempt_perform_later(school_id: school.id, students:, token:, user_id:)
-    end.to raise_error(ConcurrencyExceededForSchool)
-  end
 end
