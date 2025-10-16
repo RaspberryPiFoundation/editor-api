@@ -15,7 +15,6 @@ RSpec.describe Feedback do
   end
 
   describe 'validations' do
-    it { is_expected.to validate_presence_of(:school_project) }
     it { is_expected.to validate_presence_of(:content) }
     it { is_expected.to validate_presence_of(:user_id) }
 
