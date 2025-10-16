@@ -7,10 +7,10 @@ RSpec.describe Feedback::Create, type: :unit do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
-  let!(:class_student) { create(:class_student, school_class:, student_id: student.id) }
+  let(:class_student) { create(:class_student, school_class:, student_id: student.id) }
   let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
   let(:teacher_project) { create(:project, user_id: teacher.id, school:, lesson:) }
-  let(:student_project) { create(:project, user_id: student.id, school:, lesson:, parent: teacher_project) }
+  let(:student_project) { create(:project, user_id: class_student.student_id, school:, lesson:, parent: teacher_project) }
 
   let(:feedback_params) do
     {
