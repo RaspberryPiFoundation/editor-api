@@ -29,7 +29,7 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
 
     it 'queues CreateStudentsJob' do
       expect do
-        described_class.call(school:, school_students_params:, token:, user_id:)
+        described_class.call(school:, school_students_params:, token:)
       end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_students_params, token:)
     end
   end
@@ -43,70 +43,13 @@ RSpec.describe SchoolStudent::CreateBatch, type: :unit do
     end
 
     it 'returns a successful operation response' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
+      response = described_class.call(school:, school_students_params:, token:)
       expect(response.success?).to be(true)
     end
 
     it 'returns the job id' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
+      response = described_class.call(school:, school_students_params:, token:)
       expect(response[:job_id]).to be_truthy
-    end
-  end
-
-  context 'when a normal error occurs' do
-    let(:school_students_params) do
-      [
-        {
-          username: 'a-student',
-          password: 'Password',
-          name: 'School Student'
-        },
-        {
-          username: 'second-student-to-create',
-          password: 'Password',
-          name: 'School Student 2'
-        }
-      ]
-    end
-
-    before do
-      stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
-      allow(Sentry).to receive(:capture_exception)
-    end
-
-    it 'does not queue a new job' do
-      expect do
-        described_class.call(school:, school_students_params:, token:, user_id:)
-      end.not_to have_enqueued_job(CreateStudentsJob)
-    end
-
-    it 'returns a failed operation response' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
-      expect(response.failure?).to be(true)
-    end
-
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
-      error_message = response[:error]
-      expect(error_message).to match(/Decryption failed: iv must be 16 bytes/)
-    end
-
-    it 'sent the exception to Sentry' do
-      described_class.call(school:, school_students_params:, token:, user_id:)
-      expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
-    end
-  end
-
-  context 'when a validation error occurs' do
-    before do
-      stub_profile_api_create_school_students_validation_error
-    end
-
-    it 'returns the expected error codes' do
-      response = described_class.call(school:, school_students_params:, token:, user_id:)
-      expect(response[:error]).to eq(
-        { 'student-to-create' => %w[isUniqueInBatch isComplex notEmpty], 'another-student-to-create-2' => %w[minLength notEmpty] }
-      )
     end
   end
 end

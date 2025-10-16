@@ -78,6 +78,15 @@ class School < ApplicationRecord
     super(str.to_s.upcase)
   end
 
+  # This method returns true if there is an existing, unfinished, batch whose description
+  # matches the current school ID. This prevents two users enqueueing a batch for
+  # the same school, since GoodJob::Batch doesn't support a concurrency key.
+  def import_in_progress?
+    GoodJob::BatchRecord.where(finished_at: nil)
+                        .where(discarded_at: nil)
+                        .exists?(description: id)
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string

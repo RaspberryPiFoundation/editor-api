@@ -2,6 +2,10 @@
 
 module Api
   class SchoolStudentsController < ApiController
+    # This constant is the maximum batch size we can post to
+    # profile in the create step. We can validate larger batches.
+    MAX_BATCH_CREATION_SIZE = 50
+
     before_action :authorize_user
     load_and_authorize_resource :school
     authorize_resource :school_student, class: false
@@ -32,16 +36,65 @@ module Api
     end
 
     def create_batch
-      result = SchoolStudent::CreateBatch.call(
-        school: @school, school_students_params:, token: current_user.token, user_id: current_user.id
+      if school_students_params.blank?
+        render json: {
+                 error: StandardError,
+                 error_type: :unprocessable_entity
+               },
+               status: :unprocessable_entity
+        return
+      end
+
+      students = StudentHelpers.normalise_nil_values_to_empty_strings(school_students_params)
+
+      # We validate the entire batch here in one go and then, if the validation succeeds,
+      # feed the batch to Profile in chunks of 50.
+      validation_result = SchoolStudent::ValidateBatch.call(
+        school: @school, students: students, token: current_user.token
       )
 
-      if result.success?
-        @job_id = result[:job_id]
-        render :create_batch, formats: [:json], status: :accepted
-      else
-        render json: { error: result[:error], error_type: result[:error_type] }, status: :unprocessable_entity
+      if validation_result.failure?
+        render json: {
+          error: validation_result[:error],
+          error_type: validation_result[:error_type]
+        }, status: :unprocessable_entity
+        return
       end
+
+      # If we get this far, validation of the entire batch succeeded, so we enqueue it in chunks
+      begin
+        enqueue_batches(students)
+      rescue StandardError => e
+        Rails.logger.error "Failed to enqueue GoodJob Batch: #{e}"
+        render json: { error: e, error_type: :batch_error }, status: :unprocessable_entity
+        return
+      end
+
+      # We enqueued everything! Yay!
+      render :create_batch, formats: [:json], status: :accepted
+    end
+
+    # This method takes a large list of students to insert and enqueues a GoodJob
+    # Batch to insert them, 50 at a time. We use a GoodJob::Batch to enqueue the
+    # set of jobs atomically.
+    #
+    # This method will throw an error if any batch fails to enqueue, so callers
+    # should assume the entire student import has failed.
+    def enqueue_batches(students)
+      # Raise if a batch is already in progress for this school.
+      raise ConcurrencyExceededForSchool if @school.import_in_progress?
+
+      @batch = GoodJob::Batch.new(description: @school.id)
+      @batch.enqueue do
+        students.each_slice(MAX_BATCH_CREATION_SIZE) do |student_batch|
+          SchoolStudent::CreateBatch.call(
+            school: @school, school_students_params: student_batch, token: current_user.token
+          )
+        end
+      end
+
+      UserJob.create!(user_id: current_user.id, good_job_batch_id: @batch.id)
+      Rails.logger.info("Batch #{@batch.id} enqueued successfully with school identifier #{@school.id}!")
     end
 
     def update
@@ -75,7 +128,7 @@ module Api
     def school_students_params
       school_students = params.require(:school_students)
 
-      school_students.map do |student|
+      school_students.filter_map do |student|
         next if student.blank?
 
         student.permit(:username, :password, :name).to_h.with_indifferent_access
