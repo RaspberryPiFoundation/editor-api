@@ -3,10 +3,10 @@
 module Api
   class FeedbackController < ApiController
     before_action :authorize_user
-    # load_and_authorize_resource :feedback
+    load_and_authorize_resource :feedback
 
     def create
-      result = Feedback::Create.call(feedback_params:)
+      result = Feedback::Create.call(feedback_params: feedback_create_params)
 
       if result.success?
         @feedback = result[:feedback]
@@ -17,6 +17,13 @@ module Api
     end
 
     def feedback_params
+      school_project = Project.find_by(identifier: base_params[:identifier])&.school_project
+      feedback_create_params.except(:identifier).merge(
+        school_project_id: school_project&.id
+      )
+    end
+
+    def feedback_create_params
       base_params.merge(user_id: current_user.id)
     end
 
@@ -24,12 +31,6 @@ module Api
       permitted_params = params.permit(:project_id)
       { identifier: permitted_params[:project_id] }
     end
-
-    # def school_project_params
-    #   project_params = params.permit(:project_id)
-    #   school_project = Project.find_by(identifier: project_params[:project_id])&.school_project
-    #   {school_project_id: school_project&.id}
-    # end
 
     def base_params
       params.fetch(:feedback, {}).permit(
