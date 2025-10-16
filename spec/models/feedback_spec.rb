@@ -14,7 +14,7 @@ RSpec.describe Feedback do
     it { is_expected.to belong_to(:school_project) }
   end
 
-  describe 'validations' do
+  describe 'validations', versioning: true do
     it { is_expected.to validate_presence_of(:content) }
     it { is_expected.to validate_presence_of(:user_id) }
 

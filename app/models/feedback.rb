@@ -9,6 +9,13 @@ class Feedback < ApplicationRecord
   validate :parent_project_belongs_to_school_class
   validate :user_is_the_class_teacher_for_the_school_project
 
+  has_paper_trail(
+    meta: {
+      meta_school_project_id: ->(f) { f.school_project&.id },
+      meta_school_id: ->(c) { c.school_project&.school_id }
+    }
+  )
+
   def user_has_the_school_owner_or_school_teacher_role_for_the_school
     school = school_project&.school
     return unless user_id_changed? && errors.blank? && school
