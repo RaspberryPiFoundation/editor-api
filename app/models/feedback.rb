@@ -12,7 +12,7 @@ class Feedback < ApplicationRecord
   has_paper_trail(
     meta: {
       meta_school_project_id: ->(f) { f.school_project&.id },
-      meta_school_id: ->(c) { c.school_project&.school_id }
+      meta_school_id: ->(f) { f.school_project&.school_id }
     }
   )
 
