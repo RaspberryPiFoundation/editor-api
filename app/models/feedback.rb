@@ -16,6 +16,8 @@ class Feedback < ApplicationRecord
     }
   )
 
+  private
+
   def user_has_the_school_owner_or_school_teacher_role_for_the_school
     school = school_project&.school
     return unless user_id_changed? && errors.blank? && school
@@ -49,8 +51,6 @@ class Feedback < ApplicationRecord
 
     errors.add(:user, "'#{user_id}' is not the 'school-teacher' for school_project '#{school_project.id}'")
   end
-
-  private
 
   def school_class
     school_project&.project&.parent&.lesson&.school_class
