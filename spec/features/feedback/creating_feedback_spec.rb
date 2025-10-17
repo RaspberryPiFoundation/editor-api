@@ -20,7 +20,7 @@ RSpec.describe 'Create feedback requests', type: :request do
 
     context 'when leaving feedback on student work' do
       before do
-        post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: {content: "Nice one!"} })
+        post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: { content: 'Nice one!' } })
         student_project.reload
       end
 
@@ -50,7 +50,7 @@ RSpec.describe 'Create feedback requests', type: :request do
 
     context 'when leaving feedback on a project that is not student work' do
       before do
-        post("/api/projects/#{teacher_project.identifier}/feedback", headers:, params: { feedback: {content: "Nice one!"} })
+        post("/api/projects/#{teacher_project.identifier}/feedback", headers:, params: { feedback: { content: 'Nice one!' } })
         teacher_project.reload
       end
 
@@ -65,7 +65,7 @@ RSpec.describe 'Create feedback requests', type: :request do
 
     context 'when leaving empty feedback' do
       before do
-        post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: {content: ""} })
+        post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: { content: '' } })
         student_project.reload
       end
 
@@ -80,7 +80,7 @@ RSpec.describe 'Create feedback requests', type: :request do
 
     context 'when the project does not exist' do
       before do
-        post('/api/projects/does-not-exist/feedback', headers:, params: { feedback: {content: "Nice one!"} })
+        post('/api/projects/does-not-exist/feedback', headers:, params: { feedback: { content: 'Nice one!' } })
       end
 
       it 'returns forbidden response' do
@@ -91,10 +91,10 @@ RSpec.describe 'Create feedback requests', type: :request do
 
   context 'when logged in as another teacher' do
     let(:other_teacher) { create(:teacher, school:) }
-  
+
     before do
       authenticated_in_hydra_as(other_teacher)
-      post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: {content: "Nice one!"} })
+      post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: { content: 'Nice one!' } })
       student_project.reload
     end
 
@@ -110,7 +110,7 @@ RSpec.describe 'Create feedback requests', type: :request do
   context 'when logged in as the student' do
     before do
       authenticated_in_hydra_as(student)
-      post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: {content: "Nice one!"} })
+      post("/api/projects/#{student_project.identifier}/feedback", headers:, params: { feedback: { content: 'Nice one!' } })
       student_project.reload
     end
 
