@@ -16,6 +16,9 @@ module Api
       end
     end
 
+    # These params are used to authorize the resource with CanCanCan. The project identifier is sent in the URL,
+    # but these params need to match the shape of the feedback object whiich is attached to the SchoolProject,
+    # not the Project.
     def feedback_params
       school_project = Project.find_by(identifier: base_params[:identifier])&.school_project
       feedback_create_params.except(:identifier).merge(
@@ -23,6 +26,9 @@ module Api
       )
     end
 
+    # These params are used to create the feedback in the Feedback::Create operation. The project_id parameter,
+    # which is automatically named by Rails based on the route structure, is renamed to identifier for readability,
+    # as it is actually the human-readable project_identifier, not the project_id.
     def feedback_create_params
       base_params.merge(user_id: current_user.id)
     end
