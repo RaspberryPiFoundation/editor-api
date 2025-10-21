@@ -37,6 +37,7 @@ module SchoolMember
 
       def fetch_students(school:, token:)
         student_roles = Role.student.where(school:)
+
         students_response = student_roles.any? ? SchoolStudent::List.call(school:, token:).fetch(:school_students, []) : []
 
         students_response.map do |student|

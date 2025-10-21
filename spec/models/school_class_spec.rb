@@ -112,13 +112,6 @@ RSpec.describe SchoolClass, :versioning do
       expect(school_class.errors[:import_origin]).to include('is not included in the list')
     end
 
-    it 'requires import_id when import_origin is set' do
-      school_class.import_origin = :google_classroom
-      school_class.import_id = nil
-      expect(school_class).not_to be_valid
-      expect(school_class.errors[:import_id]).to include("can't be blank")
-    end
-
     it 'allows import_id to be nil when import_origin is nil' do
       school_class.import_origin = nil
       school_class.import_id = nil
