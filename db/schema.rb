@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_15_113652) do
+ActiveRecord::Schema[7.2].define(version: 2025_10_21_162845) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -315,6 +315,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_15_113652) do
     t.uuid "meta_project_id"
     t.uuid "meta_school_id"
     t.uuid "meta_remixed_from_id"
+    t.string "meta_school_project_id"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
