@@ -55,7 +55,7 @@ RSpec.describe Feedback::Create, type: :unit do
     end
   end
 
-  context 'when lesson creation fails' do
+  context 'when feedback creation fails' do
     let(:rogue_project) { create(:project, user_id: student.id) }
     let(:feedback_params) do
       {
@@ -85,7 +85,7 @@ RSpec.describe Feedback::Create, type: :unit do
 
     it 'raises school project not found error when no school project' do
       response = described_class.call(feedback_params:)
-      expect(response[:error]).to match(/School project not found/)
+      expect(response[:error]).to match(/School project must exist/)
     end
 
     it 'sent the exception to Sentry' do

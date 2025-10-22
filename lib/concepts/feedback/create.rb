@@ -10,12 +10,8 @@ class Feedback
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        if response[:feedback].nil?
-          response[:error] = "Error creating feedback #{e}"
-        else
-          errors = response[:feedback].errors.full_messages.join(',')
-          response[:error] = "Error creating feedback: #{errors}"
-        end
+        errors = response[:feedback]&.errors&.full_messages&.join(',')
+        response[:error] = "Error creating feedback: #{errors}"
         response
       end
 
@@ -24,10 +20,9 @@ class Feedback
       def build_feedback(feedback_hash)
         project = Project.find_by(identifier: feedback_hash[:identifier])
         school_project = project&.school_project
-        raise "School project not found for identifier: #{feedback_hash[:identifier]}" if school_project.nil?
 
         # replace identifier with school_project_id
-        feedback_hash[:school_project_id] = school_project.id
+        feedback_hash[:school_project_id] = school_project&.id
         feedback_hash.delete(:identifier)
         Feedback.new(feedback_hash)
       end
