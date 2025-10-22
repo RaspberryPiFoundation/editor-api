@@ -14,7 +14,7 @@ namespace :test_seeds do
       teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
       # Hard coded as the student's school needs to match
-      student_ids = [TEST_USERS[:jane_smith], TEST_USERS[:john_smith]]
+      student_ids = [TEST_USERS[:jane_smith], TEST_USERS[:john_smith], TEST_USERS[:emily_ssouser]]
       school_id = TEST_SCHOOL
 
       # Remove the roles first
