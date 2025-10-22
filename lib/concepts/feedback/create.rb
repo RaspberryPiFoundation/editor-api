@@ -10,8 +10,12 @@ class Feedback
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        errors = response[:feedback]&.errors&.full_messages&.join(',')
-        response[:error] = "Error creating feedback: #{errors}"
+        if response[:feedback].present? && response[:feedback].errors.any?
+          errors = response[:feedback]&.errors&.full_messages&.join(',')
+          response[:error] = "Error creating feedback: #{errors}"
+        else
+          response[:error] = "Error creating feedback: #{e.message}"
+        end
         response
       end
 
