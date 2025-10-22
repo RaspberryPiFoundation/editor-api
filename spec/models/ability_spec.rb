@@ -301,11 +301,13 @@ RSpec.describe Ability do
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
       let!(:remixed_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
+      let(:feedback) { build(:feedback, user_id:, school_project: remixed_project&.school_project) }
 
       context 'when user is the student' do
         let(:user) { student }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:create, feedback) }
         it { is_expected.to be_able_to(:create, remixed_project) }
         it { is_expected.to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
@@ -329,6 +331,7 @@ RSpec.describe Ability do
         let(:user) { create(:teacher, school:) }
 
         it { is_expected.not_to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:create, feedback) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
@@ -339,6 +342,7 @@ RSpec.describe Ability do
         let(:user) { teacher }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.to be_able_to(:create, feedback) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
@@ -349,6 +353,7 @@ RSpec.describe Ability do
         let(:user) { another_teacher }
 
         it { is_expected.to be_able_to(:read, original_project) }
+        it { is_expected.to be_able_to(:create, feedback) }
         it { is_expected.not_to be_able_to(:create, original_project) }
         it { is_expected.to be_able_to(:update, original_project) }
 
