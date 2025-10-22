@@ -19,9 +19,9 @@ class SchoolClass < ApplicationRecord
   enum :import_origin, { google_classroom: 0 }, validate: { allow_nil: true }
 
   validates :import_origin, presence: true, on: :import
+  validates :import_id, presence: true, on: :import
 
   validates :import_id, uniqueness: { scope: %i[school_id import_origin] }, if: -> { import_id.present? }
-  validates :import_id, presence: true, if: -> { import_origin.present? }
 
   has_paper_trail(
     meta: {
