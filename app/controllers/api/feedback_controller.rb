@@ -5,6 +5,11 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource :feedback
 
+    def index
+      @feedback = Feedback.where(school_project_id: feedback_params[:school_project_id])
+      render :index, formats: [:json], status: :ok
+    end
+
     def create
       result = Feedback::Create.call(feedback_params: feedback_create_params)
 
