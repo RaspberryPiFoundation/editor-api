@@ -103,8 +103,8 @@ class Ability
     visible_lesson_project_ids = Project.where(
       school_id: school.id,
       lesson_id: Lesson.where(
-        visibility: 'students',
-      ).pluck(:id)
+        visibility: 'students'
+      ).select(:id)
     ).pluck(:id)
     can(%i[read], School, id: school.id)
     can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
