@@ -6,8 +6,17 @@ module Api
     load_and_authorize_resource :feedback
 
     def index
-      @feedback = Feedback.where(school_project_id: feedback_params[:school_project_id])
-      render :index, formats: [:json], status: :ok
+      project = Project.find_by(identifier: url_params[:identifier])
+      project_feedback = Feedback.where(school_project_id: feedback_params[:school_project_id])
+      project_feedback.each do |feedback|
+        authorize! :read, feedback
+      end
+      @feedback = project_feedback.accessible_by(current_ability)
+      if project.present? && project.school_project.present?
+        render :index, formats: [:json], status: :ok
+      else
+        render json: { error: 'School project not found' }, status: :not_found
+      end
     end
 
     def create
