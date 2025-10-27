@@ -86,7 +86,7 @@ RSpec.describe ClassMember::Create, type: :unit do
         expect(response[:error]).to match(/No valid school members provided/)
       end
 
-      it 'sent the exception to Sentry' do
+      it 'sends the exception to Sentry' do
         described_class.call(school_class:, students:, teachers:)
         expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
@@ -122,9 +122,9 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect(response[:errors][different_school_student.id]).to include("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
-        it 'sent the exception to Sentry' do
+        it 'does not send the exception to Sentry' do
           described_class.call(school_class:, students:)
-          expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+          expect(Sentry).not_to have_received(:capture_exception)
         end
       end
 
@@ -181,10 +181,22 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect(response[:errors][different_school_student.id]).to eq("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
-        it 'sent the exception to Sentry' do
+        it 'does not send the exception to Sentry' do
           described_class.call(school_class:, students: new_students, teachers:)
-          expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+          expect(Sentry).not_to have_received(:capture_exception)
         end
+      end
+    end
+
+    context 'when a non-validation error occurs' do
+      it 'sends the exception to Sentry' do
+        # rubocop:disable RSpec/AnyInstance
+        allow_any_instance_of(ClassStudent).to receive(:save!).and_raise(RuntimeError)
+        # rubocop:enable RSpec/AnyInstance
+
+        described_class.call(school_class:, students:)
+
+        expect(Sentry).to have_received(:capture_exception).with(kind_of(RuntimeError)).at_least(:once)
       end
     end
   end
