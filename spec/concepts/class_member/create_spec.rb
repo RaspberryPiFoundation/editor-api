@@ -86,7 +86,7 @@ RSpec.describe ClassMember::Create, type: :unit do
         expect(response[:error]).to match(/No valid school members provided/)
       end
 
-      it 'sends the exception to Sentry' do
+      it 'sent the exception to Sentry' do
         described_class.call(school_class:, students:, teachers:)
         expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
       end
@@ -122,7 +122,7 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect(response[:errors][different_school_student.id]).to include("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
-        it 'sends the exception to Sentry' do
+        it 'sent the exception to Sentry' do
           described_class.call(school_class:, students:)
           expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
         end
@@ -181,7 +181,7 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect(response[:errors][different_school_student.id]).to eq("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
         end
 
-        it 'sends the exception to Sentry' do
+        it 'sent the exception to Sentry' do
           described_class.call(school_class:, students: new_students, teachers:)
           expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
         end
