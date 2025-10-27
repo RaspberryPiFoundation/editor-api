@@ -5,7 +5,8 @@ module SeedsHelper
     jane_doe: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
     john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com
     jane_smith: 'e52de409-9210-4e94-b08c-dd11439e07d9', # student
-    john_smith: '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' # student
+    john_smith: '0d488bec-b10d-46d3-b6f3-4cddf5d90c71', # student
+    emily_ssouser: '88e0aed6-8f20-4e40-98f9-610a0ab1cfcc' # sso student
   }.freeze
 
   # Match the school in profile...
@@ -64,7 +65,7 @@ module SeedsHelper
   end
 
   def assign_students(school_class, school)
-    [TEST_USERS[:jane_smith], TEST_USERS[:john_smith]].map do |student_id|
+    [TEST_USERS[:jane_smith], TEST_USERS[:john_smith], TEST_USERS[:emily_ssouser]].map do |student_id|
       Rails.logger.info 'Assigning student role...'
       Role.student.find_or_create_by!(user_id: student_id, school:)
 

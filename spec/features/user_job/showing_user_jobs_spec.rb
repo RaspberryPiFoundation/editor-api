@@ -7,8 +7,8 @@ RSpec.describe 'Showing user jobs', type: :request do
   let(:school) { create(:school) }
   let(:owner) { create(:owner, school:) }
 
-  let(:good_jobs) { create_list(:good_job, 2) }
-  let!(:user_jobs) { good_jobs.map { |job| create(:user_job, good_job: job, user_id: owner.id) } }
+  let!(:batch) { GoodJob::BatchRecord.create!(description: school.id) }
+  let!(:user_job) { create(:user_job, good_job_batch_id: batch.id, user_id: owner.id) }
 
   before do
     authenticated_in_hydra_as(owner)
@@ -28,11 +28,11 @@ RSpec.describe 'Showing user jobs', type: :request do
     get('/api/user_jobs', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:jobs].pluck(:id)).to eq(user_jobs.pluck(:good_job_id))
+    expect(data[:jobs].first[:id]).to eq(user_job.good_job_batch_id)
   end
 
   it 'responds with the expected job' do
-    job_id = user_jobs.first.good_job_id
+    job_id = user_job.good_job_batch_id
 
     get("/api/user_jobs/#{job_id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)

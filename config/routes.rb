@@ -41,6 +41,7 @@ Rails.application.routes.draw do
       resource :remix, only: %i[show create], controller: 'projects/remixes'
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
+      resource :feedback, only: %i[create], controller: 'feedback'
     end
 
     resource :project_errors, only: %i[create]
