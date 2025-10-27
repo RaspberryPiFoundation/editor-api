@@ -45,14 +45,14 @@ module ClassMember
       end
 
       def handle_class_teacher_error(exception, class_teacher, teacher, response)
-        Sentry.capture_exception(exception)
+        Sentry.capture_exception(exception) unless exception.message.include?('has already been taken')
         errors = class_teacher.errors.full_messages.join(',')
         response[:error] ||= "Error creating one or more class members - see 'errors' key for details"
         response[:errors][teacher.id] = "Error creating class member for teacher_id #{teacher.id}: #{errors}"
       end
 
       def handle_class_student_error(exception, class_student, student, response)
-        Sentry.capture_exception(exception)
+        Sentry.capture_exception(exception) unless exception.message.include?('has already been taken')
         errors = class_student.errors.full_messages.join(',')
         response[:error] ||= "Error creating one or more class members - see 'errors' key for details"
         response[:errors][student.id] = "Error creating class member for student_id #{student.id}: #{errors}"
