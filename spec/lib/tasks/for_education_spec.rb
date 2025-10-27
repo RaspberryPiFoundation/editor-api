@@ -3,13 +3,19 @@
 require 'rails_helper'
 require 'rake'
 require 'climate_control'
+require 'securerandom'
 
 RSpec.describe 'for_education', type: :task do
+  before do
+    # Ensure the school id is unique, to avoid conflicts
+    stub_const('SeedsHelper::TEST_SCHOOL', school_id)
+  end
+
   let(:creator_id) { 'f83ba872-b16e-46e1-9f7d-df89d267550d' }
   let(:teacher_id) { 'ccc9b8fd-f357-4238-983d-6f87b99bdbb2' }
   let(:student_1) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # jane.smith from SeedsHelper
   let(:student_2) { '0d488bec-b10d-46d3-b6f3-4cddf5d90c71' } # john.smith from SeedsHelper
-  let(:school_id) { 'e52de409-9210-4e94-b08c-dd11439e07d9' } # Use TEST_SCHOOL value so destroy works
+  let(:school_id) { SecureRandom.uuid }
 
   describe ':destroy_seed_data' do
     let(:task) { Rake::Task['for_education:destroy_seed_data'] }
