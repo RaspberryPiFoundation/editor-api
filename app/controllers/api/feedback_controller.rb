@@ -6,17 +6,16 @@ module Api
     load_and_authorize_resource :feedback
 
     def index
-      project = Project.find_by(identifier: url_params[:identifier])
-      project_feedback = Feedback.where(school_project_id: feedback_params[:school_project_id])
+      if project.blank? || project.school_project.blank?
+        render json: { error: 'School project not found' }, status: :not_found
+        return
+      end
+
       project_feedback.each do |feedback|
         authorize! :read, feedback
       end
       @feedback = project_feedback.accessible_by(current_ability)
-      if project.present? && project.school_project.present?
-        render :index, formats: [:json], status: :ok
-      else
-        render json: { error: 'School project not found' }, status: :not_found
-      end
+      render :index, formats: [:json], status: :ok
     end
 
     def create
@@ -30,11 +29,31 @@ module Api
       end
     end
 
+    private
+
+    def project
+      return @project if defined?(@project)
+
+      @project = Project.find_by(identifier: url_params[:identifier])
+    end
+
+    def project_feedback
+      return @project_feedback if defined?(@project_feedback)
+
+      @project_feedback = if project.blank? || project.school_project.blank?
+                            Feedback.none
+                          else
+                            Feedback.where(school_project_id: project.school_project.id)
+                          end
+
+      @project_feedback
+    end
+
     # These params are used to authorize the resource with CanCanCan. The project identifier is sent in the URL,
     # but these params need to match the shape of the feedback object whiich is attached to the SchoolProject,
     # not the Project.
     def feedback_params
-      school_project = Project.find_by(identifier: base_params[:identifier])&.school_project
+      school_project = project&.school_project
       feedback_create_params.except(:identifier).merge(
         school_project_id: school_project&.id
       )
