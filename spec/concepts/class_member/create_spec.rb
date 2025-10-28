@@ -187,5 +187,13 @@ RSpec.describe ClassMember::Create, type: :unit do
         end
       end
     end
+
+    context 'when duplicate validation errors occur' do
+      it 'does not send the exception to Sentry' do
+        duplicate_student = students.first
+        described_class.call(school_class:, students: [duplicate_student, duplicate_student])
+        expect(Sentry).not_to have_received(:capture_exception)
+      end
+    end
   end
 end
