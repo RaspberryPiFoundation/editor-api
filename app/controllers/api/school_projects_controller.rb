@@ -6,8 +6,8 @@ module Api
     load_and_authorize_resource :project
 
     def set_status
-      authorize! :set_status, @school_project
-      response = SchoolProject::SetStatus.call(school_project: @school_project, status: params[:status])
+      authorize! :set_status, school_project
+      response = SchoolProject::SetStatus.call(school_project:, status: params[:status])
       if response.success?
         @school_project = response[:school_project]
         render :show_status, formats: [:json], status: :ok
