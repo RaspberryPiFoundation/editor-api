@@ -11,6 +11,7 @@ module Api
         return
       end
 
+      # Checks that the user is authorised to read the feedback so that if not we can return a 403 rather than an empty array
       project_feedback.each do |feedback|
         authorize! :read, feedback
       end
