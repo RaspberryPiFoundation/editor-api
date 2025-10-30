@@ -4,7 +4,7 @@ class SchoolProject < ApplicationRecord
   belongs_to :school
   belongs_to :project
   has_many :feedback, dependent: :destroy
-  has_many :school_project_transitions, autosave: false
+  has_many :school_project_transitions, autosave: false, dependent: :nullify
 
   include Statesman::Adapters::ActiveRecordQueries[
     transition_class: ::SchoolProjectTransition,
@@ -15,7 +15,7 @@ class SchoolProject < ApplicationRecord
     state_machine.current_state
   end
 
-  def set_status(new_status)
+  def transition_status_to!(new_status)
     transition_to!(new_status)
   end
 
@@ -36,7 +36,7 @@ class SchoolProject < ApplicationRecord
     state_machine.in_state?(:returned)
   end
 
-  :delegate :can_transition_to?, :history, :transition_to, :transition_to! to: :state_machine
+  delegate :can_transition_to?, :history, :transition_to, :transition_to!, to: :state_machine
 
   private
 

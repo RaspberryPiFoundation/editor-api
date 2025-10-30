@@ -6,7 +6,7 @@ class SchoolProject
       def call(school_project:, status:)
         response = OperationResponse.new
         response[:school_project] = school_project
-        response[:school_project].set_status(status)
+        response[:school_project].transition_status_to!(status)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)

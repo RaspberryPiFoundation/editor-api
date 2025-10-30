@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SchoolProjectTransition < ApplicationRecord
   include Statesman::Adapters::ActiveRecordTransition
 
@@ -16,7 +18,13 @@ class SchoolProjectTransition < ApplicationRecord
 
   def update_most_recent
     last_transition = school_project.school_project_transitions.order(:sort_key).last
-    return unless last_transition.present?
-    last_transition.update_column(:most_recent, true)
+    return if last_transition.blank?
+
+    last_transition.set_most_recent!
+  end
+
+  def set_most_recent!
+    self.most_recent = true
+    save!
   end
 end
