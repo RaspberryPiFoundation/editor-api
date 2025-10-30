@@ -96,16 +96,23 @@ class Ability
       )
     ).pluck(:id)
     can(%i[read], Project, remixed_from_id: teacher_project_ids)
-    can(%i[create], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
+    can(%i[read create], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
   end
 
   def define_school_student_abilities(user:, school:)
+    visible_lesson_project_ids = Project.where(
+      school_id: school.id,
+      lesson_id: Lesson.where(
+        visibility: 'students'
+      ).select(:id)
+    ).pluck(:id)
     can(%i[read], School, id: school.id)
     can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
-    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(visibility: 'students').select(:id)).pluck(:id))
+    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids)
     can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
+    can(%i[read], Feedback, school_project: { project: { school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids } })
     can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
