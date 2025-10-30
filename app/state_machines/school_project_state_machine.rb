@@ -5,10 +5,11 @@ class SchoolProjectStateMachine
   state :unsubmitted, initial: :true
   state :submitted
   state :returned
-  state :completed
+  state :complete
 
   # Define transition rules
-  transition from: :unsubmitted, to: [:submitted, :completed]
-  transition from: :submitted, to: [:unsubmitted, :returned, :completed]
-  transition from: :returned, to: [:submitted, :completed]
+  transition from: :unsubmitted, to: [:submitted, :complete]
+  transition from: :submitted, to: [:unsubmitted, :returned, :complete]
+  transition from: :returned, to: [:submitted, :complete]
+  transition from: :complete, to: [:unsubmitted]
 end

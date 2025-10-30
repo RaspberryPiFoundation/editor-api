@@ -15,7 +15,7 @@ class SchoolProject < ApplicationRecord
     state_machine.current_state
   end
 
-  def status=(new_status)
+  def set_status(new_status)
     transition_to!(new_status)
   end
 
@@ -28,8 +28,8 @@ class SchoolProject < ApplicationRecord
     state_machine.in_state?(:submitted)
   end
 
-  def completed?
-    state_machine.in_state?(:completed)
+  def complete?
+    state_machine.in_state?(:complete)
   end
 
   def returned?

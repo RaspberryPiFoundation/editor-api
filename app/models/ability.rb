@@ -96,6 +96,7 @@ class Ability
       )
     ).pluck(:id)
     can(%i[read], Project, remixed_from_id: teacher_project_ids)
+    can(%i[set_status], SchoolProject, project: { remixed_from_id: teacher_project_ids })
     can(%i[create], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
   end
 
@@ -106,7 +107,7 @@ class Ability
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: Project.where(school_id: school.id, lesson_id: Lesson.where(visibility: 'students').select(:id)).pluck(:id))
     can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
-    can(%i[show_finished set_finished], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
+    can(%i[show_finished set_finished, set_status], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
   def define_experience_cs_admin_abilities(user)

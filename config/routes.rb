@@ -38,6 +38,7 @@ Rails.application.routes.draw do
       get :finished, on: :member, to: 'school_projects#show_finished'
       get :context, on: :member, to: 'projects#show_context'
       put :finished, on: :member, to: 'school_projects#set_finished'
+      put :status, on: :member, to: 'school_projects#set_status'
       resource :remix, only: %i[show create], controller: 'projects/remixes'
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
