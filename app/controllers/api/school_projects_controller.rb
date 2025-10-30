@@ -17,13 +17,13 @@ module Api
     end
 
     def show_finished
-      authorize! :show_finished, @school_project
+      authorize! :show_finished, school_project
       render :finished, formats: [:json], status: :ok
     end
 
     def set_finished
-      authorize! :set_finished, @school_project
-      result = SchoolProject::SetFinished.call(school_project: @school_project, finished: params[:finished])
+      authorize! :set_finished, school_project
+      result = SchoolProject::SetFinished.call(school_project:, finished: params[:finished])
 
       if result.success?
         @school_project = result[:school_project]
