@@ -1,7 +1,7 @@
 class SetInitialProjectStatusFromFinishedFlag < ActiveRecord::Migration[7.2]
   def up
     SchoolProject.find_each do |school_project|
-      next unless school_project.school_project_transitions.empty?
+      next if school_project.school_project_transitions.any?
 
       initial_state = school_project.finished ? 'complete' : 'unsubmitted'
       SchoolProjectTransition.create!(
