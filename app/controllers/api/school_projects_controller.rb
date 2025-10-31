@@ -5,6 +5,11 @@ module Api
     before_action :authorize_user
     load_and_authorize_resource :project
 
+    def show_status
+      authorize! :show_status, school_project
+      render :show_status, formats: [:json], status: :ok
+    end
+
     def set_status
       authorize! :set_status, school_project
       result = SchoolProject::SetStatus.call(school_project:, status: params[:status], user_id: current_user.id)
