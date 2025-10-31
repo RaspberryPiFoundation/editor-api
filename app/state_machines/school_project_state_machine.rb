@@ -4,7 +4,7 @@ class SchoolProjectStateMachine
   include Statesman::Machine
 
   # Define all possible states
-  state :unsubmitted, initial: true
+  state :unsubmitted
   state :submitted
   state :returned
   state :complete
