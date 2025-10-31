@@ -314,7 +314,6 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.to be_able_to(:set_finished, remixed_project.school_project) }
         it { is_expected.to be_able_to(:set_status, remixed_project.school_project) }
-
       end
 
       context 'when user is a student and the lesson is not visible to students' do
