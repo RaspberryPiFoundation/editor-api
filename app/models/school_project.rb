@@ -41,6 +41,6 @@ class SchoolProject < ApplicationRecord
   private
 
   def state_machine
-    @state_machine ||= SchoolProjectStateMachine.new(self, transition_class: SchoolProjectTransition, initial_transition: true)
+    @state_machine ||= SchoolProjectStateMachine.new(self, transition_class: SchoolProjectTransition)
   end
 end

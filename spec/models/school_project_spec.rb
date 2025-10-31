@@ -19,6 +19,11 @@ RSpec.describe SchoolProject do
   it { is_expected.to have_many(:school_project_transitions).dependent(:nullify) }
 
   describe '#status' do
+    it 'defaults to unsubmitted' do
+      new_school_project = create(:school_project, school:, project:)
+      expect(new_school_project.status).to eq('unsubmitted')
+    end
+
     it 'returns the current state from the state machine' do
       allow(state_machine).to receive(:current_state).and_return('submitted')
       expect(school_project.status).to eq('submitted')
