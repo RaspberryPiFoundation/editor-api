@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'School project finished requests' do
+RSpec.describe 'School project finished requests', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
