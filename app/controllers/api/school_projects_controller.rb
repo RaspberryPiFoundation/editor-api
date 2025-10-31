@@ -7,12 +7,12 @@ module Api
 
     def set_status
       authorize! :set_status, school_project
-      response = SchoolProject::SetStatus.call(school_project:, status: params[:status])
-      if response.success?
-        @school_project = response[:school_project]
+      result = SchoolProject::SetStatus.call(school_project:, status: params[:status], user_id: current_user.id)
+      if result.success?
+        @school_project = result[:school_project]
         render :show_status, formats: [:json], status: :ok
       else
-        render json: { error: response[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
 

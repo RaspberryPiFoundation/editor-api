@@ -15,8 +15,8 @@ class SchoolProject < ApplicationRecord
     state_machine.current_state
   end
 
-  def transition_status_to!(new_status)
-    transition_to!(new_status)
+  def transition_status_to!(new_status, user_id)
+    state_machine.transition_to!(new_status, metadata: { changed_by: user_id })
   end
 
   # Add convenience methods for each state
@@ -36,7 +36,7 @@ class SchoolProject < ApplicationRecord
     state_machine.in_state?(:returned)
   end
 
-  delegate :can_transition_to?, :history, :transition_to, :transition_to!, to: :state_machine
+  delegate :can_transition_to?, :history, to: :state_machine
 
   private
 

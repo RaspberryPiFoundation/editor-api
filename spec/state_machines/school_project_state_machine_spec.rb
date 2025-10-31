@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'rails_helper'
 
 RSpec.describe SchoolProjectStateMachine do
@@ -14,7 +16,7 @@ RSpec.describe SchoolProjectStateMachine do
   end
 
   describe 'transitions' do
-    context 'from unsubmitted state' do
+    context 'when in unsubmitted state' do
       it 'can transition to submitted' do
         expect(state_machine.can_transition_to?(:submitted)).to be true
       end
@@ -28,7 +30,7 @@ RSpec.describe SchoolProjectStateMachine do
       end
     end
 
-    context 'from submitted state' do
+    context 'when in submitted state' do
       before do
         state_machine.transition_to!(:submitted)
       end
@@ -46,7 +48,7 @@ RSpec.describe SchoolProjectStateMachine do
       end
     end
 
-    context 'from returned state' do
+    context 'when in returned state' do
       before do
         state_machine.transition_to!(:submitted)
         state_machine.transition_to!(:returned)
@@ -65,7 +67,7 @@ RSpec.describe SchoolProjectStateMachine do
       end
     end
 
-    context 'from complete state' do
+    context 'when in complete state' do
       before do
         state_machine.transition_to!(:submitted)
         state_machine.transition_to!(:complete)
