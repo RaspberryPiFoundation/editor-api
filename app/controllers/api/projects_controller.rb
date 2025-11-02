@@ -7,7 +7,8 @@ module Api
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]
-    load_and_authorize_resource
+    load_resource only: :create
+    authorize_resource
     before_action :verify_lesson_belongs_to_school, only: :create
     after_action :pagination_link_header, only: %i[index]
 
@@ -73,6 +74,7 @@ module Api
                  else
                    project_loader.load
                  end
+      raise ActiveRecord::RecordNotFound if @project.blank?
     end
 
     def load_projects
