@@ -10,9 +10,42 @@ module Api
       render :show_status, formats: [:json], status: :ok
     end
 
-    def set_status
-      authorize! :set_status, school_project
-      result = SchoolProject::SetStatus.call(school_project:, status: params[:status], user_id: current_user.id)
+    def unsubmit
+      authorize! :unsubmit, school_project
+      result = SchoolProject::SetStatus.call(school_project:, status: 'unsubmitted', user_id: current_user.id)
+      if result.success?
+        @school_project = result[:school_project]
+        render :show_status, formats: [:json], status: :ok
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def submit
+      authorize! :submit, school_project
+      result = SchoolProject::SetStatus.call(school_project:, status: 'submitted', user_id: current_user.id)
+      if result.success?
+        @school_project = result[:school_project]
+        render :show_status, formats: [:json], status: :ok
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def return
+      authorize! :return, school_project
+      result = SchoolProject::SetStatus.call(school_project:, status: 'returned', user_id: current_user.id)
+      if result.success?
+        @school_project = result[:school_project]
+        render :show_status, formats: [:json], status: :ok
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def complete
+      authorize! :complete, school_project
+      result = SchoolProject::SetStatus.call(school_project:, status: 'complete', user_id: current_user.id)
       if result.success?
         @school_project = result[:school_project]
         render :show_status, formats: [:json], status: :ok

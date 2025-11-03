@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'School project status requests', type: :request do
+RSpec.describe 'School project complete requests', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
@@ -25,19 +25,15 @@ RSpec.describe 'School project status requests', type: :request do
   context 'when logged in as student' do
     before do
       authenticated_in_hydra_as(student)
-      put("/api/projects/#{student_project.identifier}/status", headers:, params: { status: 'submitted' })
+      post("/api/projects/#{student_project.identifier}/complete", headers:)
     end
 
-    it 'returns success response' do
-      expect(response).to have_http_status(:ok)
+    it 'completes forbidden response' do
+      expect(response).to have_http_status(:forbidden)
     end
 
-    it 'returns the school project json' do
-      expect(response.body).to eq(school_project_json)
-    end
-
-    it 'sets the status to submitted' do
-      expect(student_project.school_project).to be_submitted
+    it 'does not change the status' do
+      expect(student_project.school_project).to be_unsubmitted
     end
   end
 
@@ -46,16 +42,17 @@ RSpec.describe 'School project status requests', type: :request do
       authenticated_in_hydra_as(teacher)
     end
 
-    context 'when transition is valid' do
+    context('when transition is valid') do
       before do
-        put("/api/projects/#{student_project.identifier}/status", headers:, params: { status: 'complete' })
+        student_project.school_project.transition_status_to!(:submitted, student.id)
+        post("/api/projects/#{student_project.identifier}/complete", headers:)
       end
 
-      it 'returns success response' do
+      it 'completes success response' do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'returns the school project json' do
+      it 'completes the school project json' do
         expect(response.body).to eq(school_project_json)
       end
 
@@ -66,19 +63,16 @@ RSpec.describe 'School project status requests', type: :request do
 
     context 'when attempting an invalid status transition' do
       before do
-        put("/api/projects/#{student_project.identifier}/status", headers:, params: { status: 'returned' })
+        student_project.school_project.transition_status_to!(:complete, student.id)
+        post("/api/projects/#{student_project.identifier}/complete", headers:)
       end
 
-      it 'returns unauthorized response' do
+      it 'completes unauthorized response' do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
-      it 'returns error message' do
-        expect(JSON.parse(response.body)['error']).to eq("Cannot transition from 'unsubmitted' to 'returned'")
-      end
-
-      it 'does not change the status' do
-        expect(student_project.school_project).to be_unsubmitted
+      it 'completes error message' do
+        expect(JSON.parse(response.body)['error']).to eq("Cannot transition from 'complete' to 'complete'")
       end
     end
   end
@@ -88,10 +82,10 @@ RSpec.describe 'School project status requests', type: :request do
 
     before do
       authenticated_in_hydra_as(another_teacher)
-      put("/api/projects/#{student_project.identifier}/status", headers:, params: { status: 'complete' })
+      post("/api/projects/#{student_project.identifier}/complete", headers:)
     end
 
-    it 'returns forbidden response' do
+    it 'completes forbidden response' do
       expect(response).to have_http_status(:forbidden)
     end
 
@@ -103,10 +97,10 @@ RSpec.describe 'School project status requests', type: :request do
   context 'when project does not exist' do
     before do
       authenticated_in_hydra_as(student)
-      put('/api/projects/does-not-exist/status', headers:, params: { status: 'submitted' })
+      post('/api/projects/does-not-exist/complete', headers:)
     end
 
-    it 'returns not found response' do
+    it 'completes not found response' do
       expect(response).to have_http_status(:not_found)
     end
   end

@@ -313,7 +313,10 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.to be_able_to(:set_finished, remixed_project.school_project) }
-        it { is_expected.to be_able_to(:set_status, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:complete, remixed_project.school_project) }
       end
 
       context 'when user is a student and the lesson is not visible to students' do
@@ -339,7 +342,10 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
-        it { is_expected.not_to be_able_to(:set_status, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:complete, remixed_project.school_project) }
       end
 
       context 'when user is teacher that owns the orginal project' do
@@ -352,7 +358,10 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
-        it { is_expected.to be_able_to(:set_status, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:complete, remixed_project.school_project) }
       end
 
       context 'when user is another teacher of the class' do
@@ -369,7 +378,10 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
-        it { is_expected.to be_able_to(:set_status, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:complete, remixed_project.school_project) }
       end
     end
   end
