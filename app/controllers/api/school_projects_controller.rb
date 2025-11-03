@@ -82,7 +82,7 @@ module Api
     end
 
     def school_project_params
-      params.permit(:finished, :status)
+      params.permit(:finished)
     end
   end
 end
