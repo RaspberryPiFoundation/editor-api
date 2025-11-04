@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-json.array!(@lessons_with_users) do |lesson, user|
+json.array!(@lessons_with_users_and_remixes) do |lesson_with_user, remix|
+  lesson, user = lesson_with_user # Destructure the pair
   json.call(
     lesson,
     :id,
@@ -26,4 +27,8 @@ json.array!(@lessons_with_users) do |lesson, user|
   end
 
   json.user_name(user&.name)
+
+  if remix.present?
+    json.remix_identifier(remix.identifier)
+  end
 end

@@ -10,7 +10,11 @@ module Api
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
       scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
       ordered_scope = scope.order(created_at: :asc)
-      @lessons_with_users = ordered_scope.accessible_by(current_ability).with_users
+      lessons_with_users = ordered_scope.accessible_by(current_ability).with_users
+      remixes = ordered_scope.map do |lesson|
+        lesson.project.remixes.where(user_id: current_user.id).accessible_by(current_ability).first
+      end
+      @lessons_with_users_and_remixes = lessons_with_users.zip(remixes)
       render :index, formats: [:json], status: :ok
     end
 
