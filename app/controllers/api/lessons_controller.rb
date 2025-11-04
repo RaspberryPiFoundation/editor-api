@@ -13,10 +13,10 @@ module Api
       lessons_with_users = ordered_scope.accessible_by(current_ability).with_users
       remixes = ordered_scope.map do |lesson|
         lesson.project.remixes
-          .where(user_id: current_user.id)
-          .accessible_by(current_ability)
-          .order(created_at: :asc)
-          .first
+              .where(user_id: current_user.id)
+              .accessible_by(current_ability)
+              .order(created_at: :asc)
+              .first
       end
       @lessons_with_users_and_remixes = lessons_with_users.zip(remixes)
       render :index, formats: [:json], status: :ok

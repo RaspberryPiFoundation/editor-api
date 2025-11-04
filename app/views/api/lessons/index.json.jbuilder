@@ -28,7 +28,5 @@ json.array!(@lessons_with_users_and_remixes) do |lesson_with_user, remix|
 
   json.user_name(user&.name)
 
-  if remix.present?
-    json.remix_identifier(remix.identifier)
-  end
+  json.remix_identifier(remix.identifier) if remix.present?
 end
