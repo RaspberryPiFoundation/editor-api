@@ -11,17 +11,17 @@ RSpec.describe SchoolProject::SetStatus, type: :unit do
   describe '.call' do
     context 'when status transition is successful' do
       it 'returns a successful operation response' do
-        response = described_class.call(school_project:, status: 'submitted', user_id: student.id)
+        response = described_class.call(school_project:, status: :submitted, user_id: student.id)
         expect(response.success?).to be(true)
       end
 
       it 'updates the school project status' do
-        described_class.call(school_project:, status: 'submitted', user_id: student.id)
+        described_class.call(school_project:, status: :submitted, user_id: student.id)
         expect(school_project.status).to eq('submitted')
       end
 
       it 'returns the updated school project in the response' do
-        response = described_class.call(school_project:, status: 'submitted', user_id: student.id)
+        response = described_class.call(school_project:, status: :submitted, user_id: student.id)
         expect(response[:school_project]).to be_a(SchoolProject)
       end
     end
@@ -32,17 +32,17 @@ RSpec.describe SchoolProject::SetStatus, type: :unit do
       end
 
       it 'returns a failed operation response' do
-        response = described_class.call(school_project:, status: 'submitted', user_id: student.id)
+        response = described_class.call(school_project:, status: :submitted, user_id: student.id)
         expect(response.success?).to be(false)
       end
 
       it 'does not update the school project status' do
-        described_class.call(school_project:, status: 'submitted', user_id: student.id)
+        described_class.call(school_project:, status: :submitted, user_id: student.id)
         expect(school_project.status).to eq('unsubmitted')
       end
 
       it 'includes the error message in the response' do
-        response = described_class.call(school_project:, status: 'submitted', user_id: student.id)
+        response = described_class.call(school_project:, status: :submitted, user_id: student.id)
         expect(response[:error]).to eq('Transition failed')
       end
     end
