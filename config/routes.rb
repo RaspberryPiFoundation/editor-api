@@ -72,6 +72,8 @@ Rails.application.routes.draw do
     end
 
     resources :user_jobs, only: %i[index show]
+
+    post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
