@@ -14,7 +14,7 @@ module Api
       remixes = ordered_scope.map do |lesson|
         next nil unless lesson&.project&.remixes.any?
         lesson.project&.remixes
-              .where(user_id: current_user?.id)
+              .where(user_id: current_user.id)
               .accessible_by(current_ability)
               .order(created_at: :asc)
               .first
