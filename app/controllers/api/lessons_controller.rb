@@ -13,8 +13,6 @@ module Api
       accessible_lessons = ordered_scope.accessible_by(current_ability)
       lessons_with_users = accessible_lessons.with_users
       remixes = user_remixes(accessible_lessons)
-      pp lessons_with_users
-      pp remixes
       @lessons_with_users_and_remixes = lessons_with_users.zip(remixes)
       render :index, formats: [:json], status: :ok
     end
