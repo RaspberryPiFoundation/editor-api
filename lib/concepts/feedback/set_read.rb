@@ -11,7 +11,7 @@ class Feedback
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = response[:feedback]&.errors
+        response[:error] = e.message
         response
       end
     end

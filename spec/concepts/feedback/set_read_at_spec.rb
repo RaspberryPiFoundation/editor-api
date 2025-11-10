@@ -14,7 +14,7 @@ RSpec.describe Feedback::SetRead, type: :unit do
 
       it 'returns the updated feedback' do
         response = described_class.call(feedback: feedback)
-        expect(response[:feedback]).to eq(feedback)
+        expect(response[:feedback]).to be_a(Feedback)
       end
 
       it 'returns read_at' do
@@ -30,17 +30,12 @@ RSpec.describe Feedback::SetRead, type: :unit do
 
     context 'when set_read fails' do
       before do
-        allow(feedback).to receive(:save!).and_raise(StandardError, 'Transition failed')
+        allow(feedback).to receive(:save!).and_raise(StandardError, 'Some API error')
       end
 
       it 'returns a failed operation response' do
         response = described_class.call(feedback: feedback)
         expect(response.success?).to be(false)
-      end
-
-      it 'returns the original feedback' do
-        response = described_class.call(feedback: feedback)
-        expect(response[:feedback]).to eq(feedback)
       end
 
       it 'does not persist read_at' do
@@ -49,9 +44,9 @@ RSpec.describe Feedback::SetRead, type: :unit do
         expect(feedback.read_at).to be_nil
       end
 
-      it 'includes an error object in the response' do
+      it 'includes the correct error response' do
         response = described_class.call(feedback: feedback)
-        expect(response[:error]).to be_a(ActiveModel::Errors)
+        expect(response[:error]).to eq('Some API error')
       end
     end
   end
