@@ -43,8 +43,30 @@ class Project < ApplicationRecord
   )
 
   def self.users(current_user)
-    school = School.find_by(id: pluck(:school_id))
-    SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id).uniq)[:school_students] || []
+    return [] unless current_user&.token
+
+    projects_scope = all
+    school_user_pairs = projects_scope.pluck(:school_id, :user_id)
+    user_ids_by_school = school_user_pairs.each_with_object(Hash.new { |h, k| h[k] = [] }) do |(school_id, user_id), memo|
+      next if user_id.blank?
+
+      memo[school_id] << user_id
+    end
+
+    school_lookup = School.where(id: user_ids_by_school.keys.compact).index_by(&:id)
+
+    user_ids_by_school.each_with_object([]) do |(school_id, user_ids), users|
+      school = school_lookup[school_id]
+      next unless school
+
+      response = SchoolStudent::List.call(
+        school:,
+        token: current_user.token,
+        student_ids: user_ids.uniq
+      )
+
+      users.concat(response.fetch(:school_students, []))
+    end
   end
 
   def self.with_users(current_user)

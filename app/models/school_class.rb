@@ -7,7 +7,7 @@ class SchoolClass < ApplicationRecord
   has_many :lessons, dependent: :nullify
   accepts_nested_attributes_for :teachers
 
-  scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
+  scope :with_teachers, ->(user_id) { joins(:teachers).where(class_teachers: { teacher_id: user_id }) }
 
   before_validation :assign_class_code, on: %i[create import]
 
