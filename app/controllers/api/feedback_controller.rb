@@ -15,7 +15,7 @@ module Api
       project_feedback.each do |feedback|
         authorize! :read, feedback
       end
-      @feedback = project_feedback.accessible_by(current_ability)
+      @feedback = project_feedback.accessible_by(current_ability).order(created_at: :asc)
       render :index, formats: [:json], status: :ok
     end
 
