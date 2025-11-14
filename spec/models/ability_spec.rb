@@ -597,4 +597,51 @@ RSpec.describe Ability do
       it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
     end
   end
+
+  describe 'Google Auth' do
+    context 'with no user' do
+      let(:user) { nil }
+
+      it { is_expected.not_to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a standard user (no school)' do
+      let(:user) { build(:user) }
+
+      it { is_expected.not_to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a school teacher' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+
+      before do
+        create(:teacher_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a school owner' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+
+      before do
+        create(:owner_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a school student' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+
+      before do
+        create(:student_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.not_to be_able_to(:exchange_code, :google_auth) }
+    end
+  end
 end
