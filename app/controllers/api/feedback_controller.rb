@@ -12,7 +12,10 @@ module Api
       end
 
       # Checks that the user is authorised to read the feedback so that if not we can return a 403 rather than an empty array
-      can :read_feedback, project.school_project
+      # can :read_feedback, project.school_project
+      project_feedback.each do |feedback|
+        authorize! :read, feedback
+      end
       @feedback = project_feedback.accessible_by(current_ability)
       render :index, formats: [:json], status: :ok
     end
