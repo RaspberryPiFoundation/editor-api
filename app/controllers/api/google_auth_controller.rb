@@ -33,6 +33,8 @@ module Api
         error_message = @token_response['error_description'] || @token_response['error'] || 'Unknown error'
         render json: { error: error_message }, status: :unauthorized
       end
+    rescue JSON::ParserError => e
+      render json: { error: e.message }, status: :bad_gateway
     rescue Faraday::Error => e
       render json: { error: e.message }, status: :service_unavailable
     end
