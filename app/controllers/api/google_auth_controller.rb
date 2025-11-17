@@ -30,7 +30,8 @@ module Api
       if response.success?
         render :exchange_code, status: :ok
       else
-        render json: { error: @token_response['error_description'] }, status: :unauthorized
+        error_message = @token_response['error_description'] || @token_response['error'] || 'Unknown error'
+        render json: { error: error_message }, status: :unauthorized
       end
     rescue Faraday::Error => e
       render json: { error: e.message }, status: :service_unavailable
