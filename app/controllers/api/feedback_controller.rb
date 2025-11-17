@@ -15,7 +15,7 @@ module Api
       project_feedback.each do |feedback|
         authorize! :read, feedback
       end
-      @feedback = project_feedback.accessible_by(current_ability)
+      @feedback = project_feedback.accessible_by(current_ability).order(created_at: :asc)
       render :index, formats: [:json], status: :ok
     end
 
@@ -25,6 +25,18 @@ module Api
       if result.success?
         @feedback = result[:feedback]
         render :show, formats: [:json], status: :created
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def set_read
+      feedback = Feedback.find(params[:id])
+      result = Feedback::SetRead.call(feedback: feedback)
+
+      if result.success?
+        @feedback = result[:feedback]
+        render :show, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
@@ -68,8 +80,8 @@ module Api
     end
 
     def url_params
-      permitted_params = params.permit(:project_id)
-      { identifier: permitted_params[:project_id] }
+      permitted_params = params.permit(:project_id, :id)
+      { identifier: permitted_params[:project_id], id: permitted_params[:id] }
     end
 
     def base_params

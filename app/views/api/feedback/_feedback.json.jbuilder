@@ -7,5 +7,6 @@ json.call(
   :user_id,
   :content,
   :created_at,
-  :updated_at
+  :updated_at,
+  :read_at
 )
