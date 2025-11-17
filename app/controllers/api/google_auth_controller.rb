@@ -8,31 +8,12 @@ module Api
     authorize_resource :google_auth, class: false
 
     def exchange_code
-      payload = google_token_params
-
-      request_body = {
-        code: payload[:code],
-        client_id: ENV.fetch('GOOGLE_CLIENT_ID'),
-        client_secret: ENV.fetch('GOOGLE_CLIENT_SECRET'),
-        redirect_uri: payload[:redirect_uri],
-        grant_type: 'authorization_code'
-      }
-
-      conn = Faraday.new do |f|
-        f.request :url_encoded
-        f.options.timeout = 10      # connection open timeout
-        f.options.open_timeout = 5  # connection initialization timeout
-      end
-
-      response = conn.post(TOKEN_EXCHANGE_URL, request_body)
+      response = faraday.post(TOKEN_EXCHANGE_URL, token_exchange_payload)
       @token_response = JSON.parse(response.body)
 
-      if response.success?
-        render :exchange_code, status: :ok
-      else
-        error_message = @token_response['error_description'] || @token_response['error'] || 'Unknown error'
-        render json: { error: error_message }, status: :unauthorized
-      end
+      return render(:exchange_code, status: :ok) if response.success?
+
+      render json: { error: response_error_message }, status: :unauthorized
     rescue JSON::ParserError => e
       render json: { error: e.message }, status: :bad_gateway
     rescue Faraday::Error => e
@@ -40,6 +21,29 @@ module Api
     end
 
     private
+
+    def faraday
+      Faraday.new do |f|
+        f.request :url_encoded
+        f.options.timeout = 10
+        f.options.open_timeout = 5
+      end
+    end
+
+    def token_exchange_payload
+      payload = google_token_params
+      {
+        code: payload[:code],
+        client_id: ENV.fetch('GOOGLE_CLIENT_ID'),
+        client_secret: ENV.fetch('GOOGLE_CLIENT_SECRET'),
+        redirect_uri: payload[:redirect_uri],
+        grant_type: 'authorization_code'
+      }
+    end
+
+    def response_error_message
+      @token_response['error_description'] || @token_response['error'] || 'Unknown error'
+    end
 
     def google_token_params
       params.require(:google_auth).require(:code)
