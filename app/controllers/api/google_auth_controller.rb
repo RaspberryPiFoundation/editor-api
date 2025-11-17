@@ -20,6 +20,8 @@ module Api
 
       conn = Faraday.new do |f|
         f.request :url_encoded
+        f.options.timeout = 10      # connection open timeout
+        f.options.open_timeout = 5  # connection initialization timeout
       end
 
       response = conn.post(TOKEN_EXCHANGE_URL, request_body)
