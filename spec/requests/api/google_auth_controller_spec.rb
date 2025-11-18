@@ -26,8 +26,7 @@ RSpec.describe 'Google Auth requests' do
         'access_token' => 'test-access-token',
         'expires_in' => 3599,
         'token_type' => 'Bearer',
-        'scope' => 'openid email profile',
-        'id_token' => 'test-id-token'
+        'scope' => 'email profile'
       }
     end
 
