@@ -70,6 +70,35 @@ RSpec.describe 'Remix requests' do
       end
     end
 
+    describe("#show_identifier") do
+      let!(:remixed_project) do
+        create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id)
+      end
+
+      it 'returns success response' do
+        get("/api/projects/#{original_project.identifier}/remix/identifier", headers:)
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the project identifier' do
+        get("/api/projects/#{original_project.identifier}/remix/identifier", headers:)
+        expect(response.parsed_body['identifier']).to eq(remixed_project.identifier)
+      end
+
+      it 'returns 404 response if invalid project' do
+        get('/api/projects/no-such-project/remix/identifier', headers:)
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns 404 if no remixed project for user' do
+        another_user = create(:owner, school:)
+        authenticated_in_hydra_as(another_user)
+
+        get("/api/projects/#{original_project.identifier}/remix/identifier", headers:)
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
     describe '#create' do
       it 'returns success response' do
         post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
@@ -112,6 +141,13 @@ RSpec.describe 'Remix requests' do
       it 'returns unauthorized' do
         get "/api/projects/#{original_project.identifier}/remix"
 
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+
+    describe '#show_identifier' do
+      it 'returns unauthorized' do
+        get "/api/projects/#{original_project.identifier}/remix/identifier"
         expect(response).to have_http_status(:unauthorized)
       end
     end
