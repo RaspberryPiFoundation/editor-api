@@ -48,7 +48,9 @@ Rails.application.routes.draw do
       end
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
-      resources :feedback, only: %i[index create], controller: 'feedback'
+      resources :feedback, only: %i[index create], controller: 'feedback' do
+        put :read, on: :member, to: 'feedback#set_read'
+      end
     end
 
     resource :project_errors, only: %i[create]
@@ -79,6 +81,8 @@ Rails.application.routes.draw do
     end
 
     resources :user_jobs, only: %i[index show]
+
+    post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

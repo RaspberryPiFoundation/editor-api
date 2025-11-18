@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_10_31_122812) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_06_170425) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -80,6 +80,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_10_31_122812) do
     t.uuid "user_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "read_at"
     t.index ["school_project_id"], name: "index_feedback_on_school_project_id"
   end
 

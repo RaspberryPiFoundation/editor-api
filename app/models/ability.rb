@@ -69,6 +69,7 @@ class Ability
     can(%i[read create create_batch update destroy], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
+    can(%i[exchange_code], :google_auth)
   end
 
   def define_school_teacher_abilities(user:, school:)
@@ -98,6 +99,7 @@ class Ability
     can(%i[read], Project, remixed_from_id: teacher_project_ids)
     can(%i[show_status unsubmit return complete], SchoolProject, project: { remixed_from_id: teacher_project_ids })
     can(%i[read create], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
+    can(%i[exchange_code], :google_auth)
   end
 
   def define_school_student_abilities(user:, school:)
@@ -113,7 +115,7 @@ class Ability
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
     can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids)
     can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
-    can(%i[read], Feedback, school_project: { project: { school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids } })
+    can(%i[read set_read], Feedback, school_project: { project: { school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids } })
     can(%i[show_finished set_finished show_status unsubmit submit], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
