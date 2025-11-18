@@ -70,7 +70,7 @@ RSpec.describe 'Remix requests' do
       end
     end
 
-    describe("#show_identifier") do
+    describe('#show_identifier') do
       let!(:remixed_project) do
         create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id)
       end
