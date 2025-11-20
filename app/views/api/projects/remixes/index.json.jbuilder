@@ -13,4 +13,5 @@ json.array!(@projects_with_users) do |project, user|
 
   json.user_name(user&.name)
   json.finished(project.school_project&.finished)
+  json.status(project.school_project&.status)
 end
