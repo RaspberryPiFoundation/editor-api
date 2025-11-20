@@ -5,6 +5,5 @@ json.call(
   'access_token',
   'expires_in',
   'token_type',
-  'scope',
-  'id_token'
+  'scope'
 )
