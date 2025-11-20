@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_06_170425) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -296,8 +296,11 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_06_170425) do
     t.boolean "creator_agree_to_ux_contact", default: false
     t.boolean "creator_agree_responsible_safeguarding", default: true
     t.integer "user_origin", default: 0
+    t.string "district_name"
+    t.string "district_nces_id"
     t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
+    t.index ["district_nces_id"], name: "index_schools_on_district_nces_id"
     t.index ["reference"], name: "index_schools_on_reference", unique: true
   end
 
