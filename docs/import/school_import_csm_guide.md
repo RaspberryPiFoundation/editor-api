@@ -2,8 +2,8 @@
 
 ## Prerequisites
 
-1. You must have the `experience-cs-admin` or `profile-admin` role
-2. School owners must have existing Code Editor for Education accounts
+1. You must have the `experience-cs-admin` or `profile-admin` role in Editor-API.
+2. School owners must have existing Code Editor for Education accounts.
 3. School owners must be unique within the CSV, and in the existing database.
 4. CSV file must be properly formatted (see template)
 
@@ -11,7 +11,7 @@
 
 ### 1. Prepare the CSV File
 
-Download the template: `docs/school_import_template.csv`
+Download the template: `docs/import/school_import_template.csv`
 
 Required columns:
 - `name` - School name
@@ -33,6 +33,20 @@ Before importing, verify that all owner emails in your CSV correspond to existin
 
 ### 3. Upload the CSV
 
+**Prerequisite**
+
+In order to use the scripts, you have to have an OAuth token from `editor-api`.
+
+TODO: Explain how to get such a token, or write a tool to do it.
+
+You can supply this token to the scripts mentioned below by:
+
+```bash
+export TOKEN=ory_ac_a2i-3ayKjE_8YcGqRlGXdaKrZ4yWkSdfG6vwQmLEsMg.bUdeff5re2vDLd6kRffaGp8NNX6ry8Yzm7wf7aaMKWM
+```
+
+Obviously, don't use this value - use your own.
+
 **Via API:**
 
 ```bash
@@ -50,9 +64,45 @@ curl -X POST https://editor-api.raspberrypi.org/api/schools/import \
 }
 ```
 
+**Via Script:**
+
+```bash
+$ $scripts/import.sh ./docs/import/school_import_template.csv
+════════════════════════════════════════════════════════════════
+  School Import
+════════════════════════════════════════════════════════════════
+
+CSV File:        ./docs/import/school_import_template.csv
+Schools to Import: 3
+API URL:         http://localhost:3009/api/schools/import
+
+Starting import...
+
+════════════════════════════════════════════════════════════════
+  ✓ Import Job Started Successfully
+════════════════════════════════════════════════════════════════
+
+Job ID:          8a24adf7-c705-451a-8bb3-051ec5d8fdd8
+Total Schools:   3
+Status:          Import job started successfully
+
+────────────────────────────────────────────────────────────────
+  Next Steps
+────────────────────────────────────────────────────────────────
+
+Check import status with:
+  ./scripts/status.sh 8a24adf7-c705-451a-8bb3-051ec5d8fdd8
+
+Or manually with curl:
+  curl -sS -H "Authorization: $TOKEN" \
+    http://localhost:3009/api/school_import_jobs/8a24adf7-c705-451a-8bb3-051ec5d8fdd8 | jq '.'
+```
+
 ### 4. Track Progress
 
 Use the job_id from the response:
+
+**Via API**
 
 ```bash
 curl https://editor-api.raspberrypi.org/api/school_import_jobs/550e8400-e29b-41d4-a716-446655440000 \
@@ -85,32 +135,42 @@ curl https://editor-api.raspberrypi.org/api/school_import_jobs/550e8400-e29b-41d
 }
 ```
 
-### 5. Review Results
+**Via Script**
 
-Once the job completes, the results will show:
+```bash
+[f@rpi] ➜ editor-api (U!@ fs-implement-school-import-endpoint) ./scripts/status.sh 8a24adf7-c705-451a-8bb3-051ec5d8fdd8
+════════════════════════════════════════════════════════════════
+  School Import Job Status
+════════════════════════════════════════════════════════════════
 
-```json
-{
-  "successful": [
-    {
-      "name": "Springfield Elementary",
-      "id": "123e4567-e89b-12d3-a456-426614174000",
-      "code": "12-34-56",
-      "owner_email": "admin@springfield-elementary.edu"
-    }
-  ],
-  "failed": [
-    {
-      "name": "Shelbyville High",
-      "error_code": "OWNER_NOT_FOUND",
-      "error": "Owner not found: admin@shelbyville-high.edu",
-      "owner_email": "admin@shelbyville-high.edu"
-    }
-  ]
-}
+Job ID:      8a24adf7-c705-451a-8bb3-051ec5d8fdd8
+Status:      completed
+Job Type:    ImportSchoolsJob
+Created:     2025-11-20T15:44:52.925Z
+Finished:    2025-11-20T15:44:53.316Z
+
+════════════════════════════════════════════════════════════════
+  Summary
+════════════════════════════════════════════════════════════════
+
+Total Schools:    3
+✓ Successful:     3
+✗ Failed:         0
+
+════════════════════════════════════════════════════════════════
+  Successful Schools
+════════════════════════════════════════════════════════════════
+
+NAME                                     CODE         OWNER EMAIL
+────────────────────────────────────────────────────────────────
+Springfield Elementary School            85-59-21     principal@springfield-elem.edu
+Shelbyville High School                  76-79-30     admin@shelbyville-high.edu
+Capital City Academy                     32-91-93     headteacher@capital-city-academy.edu
+
+════════════════════════════════════════════════════════════════
 ```
 
-### 6. Handle Failures
+### 5. Handle Failures
 
 Common failure reasons and solutions:
 
@@ -238,5 +298,5 @@ If you encounter issues:
 6. Review results: 148 succeeded, 2 failed
 7. Fix issues with 2 failed schools (duplicate references)
 8. Create those 2 schools manually or re-import
-9. Notify district admin that all schools are ready
+9. Notify district admin that all schools are ready and supply the generated codes
 10. District admin can now invite teachers to their schools
