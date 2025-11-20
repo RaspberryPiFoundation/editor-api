@@ -33,15 +33,48 @@ Start the application and its dependencies via docker:
 docker-compose up
 ```
 
+### Using the dev-container
+
+There is a dedicated image called `dev-container`, and the easiest way to use this is to use the override:
+
+`cp docker-compose.override.yml.example docker-compose.override.yml`
+
+Now when you run `docker compose up -d` it will always use the `dev-container` image.
+
+When adding a vscode project the dev-container should be automatically found and a dialog will show asking if
+you want to use this, but failing that you can open the cmd palette with `cmd + shift + p` and call:
+
+`Dev Containers: Reopen in Container`
+
+If there's an issue, do check the logs, but you can run:
+
+`Dev Containers: Rebuild and Reopen in Container`
+
+and there's also a 'without cache' variant, to ensure packages are re-built.
+
 #### Updating gems inside the container
 
-This can be done with the `bin/with-builder.sh` script:
+If running inside a dev-container:
+
+```
+bundle install
+```
+
+or outside with:
+
+```
+docker compose run --rm --no-deps api bundle install
+```
+
+This can also be done with the `bin/with-builder.sh` script:
 
 ```
 ./bin/with-builder.sh bundle update
 ```
 
-which should update the Gems in the container, without the need for rebuilding.
+which should update the Gems in the container.
+
+None of these methods require rebuilding.
 
 ### Seeding
 

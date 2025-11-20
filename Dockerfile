@@ -1,14 +1,15 @@
-FROM ruby:3.2-slim-bullseye as base
+FROM ruby:3.2-slim-bullseye AS base
 RUN gem install bundler \
   && apt-get update \
   && apt-get upgrade --yes \
   && apt-get install --yes --no-install-recommends \
   libpq5 libxml2 libxslt1.1 libvips \
   curl gnupg graphviz nodejs \
-  && echo "deb http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
-  && curl -sL https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add - \
+  && mkdir -p /usr/share/keyrings \
+  && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-archive-keyring.gpg \
+  && echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
   && apt-get update \
-  && apt-get install --yes --no-install-recommends postgresql-client-15 \
+  && apt-get install --yes --no-install-recommends postgresql-client-17 \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
 ENV TZ='Europe/London'
 ENV RUBYOPT='-W:no-deprecated -W:no-experimental'
@@ -31,11 +32,11 @@ FROM builder AS dev-container
 RUN apt-get update \
   && apt-get install --yes --no-install-recommends sudo git vim zsh ssh curl less
 RUN sh -c "$(curl -L https://github.com/deluan/zsh-in-docker/releases/download/v1.1.5/zsh-in-docker.sh)" -- \
-    -t robbyrussell \
-    -p git -p docker-compose -p yarn \
-    -p https://github.com/zsh-users/zsh-autosuggestions \
-    # -p https://github.com/marlonrichert/zsh-autocomplete \
-    -p https://github.com/unixorn/fzf-zsh-plugin
+  -t robbyrussell \
+  -p git -p docker-compose -p yarn \
+  -p https://github.com/zsh-users/zsh-autosuggestions \
+  # -p https://github.com/marlonrichert/zsh-autocomplete \
+  -p https://github.com/unixorn/fzf-zsh-plugin
 RUN chsh -s $(which zsh) ${USER}
 
 # Slim application image without development dependencies
