@@ -27,7 +27,7 @@ services:
     volumes:
       - .:/app
       - bundle-data:/usr/local/bundle
-      - node-modules:/app/node_modules
+      - node_modules:/app/node_modules
       # This is here to avoid rails finding stale pid-files in tmp/pids and then
       # thinking it is already running:
       - type: tmpfs
@@ -56,4 +56,4 @@ services:
 volumes:
   postgres-data:
   bundle-data:
-  node-modules:
+  node_modules:
