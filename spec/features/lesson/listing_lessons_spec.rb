@@ -210,6 +210,17 @@ RSpec.describe 'Listing lessons', type: :request do
       expect(data.size).to eq(1)
     end
 
+    it "includes the remix identifier when the user has remixed the lesson's project" do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+      student_project = create(:project, school:, lesson:, parent: lesson.project, user_id: student.id)
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+      expect(data.first[:remix_identifier]).to eq(student_project.identifier)
+    end
+
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
