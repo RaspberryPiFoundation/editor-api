@@ -1,0 +1,4 @@
+name,website,address_line_1,address_line_2,municipality,administrative_area,postal_code,country_code,reference,owner_email
+Springfield Elementary School,https://springfield-elem.edu,123 Main Street,,Springfield,IL,62701,US,SPE-001,principal@springfield-elem.edu
+Shelbyville High School,https://shelbyville-high.edu,456 Oak Avenue,Suite 100,Shelbyville,IL,62565,US,SHS-002,admin@shelbyville-high.edu
+Capital City Academy,https://capital-city-academy.edu,789 State Road,,Capital City,IL,62702,US,CCA-003,headteacher@capital-city-academy.edu
