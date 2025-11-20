@@ -18,14 +18,34 @@ class UserInfoApiClient
       transform_result(response.body.fetch('users', []))
     end
 
+    def find_user_by_email(email)
+      return nil if email.blank?
+      return stubbed_user_by_email(email) if bypass_oauth?
+
+      response = conn.get do |r|
+        r.url "/users/#{CGI.escape(email)}"
+      end
+      return nil if response.body.blank?
+
+      # Single user response has 'user' key, not 'users'
+      user = response.body.fetch('user', nil)
+      user.present? ? transform_user(user) : nil
+    rescue Faraday::ResourceNotFound
+      nil
+    end
+
     private
 
     def bypass_oauth?
       ENV.fetch('BYPASS_OAUTH', nil) == 'true'
     end
 
+    def transform_user(user)
+      user.transform_keys { |k| k.to_s.underscore.to_sym }
+    end
+
     def transform_result(result)
-      { result: }.transform_keys { |k| k.to_s.underscore.to_sym }.fetch(:result)
+      result.map { |user| transform_user(user) }
     end
 
     def conn
@@ -61,6 +81,27 @@ class UserInfoApiClient
           roles: ''
         }
       end
+    end
+
+    def stubbed_user_by_email(email)
+      {
+        id: Digest::UUID.uuid_v5(Digest::UUID::DNS_NAMESPACE, email),
+        email: email,
+        username: nil,
+        parentalEmail: nil,
+        name: 'School Owner',
+        nickname: 'Owner',
+        country: 'United Kingdom',
+        country_code: 'GB',
+        postcode: nil,
+        dateOfBirth: nil,
+        verifiedAt: '2024-01-01T12:00:00.000Z',
+        createdAt: '2024-01-01T12:00:00.000Z',
+        updatedAt: '2024-01-01T12:00:00.000Z',
+        discardedAt: nil,
+        lastLoggedInAt: '2024-01-01T12:00:00.000Z',
+        roles: ''
+      }
     end
   end
 end
