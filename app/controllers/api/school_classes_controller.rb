@@ -29,6 +29,31 @@ module Api
       end
     end
 
+    def import
+      school_class_params = import_school_class_params
+      school_students_params = import_school_students_params
+
+      # Find or create the school class
+      school_class_result = find_or_create_school_class(school_class_params)
+
+      if school_class_result.success?
+        school_class = school_class_result[:school_class]
+        @school_class_with_teachers = school_class.with_teachers
+
+        # Create students if class exists
+        school_students_result = create_school_students(school_students_params, school_class)
+        @school_students = school_students_result[:school_students]
+        @school_students_errors = school_students_result[:errors]
+
+        # Assign students to class
+        @class_members = assign_students_to_class(school_class, @school_students)
+
+        render :import, formats: [:json], status: :created
+      else
+        render json: { error: school_class_result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     def update
       school_class = @school.classes.find(params[:id])
       result = SchoolClass::Update.call(school_class:, school_class_params:)
@@ -53,6 +78,59 @@ module Api
 
     private
 
+    def find_or_create_school_class(school_class_params)
+      # First try and find the class (in case we're re-importing)
+      existing_school_class = SchoolClass.find_by(
+        school: @school,
+        import_origin: school_class_params[:import_origin],
+        import_id: school_class_params[:import_id]
+      )
+
+      if existing_school_class.present?
+        response = OperationResponse.new
+        response[:school_class] = existing_school_class
+        return response
+      end
+
+      # Create new school class if none exists
+      SchoolClass::Create.call(
+        school: @school,
+        school_class_params: school_class_params,
+        current_user:,
+        validate_context: :import
+      )
+    end
+
+    def create_school_students(school_students_params, school_class)
+      return { school_students: [], errors: nil } unless school_class.present? && school_students_params.present?
+
+      school_students_result = SchoolStudent::CreateBatchSSO.call(
+        school: @school,
+        school_students_params: school_students_params,
+        current_user:
+      )
+
+      {
+        school_students: school_students_result[:school_students],
+        errors: school_students_result[:errors]
+      }
+    end
+
+    def assign_students_to_class(school_class, school_students)
+      return [] unless school_class.present? && school_students.present? && school_students.any?
+
+      # Extract the student objects for class member creation
+      students = school_students.pluck(:student)
+      class_members_result = ClassMember::Create.call(school_class:, students:, teachers: [])
+
+      # Put the errors in a more useful format for the response
+      class_members_errors = class_members_result[:errors].map do |user_id, error|
+        { success: false, student_id: user_id, school_class_id: school_class.id, error: error }
+      end
+
+      class_members_result[:class_members] + class_members_errors
+    end
+
     def load_and_authorize_school
       @school = if params[:school_id].match?(/\d\d-\d\d-\d\d/)
                   School.find_by(code: params[:school_id])
@@ -63,7 +141,7 @@ module Api
     end
 
     def load_and_authorize_school_class
-      if %w[index create].include?(params[:action])
+      if %w[index create import].include?(params[:action])
         authorize! params[:action].to_sym, SchoolClass
       else
         @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
@@ -79,6 +157,21 @@ module Api
     def school_class_params
       # A school teacher may only create classes they own.
       params.require(:school_class).permit(:name, :description)
+    end
+
+    def import_school_class_params
+      params.require(:school_class).permit(:name, :description, :import_origin, :import_id)
+    end
+
+    def import_school_students_params
+      school_students_data = params[:school_students]
+      return [] if school_students_data.blank?
+
+      school_students_data.filter_map do |student|
+        next if student.blank?
+
+        student.permit(:name, :email).to_h.with_indifferent_access
+      end
     end
 
     def school_owner?

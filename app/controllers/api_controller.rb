@@ -5,32 +5,42 @@ class ApiController < ActionController::API
 
   include Identifiable
 
-  rescue_from ActionController::ParameterMissing, with: -> { bad_request }
-  rescue_from ActiveRecord::RecordNotFound, with: -> { not_found }
-  rescue_from CanCan::AccessDenied, with: -> { denied }
-  rescue_from ParameterError, with: -> { unprocessable }
+  rescue_from StandardError, with: :internal_server_error
+  rescue_from ActionController::ParameterMissing, with: :bad_request
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+  rescue_from CanCan::AccessDenied, with: :denied
+  rescue_from ParameterError, with: :unprocessable
 
   before_action :set_paper_trail_whodunnit
 
   private
 
-  def bad_request
-    head :bad_request # 400 status
+  def bad_request(exception)
+    render_error_as_json(exception, :bad_request)
   end
 
   def authorize_user
-    head :unauthorized unless current_user # 401 status
+    render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
   end
 
-  def denied
-    head :forbidden # 403 status
+  def denied(exception)
+    render_error_as_json(exception, :forbidden)
   end
 
-  def not_found
-    head :not_found # 404 status
+  def not_found(exception)
+    render_error_as_json(exception, :not_found)
   end
 
-  def unprocessable
-    head :unprocessable_entity # 422 status
+  def unprocessable(exception)
+    render_error_as_json(exception, :unprocessable_entity)
+  end
+
+  def internal_server_error(exception)
+    Sentry.capture_exception(exception)
+    render_error_as_json(exception, :internal_server_error)
+  end
+
+  def render_error_as_json(exception, status)
+    render json: { error: "#{exception.class}: #{exception.message}" }, status:
   end
 end

@@ -3,15 +3,21 @@
   "configurations": [
     {
       "type": "ruby_lsp",
-      "name": "Debug",
+      "name": "Debug Ruby file",
       "request": "launch",
       "program": "ruby ${file}",
     },
     {
       "type": "ruby_lsp",
       "request": "launch",
-      "name": "Debug test file",
-      "program": "ruby -Itest ${relativeFile}",
+      "name": "Debug RSpec file",
+      "program": "bundle exec rspec ${relativeFile}"
+    },
+    {
+      "type": "ruby_lsp",
+      "request": "launch",
+      "name": "Debug current RSpec test",
+      "program": "bundle exec rspec ${relativeFile}:${lineNumber}"
     },
     {
       "type": "ruby_lsp",

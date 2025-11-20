@@ -38,9 +38,17 @@ Rails.application.routes.draw do
       get :finished, on: :member, to: 'school_projects#show_finished'
       get :context, on: :member, to: 'projects#show_context'
       put :finished, on: :member, to: 'school_projects#set_finished'
+      get :status, on: :member, to: 'school_projects#show_status'
+      post :unsubmit, on: :member, to: 'school_projects#unsubmit'
+      post :submit, on: :member, to: 'school_projects#submit'
+      post :return, on: :member, to: 'school_projects#return'
+      post :complete, on: :member, to: 'school_projects#complete'
       resource :remix, only: %i[show create], controller: 'projects/remixes'
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
+      resources :feedback, only: %i[index create], controller: 'feedback' do
+        put :read, on: :member, to: 'feedback#set_read'
+      end
     end
 
     resource :project_errors, only: %i[create]
@@ -49,6 +57,7 @@ Rails.application.routes.draw do
     resources :schools, only: %i[index show create update destroy] do
       resources :members, only: %i[index], controller: 'school_members'
       resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do
+        post :import, on: :collection
         resources :members, only: %i[index create destroy], controller: 'class_members' do
           post :batch, on: :collection, to: 'class_members#create_batch'
         end
@@ -70,6 +79,8 @@ Rails.application.routes.draw do
     end
 
     resources :user_jobs, only: %i[index show]
+
+    post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

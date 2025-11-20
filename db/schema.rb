@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_06_170425) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -72,6 +72,16 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
     t.datetime "updated_at", null: false
     t.boolean "default", default: false, null: false
     t.index ["project_id"], name: "index_components_on_project_id"
+  end
+
+  create_table "feedback", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_project_id"
+    t.text "content"
+    t.uuid "user_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "read_at"
+    t.index ["school_project_id"], name: "index_feedback_on_school_project_id"
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -234,8 +244,23 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
     t.datetime "updated_at", null: false
     t.string "description"
     t.string "code"
+    t.integer "import_origin"
+    t.string "import_id"
     t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "school_project_transitions", force: :cascade do |t|
+    t.string "from_state", null: false
+    t.string "to_state", null: false
+    t.text "metadata", default: "{}"
+    t.integer "sort_key", null: false
+    t.uuid "school_project_id", null: false
+    t.boolean "most_recent", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_project_id", "most_recent"], name: "index_school_project_transitions_parent_most_recent", unique: true, where: "most_recent"
+    t.index ["school_project_id", "sort_key"], name: "index_school_project_transitions_parent_sort", unique: true
   end
 
   create_table "school_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -287,9 +312,10 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
 
   create_table "user_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
-    t.uuid "good_job_id", null: false
+    t.uuid "good_job_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.uuid "good_job_batch_id"
     t.index ["user_id", "good_job_id"], name: "index_user_jobs_on_user_id_and_good_job_id", unique: true
   end
 
@@ -303,6 +329,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
     t.uuid "meta_project_id"
     t.uuid "meta_school_id"
     t.uuid "meta_remixed_from_id"
+    t.string "meta_school_project_id"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
@@ -311,6 +338,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
   add_foreign_key "class_students", "school_classes"
   add_foreign_key "class_teachers", "school_classes"
   add_foreign_key "components", "projects"
+  add_foreign_key "feedback", "school_projects"
   add_foreign_key "lessons", "lessons", column: "copied_from_id"
   add_foreign_key "lessons", "school_classes"
   add_foreign_key "lessons", "schools"
@@ -319,6 +347,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_05_15_081023) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "school_project_transitions", "school_projects"
   add_foreign_key "school_projects", "projects"
   add_foreign_key "school_projects", "schools"
   add_foreign_key "teacher_invitations", "schools"

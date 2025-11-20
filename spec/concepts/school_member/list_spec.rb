@@ -11,13 +11,16 @@ RSpec.describe SchoolMember::List, type: :unit do
   let(:student_ids) { students.map(&:id) }
   let(:teacher_ids) { [teacher.id] }
 
-  context 'with students and a teacher' do
+  context 'with a mixture of students' do
+    let(:sso_student) { create(:student, :sso, school:) }
+    let(:standard_student) { create(:student, school:) }
+
     before do
-      student_attributes = students.map do |student|
-        { id: student.id, name: student.name, username: student.username }
-      end
+      student_attributes = [
+        { id: sso_student.id, name: sso_student.name, username: sso_student.username, email: sso_student.email, ssoProviders: sso_student.sso_providers },
+        { id: standard_student.id, name: standard_student.name, username: standard_student.username, email: standard_student.email, ssoProviders: standard_student.sso_providers }
+      ]
       stub_profile_api_list_school_students(school:, student_attributes:)
-      stub_user_info_api_for(teacher)
     end
 
     it 'returns a successful operation response' do
@@ -27,20 +30,75 @@ RSpec.describe SchoolMember::List, type: :unit do
 
     it 'contains the expected students' do
       response = described_class.call(school:, token:)
-      students.each do |student|
-        expect(response[:school_members].map(&:id)).to include(student.id)
-      end
+      expect(response[:school_members].map(&:id)).to include(sso_student.id)
+      expect(response[:school_members].map(&:id)).to include(standard_student.id)
+    end
+
+    it 'sets sso_providers for SSO students' do
+      response = described_class.call(school:, token:)
+      school_members = response[:school_members]
+      sso_member = school_members.find { |m| m.id == sso_student.id }
+
+      expect(sso_member.sso_providers).to be_present
+      expect(sso_member.email).to be_present
+      expect(sso_member.username).to be_nil
+      expect(sso_member.type).to eq(:student)
+    end
+
+    it 'sets sso_providers to empty for standard students' do
+      response = described_class.call(school:, token:)
+      school_members = response[:school_members]
+      standard_member = school_members.find { |m| m.id == standard_student.id }
+
+      expect(standard_member.sso_providers).to be_empty
+      expect(standard_member.email).to be_nil
+      expect(standard_member.username).to be_present
+      expect(standard_member.type).to eq(:student)
+    end
+  end
+
+  context 'with teachers' do
+    before do
+      stub_user_info_api_for(teacher)
     end
 
     it 'contains the expected teacher' do
       response = described_class.call(school:, token:)
       expect(response[:school_members].map(&:id)).to include(teacher.id)
     end
+
+    it 'sets sso_providers to empty for teachers' do
+      response = described_class.call(school:, token:)
+      school_members = response[:school_members]
+      teacher_member = school_members.find { |m| m.id == teacher.id }
+
+      expect(teacher_member.sso_providers).to be_empty
+      expect(teacher_member.type).to eq(:teacher)
+    end
+  end
+
+  context 'with owners' do
+    let(:owner) { create(:owner, school:) }
+
+    before do
+      stub_user_info_api_for(owner)
+    end
+
+    it 'sets sso_providers to empty for owners' do
+      response = described_class.call(school:, token:)
+      school_members = response[:school_members]
+      owner_member = school_members.find { |m| m.id == owner.id }
+
+      expect(owner_member.sso_providers).to be_empty
+      expect(owner_member.type).to eq(:owner)
+    end
   end
 
   context 'when errors occur' do
     before do
       allow(Sentry).to receive(:capture_exception)
+      # Ensure there are students so the error path gets exercised
+      students
     end
 
     it 'captures and handles errors' do

@@ -2,7 +2,7 @@
 
 module Api
   class TeacherInvitationsController < ApiController
-    rescue_from ActiveSupport::MessageVerifier::InvalidSignature, with: -> { denied }
+    rescue_from ActiveSupport::MessageVerifier::InvalidSignature, with: :denied
 
     before_action :authorize_user
     before_action :load_invitation

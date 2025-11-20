@@ -25,7 +25,7 @@ RSpec.describe 'Creating a class member', type: :request do
           }
         }
       end
-      let(:student_attributes) { { id: student.id, name: student.name, username: student.username, type: 'student' } }
+      let(:student_attributes) { { id: student.id, name: student.name, username: student.username, email: student.email, sso_providers: [], type: 'student' } }
 
       before do
         stub_profile_api_list_school_students(school:, student_attributes: [student_attributes])
@@ -57,6 +57,28 @@ RSpec.describe 'Creating a class member', type: :request do
         response_student = data[:class_member][:student]
 
         expect(response_student).to eq(student_attributes)
+      end
+
+      context 'when the student is already in the class' do
+        before do
+          school_class.students.create!({ student_id: student.id })
+        end
+
+        it 'responds 422 Unprocessable Entity' do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns the error message from the operation response' do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+          expect(response.parsed_body['error']).to eq("Error creating one or more class members - see 'errors' key for details")
+        end
+
+        it 'returns the errors from the operation response' do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+          expected_error_message = "Error creating class member for student_id #{student.id}: Student has already been taken"
+          expect(response.parsed_body['errors']).to eq({ student.id => expected_error_message })
+        end
       end
     end
 
@@ -101,6 +123,28 @@ RSpec.describe 'Creating a class member', type: :request do
         response_teacher = data[:class_member][:teacher]
         teacher_attributes = { id: another_teacher.id, name: another_teacher.name, email: another_teacher.email, type: 'teacher' }
         expect(response_teacher).to eq(teacher_attributes)
+      end
+
+      context 'when the teacher is already in the class' do
+        before do
+          school_class.teachers.create!({ teacher_id: another_teacher.id })
+        end
+
+        it 'responds 422 Unprocessable Entity' do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: teacher_params)
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+
+        it 'returns the error message from the operation response' do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: teacher_params)
+          expect(response.parsed_body['error']).to eq("Error creating one or more class members - see 'errors' key for details")
+        end
+
+        it 'returns the errors from the operation response' do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: teacher_params)
+          expected_error_message = "Error creating class member for teacher_id #{another_teacher.id}: Teacher has already been taken"
+          expect(response.parsed_body['errors']).to eq({ another_teacher.id => expected_error_message })
+        end
       end
     end
 

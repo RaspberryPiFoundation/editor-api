@@ -301,15 +301,23 @@ RSpec.describe Ability do
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
       let!(:remixed_project) { create(:project, school:, user_id: student.id, remixed_from_id: original_project.id) }
+      let(:feedback) { build(:feedback, user_id:, school_project: remixed_project&.school_project) }
 
       context 'when user is the student' do
         let(:user) { student }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:create, feedback) }
+        it { is_expected.to be_able_to(:read, feedback) }
+        it { is_expected.to be_able_to(:set_read, feedback) }
         it { is_expected.to be_able_to(:create, remixed_project) }
         it { is_expected.to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.to be_able_to(:set_finished, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:complete, remixed_project.school_project) }
       end
 
       context 'when user is a student and the lesson is not visible to students' do
@@ -329,26 +337,43 @@ RSpec.describe Ability do
         let(:user) { create(:teacher, school:) }
 
         it { is_expected.not_to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:create, feedback) }
+        it { is_expected.not_to be_able_to(:read, feedback) }
+        it { is_expected.not_to be_able_to(:set_read, feedback) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:complete, remixed_project.school_project) }
       end
 
       context 'when user is teacher that owns the orginal project' do
         let(:user) { teacher }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.to be_able_to(:create, feedback) }
+        it { is_expected.to be_able_to(:read, feedback) }
+        it { is_expected.not_to be_able_to(:set_read, feedback) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:complete, remixed_project.school_project) }
       end
 
       context 'when user is another teacher of the class' do
         let(:user) { another_teacher }
 
         it { is_expected.to be_able_to(:read, original_project) }
+        it { is_expected.to be_able_to(:create, feedback) }
+        it { is_expected.to be_able_to(:read, feedback) }
+        it { is_expected.not_to be_able_to(:set_read, feedback) }
         it { is_expected.not_to be_able_to(:create, original_project) }
         it { is_expected.to be_able_to(:update, original_project) }
 
@@ -357,6 +382,10 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
         it { is_expected.not_to be_able_to(:set_finished, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:unsubmit, remixed_project.school_project) }
+        it { is_expected.not_to be_able_to(:submit, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:return, remixed_project.school_project) }
+        it { is_expected.to be_able_to(:complete, remixed_project.school_project) }
       end
     end
   end
@@ -503,6 +532,116 @@ RSpec.describe Ability do
       let(:user) { nil }
 
       it { is_expected.not_to be_able_to(:read, :school_member) }
+    end
+  end
+
+  describe 'SchoolClass' do
+    let(:school) { create(:school) }
+    let(:other_school) { create(:school) }
+    let(:teacher) { create(:teacher, school: school) }
+    let(:owner) { create(:owner, school: school) }
+    let(:other_teacher) { create(:teacher, school: other_school) }
+    let(:own_school_class_saved) { create(:school_class, school: school, teacher_ids: [teacher.id]) }
+    let(:other_school_class_saved) { create(:school_class, school: other_school, teacher_ids: [other_teacher.id]) }
+
+    context 'when user is a school student' do
+      let(:user) { create(:student, school: school) }
+      let(:own_school_class) { SchoolClass.new(school: school) }
+      let(:other_school_class) { SchoolClass.new(school: other_school) }
+
+      it { is_expected.not_to be_able_to(:create, own_school_class) }
+      it { is_expected.not_to be_able_to(:import, own_school_class) }
+      it { is_expected.not_to be_able_to(:read, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:create, other_school_class) }
+      it { is_expected.not_to be_able_to(:import, other_school_class) }
+      it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
+    end
+
+    context 'when user is a school teacher' do
+      let(:user) { teacher }
+
+      let(:own_school_class) { SchoolClass.new(school: school) }
+      let(:other_school_class) { SchoolClass.new(school: other_school) }
+
+      it { is_expected.to be_able_to(:create, own_school_class) }
+      it { is_expected.to be_able_to(:import, own_school_class) }
+      it { is_expected.not_to be_able_to(:create, other_school_class) }
+      it { is_expected.not_to be_able_to(:import, other_school_class) }
+      it { is_expected.to be_able_to(:read, own_school_class_saved) }
+      it { is_expected.to be_able_to(:update, own_school_class_saved) }
+      it { is_expected.to be_able_to(:destroy, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
+    end
+
+    context 'when user is a school owner' do
+      let(:user) { owner }
+
+      let(:own_school_class) { SchoolClass.new(school: school) }
+      let(:other_school_class) { SchoolClass.new(school: other_school) }
+
+      it { is_expected.to be_able_to(:create, own_school_class) }
+      it { is_expected.to be_able_to(:import, own_school_class) }
+      it { is_expected.to be_able_to(:read, own_school_class_saved) }
+      it { is_expected.to be_able_to(:update, own_school_class_saved) }
+      it { is_expected.to be_able_to(:destroy, own_school_class_saved) }
+      it { is_expected.not_to be_able_to(:create, other_school_class) }
+      it { is_expected.not_to be_able_to(:import, other_school_class) }
+      it { is_expected.not_to be_able_to(:read, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:update, other_school_class_saved) }
+      it { is_expected.not_to be_able_to(:destroy, other_school_class_saved) }
+    end
+  end
+
+  describe 'Google Auth' do
+    context 'with no user' do
+      let(:user) { nil }
+
+      it { is_expected.not_to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a standard user (no school)' do
+      let(:user) { build(:user) }
+
+      it { is_expected.not_to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a school teacher' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+
+      before do
+        create(:teacher_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a school owner' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+
+      before do
+        create(:owner_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.to be_able_to(:exchange_code, :google_auth) }
+    end
+
+    context 'with a school student' do
+      let(:user) { create(:user) }
+      let(:school) { create(:school) }
+
+      before do
+        create(:student_role, user_id: user.id, school:)
+      end
+
+      it { is_expected.not_to be_able_to(:exchange_code, :google_auth) }
     end
   end
 end

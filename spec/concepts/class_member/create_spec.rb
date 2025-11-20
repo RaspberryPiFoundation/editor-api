@@ -102,14 +102,19 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect { described_class.call(school_class:, students:) }.not_to change(ClassStudent, :count)
         end
 
-        it 'returns a successful operation response' do
+        it 'returns an unsuccessful operation response' do
           response = described_class.call(school_class:, students:)
-          expect(response.success?).to be(true)
+          expect(response.success?).to be(false)
         end
 
         it 'returns an empty class members array' do
           response = described_class.call(school_class:, students:)
           expect(response[:class_members]).to eq([])
+        end
+
+        it 'returns a generic error message in the operation response referencing the errors Hash' do
+          response = described_class.call(school_class:, students:)
+          expect(response[:error]).to include("Error creating one or more class members - see 'errors' key for details")
         end
 
         it 'returns the error messages in the operation response' do
@@ -126,9 +131,9 @@ RSpec.describe ClassMember::Create, type: :unit do
       context 'when one creation fails' do
         let(:new_students) { students + [different_school_student] }
 
-        it 'returns a successful operation response' do
+        it 'returns an unsuccessful operation response' do
           response = described_class.call(school_class:, students: new_students, teachers:)
-          expect(response.success?).to be(true)
+          expect(response.success?).to be(false)
         end
 
         it 'returns a class members JSON array' do
@@ -166,6 +171,11 @@ RSpec.describe ClassMember::Create, type: :unit do
           expect(response_teachers.map(&:teacher_id)).to match_array(teacher_ids)
         end
 
+        it 'returns a generic error message in the operation response referencing the errors Hash' do
+          response = described_class.call(school_class:, students: new_students, teachers:)
+          expect(response[:error]).to include("Error creating one or more class members - see 'errors' key for details")
+        end
+
         it 'returns the error messages in the operation response' do
           response = described_class.call(school_class:, students: new_students, teachers:)
           expect(response[:errors][different_school_student.id]).to eq("Error creating class member for student_id #{different_school_student.id}: Student '#{different_school_student.id}' does not have the 'school-student' role for organisation '#{school.id}'")
@@ -175,6 +185,14 @@ RSpec.describe ClassMember::Create, type: :unit do
           described_class.call(school_class:, students: new_students, teachers:)
           expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
         end
+      end
+    end
+
+    context 'when duplicate validation errors occur' do
+      it 'does not send the exception to Sentry' do
+        duplicate_student = students.first
+        described_class.call(school_class:, students: [duplicate_student, duplicate_student])
+        expect(Sentry).not_to have_received(:capture_exception)
       end
     end
   end

@@ -1,10 +1,6 @@
 # frozen_string_literal: true
 
 class AuthController < ApplicationController
-  # def index
-
-  # end
-
   def callback
     Rails.logger.debug { "callback: #{omniauth_params}" }
     # Prevent session fixation.  If the session has been initialized before

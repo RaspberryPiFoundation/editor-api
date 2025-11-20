@@ -2,41 +2,64 @@
 
 module SchoolMember
   class List
-    SchoolMember = Struct.new(:id, :name, :username, :email, :type)
+    # TODO: This should be using the User model for consistency
+    SchoolMember = Struct.new(:id, :name, :username, :email, :type, :sso_providers) do
+      def initialize(id, name, username, email, type, sso_providers = [])
+        super
+      end
+    end
 
     class << self
-      # rubocop:disable Metrics/CyclomaticComplexity
       def call(school:, token:)
         response = OperationResponse.new
         response[:school_members] = []
 
-        students = teachers = owners = []
-
         begin
-          students_response = SchoolStudent::List.call(school:, token:).fetch(:school_students, [])
-          teachers_response = SchoolTeacher::List.call(school:).fetch(:school_teachers, [])
-          owners_response = SchoolOwner::List.call(school:).fetch(:school_owners, [])
+          students = fetch_students(school:, token:)
+          teachers = fetch_teachers(school:)
+          owners = fetch_owners(school:)
 
-          students = students_response.map do |student|
-            SchoolMember.new(student.id, student.name, student.username, nil, :student)
-          end
-          owners = owners_response.map do |owner|
-            SchoolMember.new(owner.id, owner.name, nil, owner.email, :owner)
-          end
+          # Filter out teachers who are also owners
           owner_ids = owners.map(&:id)
-          teachers = teachers_response.reject { |teacher| owner_ids.include?(teacher.id) }.map do |teacher|
-            SchoolMember.new(teacher.id, teacher.name, nil, teacher.email, :teacher)
-          end
+          filtered_teachers = teachers.reject { |teacher| owner_ids.include?(teacher.id) }
+
+          response[:school_members] = (owners + filtered_teachers + students).sort_by(&:name)
         rescue StandardError => e
           Sentry.capture_exception(e)
           response[:error] = "Error listing school members: #{e}"
-          response
+          return response
         end
 
-        response[:school_members] = (owners + teachers + students).sort_by(&:name)
         response
       end
+
+      private
+
+      def fetch_students(school:, token:)
+        student_roles = Role.student.where(school:)
+
+        students_response = student_roles.any? ? SchoolStudent::List.call(school:, token:).fetch(:school_students, []) : []
+
+        students_response.map do |student|
+          SchoolMember.new(student.id, student.name, student.username, student.email, :student, student.sso_providers)
+        end
+      end
+
+      def fetch_teachers(school:)
+        teachers_response = SchoolTeacher::List.call(school:).fetch(:school_teachers, [])
+
+        teachers_response.map do |teacher|
+          SchoolMember.new(teacher.id, teacher.name, nil, teacher.email, :teacher, [])
+        end
+      end
+
+      def fetch_owners(school:)
+        owners_response = SchoolOwner::List.call(school:).fetch(:school_owners, [])
+
+        owners_response.map do |owner|
+          SchoolMember.new(owner.id, owner.name, nil, owner.email, :owner, [])
+        end
+      end
     end
-    # rubocop:enable Metrics/CyclomaticComplexity
   end
 end
