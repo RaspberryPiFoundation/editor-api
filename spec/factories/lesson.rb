@@ -13,9 +13,9 @@ FactoryBot.define do
     project factory: %i[project]
 
     after(:build) do |lesson, evaluator|
-      lesson.project.user_id = lesson.user_id
-      lesson.project.name = evaluator.project_name
-      lesson.project.identifier = "#{lesson.name.parameterize}-#{lesson.user_id}"
+      lesson.project&.user_id = lesson.user_id
+      lesson.project&.name = evaluator.project_name
+      lesson.project&.identifier = "#{lesson.name.parameterize}-#{lesson.user_id}"
     end
 
     trait :with_project_components do

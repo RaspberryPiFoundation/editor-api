@@ -287,4 +287,26 @@ RSpec.describe Lesson do
       expect(lesson.archived?).to be(false)
     end
   end
+
+  describe '#submitted_count' do
+    it 'returns 0 if there is no project' do
+      lesson = create(:lesson, project: nil)
+      expect(lesson.submitted_count).to eq(0)
+    end
+
+    it 'returns the count of submitted remixes of the lesson project' do
+      student = create(:student, school:)
+      lesson = create(:lesson, school:, user_id: teacher.id)
+
+      remix1 = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      remix1.school_project.transition_status_to!(:submitted, remix1.user_id)
+
+      remix2 = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      remix2.school_project.transition_status_to!(:submitted, remix2.user_id)
+
+      create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id) # Not submitted
+
+      expect(lesson.submitted_count).to eq(2)
+    end
+  end
 end
