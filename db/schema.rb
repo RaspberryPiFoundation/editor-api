@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_06_170425) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_20_092548) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -248,6 +248,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_06_170425) do
     t.string "import_id"
     t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "school_import_results", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "job_id", null: false
+    t.uuid "user_id", null: false
+    t.jsonb "results", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_school_import_results_on_job_id", unique: true
+    t.index ["user_id"], name: "index_school_import_results_on_user_id"
   end
 
   create_table "school_project_transitions", force: :cascade do |t|
