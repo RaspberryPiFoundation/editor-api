@@ -12,6 +12,7 @@ RSpec.describe 'Listing lessons', type: :request do
   let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'public', user_id: teacher.id) }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let(:owner) { create(:owner, school:) }
+  let(:student) { create(:student, school:) }
   let(:school) { create(:school) }
   let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
   let(:another_school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
@@ -119,6 +120,17 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.size).to eq(1)
   end
 
+  it 'includes the submitted_count for each lesson' do
+    lesson.update!(school_class_id: school_class.id)
+    remix = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+    remix.school_project.transition_status_to!(:submitted, student.id)
+
+    get("/api/lessons?school_class_id=#{school_class.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.first[:submitted_count]).to eq(1)
+  end
+
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
     let(:owner) { create(:owner, school:) }
@@ -172,7 +184,6 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it 'does not include the lesson when the user is a school-student' do
-      student = create(:student, school:)
       authenticated_in_hydra_as(student)
 
       get('/api/lessons', headers:)
@@ -200,7 +211,6 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it "includes the lesson when the user is a school-student within the lesson's class" do
-      student = create(:student, school:)
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
@@ -208,6 +218,15 @@ RSpec.describe 'Listing lessons', type: :request do
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data.size).to eq(1)
+    end
+
+    it 'does not include the submitted_count when the user is a school-student within the lesson\'s class' do
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+      expect(data.first).not_to have_key(:submitted_count)
     end
 
     it "includes the remix identifier when the user has remixed the lesson's project" do
@@ -222,7 +241,6 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
-      student = create(:student, school:)
       authenticated_in_hydra_as(student)
 
       get('/api/lessons', headers:)
