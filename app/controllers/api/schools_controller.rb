@@ -54,6 +54,8 @@ module Api
         :name,
         :website,
         :reference,
+        :district_name,
+        :district_nces_id,
         :address_line_1,
         :address_line_2,
         :municipality,
