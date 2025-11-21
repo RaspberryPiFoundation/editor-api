@@ -10,7 +10,11 @@ module Api
       archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
       scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
       ordered_scope = scope.order(created_at: :asc)
-      @lessons_with_users = ordered_scope.accessible_by(current_ability).with_users
+
+      accessible_lessons = ordered_scope.accessible_by(current_ability)
+      lessons_with_users = accessible_lessons.with_users
+      remixes = user_remixes(accessible_lessons)
+      @lessons_with_users_and_remixes = lessons_with_users.zip(remixes)
       if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
         render :teacher_index, formats: [:json], status: :ok
       else
@@ -76,6 +80,22 @@ module Api
       return if school&.classes&.pluck(:id)&.include?(base_params[:school_class_id])
 
       raise ParameterError, 'school_class_id does not correspond to school_id'
+    end
+
+    def user_remixes(lessons)
+      lessons.map do |lesson|
+        next nil unless lesson&.project&.remixes&.any?
+
+        user_remix(lesson)
+      end
+    end
+
+    def user_remix(lesson)
+      lesson.project&.remixes
+            &.where(user_id: current_user.id)
+            &.accessible_by(current_ability)
+            &.order(created_at: :asc)
+            &.first
     end
 
     def lesson_params

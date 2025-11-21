@@ -2,4 +2,5 @@
 
 json.array!(@lessons_with_users) do |lesson, user|
   json.partial! 'lesson', lesson: lesson, user: user
+  json.remix_identifier(remix.identifier) if remix.present?
 end

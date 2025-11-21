@@ -43,7 +43,9 @@ Rails.application.routes.draw do
       post :submit, on: :member, to: 'school_projects#submit'
       post :return, on: :member, to: 'school_projects#return'
       post :complete, on: :member, to: 'school_projects#complete'
-      resource :remix, only: %i[show create], controller: 'projects/remixes'
+      resource :remix, only: %i[show create], controller: 'projects/remixes' do
+        get :identifier, on: :member, to: 'projects/remixes#show_identifier'
+      end
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
       resources :feedback, only: %i[index create], controller: 'feedback' do

@@ -1,10 +1,16 @@
 services:
   db:
-    image: postgres:14
+    image: postgres:17
     environment:
       - POSTGRES_DB
       - POSTGRES_PASSWORD
       - POSTGRES_USER
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
     ports:
       - "5434:5432"
     volumes:
@@ -16,9 +22,12 @@ services:
       target: builder
     image: editor-api:builder
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     volumes:
       - .:/app
+      - bundle-data:/usr/local/bundle
+      - node_modules:/app/node_modules
       # This is here to avoid rails finding stale pid-files in tmp/pids and then
       # thinking it is already running:
       - type: tmpfs
@@ -46,3 +55,5 @@ services:
 
 volumes:
   postgres-data:
+  bundle-data:
+  node_modules:

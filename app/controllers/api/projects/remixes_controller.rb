@@ -5,7 +5,7 @@ module Api
     class RemixesController < ApiController
       before_action :authorize_user
       load_and_authorize_resource :school, only: :index
-      before_action :load_and_authorize_remix, only: %i[show]
+      before_action :load_and_authorize_remix, only: %i[show show_identifier]
 
       def index
         projects = Project.where(remixed_from_id: project.id).accessible_by(current_ability)
@@ -15,6 +15,10 @@ module Api
 
       def show
         render '/api/projects/show', formats: [:json]
+      end
+
+      def show_identifier
+        render json: { identifier: @project.identifier }, status: :ok
       end
 
       def create
