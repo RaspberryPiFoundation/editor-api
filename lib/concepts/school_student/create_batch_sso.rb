@@ -32,17 +32,36 @@ module SchoolStudent
       private
 
       def create_batch_sso(school, students, token)
-        # Ensure that nil values are empty strings, else Profile will swallow validations
-        students = students.map do |student|
-          student.transform_values { |value| value.nil? ? '' : value }
-        end
-
+        students = normalize_student_params(students)
         responses = ProfileApiClient.create_school_students_sso(token:, students:, school_id: school.id)
 
-        responses.each do |student|
-          Role.student.find_or_create_by(school_id: school.id, user_id: student[:id])
-        end
+        create_student_roles(school, responses)
+        format_student_responses(responses)
+      rescue ProfileApiClient::Student422Error => e
+        handle_validations(e.errors)
+      end
 
+      def normalize_student_params(students)
+        # Ensure that nil values are empty strings, else Profile will swallow validations
+        students.map do |student|
+          student.transform_values { |value| value.nil? ? '' : value }
+        end
+      end
+
+      def create_student_roles(school, responses)
+        # Bulk check which roles already exist to avoid N+1 queries
+        user_ids = responses.pluck(:id)
+        existing_roles = Role.student.where(school_id: school.id, user_id: user_ids).index_by(&:user_id)
+
+        # Create only the missing roles
+        user_ids.each do |user_id|
+          next if existing_roles[user_id]
+
+          Role.create!(role: :student, school_id: school.id, user_id: user_id)
+        end
+      end
+
+      def format_student_responses(responses)
         # Convert hash responses to User objects with separate metadata
         # This separates student data from metadata (success, error, created flags)
         responses.map do |student_data|
@@ -53,8 +72,6 @@ module SchoolStudent
             created: student_data[:created]
           }
         end
-      rescue ProfileApiClient::Student422Error => e
-        handle_validations(e.errors)
       end
 
       def handle_validations(errors)

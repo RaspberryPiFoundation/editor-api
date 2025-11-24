@@ -23,6 +23,8 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
     let(:user_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
 
     before do
+      # Force memoization of user_ids before stub so they're consistent
+      user_ids
       stub_profile_api_create_school_students_sso(user_ids:)
     end
 
@@ -82,6 +84,39 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
       expect(second_student_item[:student].id).to eq(user_ids[1])
       expect(second_student_item[:student].name).to eq('SSO Test Student 2')
       expect(second_student_item[:success]).to be(true)
+    end
+
+    context 'when roles already exist for some students' do
+      let(:user_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
+
+      before do
+        # Pre-create a role for the first student
+        Role.create!(role: :student, school_id: school.id, user_id: user_ids[0])
+      end
+
+      it 'does not duplicate existing roles' do
+        roles_before_call = Role.student.where(school_id: school.id).to_a
+
+        described_class.call(school:, school_students_params:, current_user:)
+
+        roles_after_call = Role.student.where(school_id: school.id).to_a
+        new_student_roles = roles_after_call - roles_before_call
+
+        # Should only create 1 new student role (for second student) since first already exists
+        expect(new_student_roles.length).to eq(1)
+        expect(new_student_roles.first.user_id).to eq(user_ids[1])
+      end
+
+      it 'does not raise an error' do
+        expect do
+          described_class.call(school:, school_students_params:, current_user:)
+        end.not_to raise_error
+      end
+
+      it 'still returns all students in the response' do
+        response = described_class.call(school:, school_students_params:, current_user:)
+        expect(response[:school_students].length).to eq(2)
+      end
     end
   end
 
