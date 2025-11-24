@@ -23,7 +23,6 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
     let(:user_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
 
     before do
-      # Force memoization of user_ids before stub so they're consistent
       user_ids
       stub_profile_api_create_school_students_sso(user_ids:)
     end
@@ -36,7 +35,6 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
     it 'makes a profile API call with correct parameters' do
       described_class.call(school:, school_students_params:, current_user:)
 
-      # TODO: Replace with WebMock assertion once the profile API has been built.
       expect(ProfileApiClient).to have_received(:create_school_students_sso)
         .with(token: current_user.token, students: school_students_params, school_id: school.id)
     end
@@ -90,7 +88,6 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
       let(:user_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
 
       before do
-        # Pre-create a role for the first student
         Role.create!(role: :student, school_id: school.id, user_id: user_ids[0])
       end
 
