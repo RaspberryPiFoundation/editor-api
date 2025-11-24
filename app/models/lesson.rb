@@ -54,6 +54,7 @@ class Lesson < ApplicationRecord
 
   def submitted_count
     return 0 unless project
+  
     project.remixes.count { |remix| remix.school_project&.submitted? }
   end
 
