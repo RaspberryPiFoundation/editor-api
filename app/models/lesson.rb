@@ -52,6 +52,12 @@ class Lesson < ApplicationRecord
     save!(validate: false)
   end
 
+  def submitted_count
+    return 0 unless project
+
+    project.remixes.count { |remix| remix.school_project&.submitted? }
+  end
+
   private
 
   def assign_school_from_school_class
