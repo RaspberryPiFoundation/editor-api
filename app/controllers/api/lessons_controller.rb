@@ -12,12 +12,12 @@ module Api
       ordered_scope = scope.order(created_at: :asc)
 
       accessible_lessons = ordered_scope.accessible_by(current_ability)
-      lessons_with_users = accessible_lessons.with_users
-      remixes = user_remixes(accessible_lessons)
-      @lessons_with_users_and_remixes = lessons_with_users.zip(remixes)
+      @lessons_with_users = accessible_lessons.with_users
       if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
         render :teacher_index, formats: [:json], status: :ok
       else
+        remixes = user_remixes(accessible_lessons)
+        @lessons_with_users_and_remixes = @lessons_with_users.zip(remixes)
         render :student_index, formats: [:json], status: :ok
       end
     end
