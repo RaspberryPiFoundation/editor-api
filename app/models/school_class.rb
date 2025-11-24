@@ -58,6 +58,12 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'could not be generated')
   end
 
+  def submitted_count
+    return 0 if lessons.empty?
+
+    lessons.sum(&:submitted_count)
+  end
+
   private
 
   def school_class_has_at_least_one_teacher

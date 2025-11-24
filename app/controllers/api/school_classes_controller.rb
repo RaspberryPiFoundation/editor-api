@@ -10,7 +10,11 @@ module Api
       school_classes = @school.classes.accessible_by(current_ability)
       school_classes = school_classes.joins(:teachers).where(teachers: { teacher_id: current_user.id }) if params[:my_classes] == 'true'
       @school_classes_with_teachers = school_classes.with_teachers
-      render :index, formats: [:json], status: :ok
+      if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
+        render :teacher_index, formats: [:json], status: :ok
+      else
+        render :index, formats: [:json], status: :ok
+      end
     end
 
     def show
