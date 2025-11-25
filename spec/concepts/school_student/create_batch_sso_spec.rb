@@ -63,6 +63,35 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
       end
     end
 
+    # This test fails if Role validations change. Check create_batch_sso insert_all usage is still safe, otherwise
+    # add the validation to the expected list
+    it 'fails if Role validations change to ensure CreateBatchSSO is updated' do
+      actual_custom = Role._validate_callbacks
+                          .select { |cb| cb.filter.is_a?(Symbol) }
+                          .map(&:filter)
+                          .reject { |v| v.to_s.start_with?('cant_modify_encrypted_attributes', 'validate_associated_records') }
+                          .sort
+
+      actual_builtin = Role.validators
+                           .map { |v| { attributes: v.attributes.sort, kind: v.class.name.demodulize } }
+                           .sort_by { |v| [v[:kind], v[:attributes]] }
+
+      expected_custom = %i[students_cannot_have_additional_roles users_can_only_have_roles_in_one_school]
+      expected_builtin = [
+        { attributes: [:role], kind: 'PresenceValidator' },
+        { attributes: [:school], kind: 'PresenceValidator' },
+        { attributes: [:user_id], kind: 'PresenceValidator' },
+        { attributes: [:role], kind: 'UniquenessValidator' }
+      ]
+
+      expect(actual_custom).to eq(expected_custom),
+                               "Custom Role validations changed! Got: #{actual_custom.inspect}
+                                Consider updating CreateBatchSSO to ensure insert_all usage is still safe."
+      expect(actual_builtin).to eq(expected_builtin),
+                                "Built-in Role validations changed! Got: #{actual_builtin.inspect}
+                                Consider updating CreateBatchSSO to ensure insert_all usage is still safe."
+    end
+
     it 'returns the student data from Profile API' do
       response = described_class.call(school:, school_students_params:, current_user:)
       students = response[:school_students]
