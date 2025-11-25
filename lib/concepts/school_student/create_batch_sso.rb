@@ -49,16 +49,25 @@ module SchoolStudent
       end
 
       def create_student_roles(school, responses)
-        # Bulk check which roles already exist to avoid N+1 queries
         user_ids = responses.pluck(:id)
-        existing_roles = Role.student.where(school_id: school.id, user_id: user_ids).index_by(&:user_id)
+        existing_user_ids = Role.student.where(school_id: school.id, user_id: user_ids).pluck(:user_id)
+        new_user_ids = user_ids - existing_user_ids
 
-        # Create only the missing roles
-        user_ids.each do |user_id|
-          next if existing_roles[user_id]
+        return if new_user_ids.empty?
 
-          Role.create!(role: :student, school_id: school.id, user_id: user_id)
+        # Use insert_all to avoid N+1 INSERT queries
+        new_roles = new_user_ids.map do |user_id|
+          {
+            role: Role.roles[:student],
+            school_id: school.id,
+            user_id: user_id
+          }
         end
+
+        # We know the school and uniqueness is ok at this stage, so we can skip validations
+        # rubocop:disable Rails/SkipsModelValidations
+        Role.insert_all(new_roles, unique_by: %i[user_id school_id role])
+        # rubocop:enable Rails/SkipsModelValidations
       end
 
       def format_student_responses(responses)
