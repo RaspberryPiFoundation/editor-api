@@ -61,7 +61,16 @@ class SchoolClass < ApplicationRecord
   def submitted_count
     return 0 if lessons.empty?
 
-    lessons.sum(&:submitted_count)
+    Lesson
+      .joins(project: { remixes: { school_project: :school_project_transitions } })
+      .where(school_class_id: id)
+      .where(
+        school_project_transitions: { 
+          to_state: 'submitted', 
+          most_recent: true 
+        }
+      )
+      .count
   end
 
   private

@@ -108,7 +108,7 @@ module Api
 
     def accessible_school_classes
       if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
-        @school.classes.accessible_by(current_ability).includes(:lessons)
+        @school.classes.accessible_by(current_ability).includes(lessons: { project: { remixes: { school_project: :school_project_transitions } } })
       else
         @school.classes.accessible_by(current_ability)
       end
