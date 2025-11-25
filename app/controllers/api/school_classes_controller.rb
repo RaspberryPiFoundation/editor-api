@@ -7,12 +7,7 @@ module Api
     before_action :load_and_authorize_school_class
 
     def index
-      if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
-        school_classes = @school.classes.accessible_by(current_ability).includes(:lessons)
-      else
-        school_classes = @school.classes.accessible_by(current_ability)
-      end
-
+      school_classes = accessible_school_classes
       school_classes = school_classes.joins(:teachers).where(teachers: { teacher_id: current_user&.id }) if params[:my_classes] == 'true'
       @school_classes_with_teachers = school_classes.with_teachers
 
@@ -109,6 +104,14 @@ module Api
         current_user:,
         validate_context: :import
       )
+    end
+
+    def accessible_school_classes
+      if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
+        @school.classes.accessible_by(current_ability).includes(:lessons)
+      else
+        @school.classes.accessible_by(current_ability)
+      end
     end
 
     def create_school_students(school_students_params, school_class)
