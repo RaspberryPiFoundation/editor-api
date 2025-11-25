@@ -26,6 +26,8 @@ class SchoolDashboard < Administrate::BaseDashboard
     lessons: Field::HasMany,
     projects: Field::HasMany,
     reference: Field::String,
+    district_name: Field::String,
+    district_nces_id: Field::String,
     verified_at: Field::DateTime,
     rejected_at: Field::DateTime,
     created_at: Field::DateTime,
@@ -58,6 +60,8 @@ class SchoolDashboard < Administrate::BaseDashboard
     creator_role
     creator_department
     reference
+    district_name
+    district_nces_id
     website
     address_line_1
     address_line_2
@@ -80,6 +84,8 @@ class SchoolDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = %i[
     name
     reference
+    district_name
+    district_nces_id
     website
     address_line_1
     address_line_2
