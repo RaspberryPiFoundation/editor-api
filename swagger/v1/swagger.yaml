@@ -1,0 +1,1323 @@
+---
+openapi: 3.0.1
+info:
+  title: Editor API V1
+  version: v1
+  description: REST and GraphQL APIs for Raspberry Pi Foundation Code Editor
+paths:
+  "/api/schools/{school_id}/classes/{class_id}/members":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    - name: class_id
+      in: path
+      description: Class ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list class members
+      tags:
+      - Class Members
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: add class member
+      tags:
+      - Class Members
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '204':
+          description: no content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_id:
+                  type: string
+              required:
+              - student_id
+  "/api/schools/{school_id}/classes/{class_id}/members/batch":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    - name: class_id
+      in: path
+      description: Class ID
+      required: true
+      schema:
+        type: string
+    post:
+      summary: batch add class members
+      tags:
+      - Class Members
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                student_ids:
+                  type: array
+                  items:
+                    type: string
+  "/api/schools/{school_id}/classes/{class_id}/members/{id}":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    - name: class_id
+      in: path
+      description: Class ID
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Member ID
+      required: true
+      schema:
+        type: string
+    delete:
+      summary: remove class member
+      tags:
+      - Class Members
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: no content
+  "/api/default_project":
+    get:
+      summary: show default project
+      tags:
+      - Default Projects
+      description: Get the default project structure
+      responses:
+        '200':
+          description: successful
+  "/api/default_project/html":
+    get:
+      summary: show default HTML project
+      tags:
+      - Default Projects
+      description: Get the default HTML project structure
+      responses:
+        '200':
+          description: successful
+  "/api/default_project/python":
+    get:
+      summary: show default Python project
+      tags:
+      - Default Projects
+      description: Get the default Python project structure
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{project_id}/feedback":
+    parameters:
+    - name: project_id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list project feedback
+      tags:
+      - Project Feedback
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create project feedback
+      tags:
+      - Project Feedback
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+              required:
+              - comment
+  "/api/projects/{project_id}/feedback/{id}/read":
+    parameters:
+    - name: project_id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Feedback ID
+      required: true
+      schema:
+        type: string
+    put:
+      summary: mark feedback as read
+      tags:
+      - Project Feedback
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+  "/api/google/auth/exchange-code":
+    post:
+      summary: exchange Google OAuth code for tokens
+      tags:
+      - Google Auth
+      security:
+      - bearer_auth: []
+      description: Exchange a Google OAuth authorization code for access and refresh
+        tokens
+      parameters: []
+      responses:
+        '200':
+          description: successful
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                code:
+                  type: string
+                  description: Google OAuth authorization code
+              required:
+              - code
+  "/api/lessons":
+    parameters:
+    - name: school_class_id
+      in: query
+      required: false
+      description: Filter by school class ID
+      schema:
+        type: string
+    - name: include_archived
+      in: query
+      required: false
+      description: Include archived lessons
+      schema:
+        type: boolean
+    get:
+      summary: list lessons
+      tags:
+      - Lessons
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create lesson
+      tags:
+      - Lessons
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                visibility:
+                  type: string
+                  enum:
+                  - private
+                  - teachers
+                  - students
+                school_class_id:
+                  type: string
+                project_id:
+                  type: string
+              required:
+              - name
+              - visibility
+              - school_class_id
+              - project_id
+  "/api/lessons/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Lesson ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show lesson
+      tags:
+      - Lessons
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update lesson
+      tags:
+      - Lessons
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                visibility:
+                  type: string
+                  enum:
+                  - private
+                  - teachers
+                  - students
+    delete:
+      summary: archive lesson
+      tags:
+      - Lessons
+      security:
+      - bearer_auth: []
+      parameters:
+      - name: undo
+        in: query
+        required: false
+        description: Set to true to unarchive
+        schema:
+          type: boolean
+      responses:
+        '204':
+          description: no content
+  "/api/lessons/{id}/copy":
+    parameters:
+    - name: id
+      in: path
+      description: Lesson ID
+      required: true
+      schema:
+        type: string
+    post:
+      summary: copy lesson
+      tags:
+      - Lessons
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                school_class_id:
+                  type: string
+              required:
+              - school_class_id
+  "/api/school":
+    get:
+      summary: show current user school
+      tags:
+      - My School
+      security:
+      - bearer_auth: []
+      description: Returns the school associated with the current user
+      responses:
+        '200':
+          description: successful
+        '404':
+          description: not found
+  "/api/project_errors":
+    post:
+      summary: report project error
+      tags:
+      - Project Errors
+      security:
+      - bearer_auth: []
+      description: Report an error that occurred in a project
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                project_id:
+                  type: string
+                error_type:
+                  type: string
+                message:
+                  type: string
+                stack_trace:
+                  type: string
+              required:
+              - error_type
+              - message
+  "/api/projects/{project_id}/images":
+    parameters:
+    - name: project_id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list project images
+      tags:
+      - Project Images
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: upload project images
+      tags:
+      - Project Images
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: array
+        description: Image files to upload
+  "/api/projects/{project_id}/remixes":
+    parameters:
+    - name: project_id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list project remixes
+      tags:
+      - Project Remixes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{project_id}/remix":
+    parameters:
+    - name: project_id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show current user remix
+      tags:
+      - Project Remixes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+        '404':
+          description: not found
+    post:
+      summary: create remix
+      tags:
+      - Project Remixes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                locale:
+                  type: string
+  "/api/projects/{project_id}/remix/identifier":
+    parameters:
+    - name: project_id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: get remix identifier
+      tags:
+      - Project Remixes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{identifier}":
+    parameters:
+    - name: identifier
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    - name: locale
+      in: query
+      required: false
+      description: Project locale
+      schema:
+        type: string
+    get:
+      summary: show project
+      tags:
+      - Projects
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+        '404':
+          description: not found
+    patch:
+      summary: update project
+      tags:
+      - Projects
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                locale:
+                  type: string
+                components:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      id:
+                        type: string
+                      name:
+                        type: string
+                      extension:
+                        type: string
+                      content:
+                        type: string
+    delete:
+      summary: delete project
+      tags:
+      - Projects
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: no content
+  "/api/projects":
+    parameters:
+    - name: user_id
+      in: query
+      format: uuid
+      required: false
+      description: Filter by user ID
+      schema:
+        type: string
+    - name: page
+      in: query
+      required: false
+      description: Page number for pagination
+      schema:
+        type: integer
+    - name: per_page
+      in: query
+      required: false
+      description: Items per page
+      schema:
+        type: integer
+    get:
+      summary: list projects
+      tags:
+      - Projects
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create project
+      tags:
+      - Projects
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                identifier:
+                  type: string
+                locale:
+                  type: string
+                school_id:
+                  type: string
+                lesson_id:
+                  type: string
+                components:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      extension:
+                        type: string
+                      content:
+                        type: string
+                      default:
+                        type: boolean
+              required:
+              - name
+  "/api/projects/{id}/context":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show project context
+      tags:
+      - Projects
+      security:
+      - bearer_auth: []
+      description: Get additional context about a project (e.g., lesson, class info)
+      responses:
+        '200':
+          description: successful
+  "/api/schools/{school_id}/classes":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list school classes
+      tags:
+      - School Classes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create school class
+      tags:
+      - School Classes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+              required:
+              - name
+  "/api/schools/{school_id}/classes/import":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    post:
+      summary: import school classes from Google Classroom
+      tags:
+      - School Classes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                classes:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      external_id:
+                        type: string
+                      name:
+                        type: string
+  "/api/schools/{school_id}/classes/{id}":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Class ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show school class
+      tags:
+      - School Classes
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update school class
+      tags:
+      - School Classes
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+    delete:
+      summary: delete school class
+      tags:
+      - School Classes
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: no content
+  "/api/schools/{school_id}/members":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list school members
+      tags:
+      - School Members
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+  "/api/schools/{school_id}/owners":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list school owners
+      tags:
+      - School Owners
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{id}/finished":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show project finished status
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      description: Get the finished status for a school project
+      responses:
+        '200':
+          description: successful
+    put:
+      summary: set project finished status
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '204':
+          description: no content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                finished:
+                  type: boolean
+  "/api/projects/{id}/status":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show project status
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      description: Get the submission status for a school project
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{id}/submit":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    post:
+      summary: submit project
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      description: Submit a school project for review
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{id}/unsubmit":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    post:
+      summary: unsubmit project
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      description: Unsubmit a previously submitted school project
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{id}/return":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    post:
+      summary: return project to student
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      description: Teacher returns a submitted project to the student for revisions
+      responses:
+        '200':
+          description: successful
+  "/api/projects/{id}/complete":
+    parameters:
+    - name: id
+      in: path
+      description: Project identifier
+      required: true
+      schema:
+        type: string
+    post:
+      summary: mark project as complete
+      tags:
+      - School Projects
+      security:
+      - bearer_auth: []
+      description: Teacher marks a submitted project as complete
+      responses:
+        '200':
+          description: successful
+  "/api/schools/{school_id}/students":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list school students
+      tags:
+      - School Students
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create school student
+      tags:
+      - School Students
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '204':
+          description: no content
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                password:
+                  type: string
+              required:
+              - username
+              - name
+              - password
+  "/api/schools/{school_id}/students/batch":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    post:
+      summary: batch create school students
+      tags:
+      - School Students
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                students:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                      name:
+                        type: string
+                      password:
+                        type: string
+                    required:
+                    - username
+                    - name
+                    - password
+  "/api/schools/{school_id}/students/{id}":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    - name: id
+      in: path
+      description: Student ID
+      required: true
+      schema:
+        type: string
+    patch:
+      summary: update school student
+      tags:
+      - School Students
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '204':
+          description: no content
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                name:
+                  type: string
+                password:
+                  type: string
+    delete:
+      summary: delete school student
+      tags:
+      - School Students
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: no content
+  "/api/schools/{school_id}/teachers":
+    parameters:
+    - name: school_id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: list school teachers
+      tags:
+      - School Teachers
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: add school teacher
+      tags:
+      - School Teachers
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email_address:
+                  type: string
+                  format: email
+              required:
+              - email_address
+  "/api/schools":
+    get:
+      summary: list schools
+      tags:
+      - Schools
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    post:
+      summary: create school
+      tags:
+      - Schools
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '201':
+          description: created
+        '422':
+          description: unprocessable entity
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                school:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    website:
+                      type: string
+                    reference:
+                      type: string
+                    country_code:
+                      type: string
+                    address_line_1:
+                      type: string
+                    address_line_2:
+                      type: string
+                    municipality:
+                      type: string
+                    administrative_area:
+                      type: string
+                    postal_code:
+                      type: string
+                    creator_role:
+                      type: string
+                    creator_department:
+                      type: string
+                    creator_agree_authority:
+                      type: boolean
+                    creator_agree_terms_and_conditions:
+                      type: boolean
+                    creator_agree_to_ux_contact:
+                      type: boolean
+                    creator_agree_responsible_safeguarding:
+                      type: boolean
+                  required:
+                  - name
+                  - country_code
+  "/api/schools/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: School ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show school
+      tags:
+      - Schools
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+    patch:
+      summary: update school
+      tags:
+      - Schools
+      security:
+      - bearer_auth: []
+      parameters: []
+      responses:
+        '200':
+          description: successful
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                school:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    website:
+                      type: string
+    delete:
+      summary: delete school
+      tags:
+      - Schools
+      security:
+      - bearer_auth: []
+      responses:
+        '204':
+          description: no content
+  "/api/teacher_invitations/{token}":
+    parameters:
+    - name: token
+      in: path
+      description: Invitation token
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show teacher invitation
+      tags:
+      - Teacher Invitations
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+        '404':
+          description: not found
+  "/api/teacher_invitations/{token}/accept":
+    parameters:
+    - name: token
+      in: path
+      description: Invitation token
+      required: true
+      schema:
+        type: string
+    put:
+      summary: accept teacher invitation
+      tags:
+      - Teacher Invitations
+      security:
+      - bearer_auth: []
+      responses:
+        '200':
+          description: successful
+        '422':
+          description: unprocessable entity
+  "/api/user_jobs":
+    get:
+      summary: list user jobs
+      tags:
+      - User Jobs
+      security:
+      - bearer_auth: []
+      description: Get background jobs for the current user
+      responses:
+        '200':
+          description: successful
+  "/api/user_jobs/{id}":
+    parameters:
+    - name: id
+      in: path
+      description: Job ID
+      required: true
+      schema:
+        type: string
+    get:
+      summary: show user job
+      tags:
+      - User Jobs
+      security:
+      - bearer_auth: []
+      description: Get status of a specific background job
+      responses:
+        '200':
+          description: successful
+        '404':
+          description: not found
+servers:
+- url: http://localhost:3009
+  description: Development
+components:
+  securitySchemes:
+    bearer_auth:
+      type: http
+      scheme: bearer
+      description: 'Hydra API token via Authorization: Bearer <token>'
