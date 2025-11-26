@@ -89,6 +89,39 @@ RSpec.configure do |config|
   config.include SignInStubs, type: :request
   config.include SignInStubs, type: :system
 
+  # rspec-openapi: Generate OpenAPI docs from request specs
+  # Only runs when OPENAPI_GENERATE=1 is set
+  if ENV['OPENAPI_GENERATE']
+    require 'rspec/openapi'
+
+    config.after(:each, type: :request) do |example|
+      # Skip if the example failed or was skipped
+      next unless example.metadata[:response]
+
+      RSpec::OpenAPI.path = Rails.root.join('swagger/v1/swagger.yaml')
+      RSpec::OpenAPI.comment = <<~COMMENT
+        This file is auto-generated from request specs using rspec-openapi.
+        Run `OPENAPI_GENERATE=1 bundle exec rspec spec/requests/` to regenerate.
+      COMMENT
+      RSpec::OpenAPI.title = 'Editor API V1'
+      RSpec::OpenAPI.description = 'REST and GraphQL APIs for Raspberry Pi Foundation Code Editor'
+      RSpec::OpenAPI.application_version = 'v1'
+      RSpec::OpenAPI.server_urls = {
+        development: 'http://localhost:3009',
+        production: ENV['HOST_URL'] || 'https://editor-api.raspberrypi.org'
+      }
+
+      # Add bearer auth security scheme
+      RSpec::OpenAPI.security_schemes = {
+        bearer_auth: {
+          type: :http,
+          scheme: :bearer,
+          description: 'Hydra API token via Authorization: Bearer <token>'
+        }
+      }
+    end
+  end
+
   if Bullet.enable?
     config.before { Bullet.start_request }
     config.after  { Bullet.end_request }
@@ -128,6 +161,18 @@ RSpec.configure do |config|
     default_url_options[:host] = Capybara.server_host
 
     WebMock.disable_net_connect!(allow_localhost: true, allow: Capybara.server_host)
+  end
+
+  # rspec-openapi: Auto-generate OpenAPI docs from request specs
+  if ENV['OPENAPI']
+    require 'rspec/openapi'
+
+    config.after(:each, type: :request) do |example|
+      # Skip specs that explicitly opt out
+      next if example.metadata[:openapi] == false
+
+      RSpec::OpenAPI.path = Rails.root.join('swagger/v1/swagger.yaml')
+    end
   end
 end
 

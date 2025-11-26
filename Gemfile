@@ -63,6 +63,8 @@ end
 
 group :development do
   gem 'rails-erd'
+  gem 'rswag-api', '~> 2.17'
+  gem 'rswag-ui', '~> 2.17'
   gem 'ruby-lsp', require: false
   gem 'ruby-lsp-rspec', '~> 0.1.27', require: false
 end
@@ -71,6 +73,7 @@ group :test do
   gem 'capybara'
   gem 'climate_control'
   gem 'database_cleaner-active_record'
+  gem 'rspec-openapi', '~> 0.21.0'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 5.0'
   gem 'webdrivers'

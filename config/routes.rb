@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/api-docs' if defined?(Rswag::Ui)
+  mount Rswag::Api::Engine => '/api-docs' if defined?(Rswag::Api)
+
   namespace :admin do
     mount GoodJob::Engine => 'good_job'
     resources :components
