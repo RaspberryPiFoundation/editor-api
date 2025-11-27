@@ -11,7 +11,7 @@ module Api
       scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
       ordered_scope = scope.order(created_at: :asc)
 
-      accessible_lessons = ordered_scope.accessible_by(current_ability)
+      accessible_lessons = ordered_scope.accessible_by(current_ability).includes(project: :remixes)
       @lessons_with_users = accessible_lessons.with_users
       if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
         render :teacher_index, formats: [:json], status: :ok
