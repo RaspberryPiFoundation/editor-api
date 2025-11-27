@@ -7,10 +7,15 @@ module Api
     before_action :load_and_authorize_school_class
 
     def index
-      school_classes = @school.classes.accessible_by(current_ability)
-      school_classes = school_classes.joins(:teachers).where(teachers: { teacher_id: current_user.id }) if params[:my_classes] == 'true'
+      school_classes = accessible_school_classes
+      school_classes = school_classes.joins(:teachers).where(teachers: { teacher_id: current_user&.id }) if params[:my_classes] == 'true'
       @school_classes_with_teachers = school_classes.with_teachers
-      render :index, formats: [:json], status: :ok
+
+      if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
+        render :teacher_index, formats: [:json], status: :ok
+      else
+        render :student_index, formats: [:json], status: :ok
+      end
     end
 
     def show
@@ -99,6 +104,14 @@ module Api
         current_user:,
         validate_context: :import
       )
+    end
+
+    def accessible_school_classes
+      if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
+        @school.classes.accessible_by(current_ability).includes(lessons: { project: { remixes: { school_project: :school_project_transitions } } })
+      else
+        @school.classes.accessible_by(current_ability)
+      end
     end
 
     def create_school_students(school_students_params, school_class)
