@@ -5,23 +5,6 @@
 # Run with: OPENAPI=1 bundle exec rspec spec/requests/
 
 if defined?(RSpec::OpenAPI)
-  # Monkey patch to allow Symbol in YAML safe_load
-  # This is needed because OpenAPI specs may contain symbols
-  RSpec::OpenAPI::SchemaFile.singleton_class.prepend(Module.new do
-    def read(path)
-      return {} unless File.exist?(path)
-
-      content = File.read(path)
-      result = YAML.safe_load(
-        content,
-        permitted_classes: [Date, Time, Symbol],
-        aliases: true
-      )
-      # Return empty hash if YAML is empty or nil
-      result.is_a?(Hash) ? result : {}
-    end
-  end)
-
   RSpec::OpenAPI.title = 'Editor API V1'
   RSpec::OpenAPI.application_version = 'v1'
 
@@ -53,10 +36,10 @@ if defined?(RSpec::OpenAPI)
 
   # Define security schemes
   RSpec::OpenAPI.security_schemes = {
-    bearer_auth: {
-      type: :http,
-      scheme: :bearer,
-      description: 'Hydra API token via Authorization: Bearer <token>'
+    'bearer_auth' => {
+      'type' => 'http',
+      'scheme' => 'bearer',
+      'description' => 'Hydra API token via Authorization: Bearer <token>'
     }
   }
 

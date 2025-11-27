@@ -1,18 +1,11 @@
 # frozen_string_literal: true
 
 namespace :openapi do
-  desc 'Auto-generate OpenAPI docs from ALL request and feature specs'
+  desc 'Auto-generate OpenAPI docs from all request specs'
   task generate: :environment do
     puts 'Generating comprehensive OpenAPI spec from all specs...'
-    sh 'OPENAPI=1 bundle exec rspec spec/requests/ spec/features/ --format progress'
-    puts "\n✅ OpenAPI spec generated at swagger/v1/swagger.yaml"
-    puts 'View at: http://localhost:3009/api-docs'
-  end
-
-  desc 'Generate OpenAPI docs from only request specs (projects, google auth)'
-  task generate_requests_only: :environment do
-    puts 'Generating OpenAPI spec from spec/requests/ only...'
-    sh 'OPENAPI=1 bundle exec rspec spec/requests/ --format progress'
+    # Include spec/requests/api/ (new API specs), spec/requests/projects/ (original), and spec/features/ (school-related specs)
+    sh 'OPENAPI=1 bundle exec rspec spec/requests/api/ spec/requests/projects/ spec/requests/project_errors_spec.rb spec/features/ --format progress'
     puts "\n✅ OpenAPI spec generated at swagger/v1/swagger.yaml"
     puts 'View at: http://localhost:3009/api-docs'
   end

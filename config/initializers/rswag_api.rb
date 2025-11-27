@@ -14,18 +14,4 @@ if defined?(Rswag::Api)
     #
     # c.swagger_filter = lambda { |swagger, env| swagger['host'] = env['HTTP_HOST'] }
   end
-
-  # Monkey patch to allow Symbol class in YAML safe_load
-  # This is needed because rspec-openapi may serialize Ruby symbols in the YAML
-  module Rswag
-    module Api
-      class Middleware
-        private
-
-        def load_yaml(filename)
-          YAML.safe_load_file(filename, permitted_classes: [Symbol, Date, Time])
-        end
-      end
-    end
-  end
 end

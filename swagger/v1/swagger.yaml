@@ -3,7 +3,7 @@
 # To regenerate:
 #   OPENAPI=1 bundle exec rspec spec/requests/
 #
-# Last generated: 2025-11-26 11:46:47 UTC
+# Last generated: 2025-11-27 08:56:02 UTC
 ---
 openapi: 3.0.3
 info:
@@ -14,6 +14,152 @@ servers:
 - url: http://localhost:3009
   description: Development
 paths:
+  "/api/default_project":
+    get:
+      summary: show
+      tags:
+      - Api::DefaultProject
+      responses:
+        '200':
+          description: returns default project
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  components:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lang:
+                          type: string
+                        name:
+                          type: string
+                        content:
+                          type: string
+                      required:
+                      - lang
+                      - name
+                      - content
+                required:
+                - type
+                - components
+              example:
+                type: python
+                components:
+                - lang: py
+                  name: main
+                  content: |-
+                    import turtle
+                    t = turtle.Turtle()
+                    t.forward(100)
+                    print("Oh yeah!")
+  "/api/default_project/html":
+    get:
+      summary: html
+      tags:
+      - Api::DefaultProject
+      responses:
+        '200':
+          description: returns default HTML project
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  components:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lang:
+                          type: string
+                        name:
+                          type: string
+                        content:
+                          type: string
+                      required:
+                      - lang
+                      - name
+                      - content
+                required:
+                - type
+                - components
+              example:
+                type: html
+                components:
+                - lang: html
+                  name: index
+                  content: |
+                    <html>
+                      <head>
+                        <link rel="stylesheet" type="text/css" href="style.css">
+
+                      </head> <body>
+                        <h1>Heading</h1>
+                        <p>Paragraph</p>
+                      </body>
+                    </html>
+                - lang: css
+                  name: style
+                  content: |-
+                    h1 {
+                      color: blue;
+                    }
+                - lang: css
+                  name: test
+                  content: |-
+                    p {
+                      background-color: red;
+                    }
+  "/api/default_project/python":
+    get:
+      summary: python
+      tags:
+      - Api::DefaultProject
+      responses:
+        '200':
+          description: returns default Python project
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  type:
+                    type: string
+                  components:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        lang:
+                          type: string
+                        name:
+                          type: string
+                        content:
+                          type: string
+                      required:
+                      - lang
+                      - name
+                      - content
+                required:
+                - type
+                - components
+              example:
+                type: python
+                components:
+                - lang: py
+                  name: main
+                  content: |-
+                    import turtle
+                    t = turtle.Turtle()
+                    t.forward(100)
+                    print("Oh yeah!")
   "/api/google/auth/exchange-code":
     post:
       summary: exchange_code
@@ -65,7 +211,7 @@ paths:
                 - error
               example:
                 error: 'ActionController::ParameterMissing: param is missing or the
-                  value is empty: code'
+                  value is empty: redirect_uri'
         '401':
           description: returns unauthorized response
           content:
@@ -151,11 +297,10 @@ paths:
         required: false
         schema:
           type: string
-        example: 27d9f0e9-0bec-4d79-9656-c1055ee23993
+        example: cd86f1ea-0564-43fe-a167-d4d2cfbe9633
       responses:
         '200':
-          description: does not include the lesson whent he user does not own the
-            lesson
+          description: includes the lesson when the user owns the lesson
           content:
             application/json:
               schema:
@@ -222,7 +367,23 @@ paths:
                   - updated_at
                   - project
                   - user_name
-              example: []
+              example:
+              - id: ae907029-d1f3-427d-a39e-ea95f7cb6598
+                school_id: 
+                school_class_id: 
+                copied_from_id: 
+                user_id: 60668360-47ce-455c-844c-071af4579d67
+                name: Test Lesson
+                description: Description
+                visibility: private
+                due_date: 
+                archived_at: 
+                created_at: '2025-11-27T08:56:11.977Z'
+                updated_at: '2025-11-27T08:56:11.979Z'
+                project:
+                  identifier: test-lesson-9ee298a2-a5a7-4220-964c-a59d145c4bc4
+                  project_type: python
+                user_name: Rev. Shaquita Kiehn
     post:
       summary: create
       tags:
@@ -236,8 +397,8 @@ paths:
         example: fake-user-access-token
       responses:
         '201':
-          description: responds 201 Created when the user is the school-teacher for
-            the class
+          description: responds 201 Created when the user is a school-teacher for
+            the school
           content:
             application/json:
               schema:
@@ -297,22 +458,22 @@ paths:
                 - project
                 - user_name
               example:
-                id: 70e0260a-916b-489e-ae2b-3a2ee7a57bfe
-                school_id: 9d26e4b8-f7d7-4e32-97fc-2d14672240b4
-                school_class_id: 75f96937-738f-4c4e-b689-4285392001a3
+                id: 14ed853c-ee3b-4972-945d-f451de56ca6e
+                school_id: 7088c1b1-7810-4a3c-9d04-41986cbc0a93
+                school_class_id: 
                 copied_from_id: 
-                user_id: 5c164fee-aeb2-4844-a890-9bfc85432bba
+                user_id: c9ce9248-c3b5-4dfe-8da7-a62570489e4b
                 name: Test Lesson
                 description: 
                 visibility: teachers
                 due_date: 
                 archived_at: 
-                created_at: '2025-11-26T11:47:03.203Z'
-                updated_at: '2025-11-26T11:47:03.203Z'
+                created_at: '2025-11-27T08:56:14.779Z'
+                updated_at: '2025-11-27T08:56:14.779Z'
                 project:
-                  identifier: stunt-party-barn
+                  identifier: stuck-lurch-trait
                   project_type: python
-                user_name: Lonnie Leffler
+                user_name: Taneka Schulist
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -342,7 +503,8 @@ paths:
                 error: 'CanCan::AccessDenied: You are not authorized to access this
                   page.'
         '422':
-          description: responds 422 Unprocessable if school_id is missing
+          description: responds 422 Unprocessable if school_class_id does not correspond
+            to school_id
           content:
             application/json:
               schema:
@@ -393,9 +555,9 @@ paths:
                       - components
                     school_id:
                       type: string
-                    user_id:
-                      type: string
                     school_class_id:
+                      type: string
+                    user_id:
                       type: string
                   required:
                   - name
@@ -412,9 +574,9 @@ paths:
                   - name: main.py
                     extension: py
                     content: print("Hello, world!")
-                school_id: 9d26e4b8-f7d7-4e32-97fc-2d14672240b4
+                school_id: 7088c1b1-7810-4a3c-9d04-41986cbc0a93
+                school_class_id: d92c51e9-dda6-47ba-99e7-65b66144b9e5
                 user_id: ignored
-                school_class_id: 75f96937-738f-4c4e-b689-4285392001a3
   "/api/lessons/{id}":
     delete:
       summary: destroy
@@ -432,7 +594,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 7485df8b-d500-4c63-b783-c0ab283d8b34
+        example: 8ec6c322-2708-44b8-be06-7ac1abeb443e
       - name: undo
         in: query
         required: false
@@ -486,10 +648,11 @@ paths:
         required: true
         schema:
           type: string
-        example: 19589fed-3401-4174-9f9a-561d23d7965f
+        example: 4b9ca666-8ab7-4c5b-81be-e1381a7273ac
       responses:
         '200':
-          description: responds 200 OK when the user owns the lesson
+          description: responds 200 OK when the user is a school-student within the
+            lesson's class
           content:
             application/json:
               schema:
@@ -550,22 +713,22 @@ paths:
                 - project
                 - user_name
               example:
-                id: 75bf7f55-5fc5-42a6-9886-cefd41169ab3
-                school_id: bc46dbec-27ed-4525-b82f-7c59f39e7893
-                school_class_id: 
+                id: 355de7b5-6b52-41cd-8907-b77e97dd0219
+                school_id: 89f5aad8-1e26-4a53-bbea-b446dfa07b92
+                school_class_id: 44ccc353-f8f6-42ef-b75a-b792be9f04ed
                 copied_from_id: 
-                user_id: 3a72111b-953e-4c44-b3c2-6b323822e553
+                user_id: 2ec4dd63-ae94-4d6c-8ff0-30e99fc50e8e
                 name: Test Lesson
                 description: Description
-                visibility: teachers
+                visibility: students
                 due_date: 
                 archived_at: 
-                created_at: '2025-11-26T11:47:05.684Z'
-                updated_at: '2025-11-26T11:47:05.687Z'
+                created_at: '2025-11-27T08:56:06.844Z'
+                updated_at: '2025-11-27T08:56:06.844Z'
                 project:
-                  identifier: test-lesson-e75603c0-4f51-45c1-ba63-ce00717222e2
+                  identifier: test-lesson-2ec4dd63-ae94-4d6c-8ff0-30e99fc50e8e
                   project_type: python
-                user_name: Nell Boyle
+                user_name: Prof. Arturo Boyer
         '403':
           description: responds 403 Forbidden when the user is a school-owner for
             a different school
@@ -610,31 +773,10 @@ paths:
         required: true
         schema:
           type: string
-        example: b42fa9a8-ba14-4d42-ad65-f5166072c62b
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                lesson:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    school_class_id:
-                      type: string
-                  required:
-                  - name
-              required:
-              - lesson
-            example:
-              lesson:
-                name: New Name
-                school_class_id: 7c515bfd-b03c-4b16-8920-002c323c9964
+        example: ae978b4f-6cac-437f-acb2-ef641af20031
       responses:
         '200':
-          description: responds 200 OK when assigning the lesson to a school class
+          description: responds 200 OK when the user is a school-owner
           content:
             application/json:
               schema:
@@ -694,22 +836,22 @@ paths:
                 - project
                 - user_name
               example:
-                id: 207d77e7-dacc-4a5b-8eb2-936fb4383cab
-                school_id: 8b3862d8-b8cc-4150-a150-f776de8a55ea
-                school_class_id: 7c515bfd-b03c-4b16-8920-002c323c9964
+                id: e15a8d34-b3ab-4d28-bd94-5d1d5faa004d
+                school_id: 55bfad3c-7201-4e41-9dc2-bb8c80b7a70d
+                school_class_id: 
                 copied_from_id: 
-                user_id: e80d12c5-2d5c-4357-b205-ba58ec95f719
+                user_id: 22f4a4db-6392-4efc-b811-b1abdc906693
                 name: New Name
                 description: Description
                 visibility: teachers
                 due_date: 
                 archived_at: 
-                created_at: '2025-11-26T11:46:58.749Z'
-                updated_at: '2025-11-26T11:46:58.764Z'
+                created_at: '2025-11-27T08:56:15.322Z'
+                updated_at: '2025-11-27T08:56:15.334Z'
                 project:
-                  identifier: test-lesson-e80d12c5-2d5c-4357-b205-ba58ec95f719
+                  identifier: test-lesson-e0e415d9-970d-497c-9417-25401e2931f7
                   project_type: python
-                user_name: Cheryll Kemmer
+                user_name: School Owner
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -751,8 +893,29 @@ paths:
                 required:
                 - error
               example:
-                error: 'Error updating lesson: User ''bee92853-fd91-4d4c-b6c4-c734e259caa4''
-                  is not the ''school-teacher'' for school_class ''a51dbb00-90bd-4975-b9d0-9d94cdb12a6e'''
+                error: 'Error updating lesson: User ''be20a3a3-3485-43cb-b19e-c7ca3c0cff09''
+                  is not the ''school-teacher'' for school_class ''167e74c1-f859-4523-89ca-dcaee144ce9a'''
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                lesson:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    school_class_id:
+                      type: string
+                  required:
+                  - name
+              required:
+              - lesson
+            example:
+              lesson:
+                name: New Name
+                school_class_id: da6382c7-40ff-4468-8ed4-de9a5a0ac95b
   "/api/lessons/{id}/copy":
     post:
       summary: create_copy
@@ -770,7 +933,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 8ab77474-8cbe-4635-829e-10596c75f4e5
+        example: 93407b93-16ce-4444-92f5-f8c3c1a6b0e7
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -790,7 +953,7 @@ paths:
               lesson:
                 name: New Name
                 visibility: public
-                user_id: 5b00b036-5466-4209-9271-e9375a4faf8d
+                user_id: 4460bcd7-7cfe-4e61-8b48-9070046dd8f1
       responses:
         '201':
           description: responds 201 Created when the user owns the lesson
@@ -851,22 +1014,22 @@ paths:
                 - project
                 - user_name
               example:
-                id: b9bb77c9-6259-4683-bdec-a1bf800ffdbf
+                id: 3be8f371-8645-4f9a-a149-ae3e8fb0330a
                 school_id: 
                 school_class_id: 
-                copied_from_id: 8ab77474-8cbe-4635-829e-10596c75f4e5
-                user_id: 51ad2641-b53e-4484-afba-2e74d41ba9fe
+                copied_from_id: 93407b93-16ce-4444-92f5-f8c3c1a6b0e7
+                user_id: '0845a44f-fda6-4bab-843a-d44553d076b9'
                 name: Test Lesson
                 description: Description
                 visibility: teachers
                 due_date: 
                 archived_at: 
-                created_at: '2025-11-26T11:46:51.503Z'
-                updated_at: '2025-11-26T11:46:51.503Z'
+                created_at: '2025-11-27T08:56:14.376Z'
+                updated_at: '2025-11-27T08:56:14.376Z'
                 project:
-                  identifier: blog-kite-thorn
+                  identifier: froze-desk-fox
                   project_type: python
-                user_name: Sharyl Kilback V
+                user_name: Carmelina Farrell
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -923,11 +1086,11 @@ paths:
                 error_type:
                   type: string
                   nullable: true
-                project:
-                  type: string
                 user_id:
                   type: string
                 project_id:
+                  type: string
+                project:
                   type: string
               required:
               - error
@@ -935,9 +1098,9 @@ paths:
             example:
               error: some random test error message
               error_type: TestError
-              project: some-made-up-slug
               user_id: e0675b6c-dc48-4cd6-8c04-0f7ac05af51a
-              project_id: apply-cash-spoil
+              project_id: solve-scream-weave
+              project: some-made-up-slug
       responses:
         '201':
           description: creates an error
@@ -978,15 +1141,15 @@ paths:
                 - data
               example:
                 data:
-                  id: 64ffcd23-686b-4fb2-b748-918680693dbe
+                  id: 22b3ddfb-1358-4cdc-8a50-4a25dbcf82b8
                   project_id: 
                   error: some random test error message
                   error_type: TestError
                   user_id: 
-                  created_at: '2025-11-26T11:46:52.046Z'
-                  updated_at: '2025-11-26T11:46:52.046Z'
+                  created_at: '2025-11-27T08:56:21.660Z'
+                  updated_at: '2025-11-27T08:56:21.660Z'
         '400':
-          description: returns bad request status code
+          description: returns an empty body data object
           content:
             application/json:
               schema:
@@ -1023,7 +1186,7 @@ paths:
         example: 2
       responses:
         '200':
-          description: returns success response
+          description: has the correct response headers for the next page
           content:
             application/json:
               schema:
@@ -1048,16 +1211,26 @@ paths:
                   - user_id
                   - updated_at
               example:
-              - identifier: complete-seem-eat
+              - identifier: act-act-control
                 project_type: python
-                name: The Wings of the Dove
-                user_id: e097d93b-350d-4fa1-9803-3b6f34c02fd8
-                updated_at: '2025-11-26T11:47:02.003Z'
-              - identifier: scan-inhale-harm
+                name: East of Eden
+                user_id: f8f3a358-8ee7-4a34-9e72-79a070db6417
+                updated_at: '2025-11-27T08:56:07.888Z'
+              - identifier: grab-curb-astonish
                 project_type: python
-                name: Many Waters
-                user_id: e097d93b-350d-4fa1-9803-3b6f34c02fd8
-                updated_at: '2025-11-26T11:47:02.001Z'
+                name: Carrion Comfort
+                user_id: f8f3a358-8ee7-4a34-9e72-79a070db6417
+                updated_at: '2025-11-27T08:56:07.886Z'
+              - identifier: dream-swot-suggest
+                project_type: python
+                name: Shall not Perish
+                user_id: f8f3a358-8ee7-4a34-9e72-79a070db6417
+                updated_at: '2025-11-27T08:56:07.884Z'
+              - identifier: string-manage-mow
+                project_type: python
+                name: In a Dry Season
+                user_id: f8f3a358-8ee7-4a34-9e72-79a070db6417
+                updated_at: '2025-11-27T08:56:07.881Z'
         '401':
           description: returns unauthorized
           content:
@@ -1082,6 +1255,58 @@ paths:
         schema:
           type: string
         example: fake-user-access-token
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                project:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    components:
+                      type: array
+                      items:
+                        type: string
+                        properties:
+                          name:
+                            type: string
+                          extension:
+                            type: string
+                          content:
+                            type: string
+                        required:
+                        - name
+                        - extension
+                        - content
+                    identifier:
+                      type: string
+                    locale:
+                      type: string
+                    project_type:
+                      type: string
+                    user_id:
+                      nullable: true
+                      type: string
+                    school_id:
+                      type: string
+                    lesson_id:
+                      type: string
+                  required:
+                  - components
+            example:
+              project:
+                name: Test Project
+                components:
+                - ''
+                identifier: test-project
+                locale: fr
+                project_type: scratch
+                user_id: ca8888a6-efd5-4ea6-8ed2-bf9f8539fe44
+                school_id: 8a2bb567-f371-4e37-876d-0ff7530921b7
+                lesson_id: 5c3c24e0-9ef9-44e3-9bcb-ee17b47d24f3
       responses:
         '201':
           description: returns success
@@ -1144,11 +1369,11 @@ paths:
                 - videos
                 - audio
               example:
-                identifier: plead-distribute-yawn
+                identifier: incise-remove-kid
                 project_type: python
                 locale: es-LA
-                name: Little Hands Clapping
-                user_id: cee89176-7500-4fc9-b0b6-460221e6d71f
+                name: A Many-Splendoured Thing
+                user_id: cd0165f0-1fc4-4682-97f0-0a7ce1c6d5be
                 instructions: 
                 components: []
                 image_list: []
@@ -1168,8 +1393,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a school-student for
-            the school
+          description: responds 403 Forbidden when the current user is not the owner
+            of the lesson
           content:
             application/json:
               schema:
@@ -1195,58 +1420,6 @@ paths:
                 - error
               example:
                 error: Error creating project
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                project:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    components:
-                      type: array
-                      items:
-                        type: string
-                        properties:
-                          name:
-                            type: string
-                          extension:
-                            type: string
-                          content:
-                            type: string
-                        required:
-                        - name
-                        - extension
-                        - content
-                    identifier:
-                      type: string
-                    school_id:
-                      type: string
-                    lesson_id:
-                      type: string
-                    user_id:
-                      type: string
-                      nullable: true
-                    locale:
-                      type: string
-                    project_type:
-                      type: string
-                  required:
-                  - components
-            example:
-              project:
-                name: Test Project
-                components:
-                - ''
-                identifier: test-project
-                school_id: 359199cc-7ede-4dd2-9a7a-aacdb3d21a1d
-                lesson_id: da052ee8-6101-4447-8512-ca5d83084058
-                user_id: 
-                locale: fr
-                project_type: scratch
   "/api/projects/{id}":
     delete:
       summary: destroy
@@ -1264,7 +1437,7 @@ paths:
         required: true
         schema:
           type: string
-        example: sew-spit-own
+        example: project-identifier
       responses:
         '200':
           description: deletes user's project
@@ -1316,7 +1489,7 @@ paths:
         required: true
         schema:
           type: string
-        example: snap-repeat-hinder
+        example: obey-exclude-corrupt
       - name: locale
         in: query
         required: false
@@ -1325,7 +1498,7 @@ paths:
         example: ja-JP
       responses:
         '200':
-          description: does not include the finished boolean in the project json
+          description: returns success response
           content:
             application/json:
               schema:
@@ -1382,20 +1555,19 @@ paths:
                 - videos
                 - audio
               example:
-                identifier: hoax-beseech-preside
+                identifier: obey-exclude-corrupt
                 project_type: python
-                locale: 
-                name: A Summer Bird-Cage
-                user_id: 2c93125c-c123-41a6-98dc-eb3ad5c30b35
-                instructions: Eveniet neque quibusdam. Cupiditate assumenda eum. Rem
-                  repudiandae ex.
+                locale: ja-JP
+                name: O Jerusalem!
+                user_id: 
+                instructions: 
                 components: []
                 image_list: []
                 videos: []
                 audio: []
                 parent:
-                  name: The Way Through the Woods
-                  identifier: roar-calculate-saddle
+                  name: The Daffodil Sky
+                  identifier: consort-survive-murmur
                 user_name: Joe Bloggs
         '403':
           description: does not return the project json
@@ -1441,7 +1613,7 @@ paths:
         required: true
         schema:
           type: string
-        example: consent-view-roll
+        example: recur-partake-please
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -1451,40 +1623,46 @@ paths:
                 project:
                   type: object
                   properties:
+                    name:
+                      type: string
                     components:
                       type: array
                       items:
                         type: object
                         properties:
-                          id:
-                            type: string
                           name:
+                            type: string
+                          extension:
                             type: string
                           content:
                             type: string
-                          extension:
+                          id:
                             type: string
                         required:
                         - name
                         - extension
                         - content
-                    name:
-                      type: string
                     instructions:
                       type: string
               required:
               - project
             example:
               project:
+                name: updated project name
                 components:
-                - name: main
+                - id: f1eeca4c-80ea-4bb8-84cb-2065f28eb2df
+                  name: main
+                  content: Laudantium labore numquam. Et minus voluptatem. Tempora
+                    reiciendis hic.
                   extension: py
-                  content: print("hello")
-                name: Test Project
+                - id: 7988a98d-1a21-4979-bce9-5ac2fdabda9f
+                  name: updated
+                  extension: py
+                  content: updated component content
                 instructions: updated instructions
       responses:
         '200':
-          description: sets the project name to the specified value
+          description: returns json with updated project name
           content:
             application/json:
               schema:
@@ -1495,8 +1673,8 @@ paths:
                   project_type:
                     type: string
                   locale:
-                    nullable: true
                     type: string
+                    nullable: true
                   name:
                     type: string
                   user_id:
@@ -1554,25 +1732,31 @@ paths:
                 - videos
                 - audio
               example:
-                identifier: consent-view-roll
-                project_type: scratch
-                locale: en
-                name: Test Project
-                user_id: 
+                identifier: boil-contrast-confuse
+                project_type: python
+                locale: 
+                name: updated project name
+                user_id: 44bfb5ae-74b8-4827-a9ba-0d8add1fc064
                 instructions: 
                 components:
-                - id: efba2ae1-c369-4ff2-9531-9919b95f67a6
+                - id: e2b29948-b84c-45ed-88c7-76065baeb03a
                   name: main
                   extension: py
-                  content: print("hi")
+                  content: Doloribus doloremque ut. Et dolor possimus. Aliquam accusantium
+                    qui.
+                - id: 45b09093-7bb5-4ff2-b9c2-1b7dbb17e4a6
+                  name: quos
+                  extension: py
+                  content: Facere deserunt illum. Officia fuga quibusdam. Tempore
+                    commodi et.
                 image_list: []
                 videos: []
                 audio: []
                 parent:
-                  name: If I Forget Thee Jerusalem
-                  identifier: murmur-slim-complete
+                  name: The Road Less Traveled
+                  identifier: cower-cure-ring
         '401':
-          description: responds 401 Unauthorized when no token is given
+          description: returns unauthorized
           content:
             application/json:
               schema:
@@ -1599,7 +1783,7 @@ paths:
                 error: 'CanCan::AccessDenied: You are not authorized to access this
                   page.'
         '422':
-          description: responds 422 Unprocessable Entity when params are invalid
+          description: returns error response
           content:
             application/json:
               schema:
@@ -1610,8 +1794,7 @@ paths:
                 required:
                 - error
               example:
-                error: 'Error persisting changes: Validation failed: Components name
-                  can''t be blank, Components extension can''t be blank'
+                error: Cannot delete default file
   "/api/projects/{id}/complete":
     post:
       summary: complete
@@ -1629,10 +1812,10 @@ paths:
         required: true
         schema:
           type: string
-        example: creep-cease-dwell
+        example: does-not-exist
       responses:
         '200':
-          description: sets the status to complete
+          description: completes success response
           content:
             application/json:
               schema:
@@ -1655,13 +1838,13 @@ paths:
                 - status
                 - identifier
               example:
-                id: 976d6d55-dba4-400d-9dc1-95bc0be3c435
-                school_id: bffe96f7-72c2-4858-8342-82fb97de1b34
-                project_id: 12b668d0-854d-4d60-b8dc-3b9a1b69df68
+                id: c6a78f75-e110-432f-b33a-6ac3e54adf7e
+                school_id: 31d8e7d0-8d67-49ab-bd3d-afad9aa64b52
+                project_id: db0066f9-3865-4ef4-91e0-88400eaff8fd
                 status: complete
-                identifier: nourish-scale-banish
+                identifier: consecrate-triumph-blow
         '403':
-          description: does not change the status
+          description: completes forbidden response
           content:
             application/json:
               schema:
@@ -1725,7 +1908,7 @@ paths:
         required: true
         schema:
           type: string
-        example: inform-determine-shape
+        example: proceed-empower-delete
       responses:
         '200':
           description: returns success response
@@ -1751,13 +1934,13 @@ paths:
                 - lesson_id
                 - class_id
               example:
-                identifier: inform-determine-shape
+                identifier: illustrate-spread-zoom
                 project_type: python
-                school_id: 005673e8-4675-4d12-b682-11db84e97437
-                lesson_id: c2fb38d8-c372-4edb-99e0-4406a4f8ec17
-                class_id: 1c6b1a28-1e22-4f4f-a907-426f4692fb51
+                school_id: 92d6489b-6aae-4e01-917b-a271346a3e38
+                lesson_id: 117681ec-83fe-4451-9d91-1a7a720f7743
+                class_id: ae7e65aa-5d7c-4f6c-9c4e-9307c4eeefb6
         '403':
-          description: returns forbidden response
+          description: does not return the project context json
           content:
             application/json:
               schema:
@@ -1787,7 +1970,7 @@ paths:
         required: true
         schema:
           type: string
-        example: does-not-exist
+        example: tend-spell-evaporate
       responses:
         '200':
           description: returns response containing correct school project data
@@ -1813,11 +1996,11 @@ paths:
                 - finished
                 - identifier
               example:
-                id: e48e5c7e-db7b-4d1a-b8bd-b5f89e833057
-                school_id: cc1deb17-c60f-4622-a4b6-eeba87d2aff9
-                project_id: d82e18b0-fe02-4fa5-a3bc-79e1b53d2734
+                id: 5fa6840c-93be-458c-bd67-bbc2cb167ede
+                school_id: 96a2092c-db91-4e50-9e64-39fabd0bba64
+                project_id: a6661541-1c09-49b9-b82d-fd57716e0914
                 finished: true
-                identifier: refer-buy-slip
+                identifier: want-guard-disobey
         '403':
           description: returns forbidden response
           content:
@@ -1862,7 +2045,7 @@ paths:
         required: true
         schema:
           type: string
-        example: feel-crowd-close
+        example: refuse-manage-milk
       responses:
         '200':
           description: returns success response
@@ -1888,13 +2071,13 @@ paths:
                 - finished
                 - identifier
               example:
-                id: 88a0d44e-2da6-4a46-a9af-353eb844e5fd
-                school_id: 9039046e-eb75-44fe-b5c5-dcb2450859b6
-                project_id: f27c0b34-9961-43a7-9aed-7c9d648a41aa
+                id: a4cce738-4ae9-47bf-b3ee-debd61976b57
+                school_id: 52a907e3-391f-4bfd-94ad-10cc2179ec71
+                project_id: 25286972-ebb7-44f8-9517-16be8869c296
                 finished: true
-                identifier: feel-crowd-close
+                identifier: spoil-plot-see
         '403':
-          description: returns forbidden response
+          description: does not change the finished flag
           content:
             application/json:
               schema:
@@ -1950,10 +2133,17 @@ paths:
         required: true
         schema:
           type: string
-        example: contrive-inflect-review
+        example: indicate-impart-prepare
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties: {}
+            example: {}
       responses:
         '200':
-          description: sets the status to returned
+          description: returns the school project json
           content:
             application/json:
               schema:
@@ -1976,13 +2166,13 @@ paths:
                 - status
                 - identifier
               example:
-                id: 2c76cda2-2ada-4eaa-9611-e82773889179
-                school_id: 265df748-9a0c-481c-a113-f2ed1b6baa9b
-                project_id: 3ee81794-2941-4a5e-9ccc-5f873be5b57c
+                id: 63c09fd0-873f-411c-bcec-a9323e83669d
+                school_id: c7e8b11e-7f32-469e-bcd7-790f706d1d56
+                project_id: 42e4bf6d-fad9-4e08-b65a-5892f288d1d7
                 status: returned
-                identifier: sanctify-dine-exist
+                identifier: subscribe-occupy-crowd
         '403':
-          description: returns forbidden response
+          description: does not change the status
           content:
             application/json:
               schema:
@@ -2010,7 +2200,7 @@ paths:
                 error: 'ActiveRecord::RecordNotFound: Couldn''t find Project with
                   [WHERE "projects"."identifier" = $1]'
         '422':
-          description: returns unauthorized response
+          description: returns error message
           content:
             application/json:
               schema:
@@ -2022,13 +2212,6 @@ paths:
                 - error
               example:
                 error: Cannot transition from 'unsubmitted' to 'returned'
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties: {}
-            example: {}
   "/api/projects/{id}/status":
     get:
       summary: show_status
@@ -2046,10 +2229,10 @@ paths:
         required: true
         schema:
           type: string
-        example: does-not-exist
+        example: diminish-live-mew
       responses:
         '200':
-          description: returns success response
+          description: returns the school project json
           content:
             application/json:
               schema:
@@ -2072,11 +2255,11 @@ paths:
                 - status
                 - identifier
               example:
-                id: fb6c2457-b97c-4b0f-a1fa-ac88e856f3c4
-                school_id: eb770ee1-1e9c-4985-b822-9b657a3e1529
-                project_id: b5b00382-caeb-446a-a50a-256fb2ae013c
+                id: a2439333-432f-4a42-9735-4e15df02c178
+                school_id: ef6a74d8-df8a-4d2b-8faf-a841808d6381
+                project_id: 987d3195-4981-4a73-85d9-c4da1d0e51dd
                 status: unsubmitted
-                identifier: create-run-chew
+                identifier: diminish-live-mew
         '403':
           description: does not return the school project json
           content:
@@ -2122,10 +2305,10 @@ paths:
         required: true
         schema:
           type: string
-        example: inject-congratulate-scabble
+        example: imperil-fry-curve
       responses:
         '200':
-          description: returns the school project json
+          description: sets the status to submitted
           content:
             application/json:
               schema:
@@ -2148,107 +2331,11 @@ paths:
                 - status
                 - identifier
               example:
-                id: 6e535b8f-6af5-4434-bacb-cac2d345d536
-                school_id: 8c57f9cc-7032-4018-923a-c8e61db1396e
-                project_id: 19d3b862-ebfb-4569-80f9-a1730224c2ce
+                id: be6f35ee-7f12-4999-821b-bdc3efaacef9
+                school_id: 4c29b4c6-0818-4cb1-a87d-111dea9fe2c7
+                project_id: f9d46976-8025-49cd-b511-8eed6994ed14
                 status: submitted
-                identifier: rob-confine-retire
-        '403':
-          description: does not change the status
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: 'CanCan::AccessDenied: You are not authorized to access this
-                  page.'
-        '404':
-          description: returns not found response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: 'ActiveRecord::RecordNotFound: Couldn''t find Project with
-                  [WHERE "projects"."identifier" = $1]'
-        '422':
-          description: returns unauthorized response
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: Cannot transition from 'complete' to 'submitted'
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties: {}
-            example: {}
-  "/api/projects/{id}/unsubmit":
-    post:
-      summary: unsubmit
-      tags:
-      - Api::SchoolProject
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-        example: fake-user-access-token
-      - name: id
-        in: path
-        required: true
-        schema:
-          type: string
-        example: does-not-exist
-      responses:
-        '200':
-          description: sets the status to unsubmitted
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                  school_id:
-                    type: string
-                  project_id:
-                    type: string
-                  status:
-                    type: string
-                  identifier:
-                    type: string
-                required:
-                - id
-                - school_id
-                - project_id
-                - status
-                - identifier
-              example:
-                id: 559c9d84-96c8-48ce-929a-ade0865fb4ec
-                school_id: bc4a68ae-9821-4513-b756-be4e1ecbda10
-                project_id: 2c234a45-5ad0-4352-a970-bab436dd8b41
-                status: unsubmitted
-                identifier: desire-stretch-observe
+                identifier: sniff-ill-treat-typeset
         '403':
           description: returns forbidden response
           content:
@@ -2289,6 +2376,102 @@ paths:
                 required:
                 - error
               example:
+                error: Cannot transition from 'complete' to 'submitted'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties: {}
+            example: {}
+  "/api/projects/{id}/unsubmit":
+    post:
+      summary: unsubmit
+      tags:
+      - Api::SchoolProject
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+        example: fake-user-access-token
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+        example: shout-hustle-rely
+      responses:
+        '200':
+          description: returns the school project json
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  school_id:
+                    type: string
+                  project_id:
+                    type: string
+                  status:
+                    type: string
+                  identifier:
+                    type: string
+                required:
+                - id
+                - school_id
+                - project_id
+                - status
+                - identifier
+              example:
+                id: 36249c8d-7446-4d0c-9c3e-794263df90ba
+                school_id: 919eddc1-8317-4c10-8253-d7138cdcb949
+                project_id: b918933b-4e06-4580-a183-4072c5240199
+                status: unsubmitted
+                identifier: enjoy-imperil-satirise
+        '403':
+          description: does not change the status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: 'CanCan::AccessDenied: You are not authorized to access this
+                  page.'
+        '404':
+          description: returns not found response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: 'ActiveRecord::RecordNotFound: Couldn''t find Project with
+                  [WHERE "projects"."identifier" = $1]'
+        '422':
+          description: does not change the status
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
                 error: Cannot transition from 'returned' to 'unsubmitted'
       requestBody:
         content:
@@ -2314,10 +2497,10 @@ paths:
         required: true
         schema:
           type: string
-        example: frame-forecast-comment
+        example: inflate-scowl-proceed
       responses:
         '200':
-          description: returns ok response
+          description: returns a list of the feedback
           content:
             application/json:
               schema:
@@ -2348,12 +2531,12 @@ paths:
                   - updated_at
                   - read_at
               example:
-              - id: 24a22b4a-e638-4437-948f-55f287c9499f
-                school_project_id: 9b9336bd-c26b-4c55-9ddb-c8fb3af27a68
-                user_id: 74b0e0ab-882b-409d-a790-2c1060d0fa60
+              - id: 54101f12-4547-48c2-a7cb-f55b539e7990
+                school_project_id: 34e817f9-194a-4e4f-b99a-a059248906d8
+                user_id: cd978018-675f-430b-ab8f-243336b0a5ca
                 content: Excellent work!
-                created_at: '2025-11-26T11:47:01.052Z'
-                updated_at: '2025-11-26T11:47:01.052Z'
+                created_at: '2025-11-27T08:56:05.569Z'
+                updated_at: '2025-11-27T08:56:05.569Z'
                 read_at: 
         '403':
           description: returns forbidden response
@@ -2398,28 +2581,10 @@ paths:
         required: true
         schema:
           type: string
-        example: infect-join-carve
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                feedback:
-                  type: object
-                  properties:
-                    content:
-                      type: string
-                  required:
-                  - content
-              required:
-              - feedback
-            example:
-              feedback:
-                content: Nice one!
+        example: indicate-watch-neglect
       responses:
         '201':
-          description: returns the feedback json containing user id
+          description: returns the feedback json containing school project id
           content:
             application/json:
               schema:
@@ -2448,12 +2613,12 @@ paths:
                 - updated_at
                 - read_at
               example:
-                id: 5b2526f4-a8d9-4b24-a34e-1d8556570260
-                school_project_id: 5ad25e8d-17ec-4502-852a-e8d110897a91
-                user_id: f330f00d-f1ca-402a-ac29-ef0e93de6e6e
+                id: 86a34e74-b1bf-4105-adb8-e8338bd7847f
+                school_project_id: 1b18d12a-9b44-4820-b4f6-8acadfecdce7
+                user_id: 11795fb3-c6a2-446c-9d86-39c212ff2f3b
                 content: Nice one!
-                created_at: '2025-11-26T11:47:04.842Z'
-                updated_at: '2025-11-26T11:47:04.842Z'
+                created_at: '2025-11-27T08:56:16.203Z'
+                updated_at: '2025-11-27T08:56:16.203Z'
                 read_at: 
         '403':
           description: does not add the feedback to the school project
@@ -2482,6 +2647,24 @@ paths:
                 - error
               example:
                 error: 'Error creating feedback: Content can''t be blank'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                feedback:
+                  type: object
+                  properties:
+                    content:
+                      type: string
+                  required:
+                  - content
+              required:
+              - feedback
+            example:
+              feedback:
+                content: Nice one!
   "/api/projects/{project_id}/feedback/{id}/read":
     put:
       summary: set_read
@@ -2499,16 +2682,16 @@ paths:
         required: true
         schema:
           type: string
-        example: 68cc7fb1-90ac-4a15-847b-e5c9ac8e39a6
+        example: 4202adf9-0fb4-45fd-a66d-261339008fc1
       - name: project_id
         in: path
         required: true
         schema:
           type: string
-        example: shirk-choke-milk
+        example: adjust-stoop-peep
       responses:
         '200':
-          description: returns the feedback json
+          description: sets read_at to be a time
           content:
             application/json:
               schema:
@@ -2537,15 +2720,15 @@ paths:
                 - updated_at
                 - read_at
               example:
-                id: 68cc7fb1-90ac-4a15-847b-e5c9ac8e39a6
-                school_project_id: 1194bc17-7df2-4773-8f35-26530d3c0093
-                user_id: cdc3d7d0-5bfd-4771-bcd7-a05978cefb94
+                id: 5fb10689-8c98-47f4-a505-fd7c429de40b
+                school_project_id: 15c28148-0f79-4608-a545-bd21a54ed562
+                user_id: 1fbc7dda-3924-4eb8-bd67-d57bfa19600c
                 content: Excellent work!
-                created_at: '2025-11-26T11:46:56.306Z'
-                updated_at: '2025-11-26T11:46:56.319Z'
-                read_at: '2025-11-26T11:46:56.315Z'
+                created_at: '2025-11-27T08:56:03.862Z'
+                updated_at: '2025-11-27T08:56:03.875Z'
+                read_at: '2025-11-27T08:56:03.871Z'
         '403':
-          description: does not set the read_at on feedback
+          description: returns forbidden response
           content:
             application/json:
               schema:
@@ -2596,10 +2779,10 @@ paths:
         required: true
         schema:
           type: string
-        example: put-compare-mean
+        example: shine-dig-convert
       responses:
         '200':
-          description: returns file list
+          description: returns success response
           content:
             application/json:
               schema:
@@ -2622,7 +2805,7 @@ paths:
               example:
                 image_list:
                 - filename: test_image_1.png
-                  url: http://www.example.com/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6IjZkOTMxMGExLWMyZGQtNDdmYy1iOTk0LWE2N2ZhZWEwYTM4MiIsInB1ciI6ImJsb2JfaWQifX0=--d87f7c624ba85065cbbf3fa148a220fa219f1cba/test_image_1.png
+                  url: http://www.example.com/rails/active_storage/blobs/proxy/eyJfcmFpbHMiOnsiZGF0YSI6IjMxYzMwOWUxLTgyMDMtNDIwYS1hODBkLTZhYTIwY2NkMjNkMSIsInB1ciI6ImJsb2JfaWQifX0=--dfbc0864ca4f3c46c7dbc1d54d6dd355e3881d0c/test_image_1.png
         '401':
           description: returns unauthorized
           content:
@@ -2697,7 +2880,7 @@ paths:
         required: true
         schema:
           type: string
-        example: begin-love-preset
+        example: dream-scare-achieve
       responses:
         '200':
           description: returns success response
@@ -2753,15 +2936,15 @@ paths:
                 - videos
                 - audio
               example:
-                identifier: snatch-gain-renew
+                identifier: swot-obstruct-output
                 project_type: python
-                locale: en
-                name: An Acceptable Time
-                user_id: 2e1fc4f6-458e-498a-8d48-d9eec1546f12
+                locale: fr-FR
+                name: His Dark Materials
+                user_id: b12531bb-d076-4289-9ef7-0757c35631d1
                 instructions: 
                 parent:
-                  name: The Wings of the Dove
-                  identifier: begin-love-preset
+                  name: Things Fall Apart
+                  identifier: dream-scare-achieve
                 components: []
                 image_list: []
                 videos: []
@@ -2809,7 +2992,7 @@ paths:
         required: true
         schema:
           type: string
-        example: mew-prohibit-migrate
+        example: scat-qualify-afford
       responses:
         '200':
           description: returns success response
@@ -2865,15 +3048,15 @@ paths:
                 - videos
                 - audio
               example:
-                identifier: own-bind-ferry
+                identifier: depend-think-rend
                 project_type: python
                 locale: 
-                name: A Catskill Eagle
-                user_id: cb89b5bf-ea86-4ba0-a542-5d496ae20ca5
+                name: Have His Carcase
+                user_id: d4d0a257-04f2-41b9-a03d-3c9a05b90075
                 instructions: 
                 parent:
-                  name: A Catskill Eagle
-                  identifier: convict-contrive-speak
+                  name: Have His Carcase
+                  identifier: occupy-press-ill-treat
                 components: []
                 image_list: []
                 videos: []
@@ -2943,8 +3126,8 @@ paths:
               - project
             example:
               project:
-                name: A Catskill Eagle
-                identifier: convict-contrive-speak
+                name: Have His Carcase
+                identifier: occupy-press-ill-treat
                 components:
                 - ''
   "/api/projects/{project_id}/remix/identifier":
@@ -2964,7 +3147,7 @@ paths:
         required: true
         schema:
           type: string
-        example: nap-squeeze-marry
+        example: paste-implant-implode
       responses:
         '200':
           description: returns success response
@@ -2978,7 +3161,7 @@ paths:
                 required:
                 - identifier
               example:
-                identifier: warn-sadden-swell
+                identifier: ski-act-verify
         '401':
           description: returns unauthorized
           content:
@@ -2993,7 +3176,7 @@ paths:
               example:
                 error: Unauthorized
         '404':
-          description: returns 404 response if invalid project
+          description: returns 404 if no remixed project for user
           content:
             application/json:
               schema:
@@ -3005,7 +3188,8 @@ paths:
                 - error
               example:
                 error: 'ActiveRecord::RecordNotFound: Couldn''t find Project with
-                  [WHERE "projects"."identifier" = $1]'
+                  [WHERE "projects"."remixed_from_id" = $1 AND "projects"."user_id"
+                  = $2]'
   "/api/projects/{project_id}/remixes":
     get:
       summary: index
@@ -3023,7 +3207,7 @@ paths:
         required: true
         schema:
           type: string
-        example: permit-clutch-contest
+        example: merge-insult-prohibit
       responses:
         '200':
           description: returns the list of projects
@@ -3063,21 +3247,21 @@ paths:
                   - finished
                   - status
               example:
-              - identifier: satirise-draw-canvass
+              - identifier: speed-grind-recur
                 project_type: python
-                name: An Acceptable Time
-                user_id: 95b61093-ee1f-4a5d-b419-523f60b8e305
-                updated_at: '2025-11-26T11:46:59.490Z'
-                last_edited_at: '2025-11-26T11:46:59.490Z'
+                name: To Your Scattered Bodies Go
+                user_id: afa721c1-9a2f-4624-9150-b0ba014b1135
+                updated_at: '2025-11-27T08:56:08.300Z'
+                last_edited_at: '2025-11-27T08:56:08.300Z'
                 user_name: 
                 finished: 
                 status: 
-              - identifier: trample-sanctify-value
+              - identifier: force-recognize-heave
                 project_type: python
-                name: Down to a Sunless Sea
-                user_id: 95b61093-ee1f-4a5d-b419-523f60b8e305
-                updated_at: '2025-11-26T11:46:59.505Z'
-                last_edited_at: '2025-11-26T11:46:59.505Z'
+                name: Quo Vadis
+                user_id: afa721c1-9a2f-4624-9150-b0ba014b1135
+                updated_at: '2025-11-27T08:56:08.303Z'
+                last_edited_at: '2025-11-27T08:56:08.303Z'
                 user_name: 
                 finished: 
                 status: 
@@ -3100,13 +3284,6 @@ paths:
       summary: show
       tags:
       - Api::MySchool
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-        example: fake-user-access-token
       responses:
         '200':
           description: includes the school details and user's roles in the JSON
@@ -3173,7 +3350,7 @@ paths:
                 - code
                 - import_in_progress
               example:
-                id: c49efca1-a12e-480d-80fb-9166a5231535
+                id: 7091cfe5-c41c-4e9e-b08f-086fb0014260
                 name: school-name
                 website: http://www.example.com
                 reference: 
@@ -3186,8 +3363,8 @@ paths:
                 postal_code: 
                 country_code: GB
                 verified_at: 
-                created_at: '2025-11-26T11:47:06.459Z'
-                updated_at: '2025-11-26T11:47:06.459Z'
+                created_at: '2025-11-27T08:56:13.708Z'
+                updated_at: '2025-11-27T08:56:13.708Z'
                 roles:
                 - owner
                 code: 
@@ -3219,6 +3396,13 @@ paths:
                 - error
               example:
                 error: 'ActiveRecord::RecordNotFound: ActiveRecord::RecordNotFound'
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+        example: fake-user-access-token
   "/api/schools":
     get:
       summary: index
@@ -3233,7 +3417,7 @@ paths:
         example: fake-user-access-token
       responses:
         '200':
-          description: responds with the schools JSON
+          description: only includes schools the user belongs to
           content:
             application/json:
               schema:
@@ -3291,7 +3475,7 @@ paths:
                   - updated_at
                   - import_in_progress
               example:
-              - id: 877213c8-f9fb-4445-9544-f8f209edc69d
+              - id: 5e91f9a4-c618-4cb6-ab83-10296de95d99
                 name: Test School
                 website: http://www.example.com
                 reference: 
@@ -3304,8 +3488,8 @@ paths:
                 postal_code: 
                 country_code: GB
                 verified_at: 
-                created_at: '2025-11-26T11:46:54.797Z'
-                updated_at: '2025-11-26T11:46:54.797Z'
+                created_at: '2025-11-27T08:56:17.228Z'
+                updated_at: '2025-11-27T08:56:17.228Z'
                 import_in_progress: false
         '401':
           description: responds 401 Unauthorized when no token is given
@@ -3331,9 +3515,63 @@ paths:
         schema:
           type: string
         example: fake-user-access-token
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    website:
+                      type: string
+                    address_line_1:
+                      type: string
+                    municipality:
+                      type: string
+                    country_code:
+                      type: string
+                    creator_agree_authority:
+                      type: string
+                    creator_agree_terms_and_conditions:
+                      type: string
+                    creator_agree_to_ux_contact:
+                      type: string
+                    creator_agree_responsible_safeguarding:
+                      type: string
+                    user_origin:
+                      type: string
+                  required:
+                  - name
+                  - website
+                  - address_line_1
+                  - municipality
+                  - country_code
+                  - creator_agree_authority
+                  - creator_agree_terms_and_conditions
+                  - creator_agree_to_ux_contact
+                  - creator_agree_responsible_safeguarding
+                  - user_origin
+              required:
+              - school
+            example:
+              school:
+                name: Test School
+                website: http://www.example.com
+                address_line_1: Address Line 1
+                municipality: Greater London
+                country_code: GB
+                creator_agree_authority: 'true'
+                creator_agree_terms_and_conditions: 'true'
+                creator_agree_to_ux_contact: 'true'
+                creator_agree_responsible_safeguarding: 'true'
+                user_origin: for_education
       responses:
         '201':
-          description: responds with the school JSON
+          description: responds 201 Created
           content:
             application/json:
               schema:
@@ -3392,7 +3630,7 @@ paths:
                 - user_origin
                 - import_in_progress
               example:
-                id: 32d886cb-15a8-45e7-80ea-fd347b90e53e
+                id: 9537c521-0771-4c26-8f21-2f9471066468
                 name: Test School
                 website: http://www.example.com
                 reference: 
@@ -3405,8 +3643,8 @@ paths:
                 postal_code: 
                 country_code: GB
                 verified_at: 
-                created_at: '2025-11-26T11:47:07.043Z'
-                updated_at: '2025-11-26T11:47:07.043Z'
+                created_at: '2025-11-27T08:56:13.636Z'
+                updated_at: '2025-11-27T08:56:13.636Z'
                 user_origin: for_education
                 import_in_progress: false
         '400':
@@ -3502,60 +3740,6 @@ paths:
                   - can't be blank
                   creator_agree_terms_and_conditions:
                   - can't be blank
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                school:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    website:
-                      type: string
-                    address_line_1:
-                      type: string
-                    municipality:
-                      type: string
-                    country_code:
-                      type: string
-                    creator_agree_authority:
-                      type: string
-                    creator_agree_terms_and_conditions:
-                      type: string
-                    creator_agree_to_ux_contact:
-                      type: string
-                    creator_agree_responsible_safeguarding:
-                      type: string
-                    user_origin:
-                      type: string
-                  required:
-                  - name
-                  - website
-                  - address_line_1
-                  - municipality
-                  - country_code
-                  - creator_agree_authority
-                  - creator_agree_terms_and_conditions
-                  - creator_agree_to_ux_contact
-                  - creator_agree_responsible_safeguarding
-                  - user_origin
-              required:
-              - school
-            example:
-              school:
-                name: Test School
-                website: http://www.example.com
-                address_line_1: Address Line 1
-                municipality: Greater London
-                country_code: GB
-                creator_agree_authority: 'true'
-                creator_agree_terms_and_conditions: 'true'
-                creator_agree_to_ux_contact: 'true'
-                creator_agree_responsible_safeguarding: 'true'
-                user_origin: for_education
   "/api/schools/{id}":
     delete:
       summary: destroy
@@ -3573,7 +3757,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 3045addd-5c74-46c0-809c-85db523c2588
+        example: 63d70a7a-ba6a-4629-8cb5-9b86338b0e75
       responses:
         '204':
           description: responds 204 No Content
@@ -3682,7 +3866,7 @@ paths:
                 - user_origin
                 - import_in_progress
               example:
-                id: 006b0bd3-039f-40aa-92e2-39d2ff156a3f
+                id: 99f394ad-f6b4-482b-8190-6eb3d5bec3bd
                 name: Test School
                 website: http://www.example.com
                 reference: 
@@ -3695,8 +3879,8 @@ paths:
                 postal_code: 
                 country_code: GB
                 verified_at: 
-                created_at: '2025-11-26T11:46:54.911Z'
-                updated_at: '2025-11-26T11:46:54.911Z'
+                created_at: '2025-11-27T08:56:06.331Z'
+                updated_at: '2025-11-27T08:56:06.331Z'
                 user_origin: for_education
                 import_in_progress: false
         '401':
@@ -3756,10 +3940,10 @@ paths:
         required: true
         schema:
           type: string
-        example: 6847457f-0c8b-415e-9aec-d62157c78527
+        example: 14855f0d-e37c-45a3-9522-509d8874be3c
       responses:
         '200':
-          description: responds 200 OK
+          description: responds with the school JSON
           content:
             application/json:
               schema:
@@ -3818,7 +4002,7 @@ paths:
                 - user_origin
                 - import_in_progress
               example:
-                id: 468b50d9-27df-489f-a7f1-8df6031f7c82
+                id: 9fee5dc8-57ab-4175-8e59-8c288d67ebfd
                 name: New Name
                 website: http://www.example.com
                 reference: 
@@ -3831,8 +4015,8 @@ paths:
                 postal_code: 
                 country_code: GB
                 verified_at: 
-                created_at: '2025-11-26T11:46:48.376Z'
-                updated_at: '2025-11-26T11:46:48.386Z'
+                created_at: '2025-11-27T08:56:06.457Z'
+                updated_at: '2025-11-27T08:56:06.468Z'
                 user_origin: for_education
                 import_in_progress: false
         '400':
@@ -3944,10 +4128,11 @@ paths:
         required: true
         schema:
           type: string
-        example: f78e5fe2-a3c9-4e47-b247-5b4c57c056d1
+        example: 93822a83-a2a6-4293-8bd1-f2c3bbd29785
       responses:
         '200':
-          description: responds with the teachers JSON
+          description: does not include school classes that the school-student isn't
+            a member of
           content:
             application/json:
               schema:
@@ -3997,29 +4182,17 @@ paths:
                   - import_id
                   - teachers
               example:
-              - id: 184300b9-2634-4ac2-951b-da896c6c40dc
+              - id: f81a3c1a-def8-4fc4-bd62-b08ca0f58ab0
                 description: 
-                school_id: f78e5fe2-a3c9-4e47-b247-5b4c57c056d1
+                school_id: 93822a83-a2a6-4293-8bd1-f2c3bbd29785
                 name: Test School Class
-                created_at: '2025-11-26T11:46:54.296Z'
-                updated_at: '2025-11-26T11:46:54.296Z'
+                created_at: '2025-11-27T08:56:17.156Z'
+                updated_at: '2025-11-27T08:56:17.156Z'
                 import_origin: 
                 import_id: 
                 teachers:
-                - id: 40b6d47a-d195-4a30-aabb-797e88849bfa
+                - id: bb2b949d-52aa-49c9-8697-208cf8c3263c
                   name: School Teacher
-                  type: teacher
-              - id: a359a260-a450-41ee-bdf1-31b049b3bd3b
-                description: 
-                school_id: f78e5fe2-a3c9-4e47-b247-5b4c57c056d1
-                name: Owner School Class
-                created_at: '2025-11-26T11:46:54.306Z'
-                updated_at: '2025-11-26T11:46:54.306Z'
-                import_origin: 
-                import_id: 
-                teachers:
-                - id: eaa04e2b-d980-4672-99d9-2d6381f3748e
-                  name: Sachiko Thiel
                   type: teacher
         '401':
           description: responds 401 Unauthorized when no token is given
@@ -4050,7 +4223,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 85f5e6da-3bf4-40d2-80e9-21367e07d742
+        example: 0d705685-1434-4e13-abf2-5babf5cbb35a
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -4084,8 +4257,7 @@ paths:
                 import_id: classroom_123
       responses:
         '201':
-          description: responds with the school class JSON containing the correct
-            name
+          description: responds 201 Created
           content:
             application/json:
               schema:
@@ -4136,17 +4308,17 @@ paths:
                 - import_id
                 - teachers
               example:
-                id: 14ff100a-bb13-4090-940b-e56b4bcbc29c
+                id: 80342173-82c1-49ef-92bc-6fe34be53985
                 description: Test School Class Description
-                school_id: 85f5e6da-3bf4-40d2-80e9-21367e07d742
+                school_id: 0d705685-1434-4e13-abf2-5babf5cbb35a
                 name: Test School Class
-                code: 93-76-39
-                created_at: '2025-11-26T11:47:04.570Z'
-                updated_at: '2025-11-26T11:47:04.570Z'
+                code: 00-55-93
+                created_at: '2025-11-27T08:56:13.408Z'
+                updated_at: '2025-11-27T08:56:13.408Z'
                 import_origin: 
                 import_id: 
                 teachers:
-                - id: e28babec-b8d5-472d-b235-931114e132b1
+                - id: b6a0801d-460f-4f6b-b706-b76fd7080fb5
                   name: School Teacher
                   type: teacher
         '400':
@@ -4177,8 +4349,7 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a school-owner for
-            a different school
+          description: responds 403 Forbidden when the user is a school-student
           content:
             application/json:
               schema:
@@ -4221,11 +4392,59 @@ paths:
         required: true
         schema:
           type: string
-        example: 113d6287-8da7-4cc6-a66e-32026fc0da66
+        example: daa647aa-4003-45e2-841c-803ab2acba9f
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_class:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                    import_origin:
+                      type: string
+                    import_id:
+                      type: string
+                  required:
+                  - name
+                  - description
+                  - import_origin
+                  - import_id
+                school_students:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      name:
+                        type: string
+                      email:
+                        type: string
+                    required:
+                    - name
+                    - email
+                  nullable: true
+              required:
+              - school_class
+            example:
+              school_class:
+                name: Imported Class
+                description: Imported Description
+                import_origin: google_classroom
+                import_id: classroom_123
+              school_students:
+              - name: Jane Student
+                email: jane.student@example.com
+              - name: John Student
+                email: john.student@example.com
       responses:
         '201':
-          description: returns 201 errors in class_members section when assignment
-            fails
+          description: returns 201 with plural [:errors] in students section when
+            student creation fails
           content:
             application/json:
               schema:
@@ -4279,7 +4498,7 @@ paths:
                     - import_id
                     - teachers
                   students:
-                    type: array
+                    type: object
                     items:
                       type: object
                       properties:
@@ -4330,17 +4549,22 @@ paths:
                     items:
                       type: object
                       properties:
-                        id:
+                        success:
+                          type: boolean
+                        student_id:
                           type: string
-                        school_class_id:
                           nullable: true
+                        school_class_id:
+                          type: string
+                          nullable: true
+                        error:
+                          type: string
+                          nullable: true
+                        id:
                           type: string
                         created_at:
                           type: string
                         updated_at:
-                          type: string
-                        student_id:
-                          nullable: true
                           type: string
                         student:
                           type: object
@@ -4365,11 +4589,6 @@ paths:
                           - email
                           - sso_providers
                           - type
-                        success:
-                          type: boolean
-                        error:
-                          nullable: true
-                          type: string
                       required:
                       - success
                       - student_id
@@ -4381,45 +4600,26 @@ paths:
                 - class_members
               example:
                 school_class:
-                  id: f3077b76-7997-4eb2-bcfe-52d43aca2e85
+                  id: 3f06003e-b4ad-4fca-80d3-4675f1863a82
                   description: Imported Description
-                  school_id: 113d6287-8da7-4cc6-a66e-32026fc0da66
+                  school_id: af9e1d35-836d-40a9-a951-93c41c642b2d
                   name: Imported Class
-                  code: 52-82-83
-                  created_at: '2025-11-26T11:47:04.343Z'
-                  updated_at: '2025-11-26T11:47:04.343Z'
+                  code: 81-37-87
+                  created_at: '2025-11-27T08:56:03.363Z'
+                  updated_at: '2025-11-27T08:56:03.363Z'
                   import_origin: google_classroom
                   import_id: classroom_123
                   teachers:
-                  - id: 36d5d7a7-75c3-4c65-b308-e816fbc8970e
+                  - id: 03adc039-3086-461e-b9fa-f741a84b870f
                     name: School Teacher
                     type: teacher
                 students:
-                - id: student-1-id
-                  username: oliver
-                  name: Jane Student
-                  email: jane.student@example.com
-                  sso_providers: []
-                  type: student
-                  success: true
-                  error: 
-                  created: true
-                - id: student-2-id
-                  username: toby.bahringer
-                  name: John Student
-                  email: john.student@example.com
-                  sso_providers: []
-                  type: student
-                  success: true
-                  error: 
-                  created: true
-                class_members:
-                - success: false
-                  student_id: aa7b5a78-2bd7-4676-8184-318f09a7c494
-                  school_class_id: f3077b76-7997-4eb2-bcfe-52d43aca2e85
-                  error: Error creating class member
+                  errors:
+                    jane.student@example.com: Email already exists
+                    john.student@example.com: Invalid email format
+                class_members: []
         '422':
-          description: returns 422 if both import_origin and import_id are missing
+          description: returns 422 if import_id is missing
           content:
             application/json:
               schema:
@@ -4430,56 +4630,7 @@ paths:
                 required:
                 - error
               example:
-                error: 'Error creating school class: Import origin can''t be blank,Import
-                  id can''t be blank'
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                school_class:
-                  type: object
-                  properties:
-                    name:
-                      type: string
-                    description:
-                      type: string
-                    import_origin:
-                      type: string
-                    import_id:
-                      type: string
-                  required:
-                  - name
-                  - description
-                  - import_origin
-                  - import_id
-                school_students:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      name:
-                        type: string
-                      email:
-                        type: string
-                    required:
-                    - name
-                    - email
-                  nullable: true
-              required:
-              - school_class
-            example:
-              school_class:
-                name: Imported Class
-                description: Imported Description
-                import_origin: google_classroom
-                import_id: classroom_123
-              school_students:
-              - name: Jane Student
-                email: jane.student@example.com
-              - name: John Student
-                email: john.student@example.com
+                error: 'Error creating school class: Import id can''t be blank'
   "/api/schools/{school_id}/classes/{class_id}/members":
     get:
       summary: index
@@ -4497,17 +4648,16 @@ paths:
         required: true
         schema:
           type: string
-        example: 90ca5578-c156-4307-85c6-49f925d323c9
+        example: 7c016560-914c-4ba3-91b2-0bb43f78f3c7
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: '094478f4-a68e-4a0a-a134-1a6558b37505'
+        example: 4353b962-9e06-4d34-acc5-ef361390c949
       responses:
         '200':
-          description: responds with nil attributes for students if the user profile
-            doesn't exist
+          description: responds with the correct teacher id
           content:
             application/json:
               schema:
@@ -4590,48 +4740,48 @@ paths:
                       nullable: true
               example:
               - teacher:
-                  id: 87574016-df93-4f2c-9706-7d7455329a83
-                  name: Pres. Pamula Will
+                  id: 4336b036-51e1-4e99-9a70-5b2ba579e119
+                  name: Jermaine Hickle
                   type: teacher
-                  email: jacqulyn_effertz@volkman.example
+                  email: goldie.fay@moen.test
               - owner:
-                  id: 1a50fab9-29ae-4d71-a708-1d84a2864f1a
-                  name: Leana Thompson
+                  id: 51dc5060-d341-48c5-98fd-483c3878abc7
+                  name: Charla Larkin
                   type: owner
-                  email: lorrine_torphy@harber-dickens.example
-              - id: de36ee77-a780-4263-af72-43c03b546ccc
-                school_class_id: 792424c8-4d82-4ed8-9792-b8216b80c5e8
-                created_at: '2025-11-26T11:47:07.670Z'
-                updated_at: '2025-11-26T11:47:07.670Z'
-                student_id: a17f06a2-162d-4384-9a78-da2d414fe319
+                  email: velda@collier.test
+              - id: af0356ca-8fe6-4836-a15c-5bdb0dc55855
+                school_class_id: 7c016560-914c-4ba3-91b2-0bb43f78f3c7
+                created_at: '2025-11-27T08:56:17.886Z'
+                updated_at: '2025-11-27T08:56:17.886Z'
+                student_id: '092b81bb-2ccb-4f75-aafa-7fd4ad2e2e56'
                 student:
-                  id: a17f06a2-162d-4384-9a78-da2d414fe319
-                  username: bryant_lynch
-                  name: Anabel Schimmel
+                  id: '092b81bb-2ccb-4f75-aafa-7fd4ad2e2e56'
+                  username: esther_leannon
+                  name: Armida Nader
                   email: 
                   sso_providers: []
                   type: student
-              - id: a9e332ec-ff18-40f3-a85d-57115d4c07ad
-                school_class_id: 792424c8-4d82-4ed8-9792-b8216b80c5e8
-                created_at: '2025-11-26T11:47:07.667Z'
-                updated_at: '2025-11-26T11:47:07.667Z'
-                student_id: ca132c81-e2aa-40b2-a834-b0e8ad28fd89
+              - id: 654aa40a-846e-4bb8-b798-ad5176fcb75b
+                school_class_id: 7c016560-914c-4ba3-91b2-0bb43f78f3c7
+                created_at: '2025-11-27T08:56:17.888Z'
+                updated_at: '2025-11-27T08:56:17.888Z'
+                student_id: bd1ccf14-9f8e-420e-8d8e-2bc17672fa62
                 student:
-                  id: ca132c81-e2aa-40b2-a834-b0e8ad28fd89
-                  username: jose
-                  name: Breanna Harber
+                  id: bd1ccf14-9f8e-420e-8d8e-2bc17672fa62
+                  username: jared
+                  name: Msgr. Patrica Bins
                   email: 
                   sso_providers: []
                   type: student
-              - id: e855b5ac-6019-47c9-a460-ad771d8a8600
-                school_class_id: 792424c8-4d82-4ed8-9792-b8216b80c5e8
-                created_at: '2025-11-26T11:47:07.669Z'
-                updated_at: '2025-11-26T11:47:07.669Z'
-                student_id: f552b830-813a-454c-80b6-79ec889168a3
+              - id: 9ae00262-9dbe-4e8b-aa58-797a439a0666
+                school_class_id: 7c016560-914c-4ba3-91b2-0bb43f78f3c7
+                created_at: '2025-11-27T08:56:17.885Z'
+                updated_at: '2025-11-27T08:56:17.885Z'
+                student_id: 3534fbed-f2c7-4a52-a933-b380f9074096
                 student:
-                  id: f552b830-813a-454c-80b6-79ec889168a3
-                  username: jason.spinka
-                  name: Rafael Anderson
+                  id: 3534fbed-f2c7-4a52-a933-b380f9074096
+                  username: eliseo
+                  name: Pres. Emerita Botsford
                   email: 
                   sso_providers: []
                   type: student
@@ -4678,16 +4828,16 @@ paths:
         required: true
         schema:
           type: string
-        example: c91b23fc-e0db-463e-924b-951476401c80
+        example: 8247c6f8-fcf4-43ad-8b52-bd9f230a678c
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: f0c430ff-17f3-48bb-8704-152d4afe2262
+        example: 71abef3e-89c6-4fb6-8f03-1127f484a9a4
       responses:
         '201':
-          description: responds with the student JSON
+          description: responds with the class member JSON
           content:
             application/json:
               schema:
@@ -4707,22 +4857,6 @@ paths:
                       teacher_id:
                         type: string
                       owner:
-                        type: object
-                        properties:
-                          id:
-                            type: string
-                          name:
-                            type: string
-                          type:
-                            type: string
-                          email:
-                            type: string
-                        required:
-                        - id
-                        - name
-                        - type
-                        - email
-                      teacher:
                         type: object
                         properties:
                           id:
@@ -4763,6 +4897,22 @@ paths:
                         - email
                         - sso_providers
                         - type
+                      teacher:
+                        type: object
+                        properties:
+                          id:
+                            type: string
+                          name:
+                            type: string
+                          type:
+                            type: string
+                          email:
+                            type: string
+                        required:
+                        - id
+                        - name
+                        - type
+                        - email
                     required:
                     - id
                     - school_class_id
@@ -4772,29 +4922,29 @@ paths:
                 - class_member
               example:
                 class_member:
-                  id: 0a8c7541-0616-4e82-b091-8ec1e915a593
-                  school_class_id: 5a8b05ff-ab1f-4f0d-9330-a1bbeb57aff5
-                  created_at: '2025-11-26T11:46:55.536Z'
-                  updated_at: '2025-11-26T11:46:55.536Z'
-                  teacher_id: 5c047b5a-e25e-460a-8f71-17b2d1239779
+                  id: 27301f87-9949-47db-85a4-e9bedd8cf14b
+                  school_class_id: 8110eeb5-6e96-4ee5-bd68-9e8d8bd9deb9
+                  created_at: '2025-11-27T08:56:10.836Z'
+                  updated_at: '2025-11-27T08:56:10.836Z'
+                  teacher_id: 186ecce9-1ce6-404d-8a68-9e26e93b93c1
                   owner:
-                    id: 8fa87ac5-7c0a-4492-baaa-87349be59221
-                    name: Levi Altenwerth DVM
+                    id: fc29857e-6cbd-41eb-b411-998d264a3a21
+                    name: Chung Will I
                     type: owner
-                    email: otto_daugherty@schamberger.test
-                  teacher:
-                    id: 5c047b5a-e25e-460a-8f71-17b2d1239779
-                    name: Ciara Herzog III
-                    type: teacher
-                    email: edward@watsica.example
-                  student_id: 862d12b1-a9f6-4bc0-acbc-7d5cb828a3c5
+                    email: kristyn@pfannerstill-reilly.test
+                  student_id: ef25094b-f74b-4c77-9398-1f575b0e017a
                   student:
-                    id: 862d12b1-a9f6-4bc0-acbc-7d5cb828a3c5
+                    id: ef25094b-f74b-4c77-9398-1f575b0e017a
                     username: school-student
                     name: School Student
                     email: 
                     sso_providers: []
                     type: student
+                  teacher:
+                    id: 186ecce9-1ce6-404d-8a68-9e26e93b93c1
+                    name: Perry Schmitt
+                    type: teacher
+                    email: arthur_gutkowski@aufderhar-flatley.test
         '400':
           description: responds 400 Bad Request when params are missing
           content:
@@ -4823,8 +4973,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is not the school-teacher
-            for the class
+          description: responds 403 Forbidden when the user is a school-owner for
+            a different school
           content:
             application/json:
               schema:
@@ -4838,7 +4988,7 @@ paths:
                 error: 'CanCan::AccessDenied: You are not authorized to access this
                   page.'
         '422':
-          description: returns the errors from the operation response
+          description: responds 422 Unprocessable Entity when params are invalid
           content:
             application/json:
               schema:
@@ -4849,42 +4999,131 @@ paths:
                   errors:
                     type: object
                     properties:
-                      13841ba9-f967-4a2d-9173-12e1a2a540fe:
+                      12899f26-2063-4d81-995c-c71ab1e33913:
                         type: string
-                      3e3156a9-ea1e-45d5-87f6-6b90ae08389a:
+                      a92cccf6-9781-4f02-90ce-f732510a5430:
                         type: string
-                      1ccaba65-da22-4562-bd39-be309972527b:
+                      8b7cd842-c79a-42b4-bebf-c622c4ba35e2:
                         type: string
-                      ceddcde8-15a4-4975-9769-d76f05f0d6e0:
+                      6c2ad40a-3ca1-4e1f-879c-08eb4e534f5d:
                         type: string
-                      bd1914e3-0aac-4c3f-be7b-61c9ee75094d:
+                      88126847-ede9-480a-ab8a-dbf7ae043746:
                         type: string
-                      4a6dc0cd-9ecf-45b5-abb4-9f555cfd68ac:
+                      1fd5318c-293d-4da9-b0cf-933b1a027965:
+                        type: string
+                      12f253fc-5d5c-4924-bea9-749f530b4eec:
+                        type: string
+                      f7c36779-dd2b-4405-b9f5-f721745ca344:
+                        type: string
+                      3d4d1999-937f-417c-8ab2-2d5476fa42cd:
+                        type: string
+                      bb1c9c1e-93ec-4fce-bc62-defccd8092e2:
+                        type: string
+                      ccd50605-e97f-4719-b5cb-975fb07176b9:
+                        type: string
+                      7b020b5a-ef63-4a11-a3a1-3052ddf1cdf4:
+                        type: string
+                      acdaaab4-3e0d-4ec4-864c-a940bfe8fc05:
+                        type: string
+                      df4b767e-f12f-46ee-b413-fd4228b1c3f4:
+                        type: string
+                      a5ce094f-fe60-4143-ad46-232c1e213c48:
+                        type: string
+                      d33ef58b-fc7e-48e7-979c-93c4da9de766:
+                        type: string
+                      c66c642d-ef1c-4ae2-a1e9-ac1affeda031:
+                        type: string
+                      55f2e8b4-1e8f-4f55-9832-5f4301dc6981:
+                        type: string
+                      57dce1d1-b113-48c5-afc3-c6cfb01077f6:
+                        type: string
+                      58fec44c-ddd1-4d5e-91d7-7063dd900778:
+                        type: string
+                      cc80f4e5-0a9b-4739-998f-4e59334fd1ad:
+                        type: string
+                      d0cbdcf6-e2d9-4170-a282-923d254e78ec:
+                        type: string
+                      8870d3d2-e87d-41a5-91ff-947a32b01bbb:
+                        type: string
+                      ea0e8a23-30a2-4cc0-8118-ca3a87d0147b:
                         type: string
                 required:
                 - error
                 - errors
               example:
-                error: Error creating one or more class members - see 'errors' key
-                  for details
+                error: 'Error creating class members: No valid school members provided'
                 errors:
-                  13841ba9-f967-4a2d-9173-12e1a2a540fe: 'Error creating class member
-                    for teacher_id 13841ba9-f967-4a2d-9173-12e1a2a540fe: Teacher has
+                  12899f26-2063-4d81-995c-c71ab1e33913: 'Error creating class member
+                    for student_id 12899f26-2063-4d81-995c-c71ab1e33913: Student has
                     already been taken'
-                  3e3156a9-ea1e-45d5-87f6-6b90ae08389a: 'Error creating class member
-                    for teacher_id 3e3156a9-ea1e-45d5-87f6-6b90ae08389a: Teacher has
+                  a92cccf6-9781-4f02-90ce-f732510a5430: 'Error creating class member
+                    for student_id a92cccf6-9781-4f02-90ce-f732510a5430: Student has
                     already been taken'
-                  1ccaba65-da22-4562-bd39-be309972527b: 'Error creating class member
-                    for teacher_id 1ccaba65-da22-4562-bd39-be309972527b: Teacher has
+                  8b7cd842-c79a-42b4-bebf-c622c4ba35e2: 'Error creating class member
+                    for student_id 8b7cd842-c79a-42b4-bebf-c622c4ba35e2: Student has
                     already been taken'
-                  ceddcde8-15a4-4975-9769-d76f05f0d6e0: 'Error creating class member
-                    for student_id ceddcde8-15a4-4975-9769-d76f05f0d6e0: Student has
+                  6c2ad40a-3ca1-4e1f-879c-08eb4e534f5d: 'Error creating class member
+                    for teacher_id 6c2ad40a-3ca1-4e1f-879c-08eb4e534f5d: Teacher has
                     already been taken'
-                  bd1914e3-0aac-4c3f-be7b-61c9ee75094d: 'Error creating class member
-                    for student_id bd1914e3-0aac-4c3f-be7b-61c9ee75094d: Student has
+                  88126847-ede9-480a-ab8a-dbf7ae043746: 'Error creating class member
+                    for teacher_id 88126847-ede9-480a-ab8a-dbf7ae043746: Teacher has
                     already been taken'
-                  4a6dc0cd-9ecf-45b5-abb4-9f555cfd68ac: 'Error creating class member
-                    for student_id 4a6dc0cd-9ecf-45b5-abb4-9f555cfd68ac: Student has
+                  1fd5318c-293d-4da9-b0cf-933b1a027965: 'Error creating class member
+                    for teacher_id 1fd5318c-293d-4da9-b0cf-933b1a027965: Teacher has
+                    already been taken'
+                  12f253fc-5d5c-4924-bea9-749f530b4eec: 'Error creating class member
+                    for student_id 12f253fc-5d5c-4924-bea9-749f530b4eec: Student has
+                    already been taken'
+                  f7c36779-dd2b-4405-b9f5-f721745ca344: 'Error creating class member
+                    for student_id f7c36779-dd2b-4405-b9f5-f721745ca344: Student has
+                    already been taken'
+                  3d4d1999-937f-417c-8ab2-2d5476fa42cd: 'Error creating class member
+                    for student_id 3d4d1999-937f-417c-8ab2-2d5476fa42cd: Student has
+                    already been taken'
+                  bb1c9c1e-93ec-4fce-bc62-defccd8092e2: 'Error creating class member
+                    for teacher_id bb1c9c1e-93ec-4fce-bc62-defccd8092e2: Teacher has
+                    already been taken'
+                  ccd50605-e97f-4719-b5cb-975fb07176b9: 'Error creating class member
+                    for teacher_id ccd50605-e97f-4719-b5cb-975fb07176b9: Teacher has
+                    already been taken'
+                  7b020b5a-ef63-4a11-a3a1-3052ddf1cdf4: 'Error creating class member
+                    for teacher_id 7b020b5a-ef63-4a11-a3a1-3052ddf1cdf4: Teacher has
+                    already been taken'
+                  acdaaab4-3e0d-4ec4-864c-a940bfe8fc05: 'Error creating class member
+                    for teacher_id acdaaab4-3e0d-4ec4-864c-a940bfe8fc05: Teacher has
+                    already been taken'
+                  df4b767e-f12f-46ee-b413-fd4228b1c3f4: 'Error creating class member
+                    for teacher_id df4b767e-f12f-46ee-b413-fd4228b1c3f4: Teacher has
+                    already been taken'
+                  a5ce094f-fe60-4143-ad46-232c1e213c48: 'Error creating class member
+                    for teacher_id a5ce094f-fe60-4143-ad46-232c1e213c48: Teacher has
+                    already been taken'
+                  d33ef58b-fc7e-48e7-979c-93c4da9de766: 'Error creating class member
+                    for student_id d33ef58b-fc7e-48e7-979c-93c4da9de766: Student has
+                    already been taken'
+                  c66c642d-ef1c-4ae2-a1e9-ac1affeda031: 'Error creating class member
+                    for student_id c66c642d-ef1c-4ae2-a1e9-ac1affeda031: Student has
+                    already been taken'
+                  55f2e8b4-1e8f-4f55-9832-5f4301dc6981: 'Error creating class member
+                    for student_id 55f2e8b4-1e8f-4f55-9832-5f4301dc6981: Student has
+                    already been taken'
+                  57dce1d1-b113-48c5-afc3-c6cfb01077f6: 'Error creating class member
+                    for student_id 57dce1d1-b113-48c5-afc3-c6cfb01077f6: Student has
+                    already been taken'
+                  58fec44c-ddd1-4d5e-91d7-7063dd900778: 'Error creating class member
+                    for student_id 58fec44c-ddd1-4d5e-91d7-7063dd900778: Student has
+                    already been taken'
+                  cc80f4e5-0a9b-4739-998f-4e59334fd1ad: 'Error creating class member
+                    for student_id cc80f4e5-0a9b-4739-998f-4e59334fd1ad: Student has
+                    already been taken'
+                  d0cbdcf6-e2d9-4170-a282-923d254e78ec: 'Error creating class member
+                    for teacher_id d0cbdcf6-e2d9-4170-a282-923d254e78ec: Teacher has
+                    already been taken'
+                  8870d3d2-e87d-41a5-91ff-947a32b01bbb: 'Error creating class member
+                    for teacher_id 8870d3d2-e87d-41a5-91ff-947a32b01bbb: Teacher has
+                    already been taken'
+                  ea0e8a23-30a2-4cc0-8118-ca3a87d0147b: 'Error creating class member
+                    for teacher_id ea0e8a23-30a2-4cc0-8118-ca3a87d0147b: Teacher has
                     already been taken'
       requestBody:
         content:
@@ -4906,8 +5145,8 @@ paths:
               - class_member
             example:
               class_member:
-                user_id: 862d12b1-a9f6-4bc0-acbc-7d5cb828a3c5
-                type: student
+                user_id: 186ecce9-1ce6-404d-8a68-9e26e93b93c1
+                type: teacher
   "/api/schools/{school_id}/classes/{class_id}/members/batch":
     post:
       summary: create_batch
@@ -4925,16 +5164,44 @@ paths:
         required: true
         schema:
           type: string
-        example: e4636f66-3e3e-41db-8d02-d85e6ec20cb4
+        example: a86c90b3-d068-4bcc-9392-6b8d58ddc3e1
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: f11b9613-8bf9-44f2-876a-0b42ab022f37
+        example: 6c6357fc-ee92-4235-ac32-baacbc31f526
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                class_members:
+                  type: array
+                  items:
+                    type: object
+                    properties:
+                      user_id:
+                        type: string
+                      type:
+                        type: string
+                    required:
+                    - user_id
+                    - type
+              required:
+              - class_members
+            example:
+              class_members:
+              - user_id: 799dc560-1672-474d-a004-902495a7ff5b
+                type: student
+              - user_id: ad5f0b89-c398-4e61-a793-04773c61c76f
+                type: student
+              - user_id: 9d4c8312-74b9-4020-a01a-815d87f8dd2c
+                type: student
       responses:
         '200':
-          description: responds 200 OK
+          description: returns a result for all members sent in the request
           content:
             application/json:
               schema:
@@ -4954,15 +5221,15 @@ paths:
                   - user_id
               example:
               - success: true
-                user_id: 2191e9ba-783f-41e8-b16d-77e4094c8729
+                user_id: ad5f0b89-c398-4e61-a793-04773c61c76f
               - success: true
-                user_id: ad049226-588c-4d50-ae40-95ed2e9598fd
-              - success: true
-                user_id: 0d7ab52c-3f9f-4d25-b48c-98c1aad2f2eb
-              - success: true
-                user_id: a3ab771c-ade4-4c24-8e88-a78ab6e3358b
+                user_id: 9d4c8312-74b9-4020-a01a-815d87f8dd2c
+              - success: false
+                user_id: 799dc560-1672-474d-a004-902495a7ff5b
+                error: 'Error creating class member for student_id 799dc560-1672-474d-a004-902495a7ff5b:
+                  Student has already been taken'
         '400':
-          description: responds 400 Bad Request when params are invalid
+          description: responds 400 Bad Request when params are missing
           content:
             application/json:
               schema:
@@ -4989,8 +5256,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a teacher from a different
-            school
+          description: responds 403 Forbidden when the user is not the school-teacher
+            for the class
           content:
             application/json:
               schema:
@@ -5004,7 +5271,7 @@ paths:
                 error: 'CanCan::AccessDenied: You are not authorized to access this
                   page.'
         '422':
-          description: responds 422 Unprocessable Entity
+          description: returns the error message in the operation response
           content:
             application/json:
               schema:
@@ -5026,36 +5293,6 @@ paths:
                 class_members: []
                 errors: {}
                 error: 'Error creating class members: No valid school members provided'
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                class_members:
-                  type: array
-                  items:
-                    type: object
-                    properties:
-                      user_id:
-                        type: string
-                      type:
-                        type: string
-                    required:
-                    - user_id
-                    - type
-              required:
-              - class_members
-            example:
-              class_members:
-              - user_id: 2191e9ba-783f-41e8-b16d-77e4094c8729
-                type: owner
-              - user_id: ad049226-588c-4d50-ae40-95ed2e9598fd
-                type: student
-              - user_id: 0d7ab52c-3f9f-4d25-b48c-98c1aad2f2eb
-                type: student
-              - user_id: a3ab771c-ade4-4c24-8e88-a78ab6e3358b
-                type: student
   "/api/schools/{school_id}/classes/{class_id}/members/{id}":
     delete:
       summary: destroy
@@ -5073,19 +5310,19 @@ paths:
         required: true
         schema:
           type: string
-        example: b90279d1-fad4-4473-ae4b-bf110331cd20
+        example: 4fce7484-3bc5-4b43-94db-39df0eee8d6b
       - name: id
         in: path
         required: true
         schema:
           type: string
-        example: 1127f08e-2925-4ee7-9d0f-5ce5e75d138b
+        example: f6d91022-3c28-4959-a9bb-057594d8a930
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: b0e2a989-b660-4d46-82f0-5084ff38f1b0
+        example: 05af8163-b0f2-4e7e-a489-4cae43f82f00
       responses:
         '204':
           description: responds 204 No Content when the user is the class teacher
@@ -5103,8 +5340,7 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is not the school-teacher
-            for the class
+          description: responds 403 Forbidden when the user is a school-student
           content:
             application/json:
               schema:
@@ -5134,16 +5370,16 @@ paths:
         required: true
         schema:
           type: string
-        example: b2bbd4ef-d36e-4ae0-8936-4d2dffe30b13
+        example: 1b06e739-30cc-41e7-abca-fab16da08d8b
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: f924474e-df9a-4d26-8637-adb21f0f9caa
+        example: f73bd0e2-a5df-4fb0-b717-361a2fa223c2
       responses:
         '204':
-          description: responds 204 No Content
+          description: responds 204 No Content when the user is the class teacher
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -5188,16 +5424,17 @@ paths:
         required: true
         schema:
           type: string
-        example: 73-21-27
+        example: 957b9117-1626-4e3e-beaa-5d10eeb95304
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: 34-01-24
+        example: 8f5afda7-e4bb-4353-8932-0a32341384e4
       responses:
         '200':
-          description: responds with the school class JSON
+          description: responds with nil attributes for the teacher if their user
+            profile doesn't exist
           content:
             application/json:
               schema:
@@ -5248,19 +5485,16 @@ paths:
                 - import_id
                 - teachers
               example:
-                id: d9cba201-ee56-415a-8b6e-dec9ad1056e4
+                id: 386b06f7-46e4-42d1-8e06-475a4617f8c1
                 description: 
-                school_id: 65486616-1f1c-4150-a98c-0fb688fbcba8
+                school_id: 5b95310c-0d23-45d6-8bae-ce3a8628fce1
                 name: Test School Class
-                code: 73-21-27
-                created_at: '2025-11-26T11:46:50.406Z'
-                updated_at: '2025-11-26T11:46:50.406Z'
+                code: 65-35-36
+                created_at: '2025-11-27T08:56:12.611Z'
+                updated_at: '2025-11-27T08:56:12.611Z'
                 import_origin: 
                 import_id: 
-                teachers:
-                - id: 1c8606c1-5025-4901-9a77-43a0e8bec229
-                  name: School Teacher
-                  type: teacher
+                teachers: []
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -5275,8 +5509,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is not a school-student
-            for the class
+          description: responds 403 Forbidden when the user is a school-owner for
+            a different school
           content:
             application/json:
               schema:
@@ -5290,7 +5524,7 @@ paths:
                 error: 'CanCan::AccessDenied: You are not authorized to access this
                   page.'
         '404':
-          description: responds 404 Not Found when no school exists
+          description: responds 404 Not Found when no school class exists
           content:
             application/json:
               schema:
@@ -5301,7 +5535,8 @@ paths:
                 required:
                 - error
               example:
-                error: 'ActiveRecord::RecordNotFound: Couldn''t find School with ''id''="not-a-real-code"'
+                error: 'ActiveRecord::RecordNotFound: Couldn''t find SchoolClass with
+                  ''id''="not-a-real-id" [WHERE "school_classes"."school_id" = $1]'
     put:
       summary: update
       tags:
@@ -5318,13 +5553,13 @@ paths:
         required: true
         schema:
           type: string
-        example: 95c61800-a6f6-4920-ade3-284a42214293
+        example: 20f2e6fc-5354-4df6-9d1e-f2b7ba126306
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: edbfc461-5960-42a0-bacd-174bf2fa089f
+        example: 36d2288c-7c14-4f0b-b7a6-78c83f6fe1a2
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -5345,8 +5580,7 @@ paths:
                 name: New Name
       responses:
         '200':
-          description: responds 200 OK when the user is the school-teacher for the
-            class
+          description: responds with the teacher JSON
           content:
             application/json:
               schema:
@@ -5397,17 +5631,17 @@ paths:
                 - import_id
                 - teachers
               example:
-                id: 7cf62734-307c-4214-b0a4-d76cf692a6c8
+                id: 20f2e6fc-5354-4df6-9d1e-f2b7ba126306
                 description: 
-                school_id: 7dde8955-a861-4fed-871a-0ba8d53f6b59
+                school_id: 36d2288c-7c14-4f0b-b7a6-78c83f6fe1a2
                 name: New Name
-                code: 67-88-61
-                created_at: '2025-11-26T11:47:07.973Z'
-                updated_at: '2025-11-26T11:47:07.988Z'
+                code: 65-08-48
+                created_at: '2025-11-27T08:56:14.994Z'
+                updated_at: '2025-11-27T08:56:15.005Z'
                 import_origin: 
                 import_id: 
                 teachers:
-                - id: b2b3d97d-2442-404e-91eb-da1497cf6911
+                - id: 4bf85892-af90-44a4-81af-79737bb52ba4
                   name: School Teacher
                   type: teacher
         '400':
@@ -5438,8 +5672,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is not the school-teacher
-            for the class
+          description: responds 403 Forbidden when the user is a school-owner for
+            a different school
           content:
             application/json:
               schema:
@@ -5482,10 +5716,10 @@ paths:
         required: true
         schema:
           type: string
-        example: 7543d90e-55de-4b45-b840-8070af7cd621
+        example: 81db72ff-a174-4c81-abb8-645ec219178a
       responses:
         '200':
-          description: responds 200 OK
+          description: responds with the expected teacher parameters
           content:
             application/json:
               schema:
@@ -5553,36 +5787,36 @@ paths:
                       nullable: true
               example:
               - student:
-                  id: 43fd8407-0c73-4417-9c9b-1367de57db6b
-                  username: shaniqua.dickinson
-                  name: Cecille Graham
+                  id: 11e5ca5d-90aa-4a45-82fa-7ccddbf7abae
+                  username: myrle.kovacek
+                  name: Cecil Flatley
+                  email: 
+                  sso_providers: []
+                  type: student
+              - owner:
+                  id: edf18bae-23fd-4595-b8df-dfd0edd1fd7d
+                  name: Deshawn Corwin
+                  type: owner
+                  email: elias_wuckert@wilkinson.example
+              - student:
+                  id: 4bc8bd95-7071-4767-9b2b-45374999ad86
+                  username: matthew_bahringer
+                  name: Florencio Armstrong
                   email: 
                   sso_providers: []
                   type: student
               - student:
-                  id: bda3ca6e-b08c-4381-a942-3a0c19415f60
-                  username: jarrod
-                  name: Collene Murphy
+                  id: b4f9d269-dd6c-4f4d-a5b9-88fd8133f064
+                  username: leland
+                  name: Hung Huel
                   email: 
                   sso_providers: []
                   type: student
               - teacher:
-                  id: 67d47353-2800-4a8c-a104-78c5907a12a6
-                  name: Gov. Dan Ruecker
+                  id: 7d7ac71f-7c07-4cec-801a-e4327852bbcf
+                  name: Msgr. Xiao O'Hara
                   type: teacher
-                  email: daniela.kautzer@ziemann.example
-              - owner:
-                  id: 91154dd9-7d15-4a13-9809-869ec50dc695
-                  name: Reynaldo Thompson
-                  type: owner
-                  email: horacio@reinger.example
-              - student:
-                  id: e8cdf639-65c2-4401-9e5e-7ad1d4189a57
-                  username: shon
-                  name: Yuette Crooks
-                  email: 
-                  sso_providers: []
-                  type: student
+                  email: cristobal_howell@bernier.example
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -5597,8 +5831,7 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a school-owner for
-            a different school
+          description: responds 403 Forbidden when the user is a school-student
           content:
             application/json:
               schema:
@@ -5628,7 +5861,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 0a929a51-1b0d-48bc-9a19-b9d53da2ea92
+        example: 796b446b-4766-470a-95d3-b2d0c2121e06
       responses:
         '200':
           description: responds 200 OK when the user is a school-teacher
@@ -5653,10 +5886,10 @@ paths:
                   - type
                   - email
               example:
-              - id: 6f62d842-0f7f-46fa-9f7d-beef882868e2
+              - id: 37d068b1-161f-4ecd-a524-df1d11c57553
                 name: School Owner
                 type: owner
-                email: rogelio@rau.test
+                email: marylouise_bahringer@schmeler.test
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -5671,7 +5904,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a school-student
+          description: responds 403 Forbidden when the user is a school-owner for
+            a different school
           content:
             application/json:
               schema:
@@ -5701,7 +5935,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 45c9d630-417b-4326-97a6-a28654b817f0
+        example: 2d2c62bf-4660-4568-ba1a-30d7ded65a9e
       responses:
         '200':
           description: creates the school owner safeguarding flag
@@ -5715,8 +5949,8 @@ paths:
                     id:
                       type: string
                     username:
-                      nullable: true
                       type: string
+                      nullable: true
                     name:
                       type: string
                     email:
@@ -5734,21 +5968,21 @@ paths:
                   - sso_providers
                   - type
               example:
-              - id: dd01d9fe-5ccc-4b7e-b88e-300519561b61
-                username: emilia.ortiz
-                name: Christel Towne
+              - id: bc43f9ef-2901-4d87-9199-d0ff91576e79
+                username: geraldo
+                name: Enedina Adams
                 email: 
                 sso_providers: []
                 type: student
-              - id: 77b131fa-5e79-48b0-96eb-442c0e45c6b6
-                username: timothy
-                name: Olin Senger
+              - id: 862f4e7c-edd1-4de7-a2d6-7557bb45fe28
+                username: jospeh_mohr
+                name: Rep. Ivory Schiller
                 email: 
                 sso_providers: []
                 type: student
-              - id: d0aa5a55-07ae-46d3-ac20-1fae1fb4c4a6
-                username: ricky.runte
-                name: Thanh Kiehn
+              - id: 38d75fcf-559b-41e5-a145-9170c4d74d81
+                username: larhonda.fahey
+                name: Ms. Ramonita Kutch
                 email: 
                 sso_providers: []
                 type: student
@@ -5766,8 +6000,7 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a school-owner for
-            a different school
+          description: responds 403 Forbidden when the user is a school-student
           content:
             application/json:
               schema:
@@ -5796,37 +6029,10 @@ paths:
         required: true
         schema:
           type: string
-        example: 27530f73-7d0c-4742-a4be-5558e50ea2ba
-      requestBody:
-        content:
-          application/x-www-form-urlencoded:
-            schema:
-              type: object
-              properties:
-                school_student:
-                  type: object
-                  properties:
-                    username:
-                      type: string
-                    password:
-                      type: string
-                    name:
-                      type: string
-                  required:
-                  - username
-                  - password
-                  - name
-              required:
-              - school_student
-            example:
-              school_student:
-                username: student123
-                password: SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=
-                name: School Student
+        example: fede3d0c-00fe-41c1-8f6e-0d18c693c795
       responses:
         '204':
-          description: does not create the school owner safeguarding flag when the
-            user is a school teacher
+          description: does not create the school teacher safeguarding flag
         '400':
           description: responds 400 Bad Request when params are missing
           content:
@@ -5881,6 +6087,32 @@ paths:
                 - error
               example:
                 error: 'param is missing or the value is empty: password'
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                school_student:
+                  type: object
+                  properties:
+                    username:
+                      type: string
+                    password:
+                      type: string
+                    name:
+                      type: string
+                  required:
+                  - username
+                  - password
+                  - name
+              required:
+              - school_student
+            example:
+              school_student:
+                username: student123
+                password: SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=
+                name: School Student
   "/api/schools/{school_id}/students/batch":
     post:
       summary: create_batch
@@ -5898,7 +6130,7 @@ paths:
         required: true
         schema:
           type: string
-        example: b7838bb7-3ca2-4472-9378-cc8a7076e472
+        example: 5b75014c-c193-4565-9f77-8f4de8850082
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -5932,7 +6164,7 @@ paths:
                 name: School Student 2
       responses:
         '202':
-          description: does not create the school teacher safeguarding flag
+          description: creates the school owner safeguarding flag
           content:
             application/json:
               schema:
@@ -5943,7 +6175,7 @@ paths:
                 required:
                 - job_id
               example:
-                job_id: f17b386f-acfb-4ba9-ad65-54512ee8af3c
+                job_id: fdddf612-ea10-4ff7-852a-41d482dcebf8
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -5972,7 +6204,7 @@ paths:
                 error: 'CanCan::AccessDenied: You are not authorized to access this
                   page.'
         '422':
-          description: responds 422 when a batch already exists for this school
+          description: responds 422 Unprocessable Entity when params are invalid
           content:
             application/json:
               schema:
@@ -5998,8 +6230,8 @@ paths:
                 - error
                 - error_type
               example:
-                error: ConcurrencyExceededForSchool
-                error_type: batch_error
+                error: StandardError
+                error_type: unprocessable_entity
   "/api/schools/{school_id}/students/{id}":
     delete:
       summary: destroy
@@ -6017,16 +6249,16 @@ paths:
         required: true
         schema:
           type: string
-        example: 02af18f0-3e05-4d2f-90a5-f3ecd2156cb5
+        example: 28819e53-a0c9-42dc-96ba-887f92e329e0
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: a7a47b1c-e708-4d3e-ae7f-c5c75baf9391
+        example: de74fa56-3a22-46e8-ba2e-2e9e66f394e5
       responses:
         '204':
-          description: creates the school owner safeguarding flag
+          description: does not create the school teacher safeguarding flag
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -6041,8 +6273,7 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: does not create the school owner safeguarding flag when logged
-            in as a teacher
+          description: responds 403 Forbidden when the user is a school-student
           content:
             application/json:
               schema:
@@ -6071,44 +6302,13 @@ paths:
         required: true
         schema:
           type: string
-        example: 6d765fa3-fd23-4d1d-afbb-d3367bc55021
+        example: eca77d4c-d2f0-4a13-8dee-0b9e3129910c
       - name: school_id
         in: path
         required: true
         schema:
           type: string
-        example: 9587962c-dffe-4fdc-997e-ec944f80547e
-      responses:
-        '204':
-          description: creates the school teacher safeguarding flag when the user
-            is a school teacher
-        '401':
-          description: responds 401 Unauthorized when no token is given
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: Unauthorized
-        '403':
-          description: responds 403 Forbidden when the user is a school-student
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: 'CanCan::AccessDenied: You are not authorized to access this
-                  page.'
+        example: 25bd96db-5c0c-4dd8-beb6-d4746633d4ca
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6135,6 +6335,37 @@ paths:
                 username: new-username
                 password: SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=
                 name: New Name
+      responses:
+        '204':
+          description: does not create the school teacher safeguarding flag
+        '401':
+          description: responds 401 Unauthorized when no token is given
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: Unauthorized
+        '403':
+          description: responds 403 Forbidden when the user is a school-owner for
+            a different school
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: 'CanCan::AccessDenied: You are not authorized to access this
+                  page.'
   "/api/schools/{school_id}/teachers":
     get:
       summary: index
@@ -6152,7 +6383,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 2ffa205b-6563-4838-ac2e-ed10263c0d79
+        example: b29695e6-f51d-4531-aa82-d8ce8328103b
       responses:
         '200':
           description: responds 200 OK when the user is a school-teacher
@@ -6177,10 +6408,10 @@ paths:
                   - type
                   - email
               example:
-              - id: f36ff979-d2bf-4aa0-b49f-6db3ff5bd4cd
-                name: Hyun Waters Jr.
+              - id: '052883c2-268e-4311-8783-99a3288b6650'
+                name: Hyun Bode
                 type: teacher
-                email: trang@cummerata.test
+                email: kindra@hills-hand.test
         '401':
           description: responds 401 Unauthorized when no token is given
           content:
@@ -6225,7 +6456,7 @@ paths:
         required: true
         schema:
           type: string
-        example: d4902607-ded5-46f4-81d5-1ee1f0f0a372
+        example: 2e8e35bf-291e-4391-972e-c844d17fe795
       requestBody:
         content:
           application/x-www-form-urlencoded:
@@ -6280,7 +6511,8 @@ paths:
               example:
                 error: Unauthorized
         '403':
-          description: responds 403 Forbidden when the user is a school-student
+          description: responds 403 Forbidden when the user is a school-owner for
+            a different school
           content:
             application/json:
               schema:
@@ -6327,7 +6559,7 @@ paths:
         example: fake-token
       responses:
         '200':
-          description: responds 200 OK
+          description: includes school name in response
           content:
             application/json:
               schema:
@@ -6338,7 +6570,73 @@ paths:
                 required:
                 - school_name
               example:
-                school_name: School 76
+                school_name: School 234
+        '401':
+          description: responds 401 Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: Unauthorized
+        '403':
+          description: includes error message in response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: Invitation email does not match user email
+        '404':
+          description: responds 404 Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                required:
+                - error
+              example:
+                error: 'ActiveRecord::RecordNotFound: Couldn''t find TeacherInvitation
+                  without an ID'
+  "/api/teacher_invitations/{token}/accept":
+    put:
+      summary: accept
+      tags:
+      - Api::TeacherInvitation
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+        example: fake-user-access-token
+      - name: token
+        in: path
+        required: true
+        schema:
+          type: string
+        example: eyJfcmFpbHMiOnsiZGF0YSI6W251bGwsInRlYWNoZXJAZXhhbXBsZS5jb20iXSwiZXhwIjoiMjAyNS0xMi0yN1QwODo1NjoxMC4zMzJaIiwicHVyIjoiVGVhY2hlckludml0YXRpb25cbnRlYWNoZXJfaW52aXRhdGlvblxuMjU5MjAwMCJ9fQ==--578dfb0924efe28ad306bc10e00dc1a5afad7687
+      responses:
+        '200':
+          description: responds 200 OK
+          content:
+            text/html:
+              schema:
+                type: string
+              example: ''
         '401':
           description: responds 401 Unauthorized
           content:
@@ -6379,75 +6677,8 @@ paths:
               example:
                 error: 'ActiveRecord::RecordNotFound: Couldn''t find TeacherInvitation
                   without an ID'
-  "/api/teacher_invitations/{token}/accept":
-    put:
-      summary: accept
-      tags:
-      - Api::TeacherInvitation
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-        example: fake-user-access-token
-      - name: token
-        in: path
-        required: true
-        schema:
-          type: string
-        example: fake-token
-      responses:
-        '200':
-          description: responds 200 OK
-          content:
-            text/html:
-              schema:
-                type: string
-              example: ''
-        '401':
-          description: responds 401 Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: Unauthorized
-        '403':
-          description: responds 403 Forbidden
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: Invitation email does not match user email
-        '404':
-          description: responds 404 Not Found
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  error:
-                    type: string
-                required:
-                - error
-              example:
-                error: 'ActiveRecord::RecordNotFound: Couldn''t find TeacherInvitation
-                  without an ID'
         '422':
-          description: does not give the user the teacher role for the school to which
-            they have been invited
+          description: does not set the accepted_at timestamp on the invitation
           content:
             application/json:
               schema:
@@ -6481,6 +6712,13 @@ paths:
       summary: index
       tags:
       - Api::UserJob
+      parameters:
+      - name: Authorization
+        in: header
+        required: true
+        schema:
+          type: string
+        example: fake-user-access-token
       responses:
         '200':
           description: responds with a list of jobs
@@ -6511,8 +6749,8 @@ paths:
                 - jobs
               example:
                 jobs:
-                - id: 275bbb1c-d544-45c6-94dd-c42ebf91fce0
-                  concurrency_key: 56fa12ab-0a50-44be-96ff-4c3171748065
+                - id: 7c576ad2-f339-442b-ab7a-aa36ff51111a
+                  concurrency_key: 2b6f22ee-2734-4a28-9c1f-c13840b0f0ee
                   status: queued
                   finished_at: 
         '401':
@@ -6528,13 +6766,6 @@ paths:
                 - error
               example:
                 error: Unauthorized
-      parameters:
-      - name: Authorization
-        in: header
-        required: true
-        schema:
-          type: string
-        example: fake-user-access-token
   "/api/user_jobs/{id}":
     get:
       summary: show
@@ -6552,7 +6783,7 @@ paths:
         required: true
         schema:
           type: string
-        example: 3d4e8409-13c6-4d36-834a-43857795ab75
+        example: f16ed760-8a62-4335-b734-faebece7fe2a
       responses:
         '200':
           description: responds with the expected job
@@ -6581,13 +6812,13 @@ paths:
                 - job
               example:
                 job:
-                  id: 3d4e8409-13c6-4d36-834a-43857795ab75
-                  concurrency_key: 7096c1f2-4356-4a20-bde0-7376f13d561b
+                  id: f16ed760-8a62-4335-b734-faebece7fe2a
+                  concurrency_key: 628e04d0-6369-4c8a-88b6-833541bab29c
                   status: queued
                   finished_at: 
 components:
   securitySchemes:
     bearer_auth:
-      type: :http
-      scheme: :bearer
+      type: http
+      scheme: bearer
       description: 'Hydra API token via Authorization: Bearer <token>'
