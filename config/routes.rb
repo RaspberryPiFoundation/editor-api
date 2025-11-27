@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
     resources :school_classes, only: %i[show]
     resources :lessons, only: %i[show]
+    resources :school_import_results, only: %i[index show new create]
 
     root to: 'projects#index'
   end

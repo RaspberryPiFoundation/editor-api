@@ -1,0 +1,43 @@
+<%#
+# Index
+
+This view is the template for the index page.
+It renders the search bar, header and pagination.
+It renders the `_table` partial to display details about the resources.
+
+## Local variables:
+
+- `resources`:
+  An ActiveModel::Relation collection of resources to be displayed in the table.
+  By default, the number of resources is limited by pagination
+  or by a hard limit to prevent excessive page load times
+%>
+
+<% content_for(:title) { "School Import History" } %>
+
+<header class="main-content__header">
+  <h1 class="main-content__page-title">
+    <%= content_for(:title) %>
+  </h1>
+
+  <div>
+    <%= link_to(
+      "New Import",
+      new_admin_school_import_result_path,
+      class: "button button--primary",
+    ) %>
+  </div>
+</header>
+
+<section class="main-content__body main-content__body--flush">
+  <%= render(
+    "collection",
+    collection_presenter: page,
+    collection_field_name: :resources,
+    page: page,
+    resources: resources,
+    table_title: "page_title"
+  ) %>
+
+  <%= paginate resources, param_name: :_page %>
+</section>
