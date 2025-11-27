@@ -262,6 +262,29 @@ RSpec.describe SchoolClass, :versioning do
     end
   end
 
+  describe '#submitted_count' do
+    it 'returns 0 if there are no lessons' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      expect(school_class.submitted_count).to eq(0)
+    end
+
+    it 'returns the sum of submitted counts from all lessons' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+
+      lesson_1 = create(:lesson, school_class:, user_id: teacher.id)
+      remix_1 = create(:project, school:, remixed_from_id: lesson_1.project.id, user_id: student.id)
+      remix_1.school_project.transition_status_to!(:submitted, remix_1.user_id)
+
+      lesson_2 = create(:lesson, school_class:, user_id: teacher.id)
+      remix_2 = create(:project, school:, remixed_from_id: lesson_2.project.id, user_id: student.id)
+      remix_2.school_project.transition_status_to!(:submitted, remix_2.user_id)
+      remix_3 = create(:project, school:, remixed_from_id: lesson_2.project.id, user_id: student.id)
+      remix_3.school_project.transition_status_to!(:submitted, remix_3.user_id)
+
+      expect(school_class.submitted_count).to eq(3)
+    end
+  end
+
   describe 'auditing' do
     subject(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
 

@@ -58,6 +58,21 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'could not be generated')
   end
 
+  def submitted_count
+    return 0 if lessons.empty?
+
+    Lesson
+      .joins(project: { remixes: { school_project: :school_project_transitions } })
+      .where(school_class_id: id)
+      .where(
+        school_project_transitions: {
+          to_state: 'submitted',
+          most_recent: true
+        }
+      )
+      .count
+  end
+
   private
 
   def school_class_has_at_least_one_teacher

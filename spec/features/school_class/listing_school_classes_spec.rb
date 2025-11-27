@@ -53,6 +53,28 @@ RSpec.describe 'Listing school classes', type: :request do
     expect(data.first[:teachers].first).to be_nil
   end
 
+  it 'includes submitted_count if user is a school-teacher' do
+    authenticated_in_hydra_as(teacher)
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data.first).to have_key(:submitted_count)
+  end
+
+  it 'includes submitted_count if user is a school-owner' do
+    authenticated_in_hydra_as(owner)
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data.first).to have_key(:submitted_count)
+  end
+
+  it 'does not include submitted_count if user is a school-student' do
+    authenticated_in_hydra_as(student)
+    stub_user_info_api_for(teacher)
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data.first).not_to have_key(:submitted_count)
+  end
+
   it "does not include school classes that the school-teacher doesn't teach" do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
