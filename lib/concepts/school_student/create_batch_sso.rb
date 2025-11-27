@@ -32,17 +32,45 @@ module SchoolStudent
       private
 
       def create_batch_sso(school, students, token)
-        # Ensure that nil values are empty strings, else Profile will swallow validations
-        students = students.map do |student|
-          student.transform_values { |value| value.nil? ? '' : value }
-        end
-
+        students = normalize_student_params(students)
         responses = ProfileApiClient.create_school_students_sso(token:, students:, school_id: school.id)
 
-        responses.each do |student|
-          Role.student.find_or_create_by(school_id: school.id, user_id: student[:id])
+        create_student_roles(school, responses)
+        format_student_responses(responses)
+      rescue ProfileApiClient::Student422Error => e
+        handle_validations(e.errors)
+      end
+
+      def normalize_student_params(students)
+        # Ensure that nil values are empty strings, else Profile will swallow validations
+        students.map do |student|
+          student.transform_values { |value| value.nil? ? '' : value }
+        end
+      end
+
+      def create_student_roles(school, responses)
+        user_ids = responses.pluck(:id)
+        existing_user_ids = Role.student.where(school_id: school.id, user_id: user_ids).pluck(:user_id)
+        new_user_ids = user_ids - existing_user_ids
+
+        return if new_user_ids.empty?
+
+        # Use insert_all to avoid N+1 INSERT queries
+        new_roles = new_user_ids.map do |user_id|
+          {
+            role: Role.roles[:student],
+            school_id: school.id,
+            user_id: user_id
+          }
         end
 
+        # We know the school and uniqueness is ok at this stage, so we can skip validations
+        # rubocop:disable Rails/SkipsModelValidations
+        Role.insert_all(new_roles, unique_by: %i[user_id school_id role])
+        # rubocop:enable Rails/SkipsModelValidations
+      end
+
+      def format_student_responses(responses)
         # Convert hash responses to User objects with separate metadata
         # This separates student data from metadata (success, error, created flags)
         responses.map do |student_data|
@@ -53,8 +81,6 @@ module SchoolStudent
             created: student_data[:created]
           }
         end
-      rescue ProfileApiClient::Student422Error => e
-        handle_validations(e.errors)
       end
 
       def handle_validations(errors)
