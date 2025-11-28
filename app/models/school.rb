@@ -21,7 +21,7 @@ class School < ApplicationRecord
   validates :school_roll_number,
             uniqueness: { case_sensitive: false, allow_nil: true },
             presence: false,
-            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: 'must be alphanumeric (e.g., 01572D)' }
+            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') }
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true

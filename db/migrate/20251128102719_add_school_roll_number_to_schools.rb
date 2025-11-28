@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AddSchoolRollNumberToSchools < ActiveRecord::Migration[7.2]
   def change
     add_column :schools, :school_roll_number, :string
