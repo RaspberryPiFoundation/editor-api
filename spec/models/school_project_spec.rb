@@ -101,6 +101,18 @@ RSpec.describe SchoolProject do
       expect(school_project.unread_feedback?).to be true
     end
 
+    it 'returns false if all feedback is read' do
+      create_list(
+        :feedback,
+        2,
+        school_project: school_project,
+        read_at: Time.current,
+        content: 'Read',
+        user_id: teacher.id
+      )
+      expect(school_project.unread_feedback?).to be false
+    end
+
     it 'returns false when there is no feedback' do
       expect(school_project.unread_feedback?).to be false
     end
