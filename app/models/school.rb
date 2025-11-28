@@ -18,6 +18,10 @@ class School < ApplicationRecord
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
   validates :district_nces_id, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
+  validates :school_roll_number,
+            uniqueness: { case_sensitive: false, allow_nil: true },
+            presence: false,
+            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: 'must be alphanumeric (e.g., 01572D)' }
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
@@ -34,6 +38,7 @@ class School < ApplicationRecord
 
   before_validation :normalize_reference
   before_validation :normalize_district_fields
+  before_validation :normalize_school_roll_number
 
   before_save :format_uk_postal_code, if: :should_format_uk_postal_code?
 
@@ -100,6 +105,11 @@ class School < ApplicationRecord
   def normalize_district_fields
     self.district_name = nil if district_name.blank?
     self.district_nces_id = nil if district_nces_id.blank?
+  end
+
+  # Ensure the school_roll_number is nil, not an empty string
+  def normalize_school_roll_number
+    self.school_roll_number = nil if school_roll_number.blank?
   end
 
   def verified_at_cannot_be_changed

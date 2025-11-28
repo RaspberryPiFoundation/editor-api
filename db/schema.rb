@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_11_21_101546) do
+ActiveRecord::Schema[7.2].define(version: 2025_11_28_102719) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -298,10 +298,12 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_21_101546) do
     t.integer "user_origin", default: 0
     t.string "district_name"
     t.string "district_nces_id"
+    t.string "school_roll_number"
     t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["district_nces_id"], name: "index_schools_on_district_nces_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true
+    t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true
   end
 
   create_table "teacher_invitations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

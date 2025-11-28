@@ -147,6 +147,55 @@ RSpec.describe School do
       expect(duplicate_school).not_to be_valid
     end
 
+    it 'does not require a school_roll_number' do
+      create(:school, id: SecureRandom.uuid, school_roll_number: nil)
+
+      school.school_roll_number = nil
+      expect(school).to be_valid
+    end
+
+    it 'requires school_roll_number to be unique if provided' do
+      school.school_roll_number = '01572D'
+      school.save!
+
+      duplicate_school = build(:school, school_roll_number: '01572d')
+      expect(duplicate_school).not_to be_valid
+    end
+
+    it 'accepts a valid alphanumeric school_roll_number' do
+      school.school_roll_number = '01572D'
+      expect(school).to be_valid
+    end
+
+    it 'accepts a school_roll_number with multiple letters' do
+      school.school_roll_number = '12345ABC'
+      expect(school).to be_valid
+    end
+
+    it 'rejects a school_roll_number with only numbers' do
+      school.school_roll_number = '01572'
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include('must be alphanumeric (e.g., 01572D)')
+    end
+
+    it 'rejects a school_roll_number with only letters' do
+      school.school_roll_number = 'ABCDE'
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include('must be alphanumeric (e.g., 01572D)')
+    end
+
+    it 'rejects a school_roll_number with special characters' do
+      school.school_roll_number = '01572-D'
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include('must be alphanumeric (e.g., 01572D)')
+    end
+
+    it 'normalizes blank school_roll_number to nil' do
+      school.school_roll_number = '  '
+      school.save
+      expect(school.school_roll_number).to be_nil
+    end
+
     it 'requires an address_line_1' do
       school.address_line_1 = ' '
       expect(school).not_to be_valid
