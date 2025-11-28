@@ -53,6 +53,9 @@ class Project < ApplicationRecord
   end
 
   def with_user(current_user)
+    # students cannot call the Profile API so do not even try
+    return [self, nil] if current_user&.student?
+
     school = School.find_by(id: school_id)
     students = SchoolStudent::List.call(school:, token: current_user.token,
                                         student_ids: [user_id])[:school_students] || []
