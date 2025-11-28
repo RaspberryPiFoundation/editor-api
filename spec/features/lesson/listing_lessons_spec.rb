@@ -233,7 +233,7 @@ RSpec.describe 'Listing lessons', type: :request do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
-      student_project = create(:project, school:, lesson:, parent: lesson.project, user_id: student.id)
+      student_project = create(:project, school:, lesson:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
@@ -273,7 +273,6 @@ RSpec.describe 'Listing lessons', type: :request do
       )
       school_project = student_project.school_project
 
-      # 1 unread feedback
       create(
         :feedback,
         school_project: school_project,
@@ -282,7 +281,6 @@ RSpec.describe 'Listing lessons', type: :request do
         read_at: nil
       )
 
-      # 1 read feedback
       create(
         :feedback,
         school_project: school_project,

@@ -92,7 +92,7 @@ module Api
 
     def user_remix(lesson)
       lesson.project&.remixes
-            &.includes(school_project: :feedback)
+            &.includes(:school_project)
             &.where(user_id: current_user.id)
             &.accessible_by(current_ability)
             &.order(created_at: :asc)
