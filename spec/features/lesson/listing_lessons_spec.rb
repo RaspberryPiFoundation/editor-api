@@ -306,5 +306,17 @@ RSpec.describe 'Listing lessons', type: :request do
       expect(data.size).to eq(1)
       expect(data.first[:status]).to eq('submitted')
     end
+
+    it 'includes the default status when no transitions have happened' do
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+
+      lesson.project.update!(school: school)
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.first[:status]).to eq('unsubmitted')
+    end
   end
 end
