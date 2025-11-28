@@ -259,9 +259,10 @@ RSpec.describe 'Listing lessons', type: :request do
       expect(data.size).to eq(0)
     end
 
-    it 'includes unread_feedback_count when the user is a student' do
+    it 'includes has_unread_feedback when the user is a student' do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
+
       student_project = create(
         :project,
         school:,
@@ -271,6 +272,8 @@ RSpec.describe 'Listing lessons', type: :request do
         user_id: student.id
       )
       school_project = student_project.school_project
+
+      # 1 unread feedback
       create(
         :feedback,
         school_project: school_project,
@@ -278,6 +281,8 @@ RSpec.describe 'Listing lessons', type: :request do
         content: 'Unread',
         read_at: nil
       )
+
+      # 1 read feedback
       create(
         :feedback,
         school_project: school_project,
@@ -288,16 +293,24 @@ RSpec.describe 'Listing lessons', type: :request do
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
-      expect(data.first[:unread_feedback_count]).to eq(1)
+
+      expect(data.first[:has_unread_feedback]).to be(true)
     end
 
     it 'includes status when the user is a student' do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
-      lesson.project.update!(school: school)
-      school_project = lesson.project.school_project
+      student_project = create(
+        :project,
+        school:,
+        lesson:,
+        parent: lesson.project,
+        remixed_from_id: lesson.project.id,
+        user_id: student.id
+      )
 
+      school_project = student_project.school_project
       school_project.transition_status_to!(:submitted, teacher.id)
 
       get('/api/lessons', headers:)
@@ -311,7 +324,14 @@ RSpec.describe 'Listing lessons', type: :request do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
-      lesson.project.update!(school: school)
+      create(
+        :project,
+        school:,
+        lesson:,
+        parent: lesson.project,
+        remixed_from_id: lesson.project.id,
+        user_id: student.id
+      )
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)

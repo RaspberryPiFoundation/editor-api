@@ -4,10 +4,14 @@ require 'rails_helper'
 
 RSpec.describe SchoolProject do
   let(:state_machine) { instance_double(SchoolProjectStateMachine) }
-  let(:school_project) { create(:school_project, school:, project:) }
-  let(:project) { create(:project, school:, user_id: student.id) }
+  let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+  let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
+  let(:school_project) { create(:school_project, school:, project: remix) }
   let(:student) { create(:student, school:) }
   let(:school) { create(:school) }
+  let(:teacher) { create(:teacher, school:) }
+  let(:teacher_project) { create(:project, school:, user_id: teacher.id, lesson:) }
+  let(:remix) { create(:project, school:, user_id: student.id, remixed_from_id: teacher_project.id) }
 
   before do
     allow(school_project).to receive(:state_machine).and_return(state_machine)
@@ -20,7 +24,7 @@ RSpec.describe SchoolProject do
 
   describe '#status' do
     it 'defaults to unsubmitted' do
-      new_school_project = create(:school_project, school:, project:)
+      new_school_project = create(:school_project, school:, project: teacher_project)
       expect(new_school_project.status).to eq('unsubmitted')
     end
 
@@ -71,6 +75,34 @@ RSpec.describe SchoolProject do
       allow(state_machine).to receive(:history)
       school_project.history
       expect(state_machine).to have_received(:history)
+    end
+  end
+
+  describe '#unread_feedback?' do
+    it 'returns true if there is unread feedback for the school project' do
+      create_list(
+        :feedback,
+        3,
+        school_project: school_project,
+        read_at: nil,
+        content: 'Unread',
+        user_id: teacher.id
+      )
+
+      create_list(
+        :feedback,
+        2,
+        school_project: school_project,
+        read_at: Time.current,
+        content: 'Read',
+        user_id: teacher.id
+      )
+
+      expect(school_project.unread_feedback?).to be true
+    end
+
+    it 'returns false when there is no feedback' do
+      expect(school_project.unread_feedback?).to be false
     end
   end
 end
