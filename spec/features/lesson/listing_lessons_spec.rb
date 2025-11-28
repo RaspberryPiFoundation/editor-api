@@ -259,7 +259,7 @@ RSpec.describe 'Listing lessons', type: :request do
       expect(data.size).to eq(0)
     end
 
-    it 'includes has_unread_feedback when the user is a student' do
+    it 'includes has_unread_feedback as true when there is unread feedback' do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
@@ -293,6 +293,34 @@ RSpec.describe 'Listing lessons', type: :request do
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data.first[:has_unread_feedback]).to be(true)
+    end
+
+    it 'includes has_unread_feedback as false when there is no unread feedback' do
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+
+      student_project = create(
+        :project,
+        school:,
+        lesson:,
+        parent: lesson.project,
+        remixed_from_id: lesson.project.id,
+        user_id: student.id
+      )
+      school_project = student_project.school_project
+
+      create(
+        :feedback,
+        school_project: school_project,
+        user_id: teacher.id,
+        content: 'Unread',
+        read_at: Time.current
+      )
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.first[:has_unread_feedback]).to be(false)
     end
 
     it 'includes status when the user is a student' do
