@@ -258,5 +258,53 @@ RSpec.describe 'Listing lessons', type: :request do
 
       expect(data.size).to eq(0)
     end
+
+    it 'includes unread_feedback_count when the user is a student' do
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+      student_project = create(
+        :project,
+        school:,
+        lesson:,
+        parent: lesson.project,
+        remixed_from_id: lesson.project.id,
+        user_id: student.id
+      )
+      school_project = student_project.school_project
+      create(
+        :feedback,
+        school_project: school_project,
+        user_id: teacher.id,
+        content: 'Unread',
+        read_at: nil
+      )
+      create(
+        :feedback,
+        school_project: school_project,
+        user_id: teacher.id,
+        content: 'Read',
+        read_at: Time.current
+      )
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+      expect(data.first[:unread_feedback_count]).to eq(1)
+    end
+
+    it 'includes status when the user is a student' do
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+
+      lesson.project.update!(school: school)
+      school_project = lesson.project.school_project
+
+      school_project.transition_status_to!(:submitted, teacher.id)
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.size).to eq(1)
+      expect(data.first[:status]).to eq('submitted')
+    end
   end
 end
