@@ -21,7 +21,7 @@ RSpec.describe Feedback::Delete, type: :unit do
     end
 
     context 'when deletion fails' do
-      let (:feedback_id) { 'does-not-exist' }
+      let(:feedback_id) { 'does-not-exist' }
 
       before do
         allow(Sentry).to receive(:capture_exception)
