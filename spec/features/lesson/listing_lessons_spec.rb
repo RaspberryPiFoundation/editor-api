@@ -199,6 +199,23 @@ RSpec.describe 'Listing lessons', type: :request do
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
+    let(:class_student) do
+      create(:class_student, school_class:, student_id: student.id)
+    end
+
+    let(:student_project) do
+      create(
+        :project,
+        school:,
+        lesson:,
+        parent: lesson.project,
+        remixed_from_id: lesson.project.id,
+        user_id: student.id
+      )
+    end
+
+    let(:school_project) { student_project.school_project }
+
     it 'includes the lesson when the user owns the lesson' do
       another_teacher = create(:teacher, school:)
       authenticated_in_hydra_as(another_teacher)
@@ -263,16 +280,6 @@ RSpec.describe 'Listing lessons', type: :request do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
-      student_project = create(
-        :project,
-        school:,
-        lesson:,
-        parent: lesson.project,
-        remixed_from_id: lesson.project.id,
-        user_id: student.id
-      )
-      school_project = student_project.school_project
-
       create(
         :feedback,
         school_project: school_project,
@@ -299,16 +306,6 @@ RSpec.describe 'Listing lessons', type: :request do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
-      student_project = create(
-        :project,
-        school:,
-        lesson:,
-        parent: lesson.project,
-        remixed_from_id: lesson.project.id,
-        user_id: student.id
-      )
-      school_project = student_project.school_project
-
       create(
         :feedback,
         school_project: school_project,
@@ -326,15 +323,6 @@ RSpec.describe 'Listing lessons', type: :request do
     it 'includes status when the user is a student' do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
-
-      student_project = create(
-        :project,
-        school:,
-        lesson:,
-        parent: lesson.project,
-        remixed_from_id: lesson.project.id,
-        user_id: student.id
-      )
 
       school_project = student_project.school_project
       school_project.transition_status_to!(:submitted, teacher.id)
