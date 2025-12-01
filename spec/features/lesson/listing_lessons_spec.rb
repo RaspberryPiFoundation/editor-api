@@ -313,7 +313,7 @@ RSpec.describe 'Listing lessons', type: :request do
         :feedback,
         school_project: school_project,
         user_id: teacher.id,
-        content: 'Unread',
+        content: 'Read',
         read_at: Time.current
       )
 
