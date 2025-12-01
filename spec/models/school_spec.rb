@@ -196,6 +196,12 @@ RSpec.describe School do
       expect(school.school_roll_number).to be_nil
     end
 
+    it 'normalizes school_roll_number to uppercase' do
+      school.school_roll_number = '01572d'
+      school.save
+      expect(school.school_roll_number).to eq('01572D')
+    end
+
     it 'requires an address_line_1' do
       school.address_line_1 = ' '
       expect(school).not_to be_valid
