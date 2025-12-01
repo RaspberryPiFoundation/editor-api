@@ -364,5 +364,23 @@ RSpec.describe 'Listing lessons', type: :request do
 
       expect(data.first[:status]).to eq('unsubmitted')
     end
+
+    it 'does not include the status when the user is a teacher' do
+      authenticated_in_hydra_as(teacher)
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.first).not_to have_key(:status)
+    end
+
+    it 'does not include has_unread_feedback when the user is a teacher' do
+      authenticated_in_hydra_as(teacher)
+
+      get('/api/lessons', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.first).not_to have_key(:has_unread_feedback)
+    end
   end
 end
