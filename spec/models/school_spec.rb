@@ -192,13 +192,13 @@ RSpec.describe School do
 
     it 'normalizes blank school_roll_number to nil' do
       school.school_roll_number = '  '
-      school.save
+      expect(school).to be_valid
       expect(school.school_roll_number).to be_nil
     end
 
     it 'normalizes school_roll_number to uppercase' do
       school.school_roll_number = '01572d'
-      school.save
+      expect(school).to be_valid
       expect(school.school_roll_number).to eq('01572D')
     end
 
