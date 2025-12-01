@@ -92,12 +92,15 @@ module Api
 
     def user_remix(lesson)
       remixes = lesson&.project&.remixes
+
+      remixes = remixes
+                .where(user_id: current_user.id)
+                .accessible_by(current_ability)
+                .order(created_at: :asc)
+
       remixes = remixes.includes(school_project: :feedback) if current_user&.school_student?(school)
 
-      remixes.where(user_id: current_user.id)
-             .accessible_by(current_ability)
-             .order(created_at: :asc)
-             .first
+      remixes.first
     end
 
     def lesson_params
