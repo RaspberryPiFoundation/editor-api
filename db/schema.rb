@@ -43,14 +43,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
-  create_table "class_students", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+  create_table "class_members", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_class_id", null: false
     t.uuid "student_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["school_class_id", "student_id"], name: "index_class_students_on_school_class_id_and_student_id", unique: true
-    t.index ["school_class_id"], name: "index_class_students_on_school_class_id"
-    t.index ["student_id"], name: "index_class_students_on_student_id"
+    t.index ["school_class_id", "student_id"], name: "index_class_members_on_school_class_id_and_student_id", unique: true
+    t.index ["school_class_id"], name: "index_class_members_on_school_class_id"
+    t.index ["student_id"], name: "index_class_members_on_student_id"
   end
 
   create_table "class_teachers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -72,16 +72,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
     t.datetime "updated_at", null: false
     t.boolean "default", default: false, null: false
     t.index ["project_id"], name: "index_components_on_project_id"
-  end
-
-  create_table "feedback", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "school_project_id"
-    t.text "content"
-    t.uuid "user_id", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.datetime "read_at"
-    t.index ["school_project_id"], name: "index_feedback_on_school_project_id"
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -218,7 +208,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
     t.string "remix_origin"
     t.uuid "school_id"
     t.uuid "lesson_id"
-    t.text "instructions"
+    t.boolean "finished"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["lesson_id"], name: "index_projects_on_lesson_id"
@@ -239,38 +229,13 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
 
   create_table "school_classes", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "school_id", null: false
+    t.uuid "teacher_id", null: false
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "description"
-    t.string "code"
-    t.integer "import_origin"
-    t.string "import_id"
-    t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
+    t.index ["school_id", "teacher_id"], name: "index_school_classes_on_school_id_and_teacher_id"
     t.index ["school_id"], name: "index_school_classes_on_school_id"
-  end
-
-  create_table "school_project_transitions", force: :cascade do |t|
-    t.string "from_state", null: false
-    t.string "to_state", null: false
-    t.text "metadata", default: "{}"
-    t.integer "sort_key", null: false
-    t.uuid "school_project_id", null: false
-    t.boolean "most_recent", null: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["school_project_id", "most_recent"], name: "index_school_project_transitions_parent_most_recent", unique: true, where: "most_recent"
-    t.index ["school_project_id", "sort_key"], name: "index_school_project_transitions_parent_sort", unique: true
-  end
-
-  create_table "school_projects", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.uuid "school_id"
-    t.uuid "project_id", null: false
-    t.boolean "finished", default: false
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-    t.index ["project_id"], name: "index_school_projects_on_project_id"
-    t.index ["school_id"], name: "index_school_projects_on_school_id"
   end
 
   create_table "schools", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -315,10 +280,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
 
   create_table "user_jobs", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "user_id", null: false
-    t.uuid "good_job_id"
+    t.uuid "good_job_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.uuid "good_job_batch_id"
     t.index ["user_id", "good_job_id"], name: "index_user_jobs_on_user_id_and_good_job_id", unique: true
   end
 
@@ -332,16 +296,14 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
     t.uuid "meta_project_id"
     t.uuid "meta_school_id"
     t.uuid "meta_remixed_from_id"
-    t.string "meta_school_project_id"
     t.index ["item_type", "item_id"], name: "index_versions_on_item_type_and_item_id"
   end
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
-  add_foreign_key "class_students", "school_classes"
+  add_foreign_key "class_members", "school_classes"
   add_foreign_key "class_teachers", "school_classes"
   add_foreign_key "components", "projects"
-  add_foreign_key "feedback", "school_projects"
   add_foreign_key "lessons", "lessons", column: "copied_from_id"
   add_foreign_key "lessons", "school_classes"
   add_foreign_key "lessons", "schools"
@@ -350,9 +312,6 @@ ActiveRecord::Schema[7.2].define(version: 2025_11_20_145032) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
-  add_foreign_key "school_project_transitions", "school_projects"
-  add_foreign_key "school_projects", "projects"
-  add_foreign_key "school_projects", "schools"
   add_foreign_key "teacher_invitations", "schools"
   add_foreign_key "user_jobs", "good_jobs"
 end
