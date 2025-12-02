@@ -53,7 +53,7 @@ module Admin
 
     def create
       if params[:csv_file].blank?
-        flash[:error] = 'CSV file is required'
+        flash[:error] = I18n.t('errors.admin.csv_file_required')
         redirect_to new_admin_school_import_result_path
         return
       end
@@ -140,9 +140,9 @@ module Admin
       return {} if user_ids.empty?
 
       users = UserInfoApiClient.fetch_by_ids(user_ids)
-      users.index_by do |user|
-        user[:id]
-      end
+      return {} if users.nil?
+
+      users.index_by { |user| user[:id] }
     rescue StandardError => e
       Rails.logger.error("Failed to batch fetch user info: #{e.message}")
       {}
