@@ -199,7 +199,7 @@ RSpec.describe 'Listing lessons', type: :request do
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
-    let(:class_student) do
+    let!(:class_student) do
       create(:class_student, school_class:, student_id: student.id)
     end
 
@@ -229,8 +229,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
     it "includes the lesson when the user is a school-student within the lesson's class" do
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
-
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
 
@@ -239,17 +237,13 @@ RSpec.describe 'Listing lessons', type: :request do
 
     it 'does not include the submitted_count when the user is a school-student within the lesson\'s class' do
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
-
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
       expect(data.first).not_to have_key(:submitted_count)
     end
 
     it "includes the remix identifier when the user has remixed the lesson's project" do
-      student = create(:student, school:)
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
       student_project = create(:project, school:, lesson:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
 
       get('/api/lessons', headers:)
@@ -258,7 +252,8 @@ RSpec.describe 'Listing lessons', type: :request do
     end
 
     it "does not include the lesson when the user is not a school-student within the lesson's class" do
-      authenticated_in_hydra_as(student)
+      another_student = create(:student, school:)
+      authenticated_in_hydra_as(another_student)
 
       get('/api/lessons', headers:)
       data = JSON.parse(response.body, symbolize_names: true)
@@ -278,8 +273,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
     it 'includes has_unread_feedback as true when there is unread feedback' do
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
-
       create(
         :feedback,
         school_project: school_project,
@@ -304,8 +297,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
     it 'includes has_unread_feedback as false when there is no unread feedback' do
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
-
       create(
         :feedback,
         school_project: school_project,
@@ -322,8 +313,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
     it 'includes status when the user is a student' do
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
-
       school_project.transition_status_to!(:submitted, teacher.id)
 
       get('/api/lessons', headers:)
@@ -335,8 +324,6 @@ RSpec.describe 'Listing lessons', type: :request do
 
     it 'includes the default status when no transitions have happened' do
       authenticated_in_hydra_as(student)
-      create(:class_student, school_class:, student_id: student.id)
-
       create(
         :project,
         school:,
