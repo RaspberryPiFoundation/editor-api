@@ -3,10 +3,10 @@
 require 'rails_helper'
 
 RSpec.describe 'Admin::SchoolImportResults' do
-  let(:admin_user) { create(:user, roles: 'editor-admin') }
+  let(:admin_user) { create(:admin_user) }
 
   before do
-    allow_any_instance_of(Admin::ApplicationController).to receive(:current_user).and_return(admin_user)
+    sign_in_as(admin_user)
 
     # Stub UserInfoApiClient to avoid external API calls
     allow(UserInfoApiClient).to receive(:fetch_by_ids).and_return([
@@ -25,7 +25,7 @@ RSpec.describe 'Admin::SchoolImportResults' do
     end
 
     context 'with existing import results' do
-      let!(:import_result) do
+      before do
         SchoolImportResult.create!(
           job_id: SecureRandom.uuid,
           user_id: admin_user.id,
@@ -175,12 +175,19 @@ RSpec.describe 'Admin::SchoolImportResults' do
     let(:non_admin_user) { create(:user, roles: nil) }
 
     before do
-      allow_any_instance_of(Admin::ApplicationController).to receive(:current_user).and_return(non_admin_user)
+      sign_in_as(non_admin_user)
     end
 
     it 'redirects non-admin users' do
       get admin_school_import_results_path
       expect(response).to redirect_to('/')
     end
+  end
+
+  private
+
+  def sign_in_as(user)
+    allow(User).to receive(:from_omniauth).and_return(user)
+    get '/auth/callback'
   end
 end
