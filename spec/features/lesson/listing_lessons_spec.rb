@@ -324,7 +324,6 @@ RSpec.describe 'Listing lessons', type: :request do
       authenticated_in_hydra_as(student)
       create(:class_student, school_class:, student_id: student.id)
 
-      school_project = student_project.school_project
       school_project.transition_status_to!(:submitted, teacher.id)
 
       get('/api/lessons', headers:)
