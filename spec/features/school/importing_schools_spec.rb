@@ -81,7 +81,7 @@ RSpec.describe 'Importing schools', type: :request do
 
     context 'when job exists and is completed' do
       before do
-        GoodJob::Execution.create!(
+        GoodJob::Job.create!(
           id: SecureRandom.uuid,
           active_job_id: job_id,
           queue_name: 'import_schools_job',
@@ -107,7 +107,7 @@ RSpec.describe 'Importing schools', type: :request do
         expect(response).to have_http_status(:ok)
         data = JSON.parse(response.body, symbolize_names: true)
 
-        expect(data[:status]).to eq('completed')
+        expect(data[:status]).to eq('succeeded')
         expect(data[:results][:successful].count).to eq(1)
       end
     end
