@@ -167,7 +167,7 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'accepts a school_roll_number with multiple letters' do
+    it 'accepts a school_roll_number with one or more letters' do
       school.school_roll_number = '12345ABC'
       expect(school).to be_valid
     end
@@ -175,19 +175,19 @@ RSpec.describe School do
     it 'rejects a school_roll_number with only numbers' do
       school.school_roll_number = '01572'
       expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be alphanumeric (e.g., 01572D)')
+      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'rejects a school_roll_number with only letters' do
       school.school_roll_number = 'ABCDE'
       expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be alphanumeric (e.g., 01572D)')
+      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'rejects a school_roll_number with special characters' do
       school.school_roll_number = '01572-D'
       expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be alphanumeric (e.g., 01572D)')
+      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'normalizes blank school_roll_number to nil' do
