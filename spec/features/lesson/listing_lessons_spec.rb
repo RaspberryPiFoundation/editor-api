@@ -6,6 +6,7 @@ RSpec.describe 'Listing lessons', type: :request do
   before do
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(teacher)
+    create(:class_student, school_class:, student_id: student.id)
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
@@ -198,10 +199,6 @@ RSpec.describe 'Listing lessons', type: :request do
     let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
-
-    let!(:class_student) do
-      create(:class_student, school_class:, student_id: student.id)
-    end
 
     let(:student_project) do
       create(
