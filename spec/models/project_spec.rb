@@ -274,12 +274,39 @@ RSpec.describe Project, :versioning do
       expect(pair).to eq([project, user])
     end
 
+    it 'calls the Profile API to fetch the user' do
+      project = create(:project, user_id: student.id, school_id: school.id)
+
+      allow(SchoolStudent::List).to receive(:call).and_call_original
+
+      project.with_user(teacher)
+
+      expect(SchoolStudent::List).to have_received(:call).with(
+        school:,
+        token: teacher.token,
+        student_ids: [student.id]
+      )
+    end
+
     it 'returns a nil value if the member has no profile account' do
       user_id = SecureRandom.uuid
       project = create(:project, user_id:)
 
       pair = project.with_user(teacher)
       expect(pair).to eq([project, nil])
+    end
+
+    context 'when current_user is a student' do
+      it 'returns the project with nil user without calling Profile API' do
+        project = create(:project, user_id: student.id, school_id: school.id)
+
+        allow(SchoolStudent::List).to receive(:call)
+
+        pair = project.with_user(student)
+
+        expect(pair).to eq([project, nil])
+        expect(SchoolStudent::List).not_to have_received(:call)
+      end
     end
   end
 
