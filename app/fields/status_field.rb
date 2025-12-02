@@ -10,21 +10,24 @@ class StatusField < Administrate::Field::Base
   def job_status
     return 'unknown' if data.blank?
 
-    job = GoodJob::Execution.find_by(active_job_id: data)
+    job = GoodJob::Job.find_by(active_job_id: data)
     return 'not_found' unless job
 
-    return 'failed' if job.error.present?
-    return 'completed' if job.finished_at.present?
+    return 'discarded' if job.discarded?
+    return 'succeeded' if job.succeeded?
+    return 'failed' if job.finished? && job.error.present?
+    return 'running' if job.running?
     return 'scheduled' if job.scheduled_at.present? && job.scheduled_at > Time.current
-    return 'running' if job.performed_at.present? && job.finished_at.nil?
 
     'queued'
   end
 
   def status_class
     case job_status
+    when 'succeeded' then 'status-completed'
     when 'completed' then 'status-completed'
     when 'failed' then 'status-failed'
+    when 'discarded' then 'status-failed'
     when 'running' then 'status-running'
     when 'queued', 'scheduled' then 'status-queued'
     else 'status-unknown'

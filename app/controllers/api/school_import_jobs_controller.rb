@@ -19,10 +19,7 @@ module Api
     private
 
     def find_job
-      # GoodJob stores jobs in the good_jobs table as Executions
-      # The job_id returned to users is the ActiveJob ID
-      # We need to query by active_job_id, not by execution id
-      job = GoodJob::Execution.find_by(active_job_id: params[:id])
+      job = GoodJob::Job.find_by(active_job_id: params[:id])
 
       # Verify this is an import job (security check)
       return nil unless job && job.job_class == SchoolImportJob.name
@@ -40,7 +37,7 @@ module Api
       }
 
       # If job is finished successfully, get results from dedicated table
-      if job.finished_at.present? && job.error.blank?
+      if job.succeeded?
         result = SchoolImportResult.find_by(job_id: job.active_job_id)
         if result
           response[:results] = result.results
@@ -49,22 +46,31 @@ module Api
         end
       end
 
-      # Include error if job failed
+      # Include error if job failed or was discarded
       if job.error.present?
         response[:error] = job.error
-        response[:status] = 'failed'
+        response[:status] = job.discarded? ? 'discarded' : 'failed'
       end
 
       response
     end
 
     def job_status(job)
-      return 'failed' if job.error.present?
-      return 'completed' if job.finished_at.present?
-      return 'scheduled' if job.scheduled_at.present? && job.scheduled_at > Time.current
-      return 'running' if job.performed_at.present? && job.finished_at.nil?
+      return 'discarded' if job.discarded?
+      return 'succeeded' if job.succeeded?
+      return 'failed' if job_failed?(job)
+      return 'running' if job.running?
+      return 'scheduled' if job_scheduled?(job)
 
       'queued'
+    end
+
+    def job_failed?(job)
+      job.finished? && job.error.present?
+    end
+
+    def job_scheduled?(job)
+      job.scheduled_at.present? && job.scheduled_at > Time.current
     end
   end
 end
