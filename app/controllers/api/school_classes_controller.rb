@@ -109,11 +109,14 @@ module Api
     end
 
     def user_remix_for_lesson(lesson)
-      lesson.project&.remixes&.where(user_id: current_user.id)
-            &.accessible_by(current_ability)
-            &.order(created_at: :asc)
-            &.includes(school_project: :feedback)
-            &.first
+      remixes = lesson&.project&.remixes
+      return unless remixes
+
+      remixes
+        .where(user_id: current_user.id)
+        .accessible_by(current_ability)
+        .order(created_at: :asc)
+        .first
     end
 
     def find_or_create_school_class(school_class_params)
