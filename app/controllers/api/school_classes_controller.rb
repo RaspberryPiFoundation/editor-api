@@ -14,7 +14,7 @@ module Api
       if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
         render :teacher_index, formats: [:json], status: :ok
       else
-        render :student_index, formats: [:json], status: :ok
+        render_student_index(school_classes)
       end
     end
 
@@ -82,6 +82,43 @@ module Api
     end
 
     private
+
+    def render_student_index(school_classes)
+      unread_counts = calculate_unread_counts(school_classes)
+      @school_classes_with_teachers_and_unread_counts = @school_classes_with_teachers.zip(unread_counts)
+      render :student_index, formats: [:json], status: :ok
+    end
+
+    def calculate_unread_counts(school_classes)
+      school_classes.map do |school_class|
+        lessons = school_class.lessons.accessible_by(current_ability)
+        remixes = user_remixes_for_lessons(lessons)
+
+        remixes.count do |remix|
+          remix&.school_project&.feedback&.exists?(read_at: nil)
+        end
+      end
+    end
+
+    def user_remixes_for_lessons(lessons)
+      lessons.filter_map do |lesson|
+        next nil unless lesson&.project&.remixes&.any?
+
+        user_remix_for_lesson(lesson)
+      end
+    end
+
+    def user_remix_for_lesson(lesson)
+      remixes = lesson.project&.remixes
+      return unless remixes
+
+      remixes
+        .where(user_id: current_user.id)
+        .accessible_by(current_ability)
+        .order(created_at: :asc)
+        .includes(school_project: :feedback)
+        .first
+    end
 
     def find_or_create_school_class(school_class_params)
       # First try and find the class (in case we're re-importing)
