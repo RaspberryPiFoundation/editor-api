@@ -102,7 +102,7 @@ module Api
 
     def user_remixes_for_lessons(lessons)
       lessons.filter_map do |lesson|
-        next nil unless lesson&.project&.remixes
+        next nil unless lesson&.project&.remixes&.exists?
 
         user_remix_for_lesson(lesson)
       end
