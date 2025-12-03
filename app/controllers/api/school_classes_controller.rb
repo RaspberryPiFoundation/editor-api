@@ -90,22 +90,30 @@ module Api
     end
 
     def calculate_unread_counts(school_classes)
-      class_ids = school_classes.map(&:id)
+      school_classes.map do |school_class|
+        lessons = school_class.lessons.accessible_by(current_ability)
+        remixes = user_remixes_for_lessons(lessons)
 
-      # Count unread feedback per class in a single query
-      counts_by_class_id =
-        Feedback
-        .joins(school_project: { project: { lesson: :school_class } })
-        .where(
-          read_at: nil,
-          projects: { user_id: current_user.id },
-          school_classes: { id: class_ids }
-        )
-        .group('school_classes.id')
-        .count
+        remixes.count do |remix|
+          remix&.school_project&.feedback&.exists?(read_at: nil)
+        end
+      end
+    end
 
-      # Return counts in the same order as school_classes
-      school_classes.map { |school_class| counts_by_class_id[school_class.id] || 0 }
+    def user_remixes_for_lessons(lessons)
+      lessons.filter_map do |lesson|
+        next nil unless lesson&.project&.remixes&.exists?
+
+        user_remix_for_lesson(lesson)
+      end
+    end
+
+    def user_remix_for_lesson(lesson)
+      lesson.project&.remixes&.where(user_id: current_user.id)
+            &.accessible_by(current_ability)
+            &.order(created_at: :asc)
+            &.includes(school_project: :feedback)
+            &.first
     end
 
     def find_or_create_school_class(school_class_params)
