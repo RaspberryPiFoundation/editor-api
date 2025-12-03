@@ -102,22 +102,18 @@ module Api
 
     def user_remixes_for_lessons(lessons)
       lessons.filter_map do |lesson|
-        next nil unless lesson&.project&.remixes&.any?
+        next nil unless lesson&.project&.remixes&.exists?
 
         user_remix_for_lesson(lesson)
       end
     end
 
     def user_remix_for_lesson(lesson)
-      remixes = lesson.project&.remixes
-      return unless remixes
-
-      remixes
-        .where(user_id: current_user.id)
-        .accessible_by(current_ability)
-        .order(created_at: :asc)
-        .includes(school_project: :feedback)
-        .first
+      lesson.project&.remixes&.where(user_id: current_user.id)
+            &.accessible_by(current_ability)
+            &.order(created_at: :asc)
+            &.includes(school_project: :feedback)
+            &.first
     end
 
     def find_or_create_school_class(school_class_params)
