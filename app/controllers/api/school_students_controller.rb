@@ -110,16 +110,62 @@ module Api
     end
 
     def destroy
-      result = SchoolStudent::Delete.call(school: @school, student_id: params[:id], token: current_user.token)
+      remove_students([params[:id]])
+    end
 
-      if result.success?
-        head :no_content
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+    def destroy_batch
+      # DELETE /api/schools/:school_id/students/batch
+      # Params: { student_ids: ["uuid1", "uuid2", ...] }
+      #
+      # Returns 200 OK with one of:
+      # - Success: { results: [{ user_id: "..." }, ...] }
+      # - Partial failure: { results: [...], error: "N student(s) failed to be removed" }
+      #
+      # Each result may contain:
+      # - { user_id:, error: } - deletion failed
+      # - { user_id:, skipped:, reason: } - student skipped (e.g., not in this school)
+      # - { user_id: } - deletion succeeded
+
+      student_ids = student_ids_params
+
+      if student_ids.blank?
+        render json: {
+                 error: 'No student IDs provided',
+                 error_type: :unprocessable_entity
+               },
+               status: :unprocessable_entity
+        return
       end
+
+      # Remove duplicates to avoid redundant processing
+      unique_student_ids = student_ids.uniq
+      remove_students(unique_student_ids)
     end
 
     private
+
+    def remove_students(student_ids)
+      # Invoke StudentRemovalService
+      service = StudentRemovalService.new(
+        students: student_ids,
+        school: @school,
+        remove_from_profile: true,
+        token: current_user.token
+      )
+
+      results = service.remove_students
+
+      # Check if any errors occurred
+      errors = results.select { |r| r[:error] }
+      if errors.any?
+        render json: {
+          results: results,
+          error: "#{errors.size} student(s) failed to be removed"
+        }, status: :ok
+      else
+        render json: { results: results }, status: :ok
+      end
+    end
 
     def school_student_params
       params.require(:school_student).permit(:username, :password, :name)
@@ -133,6 +179,10 @@ module Api
 
         student.permit(:username, :password, :name).to_h.with_indifferent_access
       end
+    end
+
+    def student_ids_params
+      params.fetch(:student_ids, [])
     end
 
     def create_safeguarding_flags
