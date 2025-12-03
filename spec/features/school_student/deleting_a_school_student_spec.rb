@@ -14,6 +14,12 @@ RSpec.describe 'Deleting a school student', type: :request do
   let(:student_id) { SecureRandom.uuid }
   let(:owner) { create(:owner, school:) }
 
+  it 'calls ProfileApiClient to delete the student from the profile service' do
+    student = create(:student, school:)
+    delete("/api/schools/#{school.id}/students/#{student.id}", headers:)
+    expect(ProfileApiClient).to have_received(:delete_school_student).with(token: UserProfileMock::TOKEN, school_id: school.id, student_id: student.id)
+  end
+
   it 'creates the school owner safeguarding flag' do
     delete("/api/schools/#{school.id}/students/#{student_id}", headers:)
     expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
@@ -24,9 +30,9 @@ RSpec.describe 'Deleting a school student', type: :request do
     expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email)
   end
 
-  it 'responds 204 No Content' do
+  it 'responds 200 OK' do
     delete("/api/schools/#{school.id}/students/#{student_id}", headers:)
-    expect(response).to have_http_status(:no_content)
+    expect(response).to have_http_status(:ok)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
