@@ -109,4 +109,67 @@ RSpec.describe 'Listing school classes', type: :request do
     get("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:)
     expect(response).to have_http_status(:forbidden)
   end
+
+  it 'includes unread_feedback_count for a school-student' do
+    authenticated_in_hydra_as(student)
+    stub_user_info_api_for(teacher)
+
+    lesson = create(
+      :lesson,
+      school: school,
+      school_class: school_class,
+      visibility: 'students',
+      user_id: teacher.id
+    )
+
+    remix = create(
+      :project,
+      school: school,
+      lesson: lesson,
+      parent: lesson.project,
+      remixed_from_id: lesson.project.id,
+      user_id: student.id
+    )
+
+    create(
+      :feedback,
+      school_project: remix.school_project,
+      user_id: teacher.id,
+      content: 'Not read',
+      read_at: nil
+    )
+
+    create(
+      :feedback,
+      school_project: remix.school_project,
+      user_id: teacher.id,
+      content: 'Already read',
+      read_at: Time.current
+    )
+
+    get("/api/schools/#{school.id}/classes", headers:)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    this_class = data.find { |c| c[:name] == 'Test School Class' }
+
+    expect(this_class[:unread_feedback_count]).to eq(1)
+  end
+
+  it 'does not include unread_feedback_count if user is a school-teacher' do
+    authenticated_in_hydra_as(teacher)
+
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.first).not_to have_key(:unread_feedback_count)
+  end
+
+  it 'does not include unread_feedback_count if user is a school-owner' do
+    authenticated_in_hydra_as(owner)
+
+    get("/api/schools/#{school.id}/classes", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data.first).not_to have_key(:unread_feedback_count)
+  end
 end
