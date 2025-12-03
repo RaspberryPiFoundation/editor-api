@@ -52,6 +52,7 @@ RSpec.describe 'Delete feedback requests', type: :request do
 
   context 'when logged in as the school owner' do
     let(:owner) { create(:owner, school:) }
+
     before do
       authenticated_in_hydra_as(owner)
       delete("/api/projects/#{student_project.identifier}/feedback/#{feedback.id}", headers:)
@@ -69,6 +70,7 @@ RSpec.describe 'Delete feedback requests', type: :request do
 
   context 'when logged in as a teacher not in the class' do
     let(:other_teacher) { create(:teacher, school:) }
+
     before do
       authenticated_in_hydra_as(other_teacher)
       delete("/api/projects/#{student_project.identifier}/feedback/#{feedback.id}", headers:)
@@ -99,7 +101,3 @@ RSpec.describe 'Delete feedback requests', type: :request do
     end
   end
 end
-
-
-
-
