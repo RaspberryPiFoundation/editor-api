@@ -19,6 +19,10 @@ class SchoolProject < ApplicationRecord
     state_machine.transition_to!(new_status, metadata: { changed_by: user_id })
   end
 
+  def unread_feedback?
+    feedback.exists?(read_at: nil)
+  end
+
   # Add convenience methods for each state
   def unsubmitted?
     state_machine.in_state?(:unsubmitted)
