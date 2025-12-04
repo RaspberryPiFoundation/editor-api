@@ -6,14 +6,16 @@ module Api
 
     def show
       authorize! :read, :school_import_job
-      job = find_job
+      @job = find_job
 
-      if job.nil?
+      if @job.nil?
         render json: SchoolImportError.format_error(:job_not_found, 'Job not found'), status: :not_found
         return
       end
 
-      render json: build_job_response(job), status: :ok
+      @status = job_status(@job)
+      @result = SchoolImportResult.find_by(job_id: @job.active_job_id) if @job.succeeded?
+      render :show, formats: [:json], status: :ok
     end
 
     private
@@ -25,34 +27,6 @@ module Api
       return nil unless job && job.job_class == SchoolImportJob.name
 
       job
-    end
-
-    def build_job_response(job)
-      response = {
-        id: job.active_job_id,
-        status: job_status(job),
-        created_at: job.created_at,
-        finished_at: job.finished_at,
-        job_class: job.job_class
-      }
-
-      # If job is finished successfully, get results from dedicated table
-      if job.succeeded?
-        result = SchoolImportResult.find_by(job_id: job.active_job_id)
-        if result
-          response[:results] = result.results
-        else
-          response[:message] = 'Job completed successfully'
-        end
-      end
-
-      # Include error if job failed or was discarded
-      if job.error.present?
-        response[:error] = job.error
-        response[:status] = job.discarded? ? 'discarded' : 'failed'
-      end
-
-      response
     end
 
     def job_status(job)
