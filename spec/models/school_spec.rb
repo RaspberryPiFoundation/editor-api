@@ -202,6 +202,15 @@ RSpec.describe School do
       expect(school.school_roll_number).to eq('01572D')
     end
 
+    it 'allows school_roll_number reuse when original school is rejected' do
+      school.school_roll_number = '01572D'
+      school.save!
+      school.reject
+
+      new_school = build(:school, school_roll_number: '01572D')
+      expect(new_school).to be_valid
+    end
+
     it 'requires an address_line_1' do
       school.address_line_1 = ' '
       expect(school).not_to be_valid

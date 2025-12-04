@@ -19,7 +19,7 @@ class School < ApplicationRecord
   validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
   validates :district_nces_id, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
   validates :school_roll_number,
-            uniqueness: { case_sensitive: false, allow_nil: true },
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
             presence: false,
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') }
   validates :creator_id, presence: true, uniqueness: true
