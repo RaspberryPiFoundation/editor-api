@@ -10,7 +10,7 @@
 
 ### 1. Prepare the CSV File
 
-Download the template: `docs/school_import_template.csv`
+Download the template from the admin interface.
 
 Required columns:
 - `name` - School name
