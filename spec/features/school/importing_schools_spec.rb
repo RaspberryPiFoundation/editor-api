@@ -26,7 +26,10 @@ RSpec.describe 'Importing schools', type: :request do
 
       before do
         authenticated_in_hydra_as(admin_user)
-        allow(UserInfoApiClient).to receive(:find_user_by_email).and_return({ id: SecureRandom.uuid, email: 'owner@example.com' })
+        stub_user_info_api_find_by_email(
+          email: 'owner@example.com',
+          user: { id: SecureRandom.uuid, email: 'owner@example.com' }
+        )
         allow(SchoolImportJob).to receive(:perform_later).and_return(instance_double(SchoolImportJob, job_id: 'test-job-id'))
       end
 
