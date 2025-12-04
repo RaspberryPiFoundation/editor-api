@@ -90,30 +90,20 @@ module Api
     end
 
     def calculate_unread_counts(school_classes)
-      school_classes.map do |school_class|
-        lessons = school_class.lessons.accessible_by(current_ability)
-        remixes = user_remixes_for_lessons(lessons)
+      class_ids = school_classes.map(&:id)
 
-        remixes.count do |remix|
-          remix&.school_project&.feedback&.exists?(read_at: nil)
-        end
-      end
-    end
+      counts_by_class_id =
+        SchoolProject
+        .joins(:feedback)
+        .joins(project: { parent: { lesson: :school_class } })
+        .where(projects: { user_id: current_user.id })
+        .where(feedback: { read_at: nil })
+        .where(school_classes: { id: class_ids })
+        .merge(Lesson.accessible_by(current_ability))
+        .group('school_classes.id')
+        .count('DISTINCT school_projects.id') # Count distinct projects, not feedback records
 
-    def user_remixes_for_lessons(lessons)
-      lessons.filter_map do |lesson|
-        next nil unless lesson&.project&.remixes&.exists?
-
-        user_remix_for_lesson(lesson)
-      end
-    end
-
-    def user_remix_for_lesson(lesson)
-      lesson.project&.remixes
-            &.where(user_id: current_user.id)
-            &.accessible_by(current_ability)
-            &.order(created_at: :asc)
-            &.first
+      school_classes.map { |school_class| counts_by_class_id[school_class.id] || 0 }
     end
 
     def find_or_create_school_class(school_class_params)
@@ -143,7 +133,7 @@ module Api
       if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
         @school.classes.accessible_by(current_ability).includes(lessons: { project: { remixes: { school_project: :school_project_transitions } } })
       else
-        @school.classes.accessible_by(current_ability)
+        @school.classes.accessible_by(current_ability).includes(lessons: { project: { remixes: { school_project: :feedback } } })
       end
     end
 
