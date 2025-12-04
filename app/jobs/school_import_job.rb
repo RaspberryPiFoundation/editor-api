@@ -39,9 +39,9 @@ class SchoolImportJob < ApplicationJob
   end
 
   def import_school(school_data)
-    owner = find_owner(school_data[:owner_email])
+    proposed_owner = find_user_account_for_proposed_owner(school_data[:owner_email])
 
-    unless owner
+    unless proposed_owner
       @results[:failed] << {
         name: school_data[:name],
         error_code: SchoolImportError::CODES[:owner_not_found],
@@ -52,7 +52,7 @@ class SchoolImportJob < ApplicationJob
     end
 
     # Check if this owner already has any role in any school
-    existing_role = Role.find_by(user_id: owner[:id])
+    existing_role = Role.find_by(user_id: proposed_owner[:id])
     if existing_role
       existing_school = existing_role.school
       @results[:failed] << {
@@ -71,7 +71,7 @@ class SchoolImportJob < ApplicationJob
     School.transaction do
       result = School::Create.call(
         school_params: school_params,
-        creator_id: owner[:id]
+        creator_id: proposed_owner[:id]
       )
 
       if result.success?
@@ -105,7 +105,7 @@ class SchoolImportJob < ApplicationJob
     Sentry.capture_exception(e)
   end
 
-  def find_owner(email)
+  def find_user_account_for_proposed_owner(email)
     return nil if email.blank?
 
     UserInfoApiClient.find_user_by_email(email)
