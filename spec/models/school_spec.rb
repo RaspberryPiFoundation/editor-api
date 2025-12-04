@@ -209,6 +209,7 @@ RSpec.describe School do
 
       new_school = build(:school, school_roll_number: '01572D')
       expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
     end
 
     it 'requires an address_line_1' do
