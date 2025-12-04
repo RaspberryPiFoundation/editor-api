@@ -2,6 +2,8 @@
 
 class School
   class ImportBatch
+    REQUIRED_FIELDS = %i[name website address_line_1 municipality country_code owner_email].freeze
+
     class << self
       def call(csv_file:, current_user:)
         response = OperationResponse.new
@@ -102,8 +104,7 @@ class School
       end
 
       def valid_headers?(headers)
-        required = %i[name website address_line_1 municipality country_code owner_email]
-        required.all? { |h| headers.include?(h) }
+        REQUIRED_FIELDS.all? { |h| headers.include?(h) }
       end
 
       def validate_school_data(data, row_number)
@@ -115,8 +116,7 @@ class School
         end
 
         # Validate required fields
-        required_fields = %i[name website address_line_1 municipality country_code owner_email]
-        required_fields.each do |field|
+        REQUIRED_FIELDS.each do |field|
           errors << { field: field.to_s, message: 'is required' } if data[field].blank?
         end
 
