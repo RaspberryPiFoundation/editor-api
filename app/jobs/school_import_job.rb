@@ -8,7 +8,8 @@ class SchoolImportJob < ApplicationJob
 
   queue_as :import_schools_job
 
-  def perform(schools_data:, user_id:)
+  def perform(schools_data:, user_id:, token:)
+    @token = token
     @results = {
       successful: [],
       failed: []
@@ -76,11 +77,8 @@ class SchoolImportJob < ApplicationJob
       if result.success?
         school = result[:school]
 
-        # Auto-verify the imported school
-        school.verify!
-
-        # Create owner role
-        Role.owner.create!(school_id: school.id, user_id: owner[:id])
+        # Auto-verify the imported school using the verification service
+        SchoolVerificationService.new(school).verify(token: @token)
 
         @results[:successful] << {
           name: school.name,

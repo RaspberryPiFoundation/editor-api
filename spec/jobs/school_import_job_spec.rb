@@ -38,13 +38,16 @@ RSpec.describe SchoolImportJob do
       allow(UserInfoApiClient).to receive(:find_user_by_email)
         .with('owner2@example.com')
         .and_return({ id: owner2_id, email: 'owner2@example.com' })
+
+      allow(ProfileApiClient).to receive(:create_school).and_return(true)
     end
 
     context 'when all schools can be created successfully' do
       it 'creates schools and returns successful results' do
         results = described_class.new.perform(
           schools_data: schools_data,
-          user_id: user_id
+          user_id: user_id,
+          token: token
         )
 
         expect(results[:successful].count).to eq(2)
@@ -56,8 +59,9 @@ RSpec.describe SchoolImportJob do
         expect(school_1.code).to be_present
         expect(school_1.user_origin).to eq('experience_cs')
 
-        # Check owner role was created
+        # Check owner and teacher roles were created
         expect(Role.owner.exists?(school_id: school_1.id, user_id: owner1_id)).to be true
+        expect(Role.teacher.exists?(school_id: school_1.id, user_id: owner1_id)).to be true
       end
     end
 
@@ -71,7 +75,8 @@ RSpec.describe SchoolImportJob do
       it 'adds failed result for that school' do
         results = described_class.new.perform(
           schools_data: [schools_data.first],
-          user_id: user_id
+          user_id: user_id,
+          token: token
         )
 
         expect(results[:successful].count).to eq(0)
@@ -91,7 +96,8 @@ RSpec.describe SchoolImportJob do
       it 'adds failed result for that school' do
         results = described_class.new.perform(
           schools_data: [schools_data.first],
-          user_id: user_id
+          user_id: user_id,
+          token: token
         )
 
         expect(results[:successful].count).to eq(0)
@@ -125,7 +131,8 @@ RSpec.describe SchoolImportJob do
       it 'handles string keys correctly' do
         results = described_class.new.perform(
           schools_data: schools_data_with_string_keys,
-          user_id: user_id
+          user_id: user_id,
+          token: token
         )
 
         expect(results[:successful].count).to eq(1)
