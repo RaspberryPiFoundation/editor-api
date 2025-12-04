@@ -121,19 +121,24 @@ class Ability
     can(%i[show_finished set_finished show_status unsubmit submit], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
-  def define_editor_admin_abilities(user)
-    return unless user&.admin?
+  def define_school_import_abilities(user)
+    return unless user&.admin? || user&.experience_cs_admin?
 
     can :import, School
     can :read, :school_import_job
+  end
+
+  def define_editor_admin_abilities(user)
+    return unless user&.admin?
+
+    define_school_import_abilities(user)
   end
 
   def define_experience_cs_admin_abilities(user)
     return unless user&.experience_cs_admin?
 
     can %i[read create update destroy], Project, user_id: nil
-    can :import, School
-    can :read, :school_import_job
+    define_school_import_abilities(user)
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
