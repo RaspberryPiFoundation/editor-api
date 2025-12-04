@@ -81,6 +81,27 @@ RSpec.describe SchoolImportJob do
       end
     end
 
+    context 'when owner already has a role in another school' do
+      let(:existing_school) { create(:school, name: 'Existing School') }
+
+      before do
+        Role.owner.create!(school_id: existing_school.id, user_id: owner1_id)
+      end
+
+      it 'adds failed result for that school' do
+        results = described_class.new.perform(
+          schools_data: [schools_data.first],
+          user_id: user_id
+        )
+
+        expect(results[:successful].count).to eq(0)
+        expect(results[:failed].count).to eq(1)
+        expect(results[:failed].first[:error_code]).to eq('OWNER_HAS_EXISTING_ROLE')
+        expect(results[:failed].first[:error]).to include('already has a role in school')
+        expect(results[:failed].first[:existing_school_id]).to eq(existing_school.id)
+      end
+    end
+
     context 'when schools_data has string keys (simulating ActiveJob serialization)' do
       let(:schools_data_with_string_keys) do
         [

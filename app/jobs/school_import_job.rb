@@ -50,13 +50,14 @@ class SchoolImportJob < ApplicationJob
       return
     end
 
-    # Check if this owner already has a school as creator
-    existing_school = School.find_by(creator_id: owner[:id])
-    if existing_school
+    # Check if this owner already has any role in any school
+    existing_role = Role.find_by(user_id: owner[:id])
+    if existing_role
+      existing_school = existing_role.school
       @results[:failed] << {
         name: school_data[:name],
-        error_code: SchoolImportError::CODES[:owner_already_creator],
-        error: "Owner #{school_data[:owner_email]} is already the creator of school '#{existing_school.name}'",
+        error_code: SchoolImportError::CODES[:owner_has_existing_role],
+        error: "Owner #{school_data[:owner_email]} already has a role in school '#{existing_school.name}'",
         owner_email: school_data[:owner_email],
         existing_school_id: existing_school.id
       }
