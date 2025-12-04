@@ -52,7 +52,7 @@ module Api
       authorize! :import, School
 
       if params[:csv_file].blank?
-        render json: SchoolImportError.format_error(:csv_file_required, 'CSV file is required'),
+        render json: { error: SchoolImportError.format_error(:csv_file_required, 'CSV file is required') },
                status: :unprocessable_entity
         return
       end
@@ -63,13 +63,11 @@ module Api
       )
 
       if result.success?
-        render json: {
-          job_id: result[:job_id],
-          total_schools: result[:total_schools],
-          message: 'Import job started successfully'
-        }, status: :accepted
+        @job_id = result[:job_id]
+        @total_schools = result[:total_schools]
+        render :import, formats: [:json], status: :accepted
       else
-        render json: result[:error], status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_entity
       end
     end
 
