@@ -38,7 +38,8 @@ RSpec.describe School::ImportBatch do
               hash_including(name: 'Test School 1'),
               hash_including(name: 'Test School 2')
             ),
-            user_id: current_user.id
+            user_id: current_user.id,
+            token: current_user.token
           )
         )
       end

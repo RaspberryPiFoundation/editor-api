@@ -24,7 +24,7 @@ class School
 
         job = enqueue_import_job(
           schools_data: parsed_schools[:schools],
-          user_id: current_user.id
+          current_user: current_user
         )
 
         response[:job_id] = job.job_id
@@ -151,10 +151,11 @@ class School
         errors << { field: 'owner_email', message: 'invalid email format' }
       end
 
-      def enqueue_import_job(schools_data:, user_id:)
+      def enqueue_import_job(schools_data:, current_user:)
         SchoolImportJob.perform_later(
           schools_data: schools_data,
-          user_id: user_id
+          user_id: current_user.id,
+          token: current_user.token
         )
       end
     end
