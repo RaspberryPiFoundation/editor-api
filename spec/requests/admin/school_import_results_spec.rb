@@ -9,13 +9,14 @@ RSpec.describe 'Admin::SchoolImportResults' do
     sign_in_as(admin_user)
 
     # Stub UserInfoApiClient to avoid external API calls
-    allow(UserInfoApiClient).to receive(:fetch_by_ids).and_return([
-                                                                    {
-                                                                      id: admin_user.id,
-                                                                      name: 'Test Admin',
-                                                                      email: 'admin@test.com'
-                                                                    }
-                                                                  ])
+    stub_user_info_api_fetch_by_ids(
+      user_ids: [admin_user.id],
+      users: [{
+        id: admin_user.id,
+        name: 'Test Admin',
+        email: 'admin@test.com'
+      }]
+    )
   end
 
   describe 'GET /admin/school_import_results' do

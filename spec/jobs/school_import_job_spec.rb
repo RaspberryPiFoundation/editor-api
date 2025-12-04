@@ -31,18 +31,22 @@ RSpec.describe SchoolImportJob do
     end
 
     before do
-      allow(UserInfoApiClient).to receive(:find_user_by_email)
-        .with('owner1@example.com')
-        .and_return({ id: owner1_id, email: 'owner1@example.com' })
-
-      allow(UserInfoApiClient).to receive(:find_user_by_email)
-        .with('owner2@example.com')
-        .and_return({ id: owner2_id, email: 'owner2@example.com' })
-
       allow(ProfileApiClient).to receive(:create_school).and_return(true)
     end
 
     context 'when all schools can be created successfully' do
+      before do
+        stub_user_info_api_find_by_email(
+          email: 'owner1@example.com',
+          user: { id: owner1_id, email: 'owner1@example.com' }
+        )
+
+        stub_user_info_api_find_by_email(
+          email: 'owner2@example.com',
+          user: { id: owner2_id, email: 'owner2@example.com' }
+        )
+      end
+
       it 'creates schools and returns successful results' do
         results = described_class.new.perform(
           schools_data: schools_data,
@@ -67,9 +71,7 @@ RSpec.describe SchoolImportJob do
 
     context 'when owner email is not found' do
       before do
-        allow(UserInfoApiClient).to receive(:find_user_by_email)
-          .with('owner1@example.com')
-          .and_return(nil)
+        stub_user_info_api_find_by_email(email: 'owner1@example.com', user: nil)
       end
 
       it 'adds failed result for that school' do
@@ -91,6 +93,11 @@ RSpec.describe SchoolImportJob do
 
       before do
         Role.owner.create!(school_id: existing_school.id, user_id: owner1_id)
+
+        stub_user_info_api_find_by_email(
+          email: 'owner1@example.com',
+          user: { id: owner1_id, email: 'owner1@example.com' }
+        )
       end
 
       it 'adds failed result for that school' do
@@ -123,9 +130,10 @@ RSpec.describe SchoolImportJob do
       end
 
       before do
-        allow(UserInfoApiClient).to receive(:find_user_by_email)
-          .with('owner1@example.com')
-          .and_return({ id: owner1_id, email: 'owner1@example.com' })
+        stub_user_info_api_find_by_email(
+          email: 'owner1@example.com',
+          user: { id: owner1_id, email: 'owner1@example.com' }
+        )
       end
 
       it 'handles string keys correctly' do

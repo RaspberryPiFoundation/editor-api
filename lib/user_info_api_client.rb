@@ -7,7 +7,6 @@ class UserInfoApiClient
   class << self
     def fetch_by_ids(user_ids)
       return [] if user_ids.blank?
-      return stubbed_users(user_ids) if bypass_oauth?
 
       response = conn.get do |r|
         r.url '/users'
@@ -20,7 +19,6 @@ class UserInfoApiClient
 
     def find_user_by_email(email)
       return nil if email.blank?
-      return stubbed_user_by_email(email) if bypass_oauth?
 
       response = conn.get do |r|
         r.url "/users/#{CGI.escape(email)}"
@@ -35,10 +33,6 @@ class UserInfoApiClient
     end
 
     private
-
-    def bypass_oauth?
-      ENV.fetch('BYPASS_OAUTH', nil) == 'true'
-    end
 
     def transform_user(user)
       user.transform_keys { |k| k.to_s.underscore.to_sym }
@@ -58,50 +52,6 @@ class UserInfoApiClient
         f.response :raise_error
         f.response :json # decode response bodies as JSON
       end
-    end
-
-    def stubbed_users(user_ids)
-      user_ids.map do |user_id|
-        {
-          id: user_id,
-          email: "user-#{user_id}@example.com",
-          username: nil,
-          parentalEmail: nil,
-          name: 'School Owner',
-          nickname: 'Owner',
-          country: 'United Kingdom',
-          country_code: 'GB',
-          postcode: nil,
-          dateOfBirth: nil,
-          verifiedAt: '2024-01-01T12:00:00.000Z',
-          createdAt: '2024-01-01T12:00:00.000Z',
-          updatedAt: '2024-01-01T12:00:00.000Z',
-          discardedAt: nil,
-          lastLoggedInAt: '2024-01-01T12:00:00.000Z',
-          roles: ''
-        }
-      end
-    end
-
-    def stubbed_user_by_email(email)
-      {
-        id: Digest::UUID.uuid_v5(Digest::UUID::DNS_NAMESPACE, email),
-        email: email,
-        username: nil,
-        parentalEmail: nil,
-        name: 'School Owner',
-        nickname: 'Owner',
-        country: 'United Kingdom',
-        country_code: 'GB',
-        postcode: nil,
-        dateOfBirth: nil,
-        verifiedAt: '2024-01-01T12:00:00.000Z',
-        createdAt: '2024-01-01T12:00:00.000Z',
-        updatedAt: '2024-01-01T12:00:00.000Z',
-        discardedAt: nil,
-        lastLoggedInAt: '2024-01-01T12:00:00.000Z',
-        roles: ''
-      }
     end
   end
 end
