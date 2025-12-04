@@ -30,7 +30,6 @@ class School
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response ||= OperationResponse.new
         response[:error] = SchoolImportError.format_error(:unknown_error, e.message)
         response
       end
