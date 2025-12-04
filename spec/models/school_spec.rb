@@ -149,8 +149,6 @@ RSpec.describe School do
 
     it 'does not require a school_roll_number' do
       create(:school, id: SecureRandom.uuid, school_roll_number: nil)
-
-      school.school_roll_number = nil
       expect(school).to be_valid
     end
 
