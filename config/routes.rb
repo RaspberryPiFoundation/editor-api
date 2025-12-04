@@ -19,6 +19,7 @@ Rails.application.routes.draw do
 
     resources :school_classes, only: %i[show]
     resources :lessons, only: %i[show]
+    resources :school_import_results, only: %i[index show new create]
 
     root to: 'projects#index'
   end
@@ -57,6 +58,7 @@ Rails.application.routes.draw do
 
     resource :school, only: [:show], controller: 'my_school'
     resources :schools, only: %i[index show create update destroy] do
+      post :import, on: :collection
       resources :members, only: %i[index], controller: 'school_members'
       resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do
         post :import, on: :collection
@@ -81,6 +83,7 @@ Rails.application.routes.draw do
     end
 
     resources :user_jobs, only: %i[index show]
+    resources :school_import_jobs, only: %i[show]
 
     post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
   end

@@ -85,6 +85,7 @@ RSpec.configure do |config|
   config.include PhraseIdentifierMock
   config.include ProfileApiMock
   config.include UserProfileMock
+  config.include UserInfoApiMock
 
   config.include SignInStubs, type: :request
   config.include SignInStubs, type: :system
