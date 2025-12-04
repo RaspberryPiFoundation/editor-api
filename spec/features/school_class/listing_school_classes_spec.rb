@@ -125,7 +125,6 @@ RSpec.describe 'Listing school classes', type: :request do
     remix = create(
       :project,
       school: school,
-      lesson: lesson,
       parent: lesson.project,
       remixed_from_id: lesson.project.id,
       user_id: student.id
@@ -165,16 +164,16 @@ RSpec.describe 'Listing school classes', type: :request do
 
     # Class 1: Create 2 remixes with unread feedback
     lesson_one = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
-    remix_one = create(:project, school:, lesson: lesson_one, parent: lesson_one.project, remixed_from_id: lesson_one.project.id, user_id: student.id)
+    remix_one = create(:project, school:, parent: lesson_one.project, remixed_from_id: lesson_one.project.id, user_id: student.id)
     create(:feedback, school_project: remix_one.school_project, user_id: teacher.id, content: 'Unread 1', read_at: nil)
 
     lesson_two = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
-    remix_two = create(:project, school:, lesson: lesson_two, parent: lesson_two.project, remixed_from_id: lesson_two.project.id, user_id: student.id)
+    remix_two = create(:project, school:, parent: lesson_two.project, remixed_from_id: lesson_two.project.id, user_id: student.id)
     create(:feedback, school_project: remix_two.school_project, user_id: teacher.id, content: 'Unread 2', read_at: nil)
 
     # Class 2: Create 1 remix with unread feedback
     lesson_three = create(:lesson, school:, school_class: school_class_2, visibility: 'students', user_id: teacher.id)
-    remix_three = create(:project, school:, lesson: lesson_three, parent: lesson_three.project, remixed_from_id: lesson_three.project.id, user_id: student.id)
+    remix_three = create(:project, school:, parent: lesson_three.project, remixed_from_id: lesson_three.project.id, user_id: student.id)
     create(:feedback, school_project: remix_three.school_project, user_id: teacher.id, content: 'Unread 3', read_at: nil)
 
     get("/api/schools/#{school.id}/classes", headers:)
@@ -192,7 +191,7 @@ RSpec.describe 'Listing school classes', type: :request do
     stub_user_info_api_for(teacher)
 
     lesson = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
-    remix = create(:project, school:, lesson:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
+    remix = create(:project, school:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
 
     create(:feedback, school_project: remix.school_project, user_id: teacher.id, content: 'Already read', read_at: Time.current)
 
@@ -219,7 +218,7 @@ RSpec.describe 'Listing school classes', type: :request do
     stub_user_info_api_for(teacher)
 
     lesson = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
-    remix = create(:project, school:, lesson:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
+    remix = create(:project, school:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
 
     # Multiple unread feedback on the same project should count as 1
     create(:feedback, school_project: remix.school_project, user_id: teacher.id, content: 'Unread 1', read_at: nil)
@@ -243,11 +242,11 @@ RSpec.describe 'Listing school classes', type: :request do
     lesson = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
 
     # Current student's remix with unread feedback
-    my_remix = create(:project, school:, lesson:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
+    my_remix = create(:project, school:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
     create(:feedback, school_project: my_remix.school_project, user_id: teacher.id, content: 'My unread', read_at: nil)
 
     # Other student's remix with unread feedback (should not count)
-    other_remix = create(:project, school:, lesson:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: other_student.id)
+    other_remix = create(:project, school:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: other_student.id)
     create(:feedback, school_project: other_remix.school_project, user_id: teacher.id, content: 'Other unread', read_at: nil)
 
     get("/api/schools/#{school.id}/classes", headers:)
@@ -263,12 +262,12 @@ RSpec.describe 'Listing school classes', type: :request do
 
     # Visible lesson
     visible_lesson = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
-    visible_remix = create(:project, school:, lesson: visible_lesson, parent: visible_lesson.project, remixed_from_id: visible_lesson.project.id, user_id: student.id)
+    visible_remix = create(:project, school:, parent: visible_lesson.project, remixed_from_id: visible_lesson.project.id, user_id: student.id)
     create(:feedback, school_project: visible_remix.school_project, user_id: teacher.id, content: 'Visible', read_at: nil)
 
     # Hidden lesson (visibility: 'teachers')
     hidden_lesson = create(:lesson, school:, school_class:, visibility: 'teachers', user_id: teacher.id)
-    hidden_remix = create(:project, school:, lesson: hidden_lesson, parent: hidden_lesson.project, remixed_from_id: hidden_lesson.project.id, user_id: student.id)
+    hidden_remix = create(:project, school:, parent: hidden_lesson.project, remixed_from_id: hidden_lesson.project.id, user_id: student.id)
     create(:feedback, school_project: hidden_remix.school_project, user_id: teacher.id, content: 'Hidden', read_at: nil)
 
     get("/api/schools/#{school.id}/classes", headers:)
