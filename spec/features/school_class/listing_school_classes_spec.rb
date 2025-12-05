@@ -43,7 +43,7 @@ RSpec.describe 'Listing school classes', type: :request do
 
   describe 'basic responses' do
     it 'responds 200 OK' do
-      get("/api/schools/#{school.id}/classes", headers:)
+      get_classes
       expect(response).to have_http_status(:ok)
     end
 
