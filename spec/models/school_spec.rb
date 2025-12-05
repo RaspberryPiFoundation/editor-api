@@ -147,6 +147,77 @@ RSpec.describe School do
       expect(duplicate_school).not_to be_valid
     end
 
+    it 'does not require a school_roll_number for non-Ireland schools' do
+      school.country_code = 'GB'
+      school.school_roll_number = nil
+      expect(school).to be_valid
+    end
+
+    it 'requires school_roll_number for Ireland schools' do
+      school.country_code = 'IE'
+      school.school_roll_number = nil
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include("can't be blank")
+    end
+
+    it 'requires school_roll_number to be unique if provided' do
+      school.school_roll_number = '01572D'
+      school.save!
+
+      duplicate_school = build(:school, school_roll_number: '01572d')
+      expect(duplicate_school).not_to be_valid
+    end
+
+    it 'accepts a valid alphanumeric school_roll_number' do
+      school.school_roll_number = '01572D'
+      expect(school).to be_valid
+    end
+
+    it 'accepts a school_roll_number with one or more letters' do
+      school.school_roll_number = '12345ABC'
+      expect(school).to be_valid
+    end
+
+    it 'rejects a school_roll_number with only numbers' do
+      school.school_roll_number = '01572'
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+    end
+
+    it 'rejects a school_roll_number with only letters' do
+      school.school_roll_number = 'ABCDE'
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+    end
+
+    it 'rejects a school_roll_number with special characters' do
+      school.school_roll_number = '01572-D'
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+    end
+
+    it 'normalizes blank school_roll_number to nil' do
+      school.school_roll_number = '  '
+      expect(school).to be_valid
+      expect(school.school_roll_number).to be_nil
+    end
+
+    it 'normalizes school_roll_number to uppercase' do
+      school.school_roll_number = '01572d'
+      expect(school).to be_valid
+      expect(school.school_roll_number).to eq('01572D')
+    end
+
+    it 'allows school_roll_number reuse when original school is rejected' do
+      school.school_roll_number = '01572D'
+      school.save!
+      school.reject
+
+      new_school = build(:school, school_roll_number: '01572D')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
+    end
+
     it 'requires an address_line_1' do
       school.address_line_1 = ' '
       expect(school).not_to be_valid
