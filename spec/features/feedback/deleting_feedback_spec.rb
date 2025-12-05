@@ -39,7 +39,7 @@ RSpec.describe 'Delete feedback requests', type: :request do
         delete("/api/projects/#{student_project.identifier}/feedback/invalid-id", headers:)
       end
 
-      it 'returns unprocessable entity response' do
+      it 'returns not found response' do
         expect(response).to have_http_status(:not_found)
       end
 
