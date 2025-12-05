@@ -48,7 +48,7 @@ Rails.application.routes.draw do
       end
       resources :remixes, only: %i[index], controller: 'projects/remixes'
       resource :images, only: %i[show create], controller: 'projects/images'
-      resources :feedback, only: %i[index create], controller: 'feedback' do
+      resources :feedback, only: %i[index create destroy], controller: 'feedback' do
         put :read, on: :member, to: 'feedback#set_read'
       end
     end
