@@ -32,7 +32,7 @@ RSpec.describe 'Listing school classes', type: :request do
   # Helper to create a lesson with a student remix and optional feedback
   def create_remix_with_feedback(school_class:, student:, feedback_attrs: [])
     lesson = create(:lesson, school:, school_class:, visibility: 'students', user_id: teacher.id)
-    remix = create(:project, school:, parent: lesson.project, remixed_from_id: lesson.project.id, user_id: student.id)
+    remix = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
 
     feedback_attrs.each do |attrs|
       create(:feedback, school_project: remix.school_project, user_id: teacher.id, **attrs)
@@ -210,7 +210,7 @@ RSpec.describe 'Listing school classes', type: :request do
 
         # Hidden lesson
         hidden_lesson = create(:lesson, school:, school_class:, visibility: 'teachers', user_id: teacher.id)
-        hidden_remix = create(:project, school:, parent: hidden_lesson.project, remixed_from_id: hidden_lesson.project.id, user_id: student.id)
+        hidden_remix = create(:project, school:, remixed_from_id: hidden_lesson.project.id, user_id: student.id)
         create(:feedback, school_project: hidden_remix.school_project, user_id: teacher.id, content: 'Hidden', read_at: nil)
 
         data = get_classes
