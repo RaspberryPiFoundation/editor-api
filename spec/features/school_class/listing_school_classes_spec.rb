@@ -25,8 +25,8 @@ RSpec.describe 'Listing school classes', type: :request do
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def find_school_class_by_name(data, name)
-    data.find { |class_data| class_data[:name] == name }
+  def find_school_class_by_name(classes_data, name)
+    classes_data.find { |school_class| school_class[:name] == name }
   end
 
   # Helper to create a lesson with a student remix and optional feedback
