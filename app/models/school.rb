@@ -20,7 +20,7 @@ class School < ApplicationRecord
   validates :district_nces_id, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
   validates :school_roll_number,
             uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
-            presence: false,
+            presence: { if: :ireland? },
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') }
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
@@ -127,6 +127,10 @@ class School < ApplicationRecord
 
   def should_format_uk_postal_code?
     country_code == 'GB' && postal_code.to_s.length >= 5
+  end
+
+  def ireland?
+    country_code == 'IE'
   end
 
   def format_uk_postal_code

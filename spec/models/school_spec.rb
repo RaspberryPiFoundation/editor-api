@@ -147,9 +147,17 @@ RSpec.describe School do
       expect(duplicate_school).not_to be_valid
     end
 
-    it 'does not require a school_roll_number' do
-      create(:school, id: SecureRandom.uuid, school_roll_number: nil)
+    it 'does not require a school_roll_number for non-Ireland schools' do
+      school.country_code = 'GB'
+      school.school_roll_number = nil
       expect(school).to be_valid
+    end
+
+    it 'requires school_roll_number for Ireland schools' do
+      school.country_code = 'IE'
+      school.school_roll_number = nil
+      expect(school).not_to be_valid
+      expect(school.errors[:school_roll_number]).to include("can't be blank")
     end
 
     it 'requires school_roll_number to be unique if provided' do
