@@ -25,8 +25,8 @@ RSpec.describe 'Listing school classes', type: :request do
     JSON.parse(response.body, symbolize_names: true)
   end
 
-  def find_class(data, name)
-    data.find { |c| c[:name] == name }
+  def find_school_class_by_name(data, name)
+    data.find { |school_class| school_class[:name] == name }
   end
 
   # Helper to create a lesson with a student remix and optional feedback
@@ -142,7 +142,7 @@ RSpec.describe 'Listing school classes', type: :request do
         )
 
         data = get_classes
-        this_class = find_class(data, 'Test School Class')
+        this_class = find_school_class_by_name(data, 'Test School Class')
         expect(this_class[:unread_feedback_count]).to eq(1)
       end
 
@@ -158,21 +158,21 @@ RSpec.describe 'Listing school classes', type: :request do
         create_remix_with_feedback(school_class: school_class_2, student:, feedback_attrs: [{ content: 'Unread', read_at: nil }])
 
         data = get_classes
-        expect(find_class(data, 'Test School Class')[:unread_feedback_count]).to eq(2)
-        expect(find_class(data, 'Second Class')[:unread_feedback_count]).to eq(1)
+        expect(find_school_class_by_name(data, 'Test School Class')[:unread_feedback_count]).to eq(2)
+        expect(find_school_class_by_name(data, 'Second Class')[:unread_feedback_count]).to eq(1)
       end
 
       it 'returns 0 when all feedback is read' do
         create_remix_with_feedback(school_class:, student:, feedback_attrs: [{ content: 'Read', read_at: Time.current }])
 
         data = get_classes
-        this_class = find_class(data, 'Test School Class')
+        this_class = find_school_class_by_name(data, 'Test School Class')
         expect(this_class[:unread_feedback_count]).to eq(0)
       end
 
       it 'returns 0 when class has no feedback' do
         data = get_classes
-        this_class = find_class(data, 'Test School Class')
+        this_class = find_school_class_by_name(data, 'Test School Class')
         expect(this_class[:unread_feedback_count]).to eq(0)
       end
 
@@ -188,7 +188,7 @@ RSpec.describe 'Listing school classes', type: :request do
         )
 
         data = get_classes
-        this_class = find_class(data, 'Test School Class')
+        this_class = find_school_class_by_name(data, 'Test School Class')
         expect(this_class[:unread_feedback_count]).to eq(1)
       end
 
@@ -200,7 +200,7 @@ RSpec.describe 'Listing school classes', type: :request do
         create_remix_with_feedback(school_class:, student: other_student, feedback_attrs: [{ content: 'Theirs', read_at: nil }])
 
         data = get_classes
-        this_class = find_class(data, 'Test School Class')
+        this_class = find_school_class_by_name(data, 'Test School Class')
         expect(this_class[:unread_feedback_count]).to eq(1)
       end
 
@@ -214,7 +214,7 @@ RSpec.describe 'Listing school classes', type: :request do
         create(:feedback, school_project: hidden_remix.school_project, user_id: teacher.id, content: 'Hidden', read_at: nil)
 
         data = get_classes
-        this_class = find_class(data, 'Test School Class')
+        this_class = find_school_class_by_name(data, 'Test School Class')
         expect(this_class[:unread_feedback_count]).to eq(1)
       end
     end
