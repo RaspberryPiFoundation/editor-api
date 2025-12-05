@@ -14,7 +14,7 @@ module Api
       if current_user&.school_teacher?(@school) || current_user&.school_owner?(@school)
         render :teacher_index, formats: [:json], status: :ok
       else
-        render :student_index, formats: [:json], status: :ok
+        render_student_index(school_classes)
       end
     end
 
@@ -82,6 +82,29 @@ module Api
     end
 
     private
+
+    def render_student_index(school_classes)
+      unread_counts = calculate_unread_counts(school_classes)
+      @school_classes_with_teachers_and_unread_counts = @school_classes_with_teachers.zip(unread_counts)
+      render :student_index, formats: [:json], status: :ok
+    end
+
+    def calculate_unread_counts(school_classes)
+      class_ids = school_classes.map(&:id)
+
+      counts_by_class_id =
+        SchoolProject
+        .joins(:feedback)
+        .joins(project: { parent: { lesson: :school_class } })
+        .where(projects: { user_id: current_user.id })
+        .where(feedback: { read_at: nil })
+        .where(school_classes: { id: class_ids })
+        .merge(Lesson.accessible_by(current_ability))
+        .group('school_classes.id')
+        .count('DISTINCT school_projects.id') # Count distinct projects, not feedback records
+
+      school_classes.map { |school_class| counts_by_class_id[school_class.id] || 0 }
+    end
 
     def find_or_create_school_class(school_class_params)
       # First try and find the class (in case we're re-importing)
