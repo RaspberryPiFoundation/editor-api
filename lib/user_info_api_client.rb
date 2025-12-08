@@ -7,6 +7,7 @@ class UserInfoApiClient
   class << self
     def fetch_by_ids(user_ids)
       return [] if user_ids.blank?
+      return stubbed_users(user_ids) if bypass_oauth?
 
       response = conn.get do |r|
         r.url '/users'
@@ -19,6 +20,7 @@ class UserInfoApiClient
 
     def find_user_by_email(email)
       return nil if email.blank?
+      return stubbed_user_by_email(email) if bypass_oauth?
 
       response = conn.get do |r|
         r.url "/users/#{CGI.escape(email)}"
@@ -33,6 +35,10 @@ class UserInfoApiClient
     end
 
     private
+
+    def bypass_oauth?
+      ENV.fetch('BYPASS_OAUTH', nil) == 'true'
+    end
 
     def transform_user(user)
       user.transform_keys { |k| k.to_s.underscore.to_sym }
@@ -52,6 +58,18 @@ class UserInfoApiClient
         f.response :raise_error
         f.response :json # decode response bodies as JSON
       end
+    end
+
+    # Development/test stubbing methods - only active when BYPASS_OAUTH=true
+    # Delegates to UserInfoApiMock to avoid code duplication
+    def stubbed_users(user_ids)
+      require_relative '../spec/support/user_info_api_mock' unless defined?(UserInfoApiMock)
+      UserInfoApiMock.default_stubbed_users(user_ids)
+    end
+
+    def stubbed_user_by_email(email)
+      require_relative '../spec/support/user_info_api_mock' unless defined?(UserInfoApiMock)
+      UserInfoApiMock.default_stubbed_user_by_email(email)
     end
   end
 end

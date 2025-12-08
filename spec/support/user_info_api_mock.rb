@@ -50,4 +50,7 @@ module UserInfoApiMock
       roles: ''
     }
   end
+
+  # Class methods for use by UserInfoApiClient when BYPASS_OAUTH=true
+  module_function :default_stubbed_users, :default_stubbed_user_by_email, :default_stubbed_user
 end

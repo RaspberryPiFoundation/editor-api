@@ -73,6 +73,23 @@ RSpec.describe User do
       it 'returns a user without a username' do
         expect(user.username).to be_nil
       end
+
+      context 'when BYPASS_OAUTH is true' do
+        around do |example|
+          ClimateControl.modify(BYPASS_OAUTH: 'true') do
+            example.run
+          end
+        end
+
+        it 'does not call the API' do
+          user
+          expect(WebMock).not_to have_requested(:get, /.*/)
+        end
+
+        it 'returns a stubbed user' do
+          expect(user.name).to eq('School Owner')
+        end
+      end
     end
 
     context 'when logged into a student account' do
@@ -352,6 +369,25 @@ RSpec.describe User do
 
     it 'returns a user with the correct email' do
       expect(user.email).to eq 'school-owner@example.com'
+    end
+
+    context 'when BYPASS_OAUTH is true' do
+      around do |example|
+        ClimateControl.modify(BYPASS_OAUTH: 'true') do
+          example.run
+        end
+      end
+
+      let(:owner) { create(:owner, school:, id: '00000000-0000-0000-0000-000000000000') }
+
+      it 'does not call the API' do
+        user
+        expect(WebMock).not_to have_requested(:get, /.*/)
+      end
+
+      it 'returns a stubbed user' do
+        expect(user.name).to eq('School Owner')
+      end
     end
   end
 
