@@ -2,6 +2,7 @@ en:
   errors:
     admin:
       unauthorized: "Not authorized."
+      csv_file_required: "A CSV file is required."
     project:
       editing:
         delete_default_component: "Cannot delete default file"

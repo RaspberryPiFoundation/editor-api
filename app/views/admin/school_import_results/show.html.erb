@@ -1,0 +1,166 @@
+<% content_for(:title) { "School Import Job #{page.resource.job_id}" } %>
+
+<header class="main-content__header">
+  <h1 class="main-content__page-title">
+    <%= content_for(:title) %>
+  </h1>
+  <div>
+    <%= link_to(
+      "Download CSV",
+      admin_school_import_result_path(page.resource, format: :csv),
+      class: "button button--primary",
+      style: "margin-right: 10px;"
+    ) %>
+    <%= link_to(
+      "Back to Import History",
+      admin_school_import_results_path,
+      class: "button"
+    ) %>
+  </div>
+</header>
+
+<section class="main-content__body">
+  <dl>
+    <dt class="attribute-label">Job ID</dt>
+    <dd class="attribute-data"><%= page.resource.job_id %></dd>
+
+    <dt class="attribute-label">User</dt>
+    <dd class="attribute-data">
+      <% user_field = UserInfoField.new(:user_id, page.resource.user_id, "show") %>
+      <%= user_field.user_display %>
+    </dd>
+
+    <dt class="attribute-label">Status</dt>
+    <dd class="attribute-data">
+      <% status_field = StatusField.new(:job_id, page.resource.job_id, "show") %>
+      <span class="status-badge <%= status_field.status_class %>">
+        <%= status_field.job_status.upcase %>
+      </span>
+    </dd>
+
+    <dt class="attribute-label">Created At</dt>
+    <dd class="attribute-data"><%= page.resource.created_at.strftime("%B %d, %Y at %I:%M %p") %></dd>
+
+    <% if page.resource.updated_at != page.resource.created_at %>
+      <dt class="attribute-label">Updated At</dt>
+      <dd class="attribute-data"><%= page.resource.updated_at.strftime("%B %d, %Y at %I:%M %p") %></dd>
+    <% end %>
+  </dl>
+
+  <% results = page.resource.results %>
+  <% if results.present? %>
+    <dl>
+      <dt class="attribute-label">Results</dt>
+      <dd class="attribute-data">
+        <% results_field = ResultsSummaryField.new(:results, page.resource.results, "show") %>
+        <%= render "fields/results_summary_field/show", field: results_field %>
+      </dd>
+    </dl>
+
+    <% successful = results['successful'] || [] %>
+    <% failed = results['failed'] || [] %>
+
+    <% if successful.any? %>
+      <h2 style="margin-top: 2rem;">Successful Imports (<%= successful.count %>)</h2>
+      <table class="collection-data">
+        <thead>
+          <tr>
+            <th>School Name</th>
+            <th>School Code</th>
+            <th>School ID</th>
+            <th>Owner Email</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% successful.each do |school| %>
+            <tr>
+              <td><%= school['name'] %></td>
+              <td><strong><%= school['code'] %></strong></td>
+              <td><code><%= school['id'] %></code></td>
+              <td><%= school['owner_email'] %></td>
+              <td>
+                <%= link_to "View School", admin_school_path(school['id']), class: "button button--small" if school['id'] %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+
+    <% if failed.any? %>
+      <h2 style="margin-top: 2rem;">Failed Imports (<%= failed.count %>)</h2>
+      <table class="collection-data">
+        <thead>
+          <tr>
+            <th>School Name</th>
+            <th>Owner Email</th>
+            <th>Error Code</th>
+            <th>Error Message</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% failed.each do |school| %>
+            <tr>
+              <td><%= school['name'] %></td>
+              <td><%= school['owner_email'] %></td>
+              <td><code><%= school['error_code'] %></code></td>
+              <td style="color: red;"><%= school['error'] %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <div class="field-unit" style="margin-top: 2rem;">
+        <h3>Common Error Codes</h3>
+        <dl>
+          <dt><code>OWNER_NOT_FOUND</code></dt>
+          <dd>The owner email doesn't correspond to an existing account. The owner needs to create a Code Editor for Education account first.</dd>
+
+          <dt><code>OWNER_ALREADY_CREATOR</code></dt>
+          <dd>This owner has already created a school. Each person can only create one school.</dd>
+
+          <dt><code>SCHOOL_VALIDATION_FAILED</code></dt>
+          <dd>The school data failed validation. Check the error message for details about which fields are invalid.</dd>
+        </dl>
+      </div>
+    <% end %>
+  <% else %>
+    <div class="flash flash-alert">
+      <p>No results available yet. The job may still be running or may have failed to store results.</p>
+    </div>
+  <% end %>
+</section>
+
+<style>
+  .status-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: bold;
+    font-size: 0.9em;
+  }
+  .status-completed {
+    background-color: #d4edda;
+    color: #155724;
+  }
+  .status-failed {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+  .status-running {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+  .status-queued {
+    background-color: #d1ecf1;
+    color: #0c5460;
+  }
+  .status-unknown {
+    background-color: #e2e3e5;
+    color: #383d41;
+  }
+  .button--small {
+    padding: 4px 8px;
+    font-size: 0.875em;
+  }
+</style>
