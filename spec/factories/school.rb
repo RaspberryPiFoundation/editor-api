@@ -7,7 +7,7 @@ FactoryBot.define do
     address_line_1 { 'Address Line 1' }
     municipality { 'Greater London' }
     country_code { 'GB' }
-    sequence(:reference) { |n| format('%06d', 100000 + n) }
+    sequence(:reference) { |n| format('%06d', 100_000 + n) }
     creator_id { SecureRandom.uuid }
     creator_agree_authority { true }
     creator_agree_terms_and_conditions { true }
