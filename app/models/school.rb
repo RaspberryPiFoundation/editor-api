@@ -16,8 +16,14 @@ class School < ApplicationRecord
   validates :address_line_1, presence: true
   validates :municipality, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
-  validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
-  validates :district_nces_id, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
+  validates :reference,
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
+            presence: { if: :united_kingdom? },
+            format: { with: /\A\d{5,6}\z/, allow_nil: true, message: I18n.t('validations.school.reference') }
+  validates :district_nces_id,
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
+            presence: { if: :united_states? },
+            format: { with: /\A\d{12}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') }
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
@@ -116,6 +122,14 @@ class School < ApplicationRecord
 
   def should_format_uk_postal_code?
     country_code == 'GB' && postal_code.to_s.length >= 5
+  end
+
+  def united_kingdom?
+    country_code == 'GB'
+  end
+
+  def united_states?
+    country_code == 'US'
   end
 
   def format_uk_postal_code
