@@ -10,6 +10,7 @@ RSpec.describe School::Create, type: :unit do
       address_line_1: 'Address Line 1',
       municipality: 'Greater London',
       country_code: 'GB',
+      reference: '100000',
       creator_agree_authority: true,
       creator_agree_terms_and_conditions: true,
       creator_agree_to_ux_contact: true,

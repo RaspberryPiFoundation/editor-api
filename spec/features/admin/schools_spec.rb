@@ -79,7 +79,7 @@ RSpec.describe 'Schools', type: :request do
 
     describe 'when the school is in the United States and has a postal code' do
       before do
-        school.update(country_code: 'US', postal_code: '90210')
+        school.update(country_code: 'US', postal_code: '90210', district_nces_id: '010000000001', reference: nil)
         get admin_school_path(school)
       end
 

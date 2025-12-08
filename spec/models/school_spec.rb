@@ -132,19 +132,111 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'does not require a reference' do
-      create(:school, id: SecureRandom.uuid, reference: nil)
-
+    it 'does not require a reference for non-UK schools' do
+      school.country_code = 'IE'
       school.reference = nil
       expect(school).to be_valid
     end
 
+    it 'requires reference for UK schools' do
+      school.country_code = 'GB'
+      school.reference = nil
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include("can't be blank")
+    end
+
     it 'requires references to be unique if provided' do
-      school.reference = 'URN-123'
+      school.reference = '100000'
       school.save!
 
-      duplicate_school = build(:school, reference: 'urn-123')
+      duplicate_school = build(:school, reference: '100000')
       expect(duplicate_school).not_to be_valid
+    end
+
+    it 'accepts a valid reference format (5-6 digits)' do
+      school.reference = '100000'
+      expect(school).to be_valid
+    end
+
+    it 'accepts a 5-digit reference' do
+      school.reference = '20000'
+      expect(school).to be_valid
+    end
+
+    it 'rejects a reference with non-digit characters' do
+      school.reference = 'URN-123'
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
+    end
+
+    it 'rejects a reference with too few digits' do
+      school.reference = '1234'
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
+    end
+
+    it 'rejects a reference with too many digits' do
+      school.reference = '1234567'
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
+    end
+
+    it 'allows reference reuse when original school is rejected' do
+      school.reference = '100000'
+      school.save!
+      school.reject
+
+      new_school = build(:school, reference: '100000')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
+    end
+
+    it 'does not require a district_nces_id for non-US schools' do
+      school.country_code = 'GB'
+      school.district_nces_id = nil
+      expect(school).to be_valid
+    end
+
+    it 'requires district_nces_id for US schools' do
+      school.country_code = 'US'
+      school.district_nces_id = nil
+      expect(school).not_to be_valid
+      expect(school.errors[:district_nces_id]).to include("can't be blank")
+    end
+
+    it 'requires district_nces_id to be unique if provided' do
+      school.district_nces_id = '010000000001'
+      school.save!
+
+      duplicate_school = build(:school, district_nces_id: '010000000001')
+      expect(duplicate_school).not_to be_valid
+    end
+
+    it 'accepts a valid district_nces_id format (12 digits)' do
+      school.district_nces_id = '010000000001'
+      expect(school).to be_valid
+    end
+
+    it 'rejects a district_nces_id with non-digit characters' do
+      school.district_nces_id = '01000000000A'
+      expect(school).not_to be_valid
+      expect(school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
+    end
+
+    it 'rejects a district_nces_id with wrong length' do
+      school.district_nces_id = '12345678901'
+      expect(school).not_to be_valid
+      expect(school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
+    end
+
+    it 'allows district_nces_id reuse when original school is rejected' do
+      school.district_nces_id = '010000000001'
+      school.save!
+      school.reject
+
+      new_school = build(:school, district_nces_id: '010000000001')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
     end
 
     it 'requires an address_line_1' do
