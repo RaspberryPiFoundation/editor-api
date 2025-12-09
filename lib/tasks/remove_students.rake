@@ -39,6 +39,7 @@ namespace :remove_students do
     puts "REMOVE_FROM_PROFILE: #{remove_from_profile}"
     puts "Students to remove: #{students.size}"
     puts "====================\n\n"
+    puts "WARNING: All student projects will be deleted permanently and this operation is not reversible.\n"
     puts "Please confirm deletion of #{students.size} user(s), and that recent Postgres backups have been captured for all services affected (https://devcenter.heroku.com/articles/heroku-postgres-backups#manual-backups)"
     print 'Are you sure you want to continue? (yes/no): '
     confirmation = $stdin.gets.strip.downcase
@@ -58,7 +59,7 @@ namespace :remove_students do
       if res[:error]
         "Student: #{res[:user_id]} | Error: #{res[:error]}"
       elsif res[:skipped]
-        "Student: #{res[:user_id]} | Skipped: has project(s)"
+        "Student: #{res[:user_id]} | Skipped: #{res[:reason]}"
       else
         "Student: #{res[:user_id]} | Removed successfully"
       end
