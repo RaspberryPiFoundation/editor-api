@@ -15,6 +15,7 @@ class Ability
       define_school_owner_abilities(school:) if user.school_owner?(school)
     end
 
+    define_editor_admin_abilities(user)
     define_experience_cs_admin_abilities(user)
   end
 
@@ -69,6 +70,7 @@ class Ability
     can(%i[read create create_batch update destroy], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
+    can(%i[read destroy], Feedback, school_project: { school_id: school.id })
     can(%i[exchange_code], :google_auth)
   end
 
@@ -98,7 +100,7 @@ class Ability
     ).pluck(:id)
     can(%i[read], Project, remixed_from_id: teacher_project_ids)
     can(%i[show_status unsubmit return complete], SchoolProject, project: { remixed_from_id: teacher_project_ids })
-    can(%i[read create], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
+    can(%i[read create destroy], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
     can(%i[exchange_code], :google_auth)
   end
 
@@ -119,10 +121,24 @@ class Ability
     can(%i[show_finished set_finished show_status unsubmit submit], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
 
+  def define_school_import_abilities(user)
+    return unless user&.admin? || user&.experience_cs_admin?
+
+    can :import, School
+    can :read, :school_import_job
+  end
+
+  def define_editor_admin_abilities(user)
+    return unless user&.admin?
+
+    define_school_import_abilities(user)
+  end
+
   def define_experience_cs_admin_abilities(user)
     return unless user&.experience_cs_admin?
 
     can %i[read create update destroy], Project, user_id: nil
+    define_school_import_abilities(user)
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)

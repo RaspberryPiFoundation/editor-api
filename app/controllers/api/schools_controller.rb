@@ -4,6 +4,7 @@ module Api
   class SchoolsController < ApiController
     before_action :authorize_user
     load_and_authorize_resource
+    skip_load_and_authorize_resource only: :import
 
     def index
       @schools = School.accessible_by(current_ability)
@@ -42,6 +43,29 @@ module Api
 
       if result.success?
         head :no_content
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
+    def import
+      authorize! :import, School
+
+      if params[:csv_file].blank?
+        render json: { error: SchoolImportError.format_error(:csv_file_required, 'CSV file is required') },
+               status: :unprocessable_entity
+        return
+      end
+
+      result = School::ImportBatch.call(
+        csv_file: params[:csv_file],
+        current_user: current_user
+      )
+
+      if result.success?
+        @job_id = result[:job_id]
+        @total_schools = result[:total_schools]
+        render :import, formats: [:json], status: :accepted
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end
