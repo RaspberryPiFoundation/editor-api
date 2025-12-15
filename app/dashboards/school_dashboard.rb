@@ -47,6 +47,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     reference
     country_code
     administrative_area
+    district_name
     created_at
     verified_at
     rejected_at
