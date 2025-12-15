@@ -15,6 +15,7 @@ en:
   validations:
     school:
       website: "must be a valid URL"
+      school_roll_number: "must be numbers followed by letters (e.g., 01572D)"
     invitation:
       email_address: "'%<value>s' is invalid"
   activerecord:

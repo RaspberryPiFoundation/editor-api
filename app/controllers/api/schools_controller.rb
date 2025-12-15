@@ -80,6 +80,7 @@ module Api
         :reference,
         :district_name,
         :district_nces_id,
+        :school_roll_number,
         :address_line_1,
         :address_line_2,
         :municipality,
