@@ -142,7 +142,7 @@ class School < ApplicationRecord
   def united_states?
     country_code == 'US'
   end
-              
+
   def ireland?
     country_code == 'IE'
   end

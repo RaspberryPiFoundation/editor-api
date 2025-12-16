@@ -238,7 +238,7 @@ RSpec.describe School do
       expect(new_school).to be_valid
       expect { new_school.save! }.not_to raise_error
     end
-    
+
     it 'does not require a school_roll_number for non-Ireland schools' do
       school.country_code = 'GB'
       school.school_roll_number = nil
