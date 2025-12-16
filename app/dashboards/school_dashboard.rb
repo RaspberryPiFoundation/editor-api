@@ -28,6 +28,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     reference: Field::String,
     district_name: Field::String,
     district_nces_id: Field::String,
+    school_roll_number: Field::String,
     verified_at: Field::DateTime,
     rejected_at: Field::DateTime,
     created_at: Field::DateTime,
@@ -46,6 +47,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     reference
     country_code
     administrative_area
+    district_name
     created_at
     verified_at
     rejected_at
@@ -62,6 +64,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     reference
     district_name
     district_nces_id
+    school_roll_number
     website
     address_line_1
     address_line_2
@@ -86,6 +89,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     reference
     district_name
     district_nces_id
+    school_roll_number
     website
     address_line_1
     address_line_2

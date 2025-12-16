@@ -250,6 +250,16 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_08_134354) do
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
+  create_table "school_import_results", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "job_id", null: false
+    t.uuid "user_id", null: false
+    t.jsonb "results", default: {}, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["job_id"], name: "index_school_import_results_on_job_id", unique: true
+    t.index ["user_id"], name: "index_school_import_results_on_user_id"
+  end
+
   create_table "school_project_transitions", force: :cascade do |t|
     t.string "from_state", null: false
     t.string "to_state", null: false
@@ -303,6 +313,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_08_134354) do
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["district_nces_id"], name: "index_schools_on_district_nces_id", unique: true, where: "(rejected_at IS NULL)"
     t.index ["reference"], name: "index_schools_on_reference", unique: true, where: "(rejected_at IS NULL)"
+    t.index ["district_nces_id"], name: "index_schools_on_district_nces_id", unique: true
+    t.index ["reference"], name: "index_schools_on_reference", unique: true
     t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true, where: "(rejected_at IS NULL)"
   end
 

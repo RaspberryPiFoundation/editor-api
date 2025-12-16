@@ -24,6 +24,10 @@ class School < ApplicationRecord
             uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
             presence: { if: :united_states? },
             format: { with: /\A\d{12}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') }
+  validates :school_roll_number,
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
+            presence: { if: :ireland? },
+            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') }
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
@@ -40,6 +44,7 @@ class School < ApplicationRecord
 
   before_validation :normalize_reference
   before_validation :normalize_district_fields
+  before_validation :normalize_school_roll_number
 
   before_save :format_uk_postal_code, if: :should_format_uk_postal_code?
 
@@ -108,6 +113,12 @@ class School < ApplicationRecord
     self.district_nces_id = nil if district_nces_id.blank?
   end
 
+  # Ensure the school_roll_number is nil, not an empty string
+  # Also normalize to uppercase for consistent validation
+  def normalize_school_roll_number
+    self.school_roll_number = school_roll_number.blank? ? nil : school_roll_number.upcase
+  end
+
   def verified_at_cannot_be_changed
     errors.add(:verified_at, 'cannot be changed after verification') if verified_at_was.present? && verified_at_changed?
   end
@@ -130,6 +141,10 @@ class School < ApplicationRecord
 
   def united_states?
     country_code == 'US'
+  end
+              
+  def ireland?
+    country_code == 'IE'
   end
 
   def format_uk_postal_code

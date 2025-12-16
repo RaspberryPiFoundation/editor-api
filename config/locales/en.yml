@@ -2,6 +2,7 @@ en:
   errors:
     admin:
       unauthorized: "Not authorized."
+      csv_file_required: "A CSV file is required."
     project:
       editing:
         delete_default_component: "Cannot delete default file"
@@ -16,6 +17,7 @@ en:
       website: "must be a valid URL"
       reference: "must be 5-6 digits (e.g., 100000)"
       district_nces_id: "must be 12 digits (e.g., 010000000001)"
+      school_roll_number: "must be numbers followed by letters (e.g., 01572D)"
     invitation:
       email_address: "'%<value>s' is invalid"
   activerecord:
