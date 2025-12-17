@@ -16,15 +16,20 @@ module SeedsHelper
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
+      country_code = Faker::Address.country_code
       school.name = Faker::Educator.secondary_school
       school.website = Faker::Internet.url(scheme: 'https')
       school.address_line_1 = Faker::Address.street_address
       school.municipality = Faker::Address.city
-      school.country_code = Faker::Address.country_code
+      school.country_code = country_code
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
       school.creator_agree_to_ux_contact = true
+      # Country-specific required fields
+      school.reference = format('%06d', rand(100_000..999_999)) if country_code == 'GB'
+      school.district_nces_id = format('%012d', rand(10**12)) if country_code == 'US'
+      school.school_roll_number = "#{rand(10_000..99_999)}#{('A'..'Z').to_a.sample}" if country_code == 'IE'
     end
   end
 

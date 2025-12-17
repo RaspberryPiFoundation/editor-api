@@ -128,7 +128,10 @@ class SchoolImportJob < ApplicationJob
       creator_agree_authority: true,
       creator_agree_terms_and_conditions: true,
       creator_agree_responsible_safeguarding: true,
-      user_origin: 'experience_cs'
+      user_origin: 'experience_cs',
+      district_name: school_data[:district_name],
+      district_nces_id: school_data[:district_nces_id],
+      school_roll_number: school_data[:school_roll_number]
     }.compact
   end
 

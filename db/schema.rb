@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_04_132605) do
+ActiveRecord::Schema[7.2].define(version: 2025_12_08_134354) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -311,8 +311,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_04_132605) do
     t.string "school_roll_number"
     t.index ["code"], name: "index_schools_on_code", unique: true
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
-    t.index ["district_nces_id"], name: "index_schools_on_district_nces_id", unique: true
-    t.index ["reference"], name: "index_schools_on_reference", unique: true
+    t.index ["district_nces_id"], name: "index_schools_on_district_nces_id", unique: true, where: "(rejected_at IS NULL)"
+    t.index ["reference"], name: "index_schools_on_reference", unique: true, where: "(rejected_at IS NULL)"
     t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true, where: "(rejected_at IS NULL)"
   end
 
