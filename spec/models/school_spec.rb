@@ -133,7 +133,7 @@ RSpec.describe School do
     end
 
     it 'does not require a reference for non-UK schools' do
-      school.country_code = 'IE'
+      school.country_code = 'DE'
       school.reference = nil
       expect(school).to be_valid
     end
