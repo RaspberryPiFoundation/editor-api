@@ -17,7 +17,8 @@ RSpec.describe SchoolImportJob do
           address_line_1: '123 Main St',
           municipality: 'Springfield',
           country_code: 'US',
-          owner_email: 'owner1@example.com'
+          owner_email: 'owner1@example.com',
+          district_nces_id: '010000000001'
         },
         {
           name: 'Test School 2',
@@ -25,7 +26,8 @@ RSpec.describe SchoolImportJob do
           address_line_1: '456 Oak Ave',
           municipality: 'Boston',
           country_code: 'US',
-          owner_email: 'owner2@example.com'
+          owner_email: 'owner2@example.com',
+          district_nces_id: '010000000002'
         }
       ]
     end
@@ -124,7 +126,8 @@ RSpec.describe SchoolImportJob do
             'address_line_1' => '123 Main St',
             'municipality' => 'Springfield',
             'country_code' => 'us',
-            'owner_email' => 'owner1@example.com'
+            'owner_email' => 'owner1@example.com',
+            'district_nces_id' => '010000000001'
           }
         ]
       end
