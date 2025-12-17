@@ -6,6 +6,8 @@ RSpec.describe School do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
+  let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '010000000001', creator_id: SecureRandom.uuid) }
+  let!(:ireland_school) { create(:school, country_code: 'IE', school_roll_number: '01572D', creator_id: SecureRandom.uuid) }
 
   describe 'associations' do
     it 'has many classes' do
@@ -138,11 +140,10 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'requires reference for UK schools' do
+    it 'does not requires reference for UK schools' do
       school.country_code = 'GB'
       school.reference = nil
-      expect(school).not_to be_valid
-      expect(school.errors[:reference]).to include("can't be blank")
+      expect(school).to be_valid
     end
 
     it 'requires references to be unique if provided' do
@@ -191,48 +192,67 @@ RSpec.describe School do
       expect { new_school.save! }.not_to raise_error
     end
 
-    it 'does not require a district_nces_id for non-US schools' do
+    it 'does not require a district_nces_id for UK schools' do
       school.country_code = 'GB'
       school.district_nces_id = nil
       expect(school).to be_valid
     end
 
-    it 'requires district_nces_id for US schools' do
-      school.country_code = 'US'
+    it 'does not require a district_nces_id for CA schools' do
+      school.country_code = 'CA'
+      school.district_name = 'Some District'
       school.district_nces_id = nil
-      expect(school).not_to be_valid
-      expect(school.errors[:district_nces_id]).to include("can't be blank")
+      expect(school).to be_valid
+    end
+
+    it 'requires district_nces_id for US schools' do
+      us_school.district_nces_id = nil
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_nces_id]).to include("can't be blank")
+    end
+
+    it 'requires district_name for US schools' do
+      us_school.district_name = nil
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_name]).to include("can't be blank")
+    end
+
+    it 'does not require district_name for non-US schools' do
+      school.district_name = nil
+      expect(school).to be_valid
+    end
+
+    it 'does not require district_name for CA schools' do
+      school.country_code = 'CA'
+      school.district_name = nil
+      expect(school).to be_valid
     end
 
     it 'requires district_nces_id to be unique if provided' do
-      school.district_nces_id = '010000000001'
-      school.save!
-
-      duplicate_school = build(:school, district_nces_id: '010000000001')
+      duplicate_school = build(:school, country_code: 'US', district_nces_id: '010000000001')
       expect(duplicate_school).not_to be_valid
     end
 
     it 'accepts a valid district_nces_id format (12 digits)' do
-      school.district_nces_id = '010000000001'
-      expect(school).to be_valid
+      us_school.district_nces_id = '010000000001'
+      expect(us_school).to be_valid
     end
 
     it 'rejects a district_nces_id with non-digit characters' do
-      school.district_nces_id = '01000000000A'
-      expect(school).not_to be_valid
-      expect(school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
+      us_school.district_nces_id = '01000000000A'
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
     end
 
     it 'rejects a district_nces_id with wrong length' do
-      school.district_nces_id = '12345678901'
-      expect(school).not_to be_valid
-      expect(school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
+      us_school.district_nces_id = '12345678901'
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
     end
 
     it 'allows district_nces_id reuse when original school is rejected' do
-      school.district_nces_id = '010000000001'
-      school.save!
-      school.reject
+      us_school.district_nces_id = '010000000001'
+      us_school.reject
 
       new_school = build(:school, district_nces_id: '010000000001')
       expect(new_school).to be_valid
@@ -246,46 +266,42 @@ RSpec.describe School do
     end
 
     it 'requires school_roll_number for Ireland schools' do
-      school.country_code = 'IE'
-      school.school_roll_number = nil
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include("can't be blank")
+      ireland_school.school_roll_number = nil
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include("can't be blank")
     end
 
     it 'requires school_roll_number to be unique if provided' do
-      school.school_roll_number = '01572D'
-      school.save!
-
-      duplicate_school = build(:school, school_roll_number: '01572d')
+      duplicate_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
       expect(duplicate_school).not_to be_valid
     end
 
     it 'accepts a valid alphanumeric school_roll_number' do
-      school.school_roll_number = '01572D'
-      expect(school).to be_valid
+      ireland_school.school_roll_number = '01572D'
+      expect(ireland_school).to be_valid
     end
 
     it 'accepts a school_roll_number with one or more letters' do
-      school.school_roll_number = '12345ABC'
-      expect(school).to be_valid
+      ireland_school.school_roll_number = '12345ABC'
+      expect(ireland_school).to be_valid
     end
 
     it 'rejects a school_roll_number with only numbers' do
-      school.school_roll_number = '01572'
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+      ireland_school.school_roll_number = '01572'
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'rejects a school_roll_number with only letters' do
-      school.school_roll_number = 'ABCDE'
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+      ireland_school.school_roll_number = 'ABCDE'
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'rejects a school_roll_number with special characters' do
-      school.school_roll_number = '01572-D'
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+      ireland_school.school_roll_number = '01572-D'
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'normalizes blank school_roll_number to nil' do
@@ -301,11 +317,9 @@ RSpec.describe School do
     end
 
     it 'allows school_roll_number reuse when original school is rejected' do
-      school.school_roll_number = '01572D'
-      school.save!
-      school.reject
+      ireland_school.reject
 
-      new_school = build(:school, school_roll_number: '01572D')
+      new_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
       expect(new_school).to be_valid
       expect { new_school.save! }.not_to raise_error
     end

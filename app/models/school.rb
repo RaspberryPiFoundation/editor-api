@@ -17,17 +17,20 @@ class School < ApplicationRecord
   validates :municipality, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :reference,
-            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
-            presence: { if: :united_kingdom? },
-            format: { with: /\A\d{5,6}\z/, allow_nil: true, message: I18n.t('validations.school.reference') }
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true },
+            format: { with: /\A\d{5,6}\z/, allow_nil: true, message: I18n.t('validations.school.reference') },
+            if: :united_kingdom?
   validates :district_nces_id,
-            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
-            presence: { if: :united_states? },
-            format: { with: /\A\d{12}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') }
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true },
+            format: { with: /\A\d{12}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') },
+            presence: true,
+            if: :united_states?
+  validates :district_name, presence: true, if: :united_states?
   validates :school_roll_number,
-            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
-            presence: { if: :ireland? },
-            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') }
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true },
+            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
+            presence: true,
+            if: :ireland?
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
