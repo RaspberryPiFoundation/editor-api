@@ -8,7 +8,9 @@ RSpec.describe School::Create, type: :unit do
       name: 'Test School',
       website: 'http://www.example.com',
       address_line_1: 'Address Line 1',
+      administrative_area: 'Greater London',
       municipality: 'Greater London',
+      postal_code: 'SW1A 1AA',
       country_code: 'GB',
       reference: '100000',
       creator_agree_authority: true,
@@ -21,27 +23,31 @@ RSpec.describe School::Create, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:creator_id) { SecureRandom.uuid }
 
+  before do
+    allow(ProfileApiClient).to receive(:create_school).and_return(true)
+  end
+
   it 'returns a successful operation response' do
-    response = described_class.call(school_params:, creator_id:)
+    response = described_class.call(school_params:, creator_id:, token:)
     expect(response.success?).to be(true)
   end
 
   it 'creates a school' do
-    expect { described_class.call(school_params:, creator_id:) }.to change(School, :count).by(1)
+    expect { described_class.call(school_params:, creator_id:, token:) }.to change(School, :count).by(1)
   end
 
   it 'returns the school in the operation response' do
-    response = described_class.call(school_params:, creator_id:)
+    response = described_class.call(school_params:, creator_id:, token:)
     expect(response[:school]).to be_a(School)
   end
 
   it 'assigns the name' do
-    response = described_class.call(school_params:, creator_id:)
+    response = described_class.call(school_params:, creator_id:, token:)
     expect(response[:school].name).to eq('Test School')
   end
 
   it 'assigns the creator_id' do
-    response = described_class.call(school_params:, creator_id:)
+    response = described_class.call(school_params:, creator_id:, token:)
     expect(response[:school].creator_id).to eq(creator_id)
   end
 
@@ -53,26 +59,26 @@ RSpec.describe School::Create, type: :unit do
     end
 
     it 'does not create a school' do
-      expect { described_class.call(school_params:, creator_id:) }.not_to change(School, :count)
+      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(school_params:, creator_id:)
+      response = described_class.call(school_params:, creator_id:, token:)
       expect(response.failure?).to be(true)
     end
 
     it 'returns the correct number of objects in the operation response' do
-      response = described_class.call(school_params:, creator_id:)
-      expect(response[:error].count).to eq(9)
+      response = described_class.call(school_params:, creator_id:, token:)
+      expect(response[:error].count).to eq(11)
     end
 
     it 'returns the correct type of object in the operation response' do
-      response = described_class.call(school_params:, creator_id:)
+      response = described_class.call(school_params:, creator_id:, token:)
       expect(response[:error].first).to be_a(ActiveModel::Error)
     end
 
     it 'sent the exception to Sentry' do
-      described_class.call(school_params:, creator_id:)
+      described_class.call(school_params:, creator_id:, token:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end

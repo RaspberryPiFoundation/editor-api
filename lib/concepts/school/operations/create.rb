@@ -3,14 +3,23 @@
 class School
   class Create
     class << self
-      def call(school_params:, creator_id:)
+      def call(school_params:, creator_id:, token:)
         response = OperationResponse.new
         response[:school] = build_school(school_params.merge!(creator_id:))
-        response[:school].save!
+
+        School.transaction do
+          response[:school].save!
+
+          SchoolOnboardingService.new(response[:school]).onboard(token:) if FeatureFlags.immediate_school_onboarding?
+        end
+
+        response
+      rescue School::DuplicateSchoolError => e
+        response[:error] = e.message
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = response[:school].errors
+        response[:error] = response[:school].errors.presence || [e.message]
         response[:error_types] = response[:school].errors.details
 
         response

@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe School do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
-  let(:school) { create(:school, creator_id: SecureRandom.uuid) }
+  let(:school) { create(:school) }
   let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '010000000001', creator_id: SecureRandom.uuid) }
   let!(:ireland_school) { create(:school, country_code: 'IE', school_roll_number: '01572D', creator_id: SecureRandom.uuid) }
 
@@ -355,6 +355,16 @@ RSpec.describe School do
       expect(school).not_to be_valid
     end
 
+    it 'requires an administrative_area' do
+      school.administrative_area = ' '
+      expect(school).not_to be_valid
+    end
+
+    it 'requires a postal_code' do
+      school.postal_code = ' '
+      expect(school).not_to be_valid
+    end
+
     it 'requires a country_code' do
       school.country_code = ' '
       expect(school).not_to be_valid
@@ -413,32 +423,30 @@ RSpec.describe School do
       expect(school.errors[:verified_at]).to include('cannot be changed after verification')
     end
 
-    it 'requires #code to be unique' do
-      school.update!(code: '00-00-00', verified_at: Time.current)
-      another_school = build(:school, code: '00-00-00')
-      another_school.valid?
-      expect(another_school.errors[:code]).to include('has already been taken')
-    end
+    context 'code validations' do
+      around do |example|
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+          example.run
+        end
+      end
 
-    it 'requires #code to be set when the school is verified' do
-      school.update(verified_at: Time.current)
-      expect(school.errors[:code]).to include("can't be blank")
-    end
+      it 'requires #code to be unique' do
+        school # ensure existing school has a code
+        another_school = build(:school)
+        another_school.code = school.code
+        another_school.valid?
+        expect(another_school.errors[:code]).to include('has already been taken')
+      end
 
-    it 'requires code to be blank until the school is verified' do
-      school.update(code: 'school-code')
-      expect(school.errors[:code]).to include('must be blank')
-    end
+      it 'requires code to be formatted as 3 pairs of digits separated by hyphens' do
+        school.update(code: 'invalid')
+        expect(school.errors[:code]).to include('is invalid')
+      end
 
-    it 'requires code to be formatted as 3 pairs of digits separated by hyphens' do
-      school.update(code: 'invalid', verified_at: Time.current)
-      expect(school.errors[:code]).to include('is invalid')
-    end
-
-    it "cannot change #code once it's been set" do
-      school.verify!
-      school.update(code: '00-00-00')
-      expect(school.errors[:code]).to include('cannot be changed after verification')
+      it "cannot change #code once it's been set" do
+        school.update(code: '00-00-00')
+        expect(school.errors[:code]).to include('cannot be changed after onboarding')
+      end
     end
 
     it 'requires a user_origin' do
@@ -448,6 +456,105 @@ RSpec.describe School do
 
     it 'sets the user_origin to for_education by default' do
       expect(school.user_origin).to eq('for_education')
+    end
+
+    describe 'duplicate detection' do
+      let(:existing_school) do
+        create(:school,
+               name: 'Riverside Academy',
+               municipality: 'Greenville',
+               postal_code: 'GV1 2XY',
+               administrative_area: 'Greenshire')
+      end
+
+      before { existing_school }
+
+      it 'allows schools with the same name in different countries' do
+        duplicate = build(:school,
+                          name: existing_school.name,
+                          municipality: existing_school.municipality,
+                          postal_code: existing_school.postal_code,
+                          administrative_area: existing_school.administrative_area,
+                          country_code: 'US')
+        expect(duplicate).to be_valid
+      end
+
+      it 'allows schools with the same name in different cities' do
+        duplicate = build(:school,
+                          name: existing_school.name,
+                          municipality: 'Bluetown',
+                          postal_code: 'BT3 4ZW',
+                          administrative_area: 'Blueshire')
+        expect(duplicate).to be_valid
+      end
+
+      it 'allows schools with the same name but very different postal codes' do
+        duplicate = build(:school,
+                          name: existing_school.name,
+                          municipality: existing_school.municipality,
+                          postal_code: 'NE1 7RU',
+                          administrative_area: existing_school.administrative_area)
+        expect(duplicate).to be_valid
+      end
+
+      it 'blocks duplicate with missing apostrophe in name' do
+        duplicate = build(:school,
+                          name: 'Riverside Acadmy',
+                          municipality: existing_school.municipality,
+                          postal_code: existing_school.postal_code,
+                          administrative_area: existing_school.administrative_area)
+        expect { duplicate.save! }.to raise_error(School::DuplicateSchoolError, I18n.t('validations.school.duplicate_school'))
+      end
+
+      it 'blocks duplicate with typo in name' do
+        duplicate = build(:school,
+                          name: 'Riversid Academy',
+                          municipality: existing_school.municipality,
+                          postal_code: existing_school.postal_code,
+                          administrative_area: existing_school.administrative_area)
+        expect { duplicate.save! }.to raise_error(School::DuplicateSchoolError, I18n.t('validations.school.duplicate_school'))
+      end
+
+      it 'blocks duplicate with similar municipality spelling' do
+        duplicate = build(:school,
+                          name: existing_school.name,
+                          municipality: 'Greenvile',
+                          postal_code: existing_school.postal_code,
+                          administrative_area: existing_school.administrative_area)
+        expect { duplicate.save! }.to raise_error(School::DuplicateSchoolError, I18n.t('validations.school.duplicate_school'))
+      end
+
+      it 'blocks duplicate with slightly different postal code spacing' do
+        duplicate = build(:school,
+                          name: existing_school.name,
+                          municipality: existing_school.municipality,
+                          postal_code: 'GV12XY',
+                          administrative_area: existing_school.administrative_area)
+        expect { duplicate.save! }.to raise_error(School::DuplicateSchoolError, I18n.t('validations.school.duplicate_school'))
+      end
+
+      it 'allows updating existing school without triggering duplicate detection' do
+        existing_school.update(address_line_1: Faker::Address.street_address)
+        expect(existing_school).to be_valid
+      end
+
+      it 'allows school with very different name despite same location' do
+        duplicate = build(:school,
+                          name: 'Completely Different Academy',
+                          municipality: existing_school.municipality,
+                          postal_code: existing_school.postal_code,
+                          administrative_area: existing_school.administrative_area)
+        expect(duplicate).to be_valid
+      end
+
+      it 'allows schools with similar but sufficiently different names in same location' do
+        duplicate = build(:school,
+                          name: 'Riverside Institute',
+                          municipality: existing_school.municipality,
+                          postal_code: existing_school.postal_code,
+                          administrative_area: existing_school.administrative_area)
+        expect(duplicate).to be_valid
+      end
     end
   end
 
@@ -520,27 +627,6 @@ RSpec.describe School do
       expect(school.verified_at).to be_within(1.second).of(Time.zone.now)
     end
 
-    it 'uses the school code generator to generates and set the code' do
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return('00-00-00')
-      school.verify!
-      expect(school.code).to eq('00-00-00')
-    end
-
-    it 'retries 5 times if the school code is not unique' do
-      school.verify!
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
-      another_school = create(:school)
-      another_school.verify!
-      expect(another_school.code).to eq('00-00-00')
-    end
-
-    it 'raises exception if unique code cannot be generated in 5 retries' do
-      school.verify!
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
-      another_school = create(:school)
-      expect { another_school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
-    end
-
     it 'returns true on successful verification' do
       expect(school.verify!).to be(true)
     end
@@ -548,6 +634,51 @@ RSpec.describe School do
     it 'raises ActiveRecord::RecordInvalid if verification fails' do
       school.rejected_at = Time.zone.now
       expect { school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe 'code generation' do
+    around do |example|
+      ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+        example.run
+      end
+    end
+
+    it 'automatically generates a code after creation' do
+      new_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at'))
+      expect(new_school.reload.code).to be_present
+    end
+
+    it 'uses the school code generator to generate the code' do
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return('00-00-00')
+      new_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at', 'code'))
+      expect(new_school.reload.code).to eq('00-00-00')
+    end
+
+    it 'retries 5 times if the school code is not unique' do
+      existing_school = school
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(existing_school.code, existing_school.code, existing_school.code, existing_school.code, '00-00-00')
+      another_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at', 'code'))
+      expect(another_school.reload.code).to eq('00-00-00')
+    end
+
+    it 'raises exception if unique code cannot be generated in 5 retries' do
+      existing_school = school
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(existing_school.code)
+      another_school_attrs = build(:school).attributes.except('id', 'created_at', 'updated_at', 'code')
+      expect { described_class.create!(another_school_attrs) }.to raise_error(ActiveRecord::RecordInvalid, /Code has already been taken/)
+    end
+  end
+
+  describe '#generate_code!' do
+    it 'does not regenerate the code once it has been set' do
+      allow(ForEducationCodeGenerator).to receive(:generate)
+
+      school = create(:school)
+      existing_code = school.code
+
+      expect { school.generate_code! }.not_to change(school, :code)
+      expect(school.code).to eq(existing_code)
     end
   end
 
@@ -605,25 +736,21 @@ RSpec.describe School do
     it 'returns true on successful rejection' do
       expect(school.reject).to be(true)
     end
-
-    it 'returns false on unsuccessful rejection' do
-      school.verified_at = Time.zone.now
-      expect(school.reject).to be(false)
-    end
   end
 
   describe '#reopen' do
     it 'sets rejected_at to nil' do
+      school.reject
       school.reopen
       expect(school.rejected_at).to be_nil
     end
 
     it 'returns true on successful reopening' do
+      school.reject
       expect(school.reopen).to be(true)
     end
 
-    it 'returns false on unsuccessful reopening' do
-      school.verified_at = Time.zone.now
+    it 'returns false when trying to reopen a non-rejected school' do
       expect(school.reopen).to be(false)
     end
   end
