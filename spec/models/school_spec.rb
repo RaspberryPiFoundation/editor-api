@@ -296,7 +296,7 @@ RSpec.describe School do
       expect(school.errors[:verified_at]).to include('cannot be changed after verification')
     end
 
-    context 'code validations' do
+    describe 'code validations' do
       around do |example|
         ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
           example.run
