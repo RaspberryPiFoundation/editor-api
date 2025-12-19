@@ -16,6 +16,7 @@ class School
         response
       rescue School::DuplicateSchoolError => e
         response[:error] = e.message
+        response[:error_type] = :duplication_error
         response
       rescue StandardError => e
         Sentry.capture_exception(e)

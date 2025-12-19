@@ -24,7 +24,7 @@ module Api
       else
         render json: {
           error: result[:error],
-          error_types: result[:error_types]
+          error_type: result[:error_type] || :unknown_error
         }, status: :unprocessable_entity
       end
     end
