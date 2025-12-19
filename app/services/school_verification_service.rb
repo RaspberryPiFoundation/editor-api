@@ -7,12 +7,11 @@ class SchoolVerificationService
     @school = school
   end
 
-  def verify(token:)
+  def verify(token: nil)
     School.transaction do
       school.verify!
-      Role.owner.create!(user_id: school.creator_id, school:)
-      Role.teacher.create!(user_id: school.creator_id, school:)
-      ProfileApiClient.create_school(token:, id: school.id, code: school.code)
+
+      SchoolOnboardingService.new(school).onboard(token: token) unless FeatureFlags.immediate_school_onboarding?
     end
   rescue StandardError => e
     Sentry.capture_exception(e)

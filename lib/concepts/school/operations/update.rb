@@ -9,6 +9,10 @@ class School
         response[:school].assign_attributes(school_params)
         response[:school].save!
         response
+      rescue School::DuplicateSchoolError => e
+        Sentry.capture_exception(e)
+        response[:error] = e.message
+        response
       rescue StandardError => e
         Sentry.capture_exception(e)
         errors = response[:school].errors.full_messages.join(',')
