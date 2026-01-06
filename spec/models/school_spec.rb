@@ -269,7 +269,7 @@ RSpec.describe School do
       us_school.district_nces_id = '010000000001'
       us_school.reject
 
-      new_school = build(:school, district_nces_id: '010000000001')
+      new_school = build(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '010000000001')
       expect(new_school).to be_valid
       expect { new_school.save! }.not_to raise_error
     end
