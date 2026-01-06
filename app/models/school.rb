@@ -73,7 +73,7 @@ class School < ApplicationRecord
   end
 
   def verify!
-    generate_code! if ENV['ENABLE_IMMEDIATE_SCHOOL_ONBOARDING'].blank?
+    generate_code! unless FeatureFlags.immediate_school_onboarding?
 
     update!(verified_at: Time.zone.now)
   end
