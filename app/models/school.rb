@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class School < ApplicationRecord
-  class DuplicateSchoolError < StandardError; end
-
   has_many :classes, class_name: :SchoolClass, inverse_of: :school, dependent: :destroy
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
@@ -51,7 +49,6 @@ class School < ApplicationRecord
   before_validation :normalize_district_fields
   before_validation :normalize_school_roll_number
 
-  before_save :prevent_duplicate_school
   before_save :format_uk_postal_code, if: :should_format_uk_postal_code?
 
   after_commit :generate_code!, on: :create, if: -> { FeatureFlags.immediate_school_onboarding? }
@@ -171,30 +168,5 @@ class School < ApplicationRecord
     # insert a space as the third-from-last character in the postcode, eg. SW1A1AA -> SW1A 1AA
     # ensures UK postcodes are always formatted correctly (as the inward code is always 3 chars long)
     self.postal_code = "#{cleaned_postal_code[0..-4]} #{cleaned_postal_code[-3..]}"
-  end
-
-  def prevent_duplicate_school
-    name_threshold = 0.6
-    municipality_threshold = 0.7
-    postal_code_threshold = 0.8
-    max_edit_distance = 3
-
-    normalized_postal = postal_code.to_s.gsub(/\s+/, '')
-
-    duplicate_school = School
-                       .where.not(id:)
-                       .where(country_code:)
-                       .where(
-                         'similarity(lower(name), ?) >= ? AND levenshtein(lower(name), ?) <= ?',
-                         name.to_s, name_threshold, name.to_s, max_edit_distance
-                       )
-                       .where('similarity(lower(municipality), ?) >= ?', municipality.to_s, municipality_threshold)
-                       .where(
-                         "similarity(lower(replace(postal_code, ' ', '')), ?) >= ?",
-                         normalized_postal, postal_code_threshold
-                       )
-                       .first
-
-    raise DuplicateSchoolError, I18n.t('validations.school.duplicate_school') if duplicate_school
   end
 end
