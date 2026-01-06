@@ -28,7 +28,10 @@ module SeedsHelper
       school.creator_agree_to_ux_contact = true
       # Country-specific required fields
       school.reference = format('%06d', rand(100_000..999_999)) if country_code == 'GB'
-      school.district_nces_id = format('%012d', rand(10**12)) if country_code == 'US'
+      if country_code == 'US'
+        school.district_nces_id = format('%012d', rand(10**12))
+        school.district_name = Faker::Address.community
+      end
       school.school_roll_number = "#{rand(10_000..99_999)}#{('A'..'Z').to_a.sample}" if country_code == 'IE'
     end
   end
