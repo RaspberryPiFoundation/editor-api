@@ -7,6 +7,11 @@ RSpec.describe SchoolVerificationService do
   let(:school) { build(:school, creator_id: school_creator.id, website:) }
   let(:school_creator) { create(:user) }
   let(:service) { described_class.new(school) }
+  let(:token) { 'token' }
+
+  before do
+    allow(ProfileApiClient).to receive(:create_school)
+  end
 
   describe '#verify' do
     describe 'when immediate onboarding is enabled' do
@@ -49,16 +54,10 @@ RSpec.describe SchoolVerificationService do
 
     # TODO: Remove these examples once the feature flag is retired
     describe 'when immediate onboarding is disabled' do
-      let(:token) { 'token' }
-
       around do |example|
         ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: nil) do
           example.run
         end
-      end
-
-      before do
-        allow(ProfileApiClient).to receive(:create_school)
       end
 
       describe 'when school can be saved' do
