@@ -10,6 +10,7 @@ class School
         School.transaction do
           response[:school].save!
 
+          # TODO: Remove this conditional once the feature flag is retired
           SchoolOnboardingService.new(response[:school]).onboard(token:) if FeatureFlags.immediate_school_onboarding?
         end
 

@@ -42,6 +42,7 @@ class School < ApplicationRecord
 
   before_save :format_uk_postal_code, if: :should_format_uk_postal_code?
 
+  # TODO: Remove the conditional once the feature flag is retired
   after_commit :generate_code!, on: :create, if: -> { FeatureFlags.immediate_school_onboarding? }
 
   def self.find_for_user!(user)
@@ -64,6 +65,7 @@ class School < ApplicationRecord
   end
 
   def verify!
+    # TODO: Remove this line once the feature flag is retired
     generate_code! unless FeatureFlags.immediate_school_onboarding?
 
     update!(verified_at: Time.zone.now)

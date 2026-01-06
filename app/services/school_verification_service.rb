@@ -11,6 +11,7 @@ class SchoolVerificationService
     School.transaction do
       school.verify!
 
+      # TODO: Remove this line once the feature flag is retired
       SchoolOnboardingService.new(school).onboard(token: token) unless FeatureFlags.immediate_school_onboarding?
     end
   rescue StandardError => e
