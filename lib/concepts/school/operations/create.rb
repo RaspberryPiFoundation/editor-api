@@ -11,6 +11,8 @@ class School
       rescue StandardError => e
         Sentry.capture_exception(e)
         response[:error] = response[:school].errors
+        response[:error_types] = response[:school].errors.details
+
         response
       end
 
