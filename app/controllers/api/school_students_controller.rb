@@ -145,7 +145,6 @@ module Api
     private
 
     def remove_students(student_ids)
-      # Invoke StudentRemovalService
       service = StudentRemovalService.new(
         students: student_ids,
         school: @school,
