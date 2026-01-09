@@ -13,7 +13,6 @@ class StudentRemovalService
     results = []
 
     @students.each do |user_id|
-      # Ensure that the student has a role in this school and skip if not.
       student_roles = Role.student.where(user_id:, school_id: @school.id)
       if student_roles.empty?
         results << { user_id:, skipped: true, reason: 'no_role_in_school' }
@@ -35,7 +34,6 @@ class StudentRemovalService
           student_roles.destroy_all
 
           # Remove from profile if requested - inside transaction so it can be rolled back
-          # If this call fails, the entire transaction will be rolled back
           ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id) if @remove_from_profile && @token.present?
         end
       rescue StandardError => e
