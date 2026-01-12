@@ -23,7 +23,7 @@ module SeedsHelper
       school.administrative_area = "#{Faker::Address.city}shire"
       school.municipality = Faker::Address.city
       school.postal_code = Faker::Address.postcode
-      school.country_code = Faker::Address.country_code
+      school.country_code = country_code
       school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
