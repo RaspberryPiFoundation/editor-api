@@ -82,4 +82,44 @@ RSpec.describe School::Create, type: :unit do
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end
+
+  describe 'when immediate onboarding is enabled' do
+    # TODO: Remove this block once the feature flag is retired
+    around do |example|
+      ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+        example.run
+      end
+    end
+
+    let(:onboarding_service) { instance_spy(SchoolOnboardingService, onboard: true) }
+
+    before do
+      allow(SchoolOnboardingService).to receive(:new).and_return(onboarding_service)
+    end
+
+    it 'calls the onboarding service' do
+      described_class.call(school_params:, creator_id:, token:)
+      expect(onboarding_service).to have_received(:onboard).with(token:)
+    end
+  end
+
+  # TODO: Remove these examples once the feature flag is retired
+  describe 'when immediate onboarding is disabled' do
+    around do |example|
+      ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: nil) do
+        example.run
+      end
+    end
+
+    let(:onboarding_service) { instance_spy(SchoolOnboardingService) }
+
+    before do
+      allow(SchoolOnboardingService).to receive(:new).and_return(onboarding_service)
+    end
+
+    it 'does not call the onboarding service' do
+      described_class.call(school_params:, creator_id:, token:)
+      expect(onboarding_service).not_to have_received(:onboard)
+    end
+  end
 end
