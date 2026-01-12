@@ -13,7 +13,7 @@ class School
           # TODO: Remove this conditional once the feature flag is retired
           if FeatureFlags.immediate_school_onboarding?
             onboarded = SchoolOnboardingService.new(response[:school]).onboard(token:)
-            raise "School onboarding failed" unless onboarded
+            raise 'School onboarding failed' unless onboarded
           end
         end
 
