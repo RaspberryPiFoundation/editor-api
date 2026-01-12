@@ -11,7 +11,10 @@ class School
           response[:school].save!
 
           # TODO: Remove this conditional once the feature flag is retired
-          SchoolOnboardingService.new(response[:school]).onboard(token:) if FeatureFlags.immediate_school_onboarding?
+          if FeatureFlags.immediate_school_onboarding?
+            onboarded = SchoolOnboardingService.new(response[:school]).onboard(token:)
+            raise "School onboarding failed" unless onboarded
+          end
         end
 
         response
