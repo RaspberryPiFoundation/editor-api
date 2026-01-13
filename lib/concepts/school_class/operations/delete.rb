@@ -5,7 +5,7 @@ class SchoolClass
     class << self
       def call(school:, school_class_id:)
         response = OperationResponse.new
-        delete_school_class(school, school_class_id)
+        mark_school_class_as_deleted(school, school_class_id)
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -15,9 +15,9 @@ class SchoolClass
 
       private
 
-      def delete_school_class(school, school_class_id)
+      def mark_school_class_as_deleted(school, school_class_id)
         school_class = school.classes.find(school_class_id)
-        school_class.destroy!
+        school_class.mark_as_deleted!
       end
     end
   end

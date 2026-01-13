@@ -18,16 +18,21 @@ RSpec.describe SchoolClass::Delete, type: :unit do
     expect(response.success?).to be(true)
   end
 
-  it 'deletes a school class' do
-    expect { described_class.call(school:, school_class_id:) }.to change(SchoolClass, :count).by(-1)
+  it 'marks the school class as deleted' do
+    described_class.call(school:, school_class_id:)
+    expect(school_class.reload.deleted?).to be true
   end
 
-  it 'deletes class students in the school class' do
-    expect { described_class.call(school:, school_class_id:) }.to change(ClassStudent, :count).by(-1)
+  it 'does not delete the school class record' do
+    expect { described_class.call(school:, school_class_id:) }.not_to change(SchoolClass, :count)
   end
 
-  it 'deletes class teachers in the school class' do
-    expect { described_class.call(school:, school_class_id:) }.to change(ClassTeacher, :count).by(-1)
+  it 'does not delete class students in the school class' do
+    expect { described_class.call(school:, school_class_id:) }.not_to change(ClassStudent, :count)
+  end
+
+  it 'does not delete class teachers in the school class' do
+    expect { described_class.call(school:, school_class_id:) }.not_to change(ClassTeacher, :count)
   end
 
   context 'when deletion fails' do
