@@ -3,14 +3,24 @@
 class School
   class Create
     class << self
-      def call(school_params:, creator_id:)
+      def call(school_params:, creator_id:, token:)
         response = OperationResponse.new
         response[:school] = build_school(school_params.merge!(creator_id:))
-        response[:school].save!
+
+        School.transaction do
+          response[:school].save!
+
+          # TODO: Remove this conditional once the feature flag is retired
+          if FeatureFlags.immediate_school_onboarding?
+            onboarded = SchoolOnboardingService.new(response[:school]).onboard(token:)
+            raise 'School onboarding failed' unless onboarded
+          end
+        end
+
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = response[:school].errors
+        response[:error] = response[:school].errors.presence || [e.message]
         response[:error_types] = response[:school].errors.details
 
         response
