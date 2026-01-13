@@ -104,6 +104,31 @@ RSpec.describe 'Showing a school class', type: :request do
       get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
       expect(response).to have_http_status(:forbidden)
     end
+
+    it 'responds 403 Forbidden when the class is deleted even if student is a member' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+      school_class.update!(deleted: true)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the class is deleted even if user is the teacher' do
+      authenticated_in_hydra_as(teacher)
+      school_class.update!(deleted: true)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the class is deleted even if user is a school owner' do
+      school_class.update!(deleted: true)
+
+      get("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
   end
 
   context 'when school and class codes are provided' do
@@ -197,6 +222,31 @@ RSpec.describe 'Showing a school class', type: :request do
     it 'responds 403 Forbidden when the user is not a school-student for the class' do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
+
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the class is deleted even if student is a member' do
+      student = create(:student, school:)
+      authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
+      school_class.update!(deleted: true)
+
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the class is deleted even if user is the teacher' do
+      authenticated_in_hydra_as(teacher)
+      school_class.update!(deleted: true)
+
+      get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'responds 403 Forbidden when the class is deleted even if user is a school owner' do
+      school_class.update!(deleted: true)
 
       get("/api/schools/#{school.code}/classes/#{school_class.code}", headers:)
       expect(response).to have_http_status(:forbidden)

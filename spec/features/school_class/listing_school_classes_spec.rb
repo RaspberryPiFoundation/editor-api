@@ -102,6 +102,30 @@ RSpec.describe 'Listing school classes', type: :request do
       data = get_classes
       expect(data.size).to eq(1)
     end
+
+    it 'does not include deleted classes' do
+      school_class.update!(deleted: true)
+
+      data = get_classes
+      expect(data.pluck(:name)).not_to include('Test School Class')
+    end
+
+    it 'does not include deleted classes for school-teachers' do
+      authenticated_in_hydra_as(teacher)
+      school_class.update!(deleted: true)
+
+      data = get_classes
+      expect(data).to be_empty
+    end
+
+    it 'does not include deleted classes for school-students' do
+      authenticated_in_hydra_as(student)
+      stub_user_info_api_for(teacher)
+      school_class.update!(deleted: true)
+
+      data = get_classes
+      expect(data).to be_empty
+    end
   end
 
   describe 'submitted_count' do

@@ -18,6 +18,11 @@ RSpec.describe 'Deleting a school class', type: :request do
     expect(response).to have_http_status(:no_content)
   end
 
+  it 'marks the class as deleted instead of destroying it' do
+    delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+    expect(school_class.reload.deleted?).to be true
+  end
+
   it 'responds 204 No Content when the user is the class teacher' do
     authenticated_in_hydra_as(teacher)
 
@@ -49,6 +54,13 @@ RSpec.describe 'Deleting a school class', type: :request do
   it 'responds 403 Forbidden when the user is a school-student' do
     student = create(:student, school:)
     authenticated_in_hydra_as(student)
+
+    delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
+    expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'responds 403 Forbidden when the class is already deleted' do
+    school_class.update!(deleted: true)
 
     delete("/api/schools/#{school.id}/classes/#{school_class.id}", headers:)
     expect(response).to have_http_status(:forbidden)

@@ -84,4 +84,11 @@ RSpec.describe 'Updating a school class', type: :request do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     expect(response).to have_http_status(:forbidden)
   end
+
+  it 'responds 403 Forbidden when the class is deleted even if user is the teacher' do
+    school_class.update!(deleted: true)
+
+    put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
+    expect(response).to have_http_status(:forbidden)
+  end
 end
