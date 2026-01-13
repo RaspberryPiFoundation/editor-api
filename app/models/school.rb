@@ -22,7 +22,7 @@ class School < ApplicationRecord
             if: :united_kingdom?
   validates :district_nces_id,
             uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.district_nces_id_exists') },
-            format: { with: /\A\d{12}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') },
+            format: { with: /\A\d{7}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') },
             presence: true,
             if: :united_states?
   validates :district_name, presence: true, if: :united_states?

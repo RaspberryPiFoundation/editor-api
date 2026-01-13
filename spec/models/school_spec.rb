@@ -6,7 +6,7 @@ RSpec.describe School do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
-  let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '010000000001', creator_id: SecureRandom.uuid) }
+  let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000', creator_id: SecureRandom.uuid) }
   let!(:ireland_school) { create(:school, country_code: 'IE', school_roll_number: '01572D', creator_id: SecureRandom.uuid) }
 
   describe 'associations' do
@@ -238,38 +238,38 @@ RSpec.describe School do
     end
 
     it 'requires district_nces_id to be unique if provided' do
-      duplicate_school = build(:school, country_code: 'US', district_nces_id: '010000000001')
+      duplicate_school = build(:school, country_code: 'US', district_nces_id: '0100000')
       expect(duplicate_school).not_to be_valid
     end
 
     it 'returns error if district_nces_id is not unique' do
-      duplicate_school = build(:school, country_code: 'US', district_nces_id: '010000000001')
+      duplicate_school = build(:school, country_code: 'US', district_nces_id: '0100000')
       duplicate_school.valid?
       expect(duplicate_school.errors.details[:district_nces_id]).to include(hash_including(error: :taken))
     end
 
-    it 'accepts a valid district_nces_id format (12 digits)' do
-      us_school.district_nces_id = '010000000001'
+    it 'accepts a valid district_nces_id format (7 digits)' do
+      us_school.district_nces_id = '0100000'
       expect(us_school).to be_valid
     end
 
     it 'rejects a district_nces_id with non-digit characters' do
-      us_school.district_nces_id = '01000000000A'
+      us_school.district_nces_id = '010000A'
       expect(us_school).not_to be_valid
-      expect(us_school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
+      expect(us_school.errors[:district_nces_id]).to include('must be 7 digits (e.g., 0100000)')
     end
 
     it 'rejects a district_nces_id with wrong length' do
-      us_school.district_nces_id = '12345678901'
+      us_school.district_nces_id = '123456'
       expect(us_school).not_to be_valid
-      expect(us_school.errors[:district_nces_id]).to include('must be 12 digits (e.g., 010000000001)')
+      expect(us_school.errors[:district_nces_id]).to include('must be 7 digits (e.g., 0100000)')
     end
 
     it 'allows district_nces_id reuse when original school is rejected' do
-      us_school.district_nces_id = '010000000001'
+      us_school.district_nces_id = '0100000'
       us_school.reject
 
-      new_school = build(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '010000000001')
+      new_school = build(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000')
       expect(new_school).to be_valid
       expect { new_school.save! }.not_to raise_error
     end
