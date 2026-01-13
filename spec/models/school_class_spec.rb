@@ -285,6 +285,50 @@ RSpec.describe SchoolClass, :versioning do
     end
   end
 
+  describe '#deleted?' do
+    it 'is not deleted by default' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      expect(school_class.deleted?).to be false
+    end
+
+    it 'returns true when deleted' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      school_class.update!(deleted: true)
+      expect(school_class.deleted?).to be true
+    end
+  end
+
+  describe '#mark_as_deleted!' do
+    it 'sets deleted to true' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      school_class.mark_as_deleted!
+      expect(school_class.deleted).to be true
+    end
+
+    it 'does nothing if already deleted' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:, deleted: true)
+      expect { school_class.mark_as_deleted! }.not_to(change { school_class.reload.updated_at })
+    end
+  end
+
+  describe '.active scope' do
+    it 'only returns active (non-deleted) classes' do
+      active_class = create(:school_class, teacher_ids: [teacher.id], school:, deleted: false)
+      create(:school_class, teacher_ids: [teacher.id], school:, deleted: true)
+
+      expect(described_class.active).to contain_exactly(active_class)
+    end
+  end
+
+  describe '.deleted scope' do
+    it 'only returns deleted classes' do
+      create(:school_class, teacher_ids: [teacher.id], school:, deleted: false)
+      deleted_class = create(:school_class, teacher_ids: [teacher.id], school:, deleted: true)
+
+      expect(described_class.deleted).to contain_exactly(deleted_class)
+    end
+  end
+
   describe 'auditing' do
     subject(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
 
