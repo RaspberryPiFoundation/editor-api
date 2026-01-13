@@ -7,7 +7,7 @@ module Api
     before_action :load_and_authorize_school_class
 
     def index
-      school_classes = accessible_school_classes
+      school_classes = accessible_school_classes.active
       school_classes = school_classes.joins(:teachers).where(teachers: { teacher_id: current_user&.id }) if params[:my_classes] == 'true'
       @school_classes_with_teachers = school_classes.with_teachers
 
