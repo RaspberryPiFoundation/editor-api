@@ -8,6 +8,8 @@ class SchoolClass < ApplicationRecord
   accepts_nested_attributes_for :teachers
 
   scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
+  scope :active, -> { where(deleted: false) }
+  scope :deleted, -> { where(deleted: true) }
 
   before_validation :assign_class_code, on: %i[create import]
 
@@ -71,6 +73,17 @@ class SchoolClass < ApplicationRecord
         }
       )
       .count
+  end
+
+  def deleted?
+    deleted
+  end
+
+  def mark_as_deleted!
+    return if deleted?
+
+    self.deleted = true
+    save!(validate: false)
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_12_08_134354) do
+ActiveRecord::Schema[7.2].define(version: 2026_01_13_131231) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -246,7 +246,9 @@ ActiveRecord::Schema[7.2].define(version: 2025_12_08_134354) do
     t.string "code"
     t.integer "import_origin"
     t.string "import_id"
+    t.boolean "deleted", default: false, null: false
     t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
+    t.index ["deleted"], name: "index_school_classes_on_deleted"
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
