@@ -5,9 +5,9 @@ require 'project_loader'
 module Api
   class ProjectsController < ApiController
     before_action :authorize_user, only: %i[create update index destroy]
-    before_action :load_project, only: %i[show update destroy show_context]
+    before_action :load_project, only: %i[show update destroy show_context], unless: -> { params[:id] == "blank-scratch-starter" }
     before_action :load_projects, only: %i[index]
-    load_and_authorize_resource
+    load_and_authorize_resource unless: -> { params[:id] == "blank-scratch-starter" }
     before_action :verify_lesson_belongs_to_school, only: :create
     after_action :pagination_link_header, only: %i[index]
 
@@ -17,6 +17,9 @@ module Api
     end
 
     def show
+      if params[:id] == "blank-scratch-starter"
+        render :scratch_starter, formats: [:json] and return
+      end
       if !@project.school_id.nil? && @project.lesson_id.nil?
         project_with_user = @project.with_user(current_user)
         @user = project_with_user[1]
