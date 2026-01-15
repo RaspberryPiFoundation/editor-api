@@ -214,10 +214,9 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'requires district_nces_id for US schools' do
+    it 'does not require district_nces_id for US schools' do
       us_school.district_nces_id = nil
-      expect(us_school).not_to be_valid
-      expect(us_school.errors[:district_nces_id]).to include("can't be blank")
+      expect(us_school).to be_valid
     end
 
     it 'requires district_name for US schools' do
