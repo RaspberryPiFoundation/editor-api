@@ -132,6 +132,49 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.first[:submitted_count]).to eq(1)
   end
 
+  context 'when filtering by project_identifier' do
+    let!(:other_lesson) { create(:lesson, name: 'Another Lesson', visibility: 'public', user_id: teacher.id) }
+
+    it 'returns only lessons with the matching project identifier' do
+      # Ensure other_lesson exists with a different project
+      expect(other_lesson.project.identifier).not_to eq(lesson.project.identifier)
+
+      get("/api/lessons?project_identifier=#{lesson.project.identifier}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.size).to eq(1)
+      expect(data.first[:name]).to eq('Test Lesson')
+      expect(data.first[:project][:identifier]).to eq(lesson.project.identifier)
+    end
+
+    it 'returns empty array when no lesson matches the project identifier' do
+      get('/api/lessons?project_identifier=non-existent-identifier', headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.size).to eq(0)
+    end
+
+    it 'works without authentication' do
+      get("/api/lessons?project_identifier=#{lesson.project.identifier}")
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(response).to have_http_status(:ok)
+      expect(data.size).to eq(1)
+      expect(data.first[:name]).to eq('Test Lesson')
+    end
+
+    it 'can be combined with school_class_id filter' do
+      lesson.update!(school_class_id: school_class.id)
+      other_lesson.update!(school_class_id: school_class.id)
+
+      get("/api/lessons?school_class_id=#{school_class.id}&project_identifier=#{lesson.project.identifier}", headers:)
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.size).to eq(1)
+      expect(data.first[:name]).to eq('Test Lesson')
+    end
+  end
+
   context "when the lesson's visibility is 'private'" do
     let!(:lesson) { create(:lesson, name: 'Test Lesson', visibility: 'private') }
     let(:owner) { create(:owner, school:) }
