@@ -76,8 +76,16 @@ RSpec.describe 'for_education', type: :task do
     end
 
     it 'adds two projects' do
-      lesson = Lesson.where(school_id: school.id)
-      expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(2)
+      lessons = Lesson.where(school_id: school.id)
+      projects = Project.where(lesson_id: lessons.pluck(:id))
+
+      if projects.length != 2
+        $stdout.puts('Debug info for intermittent test')
+        lessons.each { |lesson| $stdout.puts(lesson.inspect) }
+        projects.each { |project| $stdout.puts(project.inspect) }
+      end
+
+      expect(projects.length).to eq(2)
     end
 
     it 'assigns a teacher' do
