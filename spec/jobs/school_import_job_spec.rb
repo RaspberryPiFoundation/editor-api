@@ -21,7 +21,7 @@ RSpec.describe SchoolImportJob do
           country_code: 'US',
           owner_email: 'owner1@example.com',
           district_name: 'Some District',
-          district_nces_id: '010000000001'
+          district_nces_id: '0100000'
         },
         {
           name: 'Test School 2',
@@ -33,7 +33,7 @@ RSpec.describe SchoolImportJob do
           country_code: 'US',
           owner_email: 'owner2@example.com',
           district_name: 'Other District',
-          district_nces_id: '010000000002'
+          district_nces_id: '0100001'
         }
       ]
     end
@@ -136,7 +136,7 @@ RSpec.describe SchoolImportJob do
             'country_code' => 'us',
             'owner_email' => 'owner1@example.com',
             'district_name' => 'Some District',
-            'district_nces_id' => '010000000001'
+            'district_nces_id' => '0100000'
           }
         ]
       end
