@@ -34,10 +34,9 @@ RSpec.describe 'Showing a school', type: :request do
   end
 
   it 'responds 403 Forbidden when the user belongs to a different school' do
-    Role.owner.find_by(user_id: owner.id, school:).delete
-    school.update!(id: SecureRandom.uuid)
+    other_school = create(:school)
 
-    get("/api/schools/#{school.id}", headers:)
+    get("/api/schools/#{other_school.id}", headers:)
     expect(response).to have_http_status(:forbidden)
   end
 end

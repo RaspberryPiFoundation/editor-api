@@ -71,7 +71,8 @@ class SchoolImportJob < ApplicationJob
     School.transaction do
       result = School::Create.call(
         school_params: school_params,
-        creator_id: proposed_owner[:id]
+        creator_id: proposed_owner[:id],
+        token: @token
       )
 
       if result.success?

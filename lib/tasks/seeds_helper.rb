@@ -20,7 +20,9 @@ module SeedsHelper
       school.name = Faker::Educator.secondary_school
       school.website = Faker::Internet.url(scheme: 'https')
       school.address_line_1 = Faker::Address.street_address
+      school.administrative_area = "#{Faker::Address.city}shire"
       school.municipality = Faker::Address.city
+      school.postal_code = Faker::Address.postcode
       school.country_code = country_code
       school.creator_id = creator_id
       school.creator_agree_authority = true
