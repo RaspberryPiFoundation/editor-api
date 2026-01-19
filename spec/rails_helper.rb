@@ -101,7 +101,7 @@ RSpec.configure do |config|
 
   config.around(type: :task) do |example|
     DatabaseCleaner.clean_with(:truncation)
-    DatabaseCleaner.strategy = :transaction
+    DatabaseCleaner.strategy = :truncation
 
     DatabaseCleaner.cleaning do
       Rails.application.load_tasks
