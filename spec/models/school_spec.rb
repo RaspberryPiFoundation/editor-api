@@ -241,12 +241,6 @@ RSpec.describe School do
       expect(duplicate_school).not_to be_valid
     end
 
-    it 'returns error if district_nces_id is not unique' do
-      duplicate_school = build(:school, country_code: 'US', district_nces_id: '0100000')
-      duplicate_school.valid?
-      expect(duplicate_school.errors.details[:district_nces_id]).to include(hash_including(error: :taken))
-    end
-
     it 'accepts a valid district_nces_id format (7 digits)' do
       us_school.district_nces_id = '0100000'
       expect(us_school).to be_valid
