@@ -15,13 +15,22 @@ class School < ApplicationRecord
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
   validates :address_line_1, presence: true
   validates :municipality, presence: true
+  validates :administrative_area, presence: true
+  validates :postal_code, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
-  validates :reference, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
-  validates :district_nces_id, uniqueness: { case_sensitive: false, allow_nil: true }, presence: false
+  validates :reference,
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.reference_urn_exists') },
+            format: { with: /\A\d{5,6}\z/, allow_nil: true, message: I18n.t('validations.school.reference') },
+            if: :united_kingdom?
+  validates :district_nces_id,
+            format: { with: /\A\d{7}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') },
+            if: :united_states?
+  validates :district_name, presence: true, if: :united_states?
   validates :school_roll_number,
-            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_nil: true },
-            presence: { if: :ireland? },
-            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') }
+            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.school_roll_number_exists') },
+            format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
+            presence: true,
+            if: :ireland?
   validates :creator_id, presence: true, uniqueness: true
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
@@ -30,8 +39,6 @@ class School < ApplicationRecord
   validates :verified_at, absence: { if: proc { |school| school.rejected? } }
   validates :code,
             uniqueness: { allow_nil: true },
-            presence: { if: proc { |school| school.verified? } },
-            absence: { unless: proc { |school| school.verified? } },
             format: { with: /\d\d-\d\d-\d\d/, allow_nil: true }
   validate :verified_at_cannot_be_changed
   validate :code_cannot_be_changed
@@ -41,6 +48,9 @@ class School < ApplicationRecord
   before_validation :normalize_school_roll_number
 
   before_save :format_uk_postal_code, if: :should_format_uk_postal_code?
+
+  # TODO: Remove the conditional once the feature flag is retired
+  after_create :generate_code!, if: -> { FeatureFlags.immediate_school_onboarding? }
 
   def self.find_for_user!(user)
     school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id)
@@ -62,9 +72,19 @@ class School < ApplicationRecord
   end
 
   def verify!
+    # TODO: Remove this line once the feature flag is retired
+    generate_code! unless FeatureFlags.immediate_school_onboarding?
+
+    update!(verified_at: Time.zone.now)
+  end
+
+  def generate_code!
+    return code if code.present?
+
     attempts = 0
     begin
-      update!(verified_at: Time.zone.now, code: ForEducationCodeGenerator.generate)
+      new_code = ForEducationCodeGenerator.generate
+      update!(code: new_code)
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors[:code].include?('has already been taken') && attempts <= 5
 
@@ -78,6 +98,8 @@ class School < ApplicationRecord
   end
 
   def reopen
+    return false unless rejected?
+
     update(rejected_at: nil)
   end
 
@@ -122,11 +144,19 @@ class School < ApplicationRecord
   end
 
   def code_cannot_be_changed
-    errors.add(:code, 'cannot be changed after verification') if code_was.present? && code_changed?
+    errors.add(:code, 'cannot be changed after onboarding') if code_was.present? && code_changed?
   end
 
   def should_format_uk_postal_code?
     country_code == 'GB' && postal_code.to_s.length >= 5
+  end
+
+  def united_kingdom?
+    country_code == 'GB'
+  end
+
+  def united_states?
+    country_code == 'US'
   end
 
   def ireland?

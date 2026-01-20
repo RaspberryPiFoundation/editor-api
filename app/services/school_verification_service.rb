@@ -7,19 +7,24 @@ class SchoolVerificationService
     @school = school
   end
 
-  def verify(token:)
+  def verify(token: nil)
+    success = false
     School.transaction do
       school.verify!
-      Role.owner.create!(user_id: school.creator_id, school:)
-      Role.teacher.create!(user_id: school.creator_id, school:)
-      ProfileApiClient.create_school(token:, id: school.id, code: school.code)
+
+      # TODO: Remove this line, once the feature flag is retired
+      success = FeatureFlags.immediate_school_onboarding? || SchoolOnboardingService.new(school).onboard(token: token)
+
+      # TODO: Remove this line, once the feature flag is retired
+      raise ActiveRecord::Rollback unless success
     end
   rescue StandardError => e
     Sentry.capture_exception(e)
     Rails.logger.error { "Failed to verify school #{@school.id}: #{e.message}" }
     false
   else
-    true
+    # TODO: Return 'true', once the feature flag is retired
+    success
   end
 
   delegate :reject, to: :school

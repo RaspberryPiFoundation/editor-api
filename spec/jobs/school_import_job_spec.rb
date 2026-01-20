@@ -15,17 +15,25 @@ RSpec.describe SchoolImportJob do
           name: 'Test School 1',
           website: 'https://test1.example.com',
           address_line_1: '123 Main St',
+          administrative_area: 'Massachusetts',
           municipality: 'Springfield',
+          postal_code: '01101',
           country_code: 'US',
-          owner_email: 'owner1@example.com'
+          owner_email: 'owner1@example.com',
+          district_name: 'Some District',
+          district_nces_id: '0100000'
         },
         {
           name: 'Test School 2',
           website: 'https://test2.example.com',
           address_line_1: '456 Oak Ave',
+          administrative_area: 'Massachusetts',
           municipality: 'Boston',
+          postal_code: '02101',
           country_code: 'US',
-          owner_email: 'owner2@example.com'
+          owner_email: 'owner2@example.com',
+          district_name: 'Other District',
+          district_nces_id: '0100001'
         }
       ]
     end
@@ -122,9 +130,13 @@ RSpec.describe SchoolImportJob do
             'name' => 'Test School 1',
             'website' => 'https://test1.example.com',
             'address_line_1' => '123 Main St',
+            'administrative_area' => 'Massachusetts',
             'municipality' => 'Springfield',
+            'postal_code' => '01101',
             'country_code' => 'us',
-            'owner_email' => 'owner1@example.com'
+            'owner_email' => 'owner1@example.com',
+            'district_name' => 'Some District',
+            'district_nces_id' => '0100000'
           }
         ]
       end

@@ -6,6 +6,8 @@ RSpec.describe School do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
+  let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000', creator_id: SecureRandom.uuid) }
+  let!(:ireland_school) { create(:school, country_code: 'IE', school_roll_number: '01572D', creator_id: SecureRandom.uuid) }
 
   describe 'associations' do
     it 'has many classes' do
@@ -132,19 +134,137 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'does not require a reference' do
-      create(:school, id: SecureRandom.uuid, reference: nil)
+    it 'does not require a reference for non-UK schools' do
+      school.country_code = 'DE'
+      school.reference = nil
+      expect(school).to be_valid
+    end
 
+    it 'does not require reference for UK schools' do
+      school.country_code = 'GB'
       school.reference = nil
       expect(school).to be_valid
     end
 
     it 'requires references to be unique if provided' do
-      school.reference = 'URN-123'
+      school.reference = '100000'
       school.save!
 
-      duplicate_school = build(:school, reference: 'urn-123')
+      duplicate_school = build(:school, reference: '100000')
       expect(duplicate_school).not_to be_valid
+    end
+
+    it('returns an error if reference is not unique') do
+      school.reference = '100000'
+      school.save!
+
+      duplicate_school = build(:school, reference: '100000')
+      duplicate_school.valid?
+      expect(duplicate_school.errors.details[:reference]).to include(hash_including(error: :taken))
+    end
+
+    it 'accepts a valid reference format (5-6 digits)' do
+      school.reference = '100000'
+      expect(school).to be_valid
+    end
+
+    it 'accepts a 5-digit reference' do
+      school.reference = '20000'
+      expect(school).to be_valid
+    end
+
+    it 'rejects a reference with non-digit characters' do
+      school.reference = 'URN-123'
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
+    end
+
+    it 'rejects a reference with too few digits' do
+      school.reference = '1234'
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
+    end
+
+    it 'rejects a reference with too many digits' do
+      school.reference = '1234567'
+      expect(school).not_to be_valid
+      expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
+    end
+
+    it 'allows reference reuse when original school is rejected' do
+      school.reference = '100000'
+      school.save!
+      school.reject
+
+      new_school = build(:school, reference: '100000')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
+    end
+
+    it 'does not require a district_nces_id for UK schools' do
+      school.country_code = 'GB'
+      school.district_nces_id = nil
+      expect(school).to be_valid
+    end
+
+    it 'does not require a district_nces_id for CA schools' do
+      school.country_code = 'CA'
+      school.district_name = 'Some District'
+      school.district_nces_id = nil
+      expect(school).to be_valid
+    end
+
+    it 'does not require district_nces_id for US schools' do
+      us_school.district_nces_id = nil
+      expect(us_school).to be_valid
+    end
+
+    it 'requires district_name for US schools' do
+      us_school.district_name = nil
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_name]).to include("can't be blank")
+    end
+
+    it 'does not require district_name for non-US schools' do
+      school.district_name = nil
+      expect(school).to be_valid
+    end
+
+    it 'does not require district_name for CA schools' do
+      school.country_code = 'CA'
+      school.district_name = nil
+      expect(school).to be_valid
+    end
+
+    it 'requires district_nces_id to be unique if provided' do
+      duplicate_school = build(:school, country_code: 'US', district_nces_id: '0100000')
+      expect(duplicate_school).not_to be_valid
+    end
+
+    it 'accepts a valid district_nces_id format (7 digits)' do
+      us_school.district_nces_id = '0100000'
+      expect(us_school).to be_valid
+    end
+
+    it 'rejects a district_nces_id with non-digit characters' do
+      us_school.district_nces_id = '010000A'
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_nces_id]).to include('must be 7 digits (e.g., 0100000)')
+    end
+
+    it 'rejects a district_nces_id with wrong length' do
+      us_school.district_nces_id = '123456'
+      expect(us_school).not_to be_valid
+      expect(us_school.errors[:district_nces_id]).to include('must be 7 digits (e.g., 0100000)')
+    end
+
+    it 'allows district_nces_id reuse when original school is rejected' do
+      us_school.district_nces_id = '0100000'
+      us_school.reject
+
+      new_school = build(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
     end
 
     it 'does not require a school_roll_number for non-Ireland schools' do
@@ -154,46 +274,48 @@ RSpec.describe School do
     end
 
     it 'requires school_roll_number for Ireland schools' do
-      school.country_code = 'IE'
-      school.school_roll_number = nil
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include("can't be blank")
+      ireland_school.school_roll_number = nil
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include("can't be blank")
     end
 
     it 'requires school_roll_number to be unique if provided' do
-      school.school_roll_number = '01572D'
-      school.save!
-
-      duplicate_school = build(:school, school_roll_number: '01572d')
+      duplicate_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
       expect(duplicate_school).not_to be_valid
     end
 
+    it 'returns error if school_roll_number is not unique' do
+      duplicate_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
+      duplicate_school.valid?
+      expect(duplicate_school.errors.details[:school_roll_number]).to include(hash_including(error: :taken))
+    end
+
     it 'accepts a valid alphanumeric school_roll_number' do
-      school.school_roll_number = '01572D'
-      expect(school).to be_valid
+      ireland_school.school_roll_number = '01572D'
+      expect(ireland_school).to be_valid
     end
 
     it 'accepts a school_roll_number with one or more letters' do
-      school.school_roll_number = '12345ABC'
-      expect(school).to be_valid
+      ireland_school.school_roll_number = '12345ABC'
+      expect(ireland_school).to be_valid
     end
 
     it 'rejects a school_roll_number with only numbers' do
-      school.school_roll_number = '01572'
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+      ireland_school.school_roll_number = '01572'
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'rejects a school_roll_number with only letters' do
-      school.school_roll_number = 'ABCDE'
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+      ireland_school.school_roll_number = 'ABCDE'
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'rejects a school_roll_number with special characters' do
-      school.school_roll_number = '01572-D'
-      expect(school).not_to be_valid
-      expect(school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
+      ireland_school.school_roll_number = '01572-D'
+      expect(ireland_school).not_to be_valid
+      expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
     it 'normalizes blank school_roll_number to nil' do
@@ -209,11 +331,9 @@ RSpec.describe School do
     end
 
     it 'allows school_roll_number reuse when original school is rejected' do
-      school.school_roll_number = '01572D'
-      school.save!
-      school.reject
+      ireland_school.reject
 
-      new_school = build(:school, school_roll_number: '01572D')
+      new_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
       expect(new_school).to be_valid
       expect { new_school.save! }.not_to raise_error
     end
@@ -225,6 +345,16 @@ RSpec.describe School do
 
     it 'requires a municipality' do
       school.municipality = ' '
+      expect(school).not_to be_valid
+    end
+
+    it 'requires an administrative_area' do
+      school.administrative_area = ' '
+      expect(school).not_to be_valid
+    end
+
+    it 'requires a postal_code' do
+      school.postal_code = ' '
       expect(school).not_to be_valid
     end
 
@@ -286,32 +416,30 @@ RSpec.describe School do
       expect(school.errors[:verified_at]).to include('cannot be changed after verification')
     end
 
-    it 'requires #code to be unique' do
-      school.update!(code: '00-00-00', verified_at: Time.current)
-      another_school = build(:school, code: '00-00-00')
-      another_school.valid?
-      expect(another_school.errors[:code]).to include('has already been taken')
-    end
+    describe 'code validations' do
+      around do |example|
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+          example.run
+        end
+      end
 
-    it 'requires #code to be set when the school is verified' do
-      school.update(verified_at: Time.current)
-      expect(school.errors[:code]).to include("can't be blank")
-    end
+      it 'requires #code to be unique' do
+        school # ensure existing school has a code
+        another_school = build(:school)
+        another_school.code = school.code
+        another_school.valid?
+        expect(another_school.errors[:code]).to include('has already been taken')
+      end
 
-    it 'requires code to be blank until the school is verified' do
-      school.update(code: 'school-code')
-      expect(school.errors[:code]).to include('must be blank')
-    end
+      it 'requires code to be formatted as 3 pairs of digits separated by hyphens' do
+        school.update(code: 'invalid')
+        expect(school.errors[:code]).to include('is invalid')
+      end
 
-    it 'requires code to be formatted as 3 pairs of digits separated by hyphens' do
-      school.update(code: 'invalid', verified_at: Time.current)
-      expect(school.errors[:code]).to include('is invalid')
-    end
-
-    it "cannot change #code once it's been set" do
-      school.verify!
-      school.update(code: '00-00-00')
-      expect(school.errors[:code]).to include('cannot be changed after verification')
+      it "cannot change #code once it's been set" do
+        school.update(code: '00-00-00')
+        expect(school.errors[:code]).to include('cannot be changed after onboarding')
+      end
     end
 
     it 'requires a user_origin' do
@@ -393,27 +521,6 @@ RSpec.describe School do
       expect(school.verified_at).to be_within(1.second).of(Time.zone.now)
     end
 
-    it 'uses the school code generator to generates and set the code' do
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return('00-00-00')
-      school.verify!
-      expect(school.code).to eq('00-00-00')
-    end
-
-    it 'retries 5 times if the school code is not unique' do
-      school.verify!
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, '00-00-00')
-      another_school = create(:school)
-      another_school.verify!
-      expect(another_school.code).to eq('00-00-00')
-    end
-
-    it 'raises exception if unique code cannot be generated in 5 retries' do
-      school.verify!
-      allow(ForEducationCodeGenerator).to receive(:generate).and_return(school.code, school.code, school.code, school.code, school.code)
-      another_school = create(:school)
-      expect { another_school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
-    end
-
     it 'returns true on successful verification' do
       expect(school.verify!).to be(true)
     end
@@ -421,6 +528,51 @@ RSpec.describe School do
     it 'raises ActiveRecord::RecordInvalid if verification fails' do
       school.rejected_at = Time.zone.now
       expect { school.verify! }.to raise_error(ActiveRecord::RecordInvalid)
+    end
+  end
+
+  describe 'code generation' do
+    around do |example|
+      ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+        example.run
+      end
+    end
+
+    it 'automatically generates a code after creation' do
+      new_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at'))
+      expect(new_school.reload.code).to be_present
+    end
+
+    it 'uses the school code generator to generate the code' do
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return('00-00-00')
+      new_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at', 'code'))
+      expect(new_school.reload.code).to eq('00-00-00')
+    end
+
+    it 'retries 5 times if the school code is not unique' do
+      existing_school = school
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(existing_school.code, existing_school.code, existing_school.code, existing_school.code, '00-00-00')
+      another_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at', 'code'))
+      expect(another_school.reload.code).to eq('00-00-00')
+    end
+
+    it 'raises exception if unique code cannot be generated in 5 retries' do
+      existing_school = school
+      allow(ForEducationCodeGenerator).to receive(:generate).and_return(existing_school.code)
+      another_school_attrs = build(:school).attributes.except('id', 'created_at', 'updated_at', 'code')
+      expect { described_class.create!(another_school_attrs) }.to raise_error(ActiveRecord::RecordInvalid, /Code has already been taken/)
+    end
+  end
+
+  describe '#generate_code!' do
+    it 'does not regenerate the code once it has been set' do
+      allow(ForEducationCodeGenerator).to receive(:generate)
+
+      school = create(:school)
+      existing_code = school.code
+
+      expect { school.generate_code! }.not_to change(school, :code)
+      expect(school.code).to eq(existing_code)
     end
   end
 
@@ -478,25 +630,21 @@ RSpec.describe School do
     it 'returns true on successful rejection' do
       expect(school.reject).to be(true)
     end
-
-    it 'returns false on unsuccessful rejection' do
-      school.verified_at = Time.zone.now
-      expect(school.reject).to be(false)
-    end
   end
 
   describe '#reopen' do
     it 'sets rejected_at to nil' do
+      school.reject
       school.reopen
       expect(school.rejected_at).to be_nil
     end
 
     it 'returns true on successful reopening' do
+      school.reject
       expect(school.reopen).to be(true)
     end
 
-    it 'returns false on unsuccessful reopening' do
-      school.verified_at = Time.zone.now
+    it 'returns false when trying to reopen a non-rejected school' do
       expect(school.reopen).to be(false)
     end
   end

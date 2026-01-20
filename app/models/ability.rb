@@ -67,7 +67,7 @@ class Ability
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
-    can(%i[read create create_batch update destroy], :school_student)
+    can(%i[read create create_batch update destroy destroy_batch], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
     can(%i[read destroy], Feedback, school_project: { school_id: school.id })

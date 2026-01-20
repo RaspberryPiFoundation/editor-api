@@ -7,12 +7,11 @@ module Api
     load_and_authorize_resource :lesson
 
     def index
-      archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
-      scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
-      ordered_scope = scope.order(created_at: :asc)
-
-      accessible_lessons = ordered_scope.accessible_by(current_ability).includes(project: :remixes)
+      accessible_lessons = filtered_lessons_scope
+                           .accessible_by(current_ability)
+                           .includes(project: :remixes)
       @lessons_with_users = accessible_lessons.with_users
+
       if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
         render :teacher_index, formats: [:json], status: :ok
       else
@@ -74,6 +73,13 @@ module Api
     end
 
     private
+
+    def filtered_lessons_scope
+      archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
+      scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
+      scope = scope.joins(:project).where(projects: { identifier: params[:project_identifier] }) if params[:project_identifier].present?
+      scope.order(created_at: :asc)
+    end
 
     def verify_school_class_belongs_to_school
       return if base_params[:school_class_id].blank?
