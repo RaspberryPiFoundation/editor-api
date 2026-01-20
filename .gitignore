@@ -41,3 +41,6 @@
 .byebug_history
 
 docker-compose.override.yml
+
+# Editor settings
+.idea/*
