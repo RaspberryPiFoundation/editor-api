@@ -141,6 +141,7 @@ module Api
       unique_student_ids = student_ids.uniq
       remove_students(unique_student_ids)
     end
+  
 
     private
 
@@ -208,5 +209,6 @@ module Api
         email: current_user.email
       )
     end
+
   end
 end
