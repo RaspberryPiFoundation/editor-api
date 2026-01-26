@@ -78,3 +78,5 @@ group :test do
   gem 'webdrivers'
   gem 'webmock'
 end
+
+gem "flipper-ui", "~> 1.3"

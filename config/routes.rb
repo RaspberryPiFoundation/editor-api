@@ -5,6 +5,8 @@ Rails.application.routes.draw do
     mount GoodJob::Engine => 'good_job'
     resources :components
 
+    mount Flipper::UI.app(Flipper) => '/flipper'
+
     resources :projects do
       delete :images, on: :member, action: :destroy_image
     end
