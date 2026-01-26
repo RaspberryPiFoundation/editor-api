@@ -87,6 +87,8 @@ Rails.application.routes.draw do
     resources :school_import_jobs, only: %i[show]
 
     post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
+
+    resources :features, only: %i[index]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

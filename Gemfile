@@ -38,6 +38,8 @@ gem 'rails', '~> 7.1'
 gem 'scout_apm'
 gem 'sentry-rails'
 gem 'statesman'
+gem "flipper", "~> 1.3"
+gem "flipper-active_record", "~> 1.3"
 
 group :development, :test do
   gem 'awesome_print'
