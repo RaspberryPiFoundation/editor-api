@@ -3,11 +3,13 @@
 module Api
   class FeaturesController < ApiController
     def index
-      features = Flipper.features.map do |feature|
-        [feature.key, Flipper.enabled?(feature.key, current_user&.schools&.first)]
-      end
+      school = current_user&.schools&.first
 
-      render json: features.to_h
+      enabled_feature_keys = Flipper.features
+               .select { |feature| Flipper.enabled?(feature.key, school) }
+               .map { |feature| feature.key }
+
+      render json: enabled_feature_keys
     end
   end
 end

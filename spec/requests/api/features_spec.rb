@@ -19,7 +19,7 @@ RSpec.describe "Features", type: :request do
       get "/api/features"
 
       # Assert
-      expect(response.body).not_to include('"some_global_feature":true')
+      expect(response.body).not_to include('some_global_feature')
     end
 
     it "returns a globally-enabled feature as enabled" do
@@ -30,7 +30,7 @@ RSpec.describe "Features", type: :request do
       get "/api/features"
 
       # Assert
-      expect(response.body).to include('"some_global_feature":true')
+      expect(response.body).to include('some_global_feature')
     end
 
     it "returns a school-level feature as disabled for logged-out user" do
@@ -41,7 +41,7 @@ RSpec.describe "Features", type: :request do
       get "/api/features"
 
       # Assert
-      expect(response.body).not_to include('"some_school_level_feature":true')
+      expect(response.body).not_to include('some_school_level_feature')
     end
 
     it "returns a school-level feature as enabled for a student in that school" do
@@ -54,7 +54,7 @@ RSpec.describe "Features", type: :request do
       get "/api/features", headers: headers
 
       # Assert
-      expect(response.body).to include('"some_school_level_feature":true')
+      expect(response.body).to include('some_school_level_feature')
     end
 
     it "returns both school-level and global features as enabled for a student in a school" do
@@ -68,12 +68,9 @@ RSpec.describe "Features", type: :request do
       get "/api/features", headers: headers
 
       # Assert
-      expect(response.body).to include('"some_school_level_feature":true')
-      expect(response.body).to include('"some_global_feature":true')
+      expect(response.body).to include('some_school_level_feature')
+      expect(response.body).to include('some_global_feature')
     end
-
-    # todo: Don't leak the existence of disabled feature flags
-
   end
 
   describe "Feature flag web interface" do
