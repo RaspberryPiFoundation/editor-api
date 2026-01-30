@@ -38,7 +38,7 @@ docker-compose up
   `.circleci/record_coverage`.
 
 ## Code Style & Conventions
-- Ruby `~> 3.2.0`.
+- Ruby 3.2.3 (specified as `~> 3.2.0` in Gemfile).
 - RuboCop uses Raspberry Pi Foundation shared configs plus Rails/RSpec/GraphQL cops; many metrics and
   line-length checks are relaxed.
 - Variable numbers must be snake_case (allowed: `sha256`, `X-Hub-Signature-256`).
