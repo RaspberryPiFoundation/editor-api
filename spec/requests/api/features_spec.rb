@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Features' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
+  let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
