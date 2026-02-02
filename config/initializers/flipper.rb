@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 Rails.application.configure do
   ## Memoization ensures that only one adapter call is made per feature per request.
   ## For more info, see https://www.flippercloud.io/docs/optimization#memoization

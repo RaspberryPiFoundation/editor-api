@@ -6,8 +6,8 @@ module Api
       school = current_user&.schools&.first
 
       enabled_feature_keys = Flipper.features
-               .select { |feature| Flipper.enabled?(feature.key, school) }
-               .map { |feature| feature.key }
+                                    .select { |feature| Flipper.enabled?(feature.key, school) }
+                                    .map(&:key)
 
       render json: enabled_feature_keys
     end
