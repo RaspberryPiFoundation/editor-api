@@ -9,7 +9,7 @@ module Api
                                     .select { |feature| Flipper.enabled?(feature.key, school) }
                                     .map(&:key)
 
-      render json: enabled_feature_keys
+      render json: { enabled: enabled_feature_keys }
     end
   end
 end
