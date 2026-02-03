@@ -24,7 +24,11 @@ RSpec.describe SchoolStudent::List, type: :unit do
       described_class.call(school:, token:)
 
       # TODO: Replace with WebMock assertion once the profile API has been built.
-      expect(ProfileApiClient).to have_received(:list_school_students).with(token:, school_id: school.id, student_ids: students.map(&:id))
+      expect(ProfileApiClient).to have_received(:list_school_students).with(
+        token:,
+        school_id: school.id,
+        student_ids: match_array(students.map(&:id))
+      )
     end
 
     it 'returns a school students JSON array' do
@@ -61,7 +65,11 @@ RSpec.describe SchoolStudent::List, type: :unit do
       described_class.call(school:, token:, student_ids:)
 
       # TODO: Replace with WebMock assertion once the profile API has been built.
-      expect(ProfileApiClient).to have_received(:list_school_students).with(token:, school_id: school.id, student_ids:)
+      expect(ProfileApiClient).to have_received(:list_school_students).with(
+        token:,
+        school_id: school.id,
+        student_ids: match_array(student_ids)
+      )
     end
 
     it 'returns a filtered school students JSON array' do
