@@ -8,7 +8,7 @@ class ProfileApiClient
 
   # rubocop:disable Naming/MethodName
   School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
-  SafeguardingFlag = Data.define(:id, :userId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
+  SafeguardingFlag = Data.define(:id, :userId, :schoolId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
   # rubocop:enable Naming/MethodName
 
@@ -26,6 +26,8 @@ class ProfileApiClient
       end
     end
   end
+
+  class UnauthorizedError < Error; end
 
   class UnexpectedResponse < Error
     attr_reader :response_status, :response_headers, :response_body
@@ -50,6 +52,7 @@ class ProfileApiClient
         }
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 201
 
       School.new(**response.body)
@@ -58,6 +61,7 @@ class ProfileApiClient
     def school_student(token:, school_id:, student_id:)
       response = connection(token).get("/api/v1/schools/#{school_id}/students/#{student_id}")
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 200
 
       build_student(response.body)
@@ -70,6 +74,7 @@ class ProfileApiClient
         request.body = student_ids
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 200
 
       response.body.map { |attrs| build_student(attrs) }
@@ -86,6 +91,7 @@ class ProfileApiClient
         }]
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 201
 
       response.body.deep_symbolize_keys
@@ -103,6 +109,7 @@ class ProfileApiClient
         request.headers['Content-Type'] = 'application/json'
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 200
     rescue Faraday::UnprocessableEntityError => e
       raise Student422Error, JSON.parse(e.response_body)['errors']
@@ -119,6 +126,7 @@ class ProfileApiClient
         request.headers['Content-Type'] = 'application/json'
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless [200, 201].include?(response.status)
 
       response.body.deep_symbolize_keys
@@ -136,6 +144,7 @@ class ProfileApiClient
         request.headers['Content-Type'] = 'application/json'
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless [200, 201].include?(response.status)
 
       response.body.map(&:deep_symbolize_keys)
@@ -154,6 +163,7 @@ class ProfileApiClient
         }.compact
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 200
 
       build_student(response.body)
@@ -166,28 +176,32 @@ class ProfileApiClient
 
       response = connection(token).delete("/api/v1/schools/#{school_id}/students/#{student_id}")
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 204
     end
 
     def safeguarding_flags(token:)
       response = connection(token).get('/api/v1/safeguarding-flags')
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 200
 
       response.body.map { |flag| SafeguardingFlag.new(**flag.symbolize_keys) }
     end
 
-    def create_safeguarding_flag(token:, flag:, email:)
+    def create_safeguarding_flag(token:, flag:, email:, school_id:)
       response = connection(token).post('/api/v1/safeguarding-flags') do |request|
-        request.body = { flag:, email: }
+        request.body = { flag:, email:, schoolId: school_id }
       end
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless [201, 303].include?(response.status)
     end
 
     def delete_safeguarding_flag(token:, flag:)
       response = connection(token).delete("/api/v1/safeguarding-flags/#{flag}")
 
+      unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 204
     end
 
@@ -197,7 +211,7 @@ class ProfileApiClient
       Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
         faraday.request :json
         faraday.response :json
-        faraday.response :raise_error
+        faraday.response :raise_error, allowed_statuses: [401]
         faraday.headers = {
           'Accept' => 'application/json',
           'Authorization' => "Bearer #{token}",
@@ -218,6 +232,7 @@ class ProfileApiClient
       end
     end
 
+
     def build_student(attrs)
       symbolized_attrs = attrs.symbolize_keys
 
@@ -228,6 +243,11 @@ class ProfileApiClient
       symbolized_attrs[:ssoProviders] ||= []
 
       Student.new(**symbolized_attrs)
+    end
+
+    def unauthorized!(response)
+      # The API is only available to verified non-student users that are over 13. Others get a 401.
+      raise UnauthorizedError, 'Profile API unauthorized' if response.status == 401
     end
   end
 end

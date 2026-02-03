@@ -14,6 +14,11 @@ class SchoolOnboardingService
 
       ProfileApiClient.create_school(token:, id: school.id, code: school.code)
     end
+  rescue ProfileApiClient::UnauthorizedError
+    # Do not log noise to sentry. 
+    # TODO: consider returning a separate error here to distinguish from other errors and return 401 from the API, not 422
+    Rails.logger.warn { "Failed to onboard school #{@school.id}: user is unauthorized" }
+    false
   rescue StandardError => e
     Sentry.capture_exception(e)
     Rails.logger.error { "Failed to onboard school #{@school.id}: #{e.message}" }
