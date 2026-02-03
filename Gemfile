@@ -14,6 +14,8 @@ gem 'countries'
 gem 'email_validator'
 gem 'faker'
 gem 'faraday'
+gem 'flipper', '~> 1.3'
+gem 'flipper-active_record', '~> 1.3'
 gem 'github_webhook', '~> 1.4'
 gem 'globalid'
 gem 'good_job', '~> 4.3'
@@ -76,3 +78,5 @@ group :test do
   gem 'webdrivers'
   gem 'webmock'
 end
+
+gem 'flipper-ui', '~> 1.3'
