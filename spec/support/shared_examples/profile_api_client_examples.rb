@@ -56,6 +56,11 @@ RSpec.shared_examples 'a request that handles standard HTTP errors' do |http_met
     stub_request(http_method, expected_url).to_return(status: 401)
     expect { subject }.not_to raise_error(Faraday::Error)
   end
+
+  it 'raises UnauthorizedError on 401' do
+    stub_request(http_method, expected_url).to_return(status: 401)
+    expect { subject }.to raise_error(ProfileApiClient::UnauthorizedError)
+  end
 end
 
 RSpec.shared_examples 'a request that handles an unexpected response status' do |http_method, url:, status:|
