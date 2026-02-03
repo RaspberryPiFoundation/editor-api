@@ -125,7 +125,8 @@ RSpec.describe ProfileApiClient do
         email: 'user@example.com',
         createdAt: '2024-07-01T12:49:18.926Z',
         updatedAt: '2024-07-01T12:49:18.926Z',
-        discardedAt: nil
+        discardedAt: nil,
+        schoolId: SecureRandom.uuid
       }
       expected = ProfileApiClient::SafeguardingFlag.new(**flag)
       stub_request(:get, list_safeguarding_flags_url)

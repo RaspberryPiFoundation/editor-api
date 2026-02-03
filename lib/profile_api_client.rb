@@ -232,7 +232,6 @@ class ProfileApiClient
       end
     end
 
-
     def build_student(attrs)
       symbolized_attrs = attrs.symbolize_keys
 
