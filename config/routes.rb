@@ -5,6 +5,9 @@ Rails.application.routes.draw do
     mount GoodJob::Engine => 'good_job'
     resources :components
 
+    mount Flipper::UI.app(Flipper) => '/flipper',
+          constraints: AdminSessionConstraint.new
+
     resources :projects do
       delete :images, on: :member, action: :destroy_image
     end
@@ -87,6 +90,8 @@ Rails.application.routes.draw do
     resources :school_import_jobs, only: %i[show]
 
     post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
+
+    resources :features, only: %i[index]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
