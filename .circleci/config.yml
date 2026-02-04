@@ -1,7 +1,7 @@
 jobs:
   rubocop:
     docker:
-      - image: "cimg/ruby:3.2"
+      - image: "cimg/ruby:3.4"
     steps:
       - checkout
       - ruby/install-deps
@@ -11,7 +11,7 @@ jobs:
 
   test:
     docker:
-      - image: "cimg/ruby:3.2-browsers"
+      - image: "cimg/ruby:3.4-browsers"
       - image: "circleci/postgres:12.0-alpine-ram"
         environment:
           POSTGRES_DB: choco_cake_test
