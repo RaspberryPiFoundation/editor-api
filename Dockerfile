@@ -22,7 +22,7 @@ RUN apt-get update \
   build-essential libpq-dev libxml2-dev libxslt1-dev git libyaml-dev \
   firefox-esr \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
-COPY Gemfile Gemfile.lock .ruby-version /app/
+COPY Gemfile Gemfile.lock .tool-versions /app/
 RUN bundle config set bin '/usr/local/bundle/bin'
 RUN bundle install --jobs 4 \
   && bundle binstubs --all \
