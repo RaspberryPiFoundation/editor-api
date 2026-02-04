@@ -3,7 +3,7 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby file: '.ruby-version'
+ruby file: '.tool-versions'
 
 gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
