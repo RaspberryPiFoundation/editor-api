@@ -148,6 +148,7 @@ GEM
       bigdecimal
       rexml
     crass (1.0.6)
+    csv (3.3.5)
     database_cleaner-active_record (2.2.2)
       activerecord (>= 5.a)
       database_cleaner-core (~> 2.0)
@@ -581,12 +582,14 @@ DEPENDENCIES
   administrate-field-active_storage
   awesome_print
   aws-sdk-s3
+  base64 (~> 0.3)
   bootsnap
   bullet
   cancancan (~> 3.3)
   capybara
   climate_control
   countries
+  csv (~> 3.3)
   database_cleaner-active_record
   debug
   dotenv-rails
