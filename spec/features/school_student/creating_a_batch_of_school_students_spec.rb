@@ -56,12 +56,12 @@ RSpec.describe 'Creating a batch of school students', type: :request do
 
   it 'creates the school owner safeguarding flag' do
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'does not create the school teacher safeguarding flag' do
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email, school_id: school.id)
   end
 
   it 'responds 202 Accepted' do
@@ -113,7 +113,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     authenticated_in_hydra_as(teacher)
 
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'creates the school teacher safeguarding flag when the user is a school-teacher' do
@@ -121,7 +121,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     authenticated_in_hydra_as(teacher)
 
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email, school_id: school.id)
   end
 
   it 'responds 422 Unprocessable Entity when params are invalid' do

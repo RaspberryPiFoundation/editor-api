@@ -42,9 +42,24 @@ end
 RSpec.shared_examples 'a request that handles standard HTTP errors' do |http_method, url:|
   let(:expected_url) { instance_exec(&url) }
 
-  it 'raises faraday exception for 4xx and 5xx responses' do
-    stub_request(http_method, expected_url).to_return(status: 401)
+  it 'raises faraday exception for 4xx responses' do
+    stub_request(http_method, expected_url).to_return(status: 403)
     expect { subject }.to raise_error(Faraday::Error)
+  end
+
+  it 'raises faraday exception for 5xx responses' do
+    stub_request(http_method, expected_url).to_return(status: 500)
+    expect { subject }.to raise_error(Faraday::Error)
+  end
+
+  it 'does not raise faraday exception for 401' do
+    stub_request(http_method, expected_url).to_return(status: 401)
+    expect { subject }.not_to raise_error(Faraday::Error)
+  end
+
+  it 'raises UnauthorizedError on 401' do
+    stub_request(http_method, expected_url).to_return(status: 401)
+    expect { subject }.to raise_error(ProfileApiClient::UnauthorizedError)
   end
 end
 
