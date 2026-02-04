@@ -4,7 +4,7 @@ class SchoolProject < ApplicationRecord
   belongs_to :school
   belongs_to :project
   has_many :feedback, dependent: :destroy
-  has_many :school_project_transitions, autosave: false, dependent: :nullify
+  has_many :school_project_transitions, autosave: false, dependent: :destroy
 
   include Statesman::Adapters::ActiveRecordQueries[
     transition_class: ::SchoolProjectTransition,
