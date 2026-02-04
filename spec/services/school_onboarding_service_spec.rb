@@ -54,6 +54,32 @@ RSpec.describe SchoolOnboardingService do
       end
     end
 
+    describe 'when Profile API returns unauthorized' do
+      before do
+        allow(ProfileApiClient).to receive(:create_school).and_raise(ProfileApiClient::UnauthorizedError)
+        allow(Sentry).to receive(:capture_exception)
+      end
+
+      it 'does not create owner role' do
+        service.onboard(token:)
+        expect(school_creator).not_to be_school_owner(school)
+      end
+
+      it 'does not create teacher role' do
+        service.onboard(token:)
+        expect(school_creator).not_to be_school_teacher(school)
+      end
+
+      it 'does not capture the error in Sentry' do
+        service.onboard(token:)
+        expect(Sentry).not_to have_received(:capture_exception)
+      end
+
+      it 'returns false' do
+        expect(service.onboard(token:)).to be(false)
+      end
+    end
+
     describe 'when teacher and owner roles cannot be created because they already have a role in another school' do
       let(:another_school) { create(:school) }
 

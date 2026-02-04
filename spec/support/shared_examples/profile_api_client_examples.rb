@@ -42,12 +42,12 @@ end
 RSpec.shared_examples 'a request that handles standard HTTP errors' do |http_method, url:|
   let(:expected_url) { instance_exec(&url) }
 
-  it 'raises faraday exception for 4xx and 5xx responses' do
+  it 'raises faraday exception for 4xx responses' do
     stub_request(http_method, expected_url).to_return(status: 403)
     expect { subject }.to raise_error(Faraday::Error)
   end
 
-  it 'raises faraday exception for 4xx and 5xx responses' do
+  it 'raises faraday exception for 5xx responses' do
     stub_request(http_method, expected_url).to_return(status: 500)
     expect { subject }.to raise_error(Faraday::Error)
   end
