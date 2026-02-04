@@ -1,4 +1,4 @@
-FROM ruby:3.4-slim-bullseye AS base
+FROM ruby:3.4.8-slim-trixie AS base
 RUN gem install bundler \
   && apt-get update \
   && apt-get upgrade --yes \
@@ -7,7 +7,7 @@ RUN gem install bundler \
   curl gnupg graphviz nodejs \
   && mkdir -p /usr/share/keyrings \
   && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /usr/share/keyrings/postgresql-archive-keyring.gpg \
-  && echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt bullseye-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+  && echo "deb [signed-by=/usr/share/keyrings/postgresql-archive-keyring.gpg] http://apt.postgresql.org/pub/repos/apt trixie-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
   && apt-get update \
   && apt-get install --yes --no-install-recommends postgresql-client-17 \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
@@ -20,7 +20,7 @@ WORKDIR /app
 RUN apt-get update \
   && apt-get install --yes --no-install-recommends \
   build-essential libpq-dev libxml2-dev libxslt1-dev git libyaml-dev \
-  firefox-esr python2-dev \
+  firefox-esr \
   && rm -rf /var/lib/apt/lists/* /var/lib/apt/archives/*.deb
 COPY Gemfile Gemfile.lock /app/
 RUN bundle install --jobs 4 \
