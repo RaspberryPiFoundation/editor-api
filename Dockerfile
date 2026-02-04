@@ -45,8 +45,7 @@ FROM base AS app
 WORKDIR /app
 COPY . /app
 COPY --from=builder /usr/local/bundle /usr/local/bundle
-COPY --from=builder /node_modules /node_modules
-COPY --from=builder Gemfile Gemfile.lock package.json yarn.lock .yarnrc /app/
+COPY --from=builder /app/Gemfile /app/Gemfile.lock /app
 CMD ["rails", "server", "-b", "0.0.0.0"]
 EXPOSE 3009
 
