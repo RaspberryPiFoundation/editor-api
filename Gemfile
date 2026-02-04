@@ -8,9 +8,11 @@ ruby file: '.ruby-version'
 gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
+gem 'base64', '~> 0.3'
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'countries'
+gem 'csv', '~> 3.3'
 gem 'email_validator'
 gem 'faker'
 gem 'faraday'
