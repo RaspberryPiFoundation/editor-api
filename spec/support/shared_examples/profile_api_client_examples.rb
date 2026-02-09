@@ -54,7 +54,9 @@ RSpec.shared_examples 'a request that handles standard HTTP errors' do |http_met
 
   it 'does not raise faraday exception for 401' do
     stub_request(http_method, expected_url).to_return(status: 401)
-    expect { subject }.not_to raise_error(Faraday::Error)
+    expect { subject }.to raise_error { |error|
+      expect(error).not_to be_a(Faraday::Error)
+    }
   end
 
   it 'raises UnauthorizedError on 401' do
