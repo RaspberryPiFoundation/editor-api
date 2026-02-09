@@ -64,9 +64,6 @@ module Api
     def destroy
       @lesson.destroy!
       head :no_content
-    rescue StandardError => e
-      Sentry.capture_exception(e)
-      render json: { error: "Error destroying lesson: #{e}" }, status: :unprocessable_entity
     end
 
     private
