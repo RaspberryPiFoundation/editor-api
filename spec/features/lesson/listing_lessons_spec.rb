@@ -61,8 +61,8 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.first[:user_name]).to be_nil
   end
 
-  it 'does not include archived lessons' do
-    lesson.archive!
+  it 'does not include lessons that were previously archived' do
+    lesson.update!(archived_at: Time.now.utc)
 
     get('/api/lessons', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
@@ -70,13 +70,14 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.size).to eq(0)
   end
 
-  it 'includes archived lessons if ?include_archived=true is set' do
-    lesson.archive!
+  it 'does not include previously archived lessons when filtering by school_class_id' do
+    lesson.update!(school_class_id: school_class.id)
+    lesson.update!(archived_at: Time.now.utc)
 
-    get('/api/lessons?include_archived=true', headers:)
+    get("/api/lessons?school_class_id=#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.size).to eq(1)
+    expect(data.size).to eq(0)
   end
 
   it 'does not include lessons with no class if school_class_id provided' do
@@ -98,24 +99,6 @@ RSpec.describe 'Listing lessons', type: :request do
     lesson.update!(school_class_id: school_class.id)
 
     get("/api/lessons?school_class_id=#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.size).to eq(1)
-  end
-
-  it 'defaults to not including archived lessons from the class if school_class_id provided' do
-    lesson.archive!
-    lesson.update!(school_class_id: school_class.id)
-    get("/api/lessons?school_class_id=#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.size).to eq(0)
-  end
-
-  it 'includes archived lessons from class if include_archived=true and school_class_id provided' do
-    lesson.archive!
-    lesson.update!(school_class_id: school_class.id)
-    get("/api/lessons?include_archived=true&school_class_id=#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data.size).to eq(1)

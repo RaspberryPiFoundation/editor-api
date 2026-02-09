@@ -41,9 +41,16 @@ RSpec.describe Lesson do
   end
 
   describe 'callbacks' do
-    it 'cannot be destroyed and should be archived instead' do
+    it 'can be destroyed' do
       lesson = create(:lesson)
-      expect { lesson.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
+      expect { lesson.destroy! }.not_to raise_error
+    end
+
+    it 'destroys associated project' do
+      lesson = create(:lesson)
+      project_id = lesson.project.id
+      lesson.destroy!
+      expect(Project.exists?(project_id)).to be(false)
     end
   end
 
@@ -109,19 +116,6 @@ RSpec.describe Lesson do
     it "requires a visibility that is either 'private', 'teachers', 'students' or 'public'" do
       lesson.visibility = 'invalid'
       expect(lesson).not_to be_valid
-    end
-  end
-
-  describe '.archived' do
-    let!(:archived_lesson) { create(:lesson, archived_at: Time.now.utc) }
-    let!(:unarchived_lesson) { create(:lesson) }
-
-    it 'includes archived lessons' do
-      expect(described_class.archived).to include(archived_lesson)
-    end
-
-    it 'excludes unarchived lessons' do
-      expect(described_class.archived).not_to include(unarchived_lesson)
     end
   end
 
@@ -222,69 +216,6 @@ RSpec.describe Lesson do
 
       pair = lesson.with_user
       expect(pair).to eq([lesson, nil])
-    end
-  end
-
-  describe '#archive!' do
-    let(:lesson) { build(:lesson) }
-
-    it 'archives the lesson' do
-      lesson.archive!
-      expect(lesson.archived?).to be(true)
-    end
-
-    it 'sets archived_at' do
-      lesson.archive!
-      expect(lesson.archived_at).to be_present
-    end
-
-    it 'does not set archived_at if it was already set' do
-      lesson.update!(archived_at: 1.day.ago)
-
-      lesson.archive!
-      expect(lesson.archived_at).to be < 23.hours.ago
-    end
-
-    it 'saves the record' do
-      lesson.archive!
-      expect(lesson).to be_persisted
-    end
-
-    it 'is infallible to other validation errors' do
-      lesson.save!
-      lesson.name = ' '
-      lesson.save!(validate: false)
-
-      lesson.archive!
-      expect(lesson.archived?).to be(true)
-    end
-  end
-
-  describe '#unarchive!' do
-    let(:lesson) { build(:lesson, archived_at: Time.now.utc) }
-
-    it 'unarchives the lesson' do
-      lesson.unarchive!
-      expect(lesson.archived?).to be(false)
-    end
-
-    it 'clears archived_at' do
-      lesson.unarchive!
-      expect(lesson.archived_at).to be_nil
-    end
-
-    it 'saves the record' do
-      lesson.unarchive!
-      expect(lesson).to be_persisted
-    end
-
-    it 'is infallible to other validation errors' do
-      lesson.archive!
-      lesson.name = ' '
-      lesson.save!(validate: false)
-
-      lesson.unarchive!
-      expect(lesson.archived?).to be(false)
     end
   end
 
