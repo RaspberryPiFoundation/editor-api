@@ -22,7 +22,6 @@ class LessonDashboard < Administrate::BaseDashboard
     description: Field::String,
     visibility: Field::String,
     due_date: Field::DateTime,
-    archived_at: Field::DateTime,
     created_at: Field::DateTime,
     updated_at: Field::DateTime
   }.freeze
@@ -53,7 +52,6 @@ class LessonDashboard < Administrate::BaseDashboard
     description
     visibility
     due_date
-    archived_at
     created_at
     updated_at
   ].freeze

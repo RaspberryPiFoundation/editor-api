@@ -62,21 +62,17 @@ module Api
     end
 
     def destroy
-      operation = params[:undo] == 'true' ? Lesson::Unarchive : Lesson::Archive
-      result = operation.call(lesson: @lesson)
-
-      if result.success?
-        head :no_content
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
+      @lesson.destroy!
+      head :no_content
+    rescue StandardError => e
+      Sentry.capture_exception(e)
+      render json: { error: "Error destroying lesson: #{e}" }, status: :unprocessable_entity
     end
 
     private
 
     def filtered_lessons_scope
-      archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
-      scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
+      scope = params[:school_class_id] ? Lesson.unarchived.where(school_class_id: params[:school_class_id]) : Lesson.unarchived
       scope = scope.joins(:project).where(projects: { identifier: params[:project_identifier] }) if params[:project_identifier].present?
       scope.order(created_at: :asc)
     end
