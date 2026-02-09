@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Lesson < ApplicationRecord
+  self.ignored_columns += [:archived_at]
+
   belongs_to :school, optional: true
   belongs_to :school_class, optional: true
   belongs_to :parent, optional: true, class_name: :Lesson, foreign_key: :copied_from_id, inverse_of: :copies
@@ -16,8 +18,6 @@ class Lesson < ApplicationRecord
 
   validate :user_has_the_school_owner_or_school_teacher_role_for_the_school
   validate :user_is_the_school_teacher_for_the_school_class
-
-  scope :unarchived, -> { where(archived_at: nil) }
 
   def self.users
     User.from_userinfo(ids: pluck(:user_id))

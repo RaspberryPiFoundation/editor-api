@@ -61,25 +61,6 @@ RSpec.describe 'Listing lessons', type: :request do
     expect(data.first[:user_name]).to be_nil
   end
 
-  it 'does not include lessons that were previously archived' do
-    lesson.update!(archived_at: Time.now.utc)
-
-    get('/api/lessons', headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.size).to eq(0)
-  end
-
-  it 'does not include previously archived lessons when filtering by school_class_id' do
-    lesson.update!(school_class_id: school_class.id)
-    lesson.update!(archived_at: Time.now.utc)
-
-    get("/api/lessons?school_class_id=#{school_class.id}", headers:)
-    data = JSON.parse(response.body, symbolize_names: true)
-
-    expect(data.size).to eq(0)
-  end
-
   it 'does not include lessons with no class if school_class_id provided' do
     get("/api/lessons?school_class_id=#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)

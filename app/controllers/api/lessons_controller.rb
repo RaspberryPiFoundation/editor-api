@@ -69,7 +69,7 @@ module Api
     private
 
     def filtered_lessons_scope
-      scope = params[:school_class_id] ? Lesson.unarchived.where(school_class_id: params[:school_class_id]) : Lesson.unarchived
+      scope = params[:school_class_id] ? Lesson.where(school_class_id: params[:school_class_id]) : Lesson.all
       scope = scope.joins(:project).where(projects: { identifier: params[:project_identifier] }) if params[:project_identifier].present?
       scope.order(created_at: :asc)
     end
