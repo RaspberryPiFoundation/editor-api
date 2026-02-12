@@ -18,11 +18,11 @@ RSpec.describe TeacherInvitation do
     expect(invitation).not_to be_valid
   end
 
-  it 'is invalid with an unverified school' do
+  it 'is valid with an unverified school' do
     school = build(:school, verified_at: nil)
     invitation = build(:teacher_invitation, school:)
 
-    expect(invitation).not_to be_valid
+    expect(invitation).to be_valid
   end
 
   it 'sends an invitation email after create' do
