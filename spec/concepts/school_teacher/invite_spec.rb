@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolTeacher::Invite, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
-  let(:school) { create(:verified_school) }
+  let(:school) { create(:school) }
   let(:teacher_id) { SecureRandom.uuid }
 
   let(:school_teacher_params) do
@@ -47,6 +47,15 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
     it 'sent the exception to Sentry' do
       described_class.call(school:, school_teacher_params:, token:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+    end
+  end
+
+  context 'when the school is not verified' do
+    let(:school) { create(:school) }
+
+    it 'does not return an error message in the operation response' do
+      response = described_class.call(school:, school_teacher_params:, token:)
+      expect(response[:error]).to be_blank
     end
   end
 end
