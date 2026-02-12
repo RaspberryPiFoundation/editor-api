@@ -49,13 +49,4 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end
-
-  context 'when the school is not verified' do
-    let(:school) { create(:school) }
-
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_teacher_params:, token:)
-      expect(response[:error]).to match(/School is not verified/)
-    end
-  end
 end

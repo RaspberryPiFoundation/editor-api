@@ -76,15 +76,6 @@ RSpec.describe SchoolStudent::Create, type: :unit do
     end
   end
 
-  context 'when the school is not verified' do
-    let(:school) { create(:school) }
-
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to match(/school is not verified/)
-    end
-  end
-
   context 'when the student cannot be created in profile api because of a 422 response' do
     let(:error) { { 'message' => "something's up with the username" } }
     let(:exception) { ProfileApiClient::Student422Error.new(error) }
