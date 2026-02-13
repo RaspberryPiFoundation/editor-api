@@ -12,26 +12,32 @@ namespace :test_seeds do
       Rails.logger.info 'Destroying existing seeds...'
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
       teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
+      teacher_signup_id = TEST_USERS[:jim_dun]
 
       # Hard coded as the student's school needs to match
       student_ids = [TEST_USERS[:jane_smith], TEST_USERS[:john_smith], TEST_USERS[:emily_ssouser]]
       school_id = TEST_SCHOOL
+      teacher_signup_school_id =
+        School.find_by(creator_id: teacher_signup_id)&.id
 
       # Remove the roles first
+      Role.where(user_id: teacher_signup_id).destroy_all
       Role.where(user_id: [creator_id, teacher_id] + student_ids).destroy_all
 
       # Destroy the project and then the lesson itself (The lesson's `before_destroy` prevents us using destroy)
       lesson_ids = Lesson.where(school_id:).pluck(:id)
-      Project.where(lesson_id: [lesson_ids]).destroy_all
-      Lesson.where(id: [lesson_ids]).delete_all
+      Project.where(lesson_id: lesson_ids).destroy_all
+      Lesson.where(id: lesson_ids).delete_all
 
       # Destroy the class members and then the class itself
       school_class_ids = SchoolClass.where(school_id:).pluck(:id)
-      ClassStudent.where(school_class_id: [school_class_ids]).destroy_all
-      SchoolClass.where(id: [school_class_ids]).destroy_all
+      ClassStudent.where(school_class_id: school_class_ids).destroy_all
+      SchoolClass.where(id: school_class_ids).destroy_all
 
-      # Destroy the school
-      School.find(school_id).destroy
+      # Destroy the schools
+      # school_ids = [school_id, teacher_signup_school_id].compact
+      School.where(id: school_id).destroy_all
+      School.where(id: teacher_signup_school_id).destroy_all
 
       Rails.logger.info 'Done...'
     rescue StandardError => e

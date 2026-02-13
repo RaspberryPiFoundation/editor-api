@@ -6,7 +6,8 @@ module SeedsHelper
     john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com
     jane_smith: 'e52de409-9210-4e94-b08c-dd11439e07d9', # student
     john_smith: '0d488bec-b10d-46d3-b6f3-4cddf5d90c71', # student
-    emily_ssouser: '88e0aed6-8f20-4e40-98f9-610a0ab1cfcc' # sso student
+    emily_ssouser: '88e0aed6-8f20-4e40-98f9-610a0ab1cfcc', # sso student
+    jim_dun: '019a649f-87f3-483b-8eea-39a05c324264' # user with no school
   }.freeze
 
   # Match the school in profile...
