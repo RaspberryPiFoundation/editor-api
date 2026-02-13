@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolTeacher::Invite, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
-  let(:school) { create(:verified_school) }
+  let(:school) { create(:school) }
   let(:teacher_id) { SecureRandom.uuid }
 
   let(:school_teacher_params) do
@@ -53,9 +53,9 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
   context 'when the school is not verified' do
     let(:school) { create(:school) }
 
-    it 'returns the error message in the operation response' do
+    it 'does not return an error message in the operation response' do
       response = described_class.call(school:, school_teacher_params:, token:)
-      expect(response[:error]).to match(/School is not verified/)
+      expect(response[:error]).to be_blank
     end
   end
 end

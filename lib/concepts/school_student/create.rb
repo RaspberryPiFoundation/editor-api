@@ -22,7 +22,7 @@ module SchoolStudent
         password = DecryptionHelpers.decrypt_password(encrypted_password)
         name = school_student_params.fetch(:name)
 
-        validate(school:, username:, password:, name:)
+        validate(username:, password:, name:)
 
         response = ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id:)
         user_id = response[:created].first
@@ -30,8 +30,7 @@ module SchoolStudent
         user_id
       end
 
-      def validate(school:, username:, password:, name:)
-        raise ArgumentError, 'school is not verified' unless school.verified?
+      def validate(username:, password:, name:)
         raise ArgumentError, "username '#{username}' is invalid" if username.blank?
         raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
         raise ArgumentError, "name '#{name}' is invalid" if name.blank?
