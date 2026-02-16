@@ -39,7 +39,6 @@ gem 'postmark-rails'
 gem 'puma', '~> 6'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
-gem 'scout_apm'
 gem 'sentry-rails'
 gem 'statesman'
 
