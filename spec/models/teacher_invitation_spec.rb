@@ -18,11 +18,22 @@ RSpec.describe TeacherInvitation do
     expect(invitation).not_to be_valid
   end
 
-  it 'is valid with an unverified school' do
-    school = build(:school, verified_at: nil)
-    invitation = build(:teacher_invitation, school:)
+  it 'is valid with an unverified school and immediate_school_onboarding is TRUE' do
+    ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+      school = build(:school, verified_at: nil)
+      invitation = build(:teacher_invitation, school:)
 
-    expect(invitation).to be_valid
+      expect(invitation).to be_valid
+    end
+  end
+
+  it 'is invalid with an unverified school and immediate_school_onboarding is FALSE' do
+    ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'false') do
+      school = build(:school, verified_at: nil)
+      invitation = build(:teacher_invitation, school:)
+
+      expect(invitation).not_to be_valid
+    end
   end
 
   it 'sends an invitation email after create' do
