@@ -54,10 +54,6 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
     let(:school) { create(:school) }
 
     context 'when immediate_school_onboarding is FALSE' do
-      # before do
-      #   allow(FeatureFlags).to receive(:immediate_school_onboarding?).and_return(false)
-      # end
-
       it 'does return an error message in the operation response' do
         ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'false') do
           response = described_class.call(school:, school_teacher_params:, token:)
