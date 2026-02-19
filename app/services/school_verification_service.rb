@@ -12,6 +12,10 @@ class SchoolVerificationService
     School.transaction do
       school.verify!
 
+      creator_id = school.creator_id
+      Role.owner.find_or_create_by!(user_id: creator_id, school:)
+      Role.teacher.find_or_create_by!(user_id: creator_id, school:)
+
       # TODO: Remove this line, once the feature flag is retired
       success = FeatureFlags.immediate_school_onboarding? || SchoolOnboardingService.new(school).onboard(token: token)
 
