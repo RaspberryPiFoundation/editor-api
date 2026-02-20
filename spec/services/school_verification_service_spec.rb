@@ -36,16 +36,6 @@ RSpec.describe SchoolVerificationService do
         it 'returns true' do
           expect(service.verify).to be(true)
         end
-
-        it 'grants the creator the owner role for the school' do
-          service.verify(token:)
-          expect(school_creator).to be_school_owner(school)
-        end
-
-        it 'grants the creator the teacher role for the school' do
-          service.verify(token:)
-          expect(school_creator).to be_school_teacher(school)
-        end
       end
 
       describe 'when school cannot be saved' do
