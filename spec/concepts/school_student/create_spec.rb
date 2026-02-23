@@ -77,11 +77,25 @@ RSpec.describe SchoolStudent::Create, type: :unit do
   end
 
   context 'when the school is not verified' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school) } # not verified by default
 
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to match(/school is not verified/)
+    context 'when immediate_school_onboarding is FALSE' do
+      it 'returns the error message in the operation response' do
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'false') do
+          response = described_class.call(school:, school_student_params:, token:)
+          expect(response[:error]).to match(/school must be verified/)
+        end
+      end
+    end
+
+    context 'when immediate_school_onboarding is TRUE' do
+      it 'does not error due to school verification' do
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+          response = described_class.call(school:, school_student_params:, token:)
+
+          expect(response[:error]).to be_nil
+        end
+      end
     end
   end
 
