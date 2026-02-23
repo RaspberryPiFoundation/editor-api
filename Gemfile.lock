@@ -341,7 +341,7 @@ GEM
     pp (0.6.2)
       prettyprint
     prettyprint (0.2.0)
-    prism (1.4.0)
+    prism (1.9.0)
     pry (0.15.2)
       coderay (~> 1.1)
       method_source (~> 1.0)
@@ -407,8 +407,9 @@ GEM
       zeitwerk (~> 2.6)
     rainbow (3.1.1)
     rake (13.3.0)
-    rbs (3.9.4)
+    rbs (3.10.3)
       logger
+      tsort
     rdoc (6.14.2)
       erb
       psych (>= 4.0.0)
@@ -487,7 +488,7 @@ GEM
       language_server-protocol (~> 3.17.0)
       prism (>= 1.2, < 2.0)
       rbs (>= 3, < 5)
-    ruby-lsp-rspec (0.1.27)
+    ruby-lsp-rspec (0.1.28)
       ruby-lsp (~> 0.26.0)
     ruby-progressbar (1.13.0)
     ruby-vips (2.2.5)
@@ -543,6 +544,7 @@ GEM
     time (0.4.1)
       date
     timeout (0.4.3)
+    tsort (0.2.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unaccent (0.4.0)
@@ -632,7 +634,7 @@ DEPENDENCIES
   rubocop-rspec
   rubocop-rspec_rails
   ruby-lsp
-  ruby-lsp-rspec (~> 0.1.27)
+  ruby-lsp-rspec (~> 0.1.28)
   selenium-webdriver
   sentry-rails
   shoulda-matchers (~> 5.0)
