@@ -92,6 +92,8 @@ Rails.application.routes.draw do
     post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
 
     resources :features, only: %i[index]
+
+    resources :profile_auth_check, only: %i[index]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
