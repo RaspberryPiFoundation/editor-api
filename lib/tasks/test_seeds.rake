@@ -30,14 +30,13 @@ namespace :test_seeds do
       Lesson.where(id: lesson_ids).delete_all
 
       # Destroy the class members and then the class itself
-      school_class_ids = SchoolClass.where(school_id:).pluck(:id)
+      school_class_ids = SchoolClass.where(school_id: [school_id, teacher_signup_school_id].compact).pluck(:id)
       ClassStudent.where(school_class_id: school_class_ids).destroy_all
       SchoolClass.where(id: school_class_ids).destroy_all
 
       # Destroy the schools
-      # school_ids = [school_id, teacher_signup_school_id].compact
-      School.where(id: school_id).destroy_all
-      School.where(id: teacher_signup_school_id).destroy_all
+      school_ids = [school_id, teacher_signup_school_id].compact
+      School.where(id: school_ids).destroy_all
 
       Rails.logger.info 'Done...'
     rescue StandardError => e
