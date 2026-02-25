@@ -33,6 +33,10 @@ Rails.application.routes.draw do
   mount GraphiQL::Rails::Engine, at: '/graphql', graphql_path: '/graphql#execute' unless Rails.env.production?
 
   namespace :api do
+    namespace :scratch do
+      resources :projects, only: %i[show update]
+    end
+
     resource :default_project, only: %i[show] do
       get '/html', to: 'default_projects#html'
       get '/python', to: 'default_projects#python'
