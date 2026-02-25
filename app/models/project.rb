@@ -5,6 +5,7 @@ class Project < ApplicationRecord
     PYTHON = 'python'
     HTML = 'html'
     SCRATCH = 'scratch'
+    CODE_EDITOR_SCRATCH = 'code_editor_scratch'
   end
 
   belongs_to :school, optional: true

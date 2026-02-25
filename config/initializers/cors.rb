@@ -23,5 +23,6 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
 end
 
 def standard_cors_options
+  resource '/api/projects/*', headers: :any, methods: %i[get post patch put delete], credentials: true, expose: ['Link']
   resource '*', headers: :any, methods: %i[get post patch put delete], expose: ['Link']
 end
