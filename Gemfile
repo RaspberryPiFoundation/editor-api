@@ -36,7 +36,7 @@ gem 'open-uri'
 gem 'paper_trail'
 gem 'pg', '~> 1.1'
 gem 'postmark-rails'
-gem 'puma', '~> 6'
+gem 'puma', '~> 7.2'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
 gem 'sentry-rails'
@@ -67,7 +67,7 @@ end
 group :development do
   gem 'rails-erd'
   gem 'ruby-lsp', require: false
-  gem 'ruby-lsp-rspec', '~> 0.1.27', require: false
+  gem 'ruby-lsp-rspec', '~> 0.1.28', require: false
 end
 
 group :test do
