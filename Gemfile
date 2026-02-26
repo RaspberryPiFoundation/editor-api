@@ -3,17 +3,21 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~> 3.2.0'
+ruby file: '.tool-versions'
 
 gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
+gem 'base64', '~> 0.3'
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'countries'
+gem 'csv', '~> 3.3'
 gem 'email_validator'
 gem 'faker'
 gem 'faraday'
+gem 'flipper', '~> 1.3'
+gem 'flipper-active_record', '~> 1.3'
 gem 'github_webhook', '~> 1.4'
 gem 'globalid'
 gem 'good_job', '~> 4.3'
@@ -32,10 +36,9 @@ gem 'open-uri'
 gem 'paper_trail'
 gem 'pg', '~> 1.1'
 gem 'postmark-rails'
-gem 'puma', '~> 6'
+gem 'puma', '~> 7.2'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
-gem 'scout_apm'
 gem 'sentry-rails'
 gem 'statesman'
 
@@ -64,7 +67,7 @@ end
 group :development do
   gem 'rails-erd'
   gem 'ruby-lsp', require: false
-  gem 'ruby-lsp-rspec', '~> 0.1.27', require: false
+  gem 'ruby-lsp-rspec', '~> 0.1.28', require: false
 end
 
 group :test do
@@ -76,3 +79,5 @@ group :test do
   gem 'webdrivers'
   gem 'webmock'
 end
+
+gem 'flipper-ui', '~> 1.3'

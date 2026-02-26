@@ -94,12 +94,12 @@ RSpec.describe 'Listing school members', type: :request do
 
   it 'creates the school owner safeguarding flag' do
     get("/api/schools/#{school.id}/students", headers:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'does not create the school teacher safeguarding flag' do
     get("/api/schools/#{school.id}/students", headers:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email, school_id: school.id)
   end
 
   it "responds with nil attributes for students if the user profile doesn't exist" do
@@ -136,7 +136,7 @@ RSpec.describe 'Listing school members', type: :request do
     authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/students", headers:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email)
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'creates the school teacher safeguarding flag when the user is a school teacher' do
@@ -144,6 +144,6 @@ RSpec.describe 'Listing school members', type: :request do
     authenticated_in_hydra_as(teacher)
 
     get("/api/schools/#{school.id}/students", headers:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email)
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email, school_id: school.id)
   end
 end

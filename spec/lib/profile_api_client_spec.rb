@@ -125,7 +125,8 @@ RSpec.describe ProfileApiClient do
         email: 'user@example.com',
         createdAt: '2024-07-01T12:49:18.926Z',
         updatedAt: '2024-07-01T12:49:18.926Z',
-        discardedAt: nil
+        discardedAt: nil,
+        schoolId: SecureRandom.uuid
       }
       expected = ProfileApiClient::SafeguardingFlag.new(**flag)
       stub_request(:get, list_safeguarding_flags_url)
@@ -144,6 +145,7 @@ RSpec.describe ProfileApiClient do
     subject(:create_safeguarding_flag_response) { create_safeguarding_flag }
 
     let(:flag) { 'school:owner' }
+    let(:school_id) { SecureRandom.uuid }
     let(:create_safeguarding_flag_url) { "#{api_url}/api/v1/safeguarding-flags" }
 
     before do
@@ -155,7 +157,7 @@ RSpec.describe ProfileApiClient do
 
     it 'sends the safeguarding flag in the request body' do
       create_safeguarding_flag_response
-      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(body: { flag:, email: 'user@example.com' }.to_json)
+      expect(WebMock).to have_requested(:post, create_safeguarding_flag_url).with(body: { flag:, email: 'user@example.com', schoolId: school_id }.to_json)
     end
 
     it 'returns empty body if created successfully' do
@@ -176,7 +178,7 @@ RSpec.describe ProfileApiClient do
     private
 
     def create_safeguarding_flag
-      described_class.create_safeguarding_flag(token:, flag:, email: 'user@example.com')
+      described_class.create_safeguarding_flag(token:, flag:, email: 'user@example.com', school_id:)
     end
   end
 

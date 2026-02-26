@@ -195,7 +195,8 @@ module Api
       ProfileApiClient.create_safeguarding_flag(
         token: current_user.token,
         flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher],
-        email: current_user.email
+        email: current_user.email,
+        school_id: @school.id
       )
     end
 
@@ -205,7 +206,8 @@ module Api
       ProfileApiClient.create_safeguarding_flag(
         token: current_user.token,
         flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner],
-        email: current_user.email
+        email: current_user.email,
+        school_id: @school.id
       )
     end
   end

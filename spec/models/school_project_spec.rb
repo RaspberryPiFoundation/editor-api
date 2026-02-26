@@ -20,7 +20,7 @@ RSpec.describe SchoolProject do
   it { is_expected.to belong_to(:school) }
   it { is_expected.to belong_to(:project) }
   it { is_expected.to have_many(:feedback).dependent(:destroy) }
-  it { is_expected.to have_many(:school_project_transitions).dependent(:nullify) }
+  it { is_expected.to have_many(:school_project_transitions).dependent(:destroy) }
 
   describe '#status' do
     it 'defaults to unsubmitted' do
