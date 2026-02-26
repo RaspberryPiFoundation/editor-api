@@ -29,8 +29,6 @@ docker compose up
 
 ## Development
 - Use `docker compose` for all commands; project mounts into `editor-api:builder` with tmpfs for `tmp/`.
-- Seeds: `docker compose run --rm api rails projects:create_all` (see README for others).
-- DB sync (needs Heroku CLI): `./bin/db-sync/production-to-local.sh` or `staging-to-local.sh`.
 
 ## Testing
 - Full suite: `docker compose run --rm api rspec`
