@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe 'Archiving a lesson', type: :request do
+RSpec.describe 'Destroying a lesson', type: :request do
   before do
     authenticated_in_hydra_as(owner)
   end
@@ -19,23 +19,16 @@ RSpec.describe 'Archiving a lesson', type: :request do
     expect(response).to have_http_status(:no_content)
   end
 
-  it 'responds 204 No Content if the lesson is already archived' do
-    lesson.archive!
-
-    delete("/api/lessons/#{lesson.id}", headers:)
-    expect(response).to have_http_status(:no_content)
+  it 'destroys the lesson' do
+    lesson_id = lesson.id
+    delete("/api/lessons/#{lesson_id}", headers:)
+    expect(Lesson.exists?(lesson_id)).to be(false)
   end
 
-  it 'archives the lesson' do
+  it 'destroys the associated project' do
+    project_id = lesson.project.id
     delete("/api/lessons/#{lesson.id}", headers:)
-    expect(lesson.reload.archived?).to be(true)
-  end
-
-  it 'unarchives the lesson when the ?undo=true query parameter is set' do
-    lesson.archive!
-
-    delete("/api/lessons/#{lesson.id}?undo=true", headers:)
-    expect(lesson.reload.archived?).to be(false)
+    expect(Project.exists?(project_id)).to be(false)
   end
 
   it 'responds 401 Unauthorized when no token is given' do

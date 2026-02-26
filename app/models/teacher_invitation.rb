@@ -6,7 +6,7 @@ class TeacherInvitation < ApplicationRecord
   belongs_to :school
   validates :email_address,
             format: { with: EmailValidator.regexp, message: I18n.t('validations.invitation.email_address') }
-  validate :school_is_verified
+  validate :school_is_verified, unless: -> { FeatureFlags.immediate_school_onboarding? }
   after_create_commit :send_invitation_email
   encrypts :email_address
 

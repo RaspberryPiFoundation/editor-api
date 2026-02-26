@@ -79,6 +79,22 @@ describe StudentRemovalService do
         # Other student's project should remain
         expect(Project.exists?(other_school_project.id)).to be true
       end
+
+      it 'deletes school project transitions when deleting projects' do
+        project = create(:project, user_id: student.id, school: school)
+        school_project = project.school_project
+
+        # Transition the project to create SchoolProjectTransition records
+        school_project.transition_status_to!(:submitted, student.id)
+        school_project.transition_status_to!(:returned, teacher.id)
+
+        results = service.remove_students
+
+        expect(results.first[:error]).to be_nil
+        expect(Project.exists?(project.id)).to be false
+        expect(SchoolProject.exists?(school_project.id)).to be false
+        expect(SchoolProjectTransition.where(school_project_id: school_project.id).count).to eq(0)
+      end
     end
 
     context 'when student does not have a role in the school' do

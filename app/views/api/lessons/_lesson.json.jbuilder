@@ -11,7 +11,6 @@ json.call(
   :description,
   :visibility,
   :due_date,
-  :archived_at,
   :created_at,
   :updated_at
 )
