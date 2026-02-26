@@ -1,76 +1,47 @@
 # Project Overview
-- Rails 7.1 monolith for the Raspberry Pi Code Editor API (REST + GraphQL), served at
-  `editor-api.raspberrypi.org`. Provides auth, project storage, and education features.
-- Primary runtime via Docker; API listens on port 3009 in containers.
+- Rails 7.1 monolith for the Raspberry Pi Code Editor API (REST + GraphQL), served at `editor-api.raspberrypi.org`.
+- Primary runtime via Docker; API listens on port 3009.
 
-## Repository Structure
-- `app/` Rails application code (REST, GraphQL, jobs, views, admin).
-- `config/` environment, initializers, Puma, CORS, credentials.
-- `db/` migrations, seeds, schema helpers; `bin/db-sync/` for pulling Heroku data locally.
-- `spec/` RSpec tests (Rails, GraphQL, feature/system).
-- `bin/` developer scripts (`with-builder.sh`, `db-sync/*`, Rails binstubs).
-- `lib/` supporting libraries, tasks, assets; `public/` static assets; `docker-compose.yml`
-  for local stack; `.circleci/` for CI; `.rubocop.yml` for style config.
+## Architecture
+- **REST** under `app/controllers/api/**` with Jbuilder views in `app/views/api/**`; **GraphQL** at `/graphql` (schema in `app/graphql/**`).
+- **Auth**: Browser/session via OmniAuth (OIDC to Hydra); API token via `Authorization: Bearer` with `Identifiable#identify_user` → `User.from_token` → `HydraPublicApiClient`.
+- **Authorization**: cancancan in `app/models/ability.rb`. Use `load_and_authorize_resource` in controllers; GraphQL uses `Types::ProjectType.authorized?` and `current_ability` in context.
+- **Domain**: `Project` (+ `Component`) with Active Storage attachments. Domain operations in `lib/concepts/**` (e.g. `Project::Create`, `Project::CreateRemix`). Prefer calling these from controllers/mutations.
+- **Jobs**: GoodJob (`bundle exec good_job start --max-threads=8`). Admin UI at `/admin/good_job`.
+- **Integrations**: Profile API (`lib/profile_api_client.rb`), UserInfo API, GitHub GraphQL (`lib/github_api.rb`), GitHub webhooks via `GithubWebhooksController`.
+- **Storage/CORS**: Active Storage uses S3 in non-dev. CORS via `config/initializers/cors.rb` and `lib/origin_parser.rb`. `CorpMiddleware` sets CORP for Active Storage routes.
 
-## Quickstart Commands
+## Key Conventions
+- GraphQL context: `current_user`, `current_ability`, `remix_origin`. Object IDs use GlobalID. Locale fallback via `ProjectLoader`: `[requested, 'en', nil]`.
+- REST pagination returns HTTP `Link` header (see `Api::ProjectsController#pagination_link_header`).
+- Project rules: identifiers unique per locale; default component name/extension immutable on update; students cannot update `instructions` on school projects; creating a project in a school auto-builds `SchoolProject`.
+- Remix: `Project::CreateRemix` clones media/components, sets `remix_origin`, clears `lesson_id`.
+- Errors: domain ops return `OperationResponse` with `:error`; controllers return 4xx heads; GraphQL raises `GraphQL::ExecutionError`. Exceptions reported to Sentry.
+- snake_case for variable numbers (exceptions: `sha256`, `X-Hub-Signature-256`).
+
+## Quickstart
 ```bash
 cp .env.example .env
-docker-compose build
+docker compose build
 docker compose run --rm api rails db:setup
-docker-compose up
-# API available on http://localhost:3009
+docker compose up
 ```
 
-## Development Workflow
-- Prefer Docker compose; mounts project into `editor-api:builder` image with tmpfs for `tmp/`.
-- Use `./bin/with-builder.sh <cmd>` for operations that modify Gemfile.lock (e.g. `bundle update`).
-- Seeds (dev): `docker compose run --rm api rails projects:create_all` and
-  `docker compose run --rm api rails for_education:seed_a_school_with_lessons_and_students`
-  (others in README).
-- DB sync (needs Heroku access): `./bin/db-sync/production-to-local.sh` or `staging-to-local.sh`.
-- Background jobs use GoodJob; Procfile defines `worker: bundle exec good_job start --max-threads=8`.
+## Development
+- Use `docker compose` for all commands; project mounts into `editor-api:builder` with tmpfs for `tmp/`.
+- Seeds: `docker compose run --rm api rails projects:create_all` (see README for others).
+- DB sync (needs Heroku CLI): `./bin/db-sync/production-to-local.sh` or `staging-to-local.sh`.
 
-## Testing & CI
-- Full suite: `docker-compose run api rspec`
-- Single spec: `docker-compose run api rspec spec/path/to/spec.rb`
-- CI (CircleCI): Ruby 3.2 images with Postgres 12 + Redis; steps include `bin/rails db:setup --trace`,
-  `ruby/rspec-test`, RuboCop via `ruby/rubocop-check`, coverage artifacts uploaded and posted via
-  `.circleci/record_coverage`.
+## Testing
+- Full suite: `docker compose run --rm api rspec`
+- Single spec: `docker compose run --rm api rspec spec/path/to/spec.rb`
+- Lint: `docker compose run --rm api bundle exec rubocop`
+- CI: CircleCI with Ruby 3.2, Postgres 12, Redis.
 
-## Code Style & Conventions
-- Ruby 3.2.3 (specified as `~> 3.2.0` in Gemfile).
-- RuboCop uses Raspberry Pi Foundation shared configs plus Rails/RSpec/GraphQL cops; many metrics and
-  line-length checks are relaxed.
-- Variable numbers must be snake_case (allowed: `sha256`, `X-Hub-Signature-256`).
-- Tests in RSpec (`spec/`), Jbuilder for JSON views, GraphQL types under `app/graphql/`.
-- GoodJob for background processing; Puma configured via `config/puma.rb`; release hook runs migrations
-  then `rake projects:create_experience_cs_examples` (see Procfile).
+## Where to Look First
+- Routes: `config/routes.rb`. Auth: `config/initializers/omniauth.rb`, `app/helpers/authentication_helper.rb`, `app/controllers/concerns/identifiable.rb`.
+- Permissions: `app/models/ability.rb`. Domain ops: `lib/concepts/**`. Models: `app/models/**`. GraphQL: `app/graphql/**`.
 
-## Security & Safety Guardrails
-- Never commit secrets: `.env`, `config/master.key`, AWS/Postmark tokens, Hydra/Profile secrets,
-  webhook secrets. Keep `.env.example` values as references only.
-- DB sync scripts fetch production/staging data; run only if authorized and handle dumps securely.
-- Generated/ignored paths: `log/`, `tmp/`, `storage/`, `coverage/`, `public/assets/`, `.bundle/`,
-  `docker-compose.override.yml` (gitignored); do not add noise from these.
-- Webhooks and smee tunnel secrets live in env vars; avoid logging or sharing real values.
-
-## Common Tasks (add feature, add test, refactor, release/deploy if applicable)
-- Run app locally: ensure `.env`, then `docker-compose up` (build + `rails db:setup` first).
-- Lint: `docker-compose run --rm api bundle exec rubocop` (mirrors CI RuboCop check).
-- Migrate: `docker compose run --rm api rails db:migrate` (release hook also migrates).
-- Update gems: `./bin/with-builder.sh bundle update` (keeps builder image and lockfiles in sync).
-- Seed dev data: commands in README (e.g. `rails projects:create_all`,
-  `rails for_education:seed_a_school_with_lessons_and_students`).
-- Sync DB from Heroku: `./bin/db-sync/production-to-local.sh` or `staging-to-local.sh` (requires Heroku
-  CLI + app access).
-- Release/deploy: Procfile release runs migrations then `rake projects:create_experience_cs_examples`;
-  confirm platform/trigger before running manually. > TODO: document official deploy pipeline and branch
-  triggers.
-
-## Further Reading (relative links)
-- `README.md`
-- `.circleci/config.yml`
-- `.rubocop.yml`
-- `.env.example`
-- `Procfile`
-- `bin/db-sync/load-local-db.sh`
+## Security
+- Never commit secrets (`.env`, `config/master.key`, API tokens, webhook secrets).
+- `.env.example` contains placeholder values only.
