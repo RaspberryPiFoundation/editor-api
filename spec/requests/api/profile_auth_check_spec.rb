@@ -6,15 +6,21 @@ RSpec.describe 'Profile auth check API' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:student) { create(:student, school:) }
+  let(:api_url) { 'http://example.com' }
+  let(:api_key) { 'api-key' }
 
-  identity_url = "#{ENV.fetch('IDENTITY_URL')}/api/v1/access"
+  before do
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with('IDENTITY_URL').and_return(api_url)
+    allow(ENV).to receive(:fetch).with('PROFILE_API_KEY').and_return(api_key)
+  end
 
   describe 'GET /api/profile_auth_check' do
     context 'when the profile API authorises the current user' do
       it 'returns can_use_profile_api: true' do
         # Arrange
         authenticated_in_hydra_as(student)
-        stub_request(:get, identity_url).to_return(status: 200, headers:)
+        stub_request(:get, "#{ENV.fetch('IDENTITY_URL')}/api/v1/access").to_return(status: 200, headers:)
 
         # Act
         get '/api/profile_auth_check', headers: headers
@@ -29,7 +35,7 @@ RSpec.describe 'Profile auth check API' do
       it 'returns can_use_profile_api: false' do
         # Arrange
         authenticated_in_hydra_as(student)
-        stub_request(:get, identity_url).to_return(status: 401, headers:)
+        stub_request(:get, "#{ENV.fetch('IDENTITY_URL')}/api/v1/access").to_return(status: 401, headers:)
 
         # Act
         get '/api/profile_auth_check', headers: headers
@@ -43,7 +49,7 @@ RSpec.describe 'Profile auth check API' do
     context 'when there is no current user' do
       it 'returns can_use_profile_api: false' do
         # Arrange
-        stub_request(:get, identity_url).to_return(status: 400, headers:)
+        stub_request(:get, "#{ENV.fetch('IDENTITY_URL')}/api/v1/access").to_return(status: 400, headers:)
 
         # Act
         get '/api/profile_auth_check'
