@@ -4,6 +4,7 @@ module Api
   class SchoolsController < ApiController
     before_action :authorize_user
     load_and_authorize_resource
+    skip_load_and_authorize_resource only: :import
 
     def index
       @schools = School.accessible_by(current_ability)
@@ -15,13 +16,16 @@ module Api
     end
 
     def create
-      result = School::Create.call(school_params:, creator_id: current_user.id)
+      result = School::Create.call(school_params:, creator_id: current_user.id, token: current_user.token)
 
       if result.success?
         @school = result[:school]
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: {
+          error: result[:error],
+          error_types: result[:error_types]
+        }, status: :unprocessable_entity
       end
     end
 
@@ -47,6 +51,29 @@ module Api
       end
     end
 
+    def import
+      authorize! :import, School
+
+      if params[:csv_file].blank?
+        render json: { error: SchoolImportError.format_error(:csv_file_required, 'CSV file is required') },
+               status: :unprocessable_entity
+        return
+      end
+
+      result = School::ImportBatch.call(
+        csv_file: params[:csv_file],
+        current_user: current_user
+      )
+
+      if result.success?
+        @job_id = result[:job_id]
+        @total_schools = result[:total_schools]
+        render :import, formats: [:json], status: :accepted
+      else
+        render json: { error: result[:error] }, status: :unprocessable_entity
+      end
+    end
+
     private
 
     def school_params
@@ -54,6 +81,9 @@ module Api
         :name,
         :website,
         :reference,
+        :district_name,
+        :district_nces_id,
+        :school_roll_number,
         :address_line_1,
         :address_line_2,
         :municipality,
@@ -63,7 +93,10 @@ module Api
         :creator_role,
         :creator_department,
         :creator_agree_authority,
-        :creator_agree_terms_and_conditions
+        :creator_agree_terms_and_conditions,
+        :creator_agree_to_ux_contact,
+        :creator_agree_responsible_safeguarding,
+        :user_origin
       )
     end
   end

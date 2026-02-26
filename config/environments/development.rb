@@ -37,7 +37,7 @@ Rails.application.configure do
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
   config.active_storage.service = :local
-  Rails.application.routes.default_url_options = { host: ENV.fetch('HOST_URL', 'http://localhost:3000') }
+  Rails.application.routes.default_url_options = { host: ENV.fetch('HOST_URL', 'http://localhost:3009') }
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
@@ -69,6 +69,9 @@ Rails.application.configure do
 
   # Highlight code that enqueued background job in logs.
   config.active_job.verbose_enqueue_logs = true
+
+  # Use the async adapter for Active Job in development
+  config.active_job.queue_adapter = :good_job
 
   # Suppress logger output for asset requests.
   config.assets.quiet = true

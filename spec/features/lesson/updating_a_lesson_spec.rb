@@ -3,23 +3,22 @@
 require 'rails_helper'
 
 RSpec.describe 'Updating a lesson', type: :request do
-  before do
-    authenticated_in_hydra_as(owner)
-    stub_user_info_api_for(teacher)
-  end
-
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
-  let(:owner) { create(:owner, school:, name: 'School Owner') }
-  let(:teacher) { create(:teacher, school:) }
-  let(:school) { create(:school) }
-
   let(:params) do
     {
       lesson: {
         name: 'New Name'
       }
     }
+  end
+  let!(:lesson) { create(:lesson, name: 'Test Lesson', user_id: owner.id) }
+  let(:teacher) { create(:teacher, school:) }
+  let(:school) { create(:verified_school) }
+  let(:owner) { create(:owner, school:, name: 'School Owner') }
+
+  before do
+    authenticated_in_hydra_as(owner)
+    stub_user_info_api_for(teacher)
   end
 
   it 'responds 200 OK' do
@@ -59,8 +58,11 @@ RSpec.describe 'Updating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school (library)' do
-    let(:school) { create(:school) }
     let!(:lesson) { create(:lesson, school:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
+
+    before do
+      lesson
+    end
 
     it 'responds 200 OK when the user is a school-owner' do
       put("/api/lessons/#{lesson.id}", headers:, params:)
@@ -69,7 +71,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
     it 'responds 200 OK when assigning the lesson to a school class' do
       authenticated_in_hydra_as(teacher)
-      school_class = create(:school_class, school:, teacher_id: teacher.id)
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
@@ -103,7 +105,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   context 'when the lesson is associated with a school class' do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
 
     before do
@@ -115,17 +117,15 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    # rubocop:disable RSpec/ExampleLength
     it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
       school = create(:school, id: SecureRandom.uuid)
       teacher = create(:teacher, school:)
-      school_class = create(:school_class, school:, teacher_id: teacher.id)
+      school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 
       expect(response).to have_http_status(:unprocessable_entity)
     end
-    # rubocop:enable RSpec/ExampleLength
   end
 end

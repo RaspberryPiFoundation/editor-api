@@ -5,12 +5,28 @@ FactoryBot.define do
     id { SecureRandom.uuid }
     name { Faker::Name.name }
     email { Faker::Internet.email }
+    username { nil }
+    sso_providers { [] }
 
     factory :admin_user do
       roles { 'editor-admin' }
     end
 
+    factory :experience_cs_admin_user do
+      roles { 'experience-cs-admin' }
+    end
+
     factory :student do
+      email { nil }
+      username { Faker::Internet.username }
+      sso_providers { [] } # standard students have no SSO providers
+
+      trait :sso do
+        email { Faker::Internet.email }
+        username { nil }
+        sso_providers { ['google'] } # SSO students have SSO providers
+      end
+
       transient do
         school { nil }
       end

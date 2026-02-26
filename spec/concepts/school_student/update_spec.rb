@@ -10,12 +10,13 @@ RSpec.describe SchoolStudent::Update, type: :unit do
   let(:school_student_params) do
     {
       username: 'new-username',
-      password: 'new-password',
+      password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
       name: 'New Name'
     }
   end
 
   before do
+    stub_profile_api_school_student # This is the call made to determine if it's an SSO student
     stub_profile_api_update_school_student
   end
 
@@ -29,14 +30,14 @@ RSpec.describe SchoolStudent::Update, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:update_school_student)
-      .with(token:, username: 'new-username', password: 'new-password', name: 'New Name', school_id: school.id, student_id:)
+      .with(token:, username: 'new-username', password: 'Student2024', name: 'New Name', school_id: school.id, student_id:)
   end
 
   context 'when updating fails' do
     let(:school_student_params) do
       {
         username: ' ',
-        password: 'new-password',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'New Name'
       }
     end
@@ -63,6 +64,33 @@ RSpec.describe SchoolStudent::Update, type: :unit do
     it 'sent the exception to Sentry' do
       described_class.call(school:, student_id:, school_student_params:, token:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+    end
+  end
+
+  context 'when updating an SSO student' do
+    before do
+      allow(Sentry).to receive(:capture_exception)
+      stub_profile_api_school_student(sso: true)
+    end
+
+    it 'does not make a profile API request' do
+      described_class.call(school:, student_id:, school_student_params:, token:)
+      expect(ProfileApiClient).not_to have_received(:update_school_student)
+    end
+
+    it 'returns a failed operation response' do
+      response = described_class.call(school:, student_id:, school_student_params:, token:)
+      expect(response.failure?).to be(true)
+    end
+
+    it 'returns an SSO update error message' do
+      response = described_class.call(school:, student_id:, school_student_params:, token:)
+      expect(response[:error]).to eq('Updating SSO students is not allowed')
+    end
+
+    it 'sent the exception to Sentry' do
+      described_class.call(school:, student_id:, school_student_params:, token:)
+      expect(Sentry).to have_received(:capture_exception).with(kind_of(SchoolStudent::SSOStudentUpdateError))
     end
   end
 end

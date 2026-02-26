@@ -8,9 +8,10 @@ RSpec.describe Project::Update, type: :unit do
       name: 'updated project name',
       components: [default_component_hash, edited_component_hash, new_component_hash]
     }
-    described_class.call(project:, update_hash:)
+    described_class.call(project:, update_hash:, current_user:)
   end
 
+  let(:current_user) { create(:user) }
   let!(:project) { create(:project, :with_default_component, :with_components, component_count: 2) }
   let(:editable_component) { project.components.last }
   let(:default_component) { project.components.first }

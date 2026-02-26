@@ -5,100 +5,51 @@ require 'rails_helper'
 RSpec.describe SchoolStudent::CreateBatch, type: :unit do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:verified_school) }
-  let(:file) { fixture_file_upload('students.csv') }
+  let(:user_id) { create(:teacher, school:).id }
 
-  before do
-    stub_profile_api_create_school_student
+  let(:school_students_params) do
+    [
+      {
+        username: 'student-to-create',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
+        name: 'School Student'
+      },
+      {
+        username: 'second-student-to-create',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
+        name: 'School Student 2'
+      }
+    ]
   end
 
-  it 'returns a successful operation response' do
-    response = described_class.call(school:, uploaded_file: file, token:)
-    expect(response.success?).to be(true)
+  context 'when queuing a job' do
+    before do
+      stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
+    end
+
+    it 'queues CreateStudentsJob' do
+      expect do
+        described_class.call(school:, school_students_params:, token:)
+      end.to have_enqueued_job(CreateStudentsJob).with(school_id: school.id, students: school_students_params, token:)
+    end
   end
 
-  it "makes a profile API call to create Jane Doe's account" do
-    described_class.call(school:, uploaded_file: file, token:)
-
-    # TODO: Replace with WebMock assertion once the profile API has been built.
-    expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'jane123', password: 'secret123', name: 'Jane Doe', school_id: school.id)
-  end
-
-  it "makes a profile API call to create John Doe's account" do
-    described_class.call(school:, uploaded_file: file, token:)
-
-    # TODO: Replace with WebMock assertion once the profile API has been built.
-    expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'john123', password: 'secret456', name: 'John Doe', school_id: school.id)
-  end
-
-  context 'when an .xlsx file is provided' do
-    let(:file) { fixture_file_upload('students.xlsx') }
+  context 'when a job has been queued' do
+    before do
+      stub_profile_api_create_school_students(user_ids: [SecureRandom.uuid, SecureRandom.uuid])
+      allow(CreateStudentsJob).to receive(:attempt_perform_later).and_return(
+        instance_double(CreateStudentsJob, job_id: SecureRandom.uuid)
+      )
+    end
 
     it 'returns a successful operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
+      response = described_class.call(school:, school_students_params:, token:)
       expect(response.success?).to be(true)
     end
-  end
 
-  context 'when creation fails' do
-    let(:file) { fixture_file_upload('test_image_1.png') }
-
-    before do
-      allow(Sentry).to receive(:capture_exception)
-    end
-
-    it 'does not make a profile API request' do
-      described_class.call(school:, uploaded_file: file, token:)
-      expect(ProfileApiClient).not_to have_received(:create_school_student)
-    end
-
-    it 'returns a failed operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
-      expect(response.failure?).to be(true)
-    end
-
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
-      expect(response[:error]).to match(/can't detect the type/i)
-    end
-
-    it 'sent the exception to Sentry' do
-      described_class.call(school:, uploaded_file: file, token:)
-      expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
-    end
-  end
-
-  context 'when the school is not verified' do
-    let(:school) { create(:school) }
-
-    it 'returns a failed operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
-      expect(response.failure?).to be(true)
-    end
-
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
-      expect(response[:error]).to match(/school is not verified/)
-    end
-  end
-
-  context 'when the file contains invalid data' do
-    let(:file) { fixture_file_upload('students-invalid.csv') }
-
-    it 'returns a failed operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
-      expect(response.failure?).to be(true)
-    end
-
-    it 'returns all of the validation errors in the operation response' do
-      response = described_class.call(school:, uploaded_file: file, token:)
-      expect(response[:error]).to match(/password 'invalid' is invalid, name ' ' is invalid, username '  '/)
-    end
-
-    it 'does not make a profile API request' do
-      described_class.call(school:, uploaded_file: file, token:)
-      expect(ProfileApiClient).not_to have_received(:create_school_student)
+    it 'returns the job id' do
+      response = described_class.call(school:, school_students_params:, token:)
+      expect(response[:job_id]).to be_truthy
     end
   end
 end

@@ -17,7 +17,7 @@ RSpec.describe 'Creating a school student', type: :request do
     {
       school_student: {
         username: 'student123',
-        password: 'at-least-8-characters',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'School Student'
       }
     }
@@ -25,12 +25,12 @@ RSpec.describe 'Creating a school student', type: :request do
 
   it 'creates the school owner safeguarding flag' do
     post("/api/schools/#{school.id}/students", headers:, params:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'does not create the school teacher safeguarding flag' do
     post("/api/schools/#{school.id}/students", headers:, params:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email, school_id: school.id)
   end
 
   it 'responds 204 No Content' do
@@ -51,7 +51,7 @@ RSpec.describe 'Creating a school student', type: :request do
     authenticated_in_hydra_as(teacher)
 
     post("/api/schools/#{school.id}/students", headers:, params:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'creates the school teacher safeguarding flag when the user is a school teacher' do
@@ -59,7 +59,7 @@ RSpec.describe 'Creating a school student', type: :request do
     authenticated_in_hydra_as(teacher)
 
     post("/api/schools/#{school.id}/students", headers:, params:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email, school_id: school.id)
   end
 
   it 'responds 400 Bad Request when params are missing' do

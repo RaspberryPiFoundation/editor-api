@@ -17,12 +17,10 @@ as well as a link to its edit page.
 %>
 
 <% content_for(:title) { t("administrate.actions.show_resource", name: page.page_title) } %>
-
 <header class="main-content__header">
   <h1 class="main-content__page-title">
     <%= content_for(:title) %>
   </h1>
-
   <div>
     <%= link_to(
       t("administrate.actions.edit_resource", name: page.page_title),
@@ -38,6 +36,15 @@ as well as a link to its edit page.
       style: "background-color: green; margin: 5px;",
       data: { confirm: t("administrate.actions.confirm_verify_school") }
     ) unless page.resource.verified? || page.resource.rejected? %>
+
+    <%= link_to(
+      t("administrate.actions.reopen_school"),
+      reopen_admin_school_path(page.resource),
+      class: "button button--verify",
+      method: :patch,
+      style: "background-color: darkorange; margin: 5px;",
+      data: { confirm: t("administrate.actions.confirm_reopen_school") }
+    ) unless page.resource.verified? || !page.resource.rejected? %>
 
     <%= link_to(
       t("administrate.actions.reject_school"),
@@ -73,3 +80,9 @@ as well as a link to its edit page.
     <% end %>
   </dl>
 </section>
+
+<% if page.resource.country_code == "US" && page.resource.postal_code.present? %>
+<section class="main-content__body">
+  <%= link_to "Search for this school in the NCES database", "https://nces.ed.gov/ccd/schoolsearch/school_list.asp?Search=1&Zip=#{url_encode(page.resource.postal_code)}" %>
+</section>
+<% end %>

@@ -1,15 +1,15 @@
 # frozen_string_literal: true
 
-json.array!(@class_members_with_students) do |class_member, student|
-  json.call(
-    class_member,
-    :id,
-    :school_class_id,
-    :student_id,
-    :created_at,
-    :updated_at
-  )
-
-  json.student_username(student&.username)
-  json.student_name(student&.name)
+json.array!(@class_members) do |class_member|
+  if class_member.respond_to?(:student_id)
+    json.partial! 'class_member', class_member:
+  elsif @school_owner_ids.include?(class_member.id)
+    json.set! :owner do
+      json.partial! '/api/school_owners/school_owner', owner: class_member
+    end
+  else
+    json.set! :teacher do
+      json.partial! '/api/school_teachers/school_teacher', teacher: class_member
+    end
+  end
 end

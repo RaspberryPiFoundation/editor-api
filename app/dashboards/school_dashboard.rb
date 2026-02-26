@@ -12,6 +12,9 @@ class SchoolDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::String,
     creator: Field::BelongsTo.with_options(class_name: 'User'),
+    postal_code: Field::String,
+    creator_role: Field::String,
+    creator_department: Field::String,
     name: Field::String,
     website: Field::String,
     address_line_1: Field::String,
@@ -23,10 +26,14 @@ class SchoolDashboard < Administrate::BaseDashboard
     lessons: Field::HasMany,
     projects: Field::HasMany,
     reference: Field::String,
+    district_name: Field::String,
+    district_nces_id: Field::String,
+    school_roll_number: Field::String,
     verified_at: Field::DateTime,
     rejected_at: Field::DateTime,
     created_at: Field::DateTime,
-    updated_at: Field::DateTime
+    updated_at: Field::DateTime,
+    user_origin: EnumField
   }.freeze
 
   # COLLECTION_ATTRIBUTES
@@ -36,8 +43,11 @@ class SchoolDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
     name
+    user_origin
     reference
     country_code
+    administrative_area
+    district_name
     created_at
     verified_at
     rejected_at
@@ -47,21 +57,28 @@ class SchoolDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     name
-    verified_at
-    rejected_at
+    user_origin
     creator
+    creator_role
+    creator_department
     reference
+    district_name
+    district_nces_id
+    school_roll_number
     website
     address_line_1
     address_line_2
     municipality
     administrative_area
+    postal_code
     country_code
     classes
     lessons
     projects
     created_at
     updated_at
+    verified_at
+    rejected_at
   ].freeze
 
   # FORM_ATTRIBUTES
@@ -70,10 +87,14 @@ class SchoolDashboard < Administrate::BaseDashboard
   FORM_ATTRIBUTES = %i[
     name
     reference
+    district_name
+    district_nces_id
+    school_roll_number
     website
     address_line_1
     address_line_2
     municipality
+    postal_code
     administrative_area
     country_code
   ].freeze

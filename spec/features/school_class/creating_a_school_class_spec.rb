@@ -50,14 +50,14 @@ RSpec.describe 'Creating a school class', type: :request do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_name]).to eq('School Teacher')
+    expect(data[:teachers].first[:name]).to eq('School Teacher')
   end
 
   it 'sets the class teacher to the specified user for school-owner users' do
     post("/api/schools/#{school.id}/classes", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_id]).to eq(teacher.id)
+    expect(data[:teachers].first[:id]).to eq(teacher.id)
   end
 
   it 'sets the class teacher to the current user for school-teacher users' do
@@ -68,7 +68,7 @@ RSpec.describe 'Creating a school class', type: :request do
     post("/api/schools/#{school.id}/classes", headers:, params: new_params)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_id]).to eq(teacher.id)
+    expect(data[:teachers].first[:id]).to eq(teacher.id)
   end
 
   it 'responds 400 Bad Request when params are missing' do
@@ -100,5 +100,28 @@ RSpec.describe 'Creating a school class', type: :request do
 
     post("/api/schools/#{school.id}/classes", headers:, params:)
     expect(response).to have_http_status(:forbidden)
+  end
+
+  it 'ignores import_origin and import_id parameters and sets them to nil' do
+    params_with_import = {
+      school_class: {
+        name: 'Test School Class',
+        description: 'Test School Class Description',
+        import_origin: 'google_classroom',
+        import_id: 'classroom_123'
+      }
+    }
+
+    post("/api/schools/#{school.id}/classes", headers:, params: params_with_import)
+    expect(response).to have_http_status(:created)
+
+    data = JSON.parse(response.body, symbolize_names: true)
+    expect(data[:name]).to eq('Test School Class')
+    expect(data[:description]).to eq('Test School Class Description')
+
+    # Verify that the created school class has nil values for import fields
+    created_school_class = SchoolClass.find_by(name: 'Test School Class')
+    expect(created_school_class.import_origin).to be_nil
+    expect(created_school_class.import_id).to be_nil
   end
 end

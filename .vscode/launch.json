@@ -1,27 +1,28 @@
 {
-  // Use IntelliSense to learn about possible attributes.
-  // Hover to view descriptions of existing attributes.
-  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
     {
       "type": "ruby_lsp",
+      "name": "Debug Ruby file",
       "request": "launch",
-      "name": "Debug program",
-      "program": "ruby "
+      "program": "ruby ${file}",
     },
     {
-      "type": "rdbg",
-      "name": "Debug current file with rdbg",
+      "type": "ruby_lsp",
       "request": "launch",
-      "script": "${file}",
-      "args": [],
-      "askParameters": true
+      "name": "Debug RSpec file",
+      "program": "bundle exec rspec ${relativeFile}"
     },
     {
-      "type": "rdbg",
-      "name": "Attach with rdbg",
-      "request": "attach"
-    }
-  ]
+      "type": "ruby_lsp",
+      "request": "launch",
+      "name": "Debug current RSpec test",
+      "program": "bundle exec rspec ${relativeFile}:${lineNumber}"
+    },
+    {
+      "type": "ruby_lsp",
+      "request": "attach",
+      "name": "Attach to existing server",
+    },
+  ],
 }

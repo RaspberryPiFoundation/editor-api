@@ -3,7 +3,9 @@
 require 'faraday'
 
 class HydraPublicApiClient
-  API_URL = ENV.fetch('HYDRA_PUBLIC_URL', 'http://localhost:9001')
+  # Allows us to use a different URL for API calls to auth locally
+  HYDRA_PUBLIC_API_URL = ENV.fetch('HYDRA_PUBLIC_API_URL', nil)
+  API_URL = HYDRA_PUBLIC_API_URL || ENV.fetch('HYDRA_PUBLIC_URL', 'http://localhost:9001')
 
   class << self
     def fetch_oauth_user(...)

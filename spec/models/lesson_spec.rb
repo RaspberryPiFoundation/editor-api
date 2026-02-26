@@ -17,7 +17,7 @@ RSpec.describe Lesson do
     end
 
     it 'optionally belongs to a school class' do
-      school_class = create(:school_class, teacher_id: teacher.id, school:)
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
 
       lesson = create(:lesson, school_class:, school: school_class.school, user_id: teacher.id)
       expect(lesson.school_class).to be_a(SchoolClass)
@@ -41,9 +41,16 @@ RSpec.describe Lesson do
   end
 
   describe 'callbacks' do
-    it 'cannot be destroyed and should be archived instead' do
+    it 'can be destroyed' do
       lesson = create(:lesson)
-      expect { lesson.destroy! }.to raise_error(ActiveRecord::RecordNotDestroyed)
+      expect { lesson.destroy! }.not_to raise_error
+    end
+
+    it 'destroys associated project' do
+      lesson = create(:lesson)
+      project_id = lesson.project.id
+      lesson.destroy!
+      expect(Project.exists?(project_id)).to be(false)
     end
   end
 
@@ -60,12 +67,12 @@ RSpec.describe Lesson do
 
     it 'requires a user_id' do
       lesson.user_id = ' '
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     it 'requires a UUID user_id' do
       lesson.user_id = 'invalid'
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     context 'when the lesson has a school' do
@@ -78,63 +85,37 @@ RSpec.describe Lesson do
       it 'requires that the user that has the school-owner or school-teacher role for the school' do
         student = create(:student, school:)
         lesson.user_id = student.id
-        expect(lesson).to be_invalid
+        expect(lesson).not_to be_valid
       end
     end
 
     context 'when the lesson has a school_class' do
       before do
-        lesson.update!(school_class: create(:school_class, teacher_id: teacher.id, school:))
+        lesson.update!(school_class: create(:school_class, teacher_ids: [teacher.id], school:))
       end
 
       let(:school) { create(:school) }
 
-      it 'requires that the user that is the school-teacher for the school_class' do
+      it 'requires that the user that is a school-teacher for the school_class' do
         owner = create(:owner, school:)
         lesson.user_id = owner.id
-        expect(lesson).to be_invalid
+        expect(lesson).not_to be_valid
       end
     end
 
     it 'requires a name' do
       lesson.name = ' '
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     it 'requires a visibility' do
       lesson.visibility = ' '
-      expect(lesson).to be_invalid
+      expect(lesson).not_to be_valid
     end
 
     it "requires a visibility that is either 'private', 'teachers', 'students' or 'public'" do
       lesson.visibility = 'invalid'
-      expect(lesson).to be_invalid
-    end
-  end
-
-  describe '.archived' do
-    let!(:archived_lesson) { create(:lesson, archived_at: Time.now.utc) }
-    let!(:unarchived_lesson) { create(:lesson) }
-
-    it 'includes archived lessons' do
-      expect(described_class.archived).to include(archived_lesson)
-    end
-
-    it 'excludes unarchived lessons' do
-      expect(described_class.archived).not_to include(unarchived_lesson)
-    end
-  end
-
-  describe '.unarchived' do
-    let!(:archived_lesson) { create(:lesson, archived_at: Time.now.utc) }
-    let!(:unarchived_lesson) { create(:lesson) }
-
-    it 'includes unarchived lessons' do
-      expect(described_class.unarchived).to include(unarchived_lesson)
-    end
-
-    it 'excludes archived lessons' do
-      expect(described_class.unarchived).not_to include(archived_lesson)
+      expect(lesson).not_to be_valid
     end
   end
 
@@ -142,7 +123,8 @@ RSpec.describe Lesson do
     let(:school) { create(:school) }
 
     it 'is set from the school_class' do
-      lesson = create(:lesson, school_class: build(:school_class, teacher_id: teacher.id, school:), user_id: teacher.id)
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      lesson = create(:lesson, school_class:, user_id: teacher.id)
       expect(lesson.school).to eq(lesson.school_class.school)
     end
 
@@ -224,66 +206,25 @@ RSpec.describe Lesson do
     end
   end
 
-  describe '#archive!' do
-    let(:lesson) { build(:lesson) }
-
-    it 'archives the lesson' do
-      lesson.archive!
-      expect(lesson.archived?).to be(true)
+  describe '#submitted_count' do
+    it 'returns 0 if there is no project' do
+      lesson = create(:lesson, project: nil)
+      expect(lesson.submitted_count).to eq(0)
     end
 
-    it 'sets archived_at' do
-      lesson.archive!
-      expect(lesson.archived_at).to be_present
-    end
+    it 'returns the count of submitted remixes of the lesson project' do
+      student = create(:student, school:)
+      lesson = create(:lesson, school:, user_id: teacher.id)
 
-    it 'does not set archived_at if it was already set' do
-      lesson.update!(archived_at: 1.day.ago)
+      remix_1 = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      remix_1.school_project.transition_status_to!(:submitted, remix_1.user_id)
 
-      lesson.archive!
-      expect(lesson.archived_at).to be < 23.hours.ago
-    end
+      remix_2 = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      remix_2.school_project.transition_status_to!(:submitted, remix_2.user_id)
 
-    it 'saves the record' do
-      lesson.archive!
-      expect(lesson).to be_persisted
-    end
+      create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id) # Not submitted
 
-    it 'is infallible to other validation errors' do
-      lesson.save!
-      lesson.name = ' '
-      lesson.save!(validate: false)
-
-      lesson.archive!
-      expect(lesson.archived?).to be(true)
-    end
-  end
-
-  describe '#unarchive!' do
-    let(:lesson) { build(:lesson, archived_at: Time.now.utc) }
-
-    it 'unarchives the lesson' do
-      lesson.unarchive!
-      expect(lesson.archived?).to be(false)
-    end
-
-    it 'clears archived_at' do
-      lesson.unarchive!
-      expect(lesson.archived_at).to be_nil
-    end
-
-    it 'saves the record' do
-      lesson.unarchive!
-      expect(lesson).to be_persisted
-    end
-
-    it 'is infallible to other validation errors' do
-      lesson.archive!
-      lesson.name = ' '
-      lesson.save!(validate: false)
-
-      lesson.unarchive!
-      expect(lesson.archived?).to be(false)
+      expect(lesson.submitted_count).to eq(2)
     end
   end
 end

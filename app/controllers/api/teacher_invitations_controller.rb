@@ -2,7 +2,7 @@
 
 module Api
   class TeacherInvitationsController < ApiController
-    rescue_from ActiveSupport::MessageVerifier::InvalidSignature, with: -> { denied }
+    rescue_from ActiveSupport::MessageVerifier::InvalidSignature, with: :denied
 
     before_action :authorize_user
     before_action :load_invitation
@@ -29,7 +29,7 @@ module Api
     end
 
     def ensure_invitation_email_matches_user_email
-      return if @invitation.email_address == current_user.email
+      return if @invitation.email_address.casecmp?(current_user.email)
 
       render json: { error: 'Invitation email does not match user email' }, status: :forbidden
     end

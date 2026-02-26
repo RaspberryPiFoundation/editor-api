@@ -5,7 +5,7 @@ require 'project_loader'
 module Api
   class ProjectsController < ApiController
     before_action :authorize_user, only: %i[create update index destroy]
-    before_action :load_project, only: %i[show update destroy]
+    before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
     before_action :verify_lesson_belongs_to_school, only: :create
@@ -17,11 +17,17 @@ module Api
     end
 
     def show
+      if !@project.school_id.nil? && @project.lesson_id.nil?
+        project_with_user = @project.with_user(current_user)
+        @user = project_with_user[1]
+      end
+
+      @project.user_id = current_user.id if class_teacher?(@project)
       render :show, formats: [:json]
     end
 
     def create
-      result = Project::Create.call(project_hash: project_params)
+      result = Project::Create.call(project_hash: project_params, current_user:)
 
       if result.success?
         @project = result[:project]
@@ -32,7 +38,7 @@ module Api
     end
 
     def update
-      result = Project::Update.call(project: @project, update_hash: project_params)
+      result = Project::Update.call(project: @project, update_hash: project_params, current_user:)
 
       if result.success?
         render :show, formats: [:json]
@@ -46,6 +52,11 @@ module Api
       head :ok
     end
 
+    # Returns the identifier, school_id, lesson_id, and class_id of the project so the full context can be loaded
+    def show_context
+      render :context, formats: [:json]
+    end
+
     private
 
     def verify_lesson_belongs_to_school
@@ -57,7 +68,11 @@ module Api
 
     def load_project
       project_loader = ProjectLoader.new(params[:id], [params[:locale]])
-      @project = project_loader.load
+      @project = if action_name == 'show'
+                   project_loader.load(include_images: true)
+                 else
+                   project_loader.load
+                 end
     end
 
     def load_projects
@@ -65,8 +80,8 @@ module Api
     end
 
     def project_params
-      if school_owner?
-        # A school owner must specify who the project user is.
+      if school_owner? || current_user&.experience_cs_admin?
+        # A school owner or an Experience CS admin must specify who the project user is.
         base_params
       else
         # A school teacher may only create projects they own.
@@ -83,14 +98,21 @@ module Api
         :name,
         :project_type,
         :locale,
+        :instructions,
         {
           components: %i[id name extension content index default]
-        }
+        },
+        parent: {},
+        image_list: []
       )
     end
 
     def school_owner?
       school && current_user.school_owner?(school)
+    end
+
+    def class_teacher?(project)
+      project.lesson_id.present? && project.lesson.school_class.present? && project.lesson.school_class.teacher_ids.include?(current_user.id)
     end
 
     def school

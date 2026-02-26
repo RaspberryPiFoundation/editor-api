@@ -1,15 +1,11 @@
 # frozen_string_literal: true
 
-class_member, student = @class_member_with_student
-
-json.call(
-  class_member,
-  :id,
-  :school_class_id,
-  :student_id,
-  :created_at,
-  :updated_at
-)
-
-json.student_username(student&.username)
-json.student_name(student&.name)
+if defined?(@class_members)
+  json.array! @class_members do |class_member|
+    json.partial! 'class_member', class_member:
+  end
+elsif defined?(@class_member)
+  json.class_member do
+    json.partial! 'class_member', class_member: @class_member
+  end
+end

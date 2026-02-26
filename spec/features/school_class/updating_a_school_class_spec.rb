@@ -10,7 +10,7 @@ RSpec.describe 'Updating a school class', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
-  let!(:school_class) { create(:school_class, name: 'Test School Class', school:, teacher_id: teacher.id) }
+  let!(:school_class) { create(:school_class, name: 'Test School Class', school:, teacher_ids: [teacher.id]) }
 
   let(:params) do
     {
@@ -43,7 +43,7 @@ RSpec.describe 'Updating a school class', type: :request do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:teacher_name]).to eq('School Teacher')
+    expect(data[:teachers].first[:name]).to eq('School Teacher')
   end
 
   it 'responds 400 Bad Request when params are missing' do

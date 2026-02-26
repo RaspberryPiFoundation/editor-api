@@ -35,6 +35,14 @@ class Project
           remix.images.attach(image.blob)
         end
 
+        original_project.videos.each do |video|
+          remix.videos.attach(video.blob)
+        end
+
+        original_project.audio.each do |audio_file|
+          remix.audio.attach(audio_file.blob)
+        end
+
         params[:components].each do |x|
           remix.components.build(x.slice(:name, :extension, :content))
         end
@@ -50,6 +58,7 @@ class Project
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
           proj.remix_origin = remix_origin
+          proj.lesson_id = nil # Only the original can have a lesson id
         end
       end
     end

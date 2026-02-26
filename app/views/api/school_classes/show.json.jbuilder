@@ -1,16 +1,7 @@
 # frozen_string_literal: true
 
-school_class, teacher = @school_class_with_teacher
+school_class, teachers = @school_class_with_teachers
 
-json.call(
-  school_class,
-  :id,
-  :description,
-  :school_id,
-  :teacher_id,
-  :name,
-  :created_at,
-  :updated_at
-)
+json.partial! 'school_class', school_class: school_class, teachers: teachers
 
-json.teacher_name(teacher&.name)
+json.code school_class.code

@@ -7,7 +7,7 @@ RSpec.describe Project::CreateRemix, type: :unit do
 
   let(:remix_origin) { 'editor.com' }
   let(:user_id) { 'e0675b6c-dc48-4cd6-8c04-0f7ac05af51a' }
-  let!(:original_project) { create(:project, :with_components, :with_attached_image) }
+  let!(:original_project) { create(:project, :with_components, :with_attached_image, :with_attached_video, :with_attached_audio) }
   let(:remix_params) do
     component = original_project.components.first
     {
@@ -79,12 +79,27 @@ RSpec.describe Project::CreateRemix, type: :unit do
       expect(remixed_project.images.length).to eq(original_project.images.length)
     end
 
-    it 'creates a new attachment' do
-      expect { create_remix }.to change(ActiveStorage::Attachment, :count).by(1)
+    it 'links remix to attached videos' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.videos.length).to eq(original_project.videos.length)
     end
 
-    it 'does not create a new image' do
+    it 'links remix to attached audio' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.audio.length).to eq(original_project.audio.length)
+    end
+
+    it 'creates new attachments' do
+      expect { create_remix }.to change(ActiveStorage::Attachment, :count).by(3)
+    end
+
+    it 'does not create new media' do
       expect { create_remix }.not_to change(ActiveStorage::Blob, :count)
+    end
+
+    it 'does not copy the lesson id' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.lesson_id).to be_nil
     end
 
     it 'creates new components' do
@@ -109,7 +124,8 @@ RSpec.describe Project::CreateRemix, type: :unit do
 
       it 'persists the new component' do
         remixed_project = create_remix[:project]
-        expect(remixed_project.components.first.attributes.symbolize_keys).to include(new_component_params)
+        new_component = remixed_project.components.find { |c| c.name == new_component_params[:name] }
+        expect(new_component.attributes.symbolize_keys).to include(new_component_params)
       end
     end
 

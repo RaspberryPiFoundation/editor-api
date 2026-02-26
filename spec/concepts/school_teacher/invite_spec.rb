@@ -16,6 +16,11 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
     expect(response.success?).to be(true)
   end
 
+  it 'does not return an error in operation response' do
+    response = described_class.call(school:, school_teacher_params:, token:)
+    expect(response[:error]).to be_blank
+  end
+
   it 'creates a TeacherInvitation' do
     expect { described_class.call(school:, school_teacher_params:, token:) }.to change(TeacherInvitation, :count)
   end
@@ -48,9 +53,22 @@ RSpec.describe SchoolTeacher::Invite, type: :unit do
   context 'when the school is not verified' do
     let(:school) { create(:school) }
 
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_teacher_params:, token:)
-      expect(response[:error]).to match(/School is not verified/)
+    context 'when immediate_school_onboarding is FALSE' do
+      it 'does return an error message in the operation response' do
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'false') do
+          response = described_class.call(school:, school_teacher_params:, token:)
+          expect(response[:error]).to match(/is not verified/)
+        end
+      end
+    end
+
+    context 'when immediate_school_onboarding is TRUE' do
+      it 'does not return an error message in the operation response' do
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+          response = described_class.call(school:, school_teacher_params:, token:)
+          expect(response[:error]).to be_blank
+        end
+      end
     end
   end
 end

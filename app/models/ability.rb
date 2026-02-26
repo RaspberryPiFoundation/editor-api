@@ -3,24 +3,37 @@
 class Ability
   include CanCan::Ability
 
-  # rubocop:disable Metrics/AbcSize
   def initialize(user)
-    # Anyone can view projects not owner by a user or a school.
+    define_common_non_student_abilities(user)
+
+    return unless user
+
+    define_authenticated_non_student_abilities(user)
+    user.schools.each do |school|
+      define_school_student_abilities(user:, school:) if user.school_student?(school)
+      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
+      define_school_owner_abilities(school:) if user.school_owner?(school)
+    end
+
+    define_editor_admin_abilities(user)
+    define_experience_cs_admin_abilities(user)
+  end
+
+  private
+
+  def define_common_non_student_abilities(user)
+    return if user&.student?
+
+    # Anyone can view projects not owned by a user or a school.
     can :show, Project, user_id: nil, school_id: nil
     can :show, Component, project: { user_id: nil, school_id: nil }
 
     # Anyone can read publicly shared lessons.
     can :read, Lesson, visibility: 'public'
+  end
 
-    return unless user
-
-    # Any authenticated user can create projects not owned by a school.
-    can :create, Project, user_id: user.id, school_id: nil
-    can :create, Component, project: { user_id: user.id, school_id: nil }
-
-    # Any authenticated user can manage their own projects.
-    can %i[read update destroy], Project, user_id: user.id
-    can %i[read update destroy], Component, project: { user_id: user.id }
+  def define_authenticated_non_student_abilities(user)
+    return if user&.student?
 
     # Any authenticated user can create a school. They agree to become the school-owner.
     can :create, School
@@ -35,65 +48,104 @@ class Ability
     can :create_copy, Lesson, visibility: 'public'
 
     # Any authenticated user can manage their own lessons.
-    can %i[read create_copy update destroy], Lesson, user_id: user.id
+    can %i[read create_copy update destroy], Lesson, user_id: user.id, school_id: nil
 
-    user.schools.each do |school|
-      define_school_student_abilities(user:, school:) if user.school_student?(school)
-      define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
-      define_school_owner_abilities(school:) if user.school_owner?(school)
-    end
+    # Any authenticated user can create projects not owned by a school.
+    can :create, Project, user_id: user.id, school_id: nil
+    can :create, Component, project: { user_id: user.id, school_id: nil }
+
+    # Any authenticated user can manage their own projects.
+    can %i[read update destroy], Project, user_id: user.id
+    can %i[read update destroy], Component, project: { user_id: user.id }
   end
-  # rubocop:enable Metrics/AbcSize
-
-  private
 
   def define_school_owner_abilities(school:)
     can(%i[read update destroy], School, id: school.id)
-    can(%i[read create update destroy], SchoolClass, school: { id: school.id })
-    can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id } })
+    can(%i[read], :school_member)
+    can(%i[read create import update destroy], SchoolClass, school: { id: school.id })
+    can(%i[read show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
-    can(%i[read create create_batch update destroy], :school_student)
+    can(%i[read create create_batch update destroy destroy_batch], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
-    can(%i[create], Project, school_id: school.id)
+    can(%i[read destroy], Feedback, school_project: { school_id: school.id })
+    can(%i[exchange_code], :google_auth)
   end
 
-  # rubocop:disable Metrics/AbcSize
   def define_school_teacher_abilities(user:, school:)
     can(%i[read], School, id: school.id)
-    can(%i[create], SchoolClass, school: { id: school.id })
-    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teacher_id: user.id)
-    can(%i[read], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    can(%i[read create destroy], ClassMember, school_class: { school: { id: school.id }, teacher_id: user.id })
+    can(%i[read], :school_member)
+    can(%i[create import], SchoolClass, school: { id: school.id })
+    can(%i[read update destroy], SchoolClass, school: { id: school.id }, teachers: { teacher_id: user.id })
+    can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id }, teachers: { teacher_id: user.id } })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(%i[read create create_batch update], :school_student)
-    can(%i[create destroy], Lesson) do |lesson|
+    can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
     end
     can(%i[read create_copy], Lesson, school_id: school.id, visibility: %w[teachers students])
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
+    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    teacher_project_ids = Project.where(
+      school_id: school.id,
+      remixed_from_id: nil,
+      lesson_id: Lesson.where(
+        school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id)
+      )
+    ).pluck(:id)
+    can(%i[read], Project, remixed_from_id: teacher_project_ids)
+    can(%i[show_status unsubmit return complete], SchoolProject, project: { remixed_from_id: teacher_project_ids })
+    can(%i[read create destroy], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
+    can(%i[exchange_code], :google_auth)
   end
-  # rubocop:enable Metrics/AbcSize
 
-  # rubocop:disable Layout/LineLength
   def define_school_student_abilities(user:, school:)
+    visible_lesson_project_ids = Project.where(
+      school_id: school.id,
+      lesson_id: Lesson.where(
+        visibility: 'students'
+      ).select(:id)
+    ).pluck(:id)
     can(%i[read], School, id: school.id)
-    can(%i[read], SchoolClass, school: { id: school.id }, members: { student_id: user.id })
-    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { members: { student_id: user.id } })
-    can(%i[create], Project, school_id: school.id, user_id: user.id, lesson_id: nil)
+    can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
+    # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
+    can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
+    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids)
+    can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
+    can(%i[read set_read], Feedback, school_project: { project: { school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids } })
+    can(%i[show_finished set_finished show_status unsubmit submit], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)
   end
-  # rubocop:enable Layout/LineLength
+
+  def define_school_import_abilities(user)
+    return unless user&.admin? || user&.experience_cs_admin?
+
+    can :import, School
+    can :read, :school_import_job
+  end
+
+  def define_editor_admin_abilities(user)
+    return unless user&.admin?
+
+    define_school_import_abilities(user)
+  end
+
+  def define_experience_cs_admin_abilities(user)
+    return unless user&.experience_cs_admin?
+
+    can %i[read create update destroy], Project, user_id: nil
+    define_school_import_abilities(user)
+  end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
     is_my_lesson = lesson.school_id == school.id && lesson.user_id == user.id
-    is_my_class = lesson.school_class && lesson.school_class.teacher_id == user.id
+    is_my_class = lesson.school_class&.teacher_ids&.include?(user.id)
 
-    is_my_lesson && (is_my_class || !lesson.school_class)
+    is_my_class || (is_my_lesson && !lesson.school_class)
   end
 
   def school_teacher_can_manage_project?(user:, school:, project:)

@@ -18,6 +18,7 @@ class User
     token
     username
     roles
+    sso_providers
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -46,8 +47,20 @@ class User
     Role.student.find_by(school:, user_id: id)
   end
 
+  def student?
+    Role.student.exists?(user_id: id)
+  end
+
   def admin?
-    (roles&.to_s&.split(',')&.map(&:strip) || []).include?('editor-admin')
+    parsed_roles.include?('editor-admin')
+  end
+
+  def experience_cs_admin?
+    parsed_roles.include?('experience-cs-admin')
+  end
+
+  def parsed_roles
+    roles&.to_s&.split(',')&.map(&:strip) || []
   end
 
   def ==(other)
@@ -94,7 +107,7 @@ class User
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)
 
-    args['id'] ||= auth['sub']
+    args['id'] ||= auth['sub'].sub('student:', '')
     args['token'] = token
 
     new(args)

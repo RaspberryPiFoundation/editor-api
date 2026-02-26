@@ -13,7 +13,7 @@ module Mutations
         components: input[:components]&.map(&:to_h)
       )
 
-      response = Project::Create.call(project_hash:)
+      response = Project::Create.call(project_hash:, current_user: context[:current_user])
       raise GraphQL::ExecutionError, response[:error] unless response.success?
 
       { project: response[:project] }

@@ -4,12 +4,12 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a school', type: :request do
   before do
-    authenticated_in_hydra_as(owner)
+    authenticated_in_hydra_as(user)
+    stub_profile_api_create_school
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
-  let(:owner) { create(:owner, school:) }
+  let(:user) { create(:user) }
 
   let(:params) do
     {
@@ -17,10 +17,16 @@ RSpec.describe 'Creating a school', type: :request do
         name: 'Test School',
         website: 'http://www.example.com',
         address_line_1: 'Address Line 1',
+        administrative_area: 'Greater London',
         municipality: 'Greater London',
+        postal_code: 'SW1A 1AA',
         country_code: 'GB',
+        reference: '100000',
         creator_agree_authority: true,
-        creator_agree_terms_and_conditions: true
+        creator_agree_terms_and_conditions: true,
+        creator_agree_to_ux_contact: true,
+        creator_agree_responsible_safeguarding: true,
+        user_origin: 'for_education'
       }
     }
   end

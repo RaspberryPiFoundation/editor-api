@@ -8,10 +8,21 @@ en:
       confirm_verify_school: Are you sure you want to verify this school?
       reject_school: Reject School
       confirm_reject_school: Are you sure you want to reject this school?
+      reopen_school: Reopen School
+      confirm_reopen_school: Are you sure you want to reopen this school?
     controller:
       verify_school:
         success: "Successfully verified."
-        error: "There was an error verifying the school."
+        error: "There was an error verifying the school"
       reject_school:
         success: "Successfully rejected."
-        error: "There was an error rejecting the school."
+        error: "There was an error rejecting the school"
+      reopen_school:
+        success: "Successfully reopened."
+        error: "There was an error reopening the school"
+  activerecord:
+    attributes:
+      school:
+        user_origin_values:
+          for_education: "Code Editor for Education"
+          experience_cs: "Experience CS"

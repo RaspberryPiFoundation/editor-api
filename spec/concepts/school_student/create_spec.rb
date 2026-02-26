@@ -10,7 +10,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
   let(:school_student_params) do
     {
       username: 'student-to-create',
-      password: 'at-least-8-characters',
+      password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
       name: 'School Student'
     }
   end
@@ -29,7 +29,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     # TODO: Replace with WebMock assertion once the profile API has been built.
     expect(ProfileApiClient).to have_received(:create_school_student)
-      .with(token:, username: 'student-to-create', password: 'at-least-8-characters', name: 'School Student', school_id: school.id)
+      .with(token:, username: 'student-to-create', password: 'Student2024', name: 'School Student', school_id: school.id)
   end
 
   it 'creates a role associating the student with the school' do
@@ -46,7 +46,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
     let(:school_student_params) do
       {
         username: '',
-        password: 'at-least-8-characters',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'School Student'
       }
     end
@@ -77,16 +77,30 @@ RSpec.describe SchoolStudent::Create, type: :unit do
   end
 
   context 'when the school is not verified' do
-    let(:school) { create(:school) }
+    let(:school) { create(:school) } # not verified by default
 
-    it 'returns the error message in the operation response' do
-      response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to match(/school is not verified/)
+    context 'when immediate_school_onboarding is FALSE' do
+      it 'returns the error message in the operation response' do
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'false') do
+          response = described_class.call(school:, school_student_params:, token:)
+          expect(response[:error]).to match(/school must be verified/)
+        end
+      end
+    end
+
+    context 'when immediate_school_onboarding is TRUE' do
+      it 'does not error due to school verification' do
+        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
+          response = described_class.call(school:, school_student_params:, token:)
+
+          expect(response[:error]).to be_nil
+        end
+      end
     end
   end
 
   context 'when the student cannot be created in profile api because of a 422 response' do
-    let(:error) { { 'username' => 'username', 'error' => 'ERR_USER_EXISTS' } }
+    let(:error) { { 'message' => "something's up with the username" } }
     let(:exception) { ProfileApiClient::Student422Error.new(error) }
 
     before do
@@ -95,7 +109,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     it 'adds a useful error message' do
       response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to eq('Error creating school student: username has already been taken')
+      expect(response[:error]).to eq("something's up with the username")
     end
   end
 
@@ -107,7 +121,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
     it 'adds a useful error message' do
       response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to eq('Error creating school student: Student not created in Profile API (status code 401)')
+      expect(response[:error]).to eq('Student not created in Profile API (status code 401)')
     end
   end
 end

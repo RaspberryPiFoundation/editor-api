@@ -3,21 +3,27 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '~> 3.2.0'
+ruby file: '.tool-versions'
 
 gem 'administrate', '~> 0.20.1'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
+gem 'base64', '~> 0.3'
 gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'countries'
+gem 'csv', '~> 3.3'
 gem 'email_validator'
+gem 'faker'
 gem 'faraday'
+gem 'flipper', '~> 1.3'
+gem 'flipper-active_record', '~> 1.3'
 gem 'github_webhook', '~> 1.4'
 gem 'globalid'
-gem 'good_job', '~> 3.12'
+gem 'good_job', '~> 4.3'
 gem 'graphql'
 gem 'graphql-client'
+gem 'i18n'
 gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
@@ -27,35 +33,41 @@ gem 'omniauth-rpi',
     github: 'RaspberryPiFoundation/omniauth-rpi',
     tag: 'v1.3.1'
 gem 'open-uri'
+gem 'paper_trail'
 gem 'pg', '~> 1.1'
 gem 'postmark-rails'
-gem 'puma', '~> 6'
+gem 'puma', '~> 7.2'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
-gem 'roo'
-gem 'scout_apm'
 gem 'sentry-rails'
+gem 'statesman'
 
 group :development, :test do
+  gem 'awesome_print'
   gem 'bullet'
+  gem 'debug'
   gem 'dotenv-rails'
   gem 'factory_bot_rails'
-  gem 'faker'
   gem 'graphiql-rails'
   gem 'pry-byebug'
   gem 'rspec'
   gem 'rspec_junit_formatter'
   gem 'rspec-rails'
   gem 'rubocop', require: false
+  gem 'rubocop-capybara', require: false
+  gem 'rubocop-factory_bot', require: false
   gem 'rubocop-graphql', require: false
+  gem 'rubocop-performance', require: false
   gem 'rubocop-rails', require: false
   gem 'rubocop-rspec', require: false
+  gem 'rubocop-rspec_rails', require: false
   gem 'simplecov', require: false
 end
 
 group :development do
-  gem 'ruby-lsp-rails'
-  gem 'ruby-lsp-rspec'
+  gem 'rails-erd'
+  gem 'ruby-lsp', require: false
+  gem 'ruby-lsp-rspec', '~> 0.1.28', require: false
 end
 
 group :test do
@@ -67,3 +79,5 @@ group :test do
   gem 'webdrivers'
   gem 'webmock'
 end
+
+gem 'flipper-ui', '~> 1.3'

@@ -18,7 +18,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
       project: {
         id: project_id,
         name: 'Untitled project again',
-        projectType: 'html'
+        projectType: Project::Types::HTML
       }
     }
   end
@@ -26,7 +26,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
   it { expect(mutation).to be_a_valid_graphql_query }
 
   context 'with an existing project' do
-    let(:project) { create(:project, user_id: authenticated_user.id, project_type: :python) }
+    let(:project) { create(:project, user_id: authenticated_user.id, project_type: Project::Types::PYTHON) }
     let(:project_id) { project.to_gid_param }
     let(:school) { create(:school) }
 
@@ -62,7 +62,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
       end
 
       it 'updates the project type' do
-        expect { result }.to change { project.reload.project_type }.from(project.project_type).to('html')
+        expect { result }.to change { project.reload.project_type }.from(project.project_type).to(Project::Types::HTML)
       end
 
       context 'when the project cannot be found' do
@@ -87,8 +87,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
       context 'when project update fails' do
         before do
           errors = instance_double(ActiveModel::Errors, full_messages: ['An error message'])
-          allow(project).to receive(:save).and_return(false)
-          allow(project).to receive(:errors).and_return(errors)
+          allow(project).to receive_messages(save: false, errors: errors)
           allow(GlobalID).to receive(:find).and_return(project)
         end
 

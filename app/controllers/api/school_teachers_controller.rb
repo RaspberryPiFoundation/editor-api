@@ -7,7 +7,7 @@ module Api
     authorize_resource :school_teacher, class: false
 
     def index
-      result = SchoolTeacher::List.call(school: @school, token: current_user.token)
+      result = SchoolTeacher::List.call(school: @school)
 
       if result.success?
         @school_teachers = result[:school_teachers]
@@ -22,16 +22,6 @@ module Api
 
       if result.success?
         head :created
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
-    end
-
-    def destroy
-      result = SchoolTeacher::Remove.call(school: @school, teacher_id: params[:id], token: current_user.token)
-
-      if result.success?
-        head :no_content
       else
         render json: { error: result[:error] }, status: :unprocessable_entity
       end

@@ -1,0 +1,165 @@
+<% content_for(:title) { "Upload School Import CSV" } %>
+
+<header class="main-content__header">
+  <h1 class="main-content__page-title">
+    <%= content_for(:title) %>
+  </h1>
+  <div>
+    <%= link_to(
+      "View Import History",
+      admin_school_import_results_path,
+      class: "button"
+    ) %>
+  </div>
+</header>
+
+<section class="main-content__body">
+  <% if flash[:error] %>
+    <div class="flash flash-alert" style="margin-bottom: 2rem;">
+      <%= flash[:error] %>
+      
+      <% if @error_details %>
+        <% if @error_details[:row_errors] %>
+          <div style="margin-top: 1rem;">
+            <strong>Row Errors:</strong>
+            <table class="collection-data" style="margin-top: 0.5rem;">
+              <thead>
+                <tr>
+                  <th>Row</th>
+                  <th>Errors</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% @error_details[:row_errors].each do |error| %>
+                  <tr>
+                    <td><%= error[:row] || error['row'] %></td>
+                    <td>
+                      <% errors = error[:errors] || error['errors'] || [] %>
+                      <% errors.each do |err| %>
+                        <div><strong><%= err[:field] || err['field'] %>:</strong> <%= err[:message] || err['message'] %></div>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% elsif @error_details[:duplicate_emails] %>
+          <div style="margin-top: 1rem;">
+            <strong>Duplicate Owner Emails Found:</strong>
+            <ul>
+              <% @error_details[:duplicate_emails].each do |email| %>
+                <li><%= email %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="field-unit">
+    <p>
+      Use this form to import multiple schools from a CSV file. 
+      The import will run in the background and you can track its progress on the Import History page.
+    </p>
+  </div>
+
+  <hr style="margin: 2rem 0;">
+
+  <%= form_with url: admin_school_import_results_path, method: :post, multipart: true, class: "form" do |f| %>
+    <div class="field-unit field-unit--file">
+      <%= f.label :csv_file, "CSV File", class: "field-unit__label" %>
+      <%= f.file_field :csv_file, accept: ".csv", required: true, class: "field-unit__field" %>
+      <p class="field-unit__hint">
+        Select a CSV file containing school data to import. 
+        Download the <%= link_to "CSV template", "/docs/import/school_import_template.csv" %> to see the required format.
+      </p>
+    </div>
+
+    <div class="form-actions">
+      <%= f.submit "Upload and Start Import", class: "button button--primary" %>
+    </div>
+  <% end %>
+
+  <hr style="margin: 2rem 0;">
+
+  <div class="field-unit">
+    <h3>CSV Format Requirements</h3>
+    <table class="collection-data">
+      <thead>
+        <tr>
+          <th>Column</th>
+          <th>Required</th>
+          <th>Description</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><code>name</code></td>
+          <td>Yes</td>
+          <td>School name</td>
+        </tr>
+        <tr>
+          <td><code>website</code></td>
+          <td>Yes</td>
+          <td>School website URL (must include https://)</td>
+        </tr>
+        <tr>
+          <td><code>address_line_1</code></td>
+          <td>Yes</td>
+          <td>Street address</td>
+        </tr>
+        <tr>
+          <td><code>municipality</code></td>
+          <td>Yes</td>
+          <td>City/town</td>
+        </tr>
+        <tr>
+          <td><code>country_code</code></td>
+          <td>Yes</td>
+          <td>2-letter ISO country code (e.g., US, GB, CA)</td>
+        </tr>
+        <tr>
+          <td><code>owner_email</code></td>
+          <td>Yes</td>
+          <td>Email of school owner (must have existing RPF account)</td>
+        </tr>
+        <tr>
+          <td><code>address_line_2</code></td>
+          <td>No</td>
+          <td>Additional address information</td>
+        </tr>
+        <tr>
+          <td><code>administrative_area</code></td>
+          <td>No</td>
+          <td>State/province</td>
+        </tr>
+        <tr>
+          <td><code>postal_code</code></td>
+          <td>No</td>
+          <td>ZIP/postal code</td>
+        </tr>
+        <tr>
+          <td><code>reference</code></td>
+          <td>No</td>
+          <td>School reference number (must be unique if provided)</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="field-unit" style="margin-top: 2rem;">
+    <h3>Important Notes</h3>
+  </div>
+  <div class="field-unit" style="margin-top: 2rem;">
+    <ul>
+      <li>All owner emails must correspond to existing Code Editor for Education accounts.</li>
+      <li>Each owner can only create one school.</li>
+      <li>The same owner email cannot appear multiple times in the CSV.</li>
+      <li>Imported schools are automatically verified and receive school codes.</li>
+      <li>Owner roles are automatically created for each school.</li>
+      <li>The import runs in the background and may take several minutes for large files.</li>
+    </ul>
+  </div>
+</section>

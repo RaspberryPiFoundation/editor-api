@@ -36,6 +36,29 @@ RSpec.describe 'Project delete requests' do
         expect(response).to have_http_status(:forbidden)
       end
     end
+
+    context 'when an Experience CS admin destroys a starter Scratch project' do
+      let(:project) do
+        create(
+          :project, {
+            project_type: Project::Types::SCRATCH,
+            user_id: nil,
+            locale: 'en'
+          }
+        )
+      end
+      let(:experience_cs_admin) { create(:experience_cs_admin_user) }
+
+      before do
+        authenticated_in_hydra_as(experience_cs_admin)
+      end
+
+      it 'deletes the project' do
+        expect do
+          delete("/api/projects/#{project.identifier}", headers:)
+        end.to change(Project, :count).by(-1)
+      end
+    end
   end
 
   context 'when no token is given' do

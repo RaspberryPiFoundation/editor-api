@@ -38,7 +38,6 @@ RSpec.describe 'Showing a lesson', type: :request do
     expect(data[:user_name]).to eq('School Teacher')
   end
 
-  # rubocop:disable RSpec/ExampleLength
   it "responds with nil attributes for the user if their user profile doesn't exist" do
     user_id = SecureRandom.uuid
     stub_user_info_api_for_unknown_users(user_id:)
@@ -49,7 +48,6 @@ RSpec.describe 'Showing a lesson', type: :request do
 
     expect(data[:user_name]).to be_nil
   end
-  # rubocop:enable RSpec/ExampleLength
 
   it 'responds 404 Not Found when no lesson exists' do
     get('/api/lessons/not-a-real-id', headers:)
@@ -109,7 +107,7 @@ RSpec.describe 'Showing a lesson', type: :request do
 
   context "when the lesson's visibility is 'students'" do
     let(:school) { create(:school) }
-    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'students', user_id: teacher.id) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -125,7 +123,7 @@ RSpec.describe 'Showing a lesson', type: :request do
     it "responds 200 OK when the user is a school-student within the lesson's class" do
       student = create(:student, school:)
       authenticated_in_hydra_as(student)
-      create(:class_member, school_class:, student_id: student.id)
+      create(:class_student, school_class:, student_id: student.id)
 
       get("/api/lessons/#{lesson.id}", headers:)
       expect(response).to have_http_status(:ok)

@@ -7,10 +7,18 @@ module Api
     load_and_authorize_resource :lesson
 
     def index
-      archive_scope = params[:include_archived] == 'true' ? Lesson : Lesson.unarchived
-      scope = params[:school_class_id] ? archive_scope.where(school_class_id: params[:school_class_id]) : archive_scope
-      @lessons_with_users = scope.accessible_by(current_ability).with_users
-      render :index, formats: [:json], status: :ok
+      accessible_lessons = filtered_lessons_scope
+                           .accessible_by(current_ability)
+                           .includes(project: :remixes)
+      @lessons_with_users = accessible_lessons.with_users
+
+      if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
+        render :teacher_index, formats: [:json], status: :ok
+      else
+        remixes = user_remixes(accessible_lessons)
+        @lessons_with_users_and_remixes = @lessons_with_users.zip(remixes)
+        render :student_index, formats: [:json], status: :ok
+      end
     end
 
     def show
@@ -41,6 +49,8 @@ module Api
     end
 
     def update
+      # TODO: Consider removing user_id from the lesson_params for update so users can update other users' lessons without changing ownership
+      # OR consider dropping user_id on lessons and using teacher id/ids on the class instead
       result = Lesson::Update.call(lesson: @lesson, lesson_params:)
 
       if result.success?
@@ -52,23 +62,44 @@ module Api
     end
 
     def destroy
-      operation = params[:undo] == 'true' ? Lesson::Unarchive : Lesson::Archive
-      result = operation.call(lesson: @lesson)
-
-      if result.success?
-        head :no_content
-      else
-        render json: { error: result[:error] }, status: :unprocessable_entity
-      end
+      @lesson.destroy!
+      head :no_content
     end
 
     private
+
+    def filtered_lessons_scope
+      scope = params[:school_class_id] ? Lesson.where(school_class_id: params[:school_class_id]) : Lesson.all
+      scope = scope.joins(:project).where(projects: { identifier: params[:project_identifier] }) if params[:project_identifier].present?
+      scope.order(created_at: :asc)
+    end
 
     def verify_school_class_belongs_to_school
       return if base_params[:school_class_id].blank?
       return if school&.classes&.pluck(:id)&.include?(base_params[:school_class_id])
 
       raise ParameterError, 'school_class_id does not correspond to school_id'
+    end
+
+    def user_remixes(lessons)
+      lessons.map do |lesson|
+        next nil unless lesson&.project&.remixes&.any?
+
+        user_remix(lesson)
+      end
+    end
+
+    def user_remix(lesson)
+      remixes = lesson&.project&.remixes
+
+      remixes = remixes
+                .where(user_id: current_user.id)
+                .accessible_by(current_ability)
+                .order(created_at: :asc)
+
+      remixes = remixes.includes(school_project: :feedback) if current_user&.school_student?(school)
+
+      remixes.first
     end
 
     def lesson_params
@@ -99,7 +130,7 @@ module Api
     end
 
     def school
-      @school ||= @lesson&.school || School.find_by(id: base_params[:school_id])
+      @school ||= @lesson&.school || School.find_by(id: base_params[:school_id]) || SchoolClass.find_by(id: params[:school_class_id])&.school
     end
   end
 end

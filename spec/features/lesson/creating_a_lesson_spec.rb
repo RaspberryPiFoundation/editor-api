@@ -19,7 +19,7 @@ RSpec.describe 'Creating a lesson', type: :request do
         name: 'Test Lesson',
         project_attributes: {
           name: 'Hello world project',
-          project_type: 'python',
+          project_type: Project::Types::PYTHON,
           components: [
             { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
           ]
@@ -68,7 +68,7 @@ RSpec.describe 'Creating a lesson', type: :request do
           school_id: school.id,
           project_attributes: {
             name: 'Hello world project',
-            project_type: 'python',
+            project_type: Project::Types::PYTHON,
             components: [
               { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
             ]
@@ -118,7 +118,7 @@ RSpec.describe 'Creating a lesson', type: :request do
   end
 
   context 'when the lesson is associated with a school class' do
-    let(:school_class) { create(:school_class, teacher_id: teacher.id, school:) }
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let(:school) { create(:school) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -130,7 +130,7 @@ RSpec.describe 'Creating a lesson', type: :request do
           school_class_id: school_class.id,
           project_attributes: {
             name: 'Hello world project',
-            project_type: 'python',
+            project_type: Project::Types::PYTHON,
             components: [
               { name: 'main.py', extension: 'py', content: 'print("Hello, world!")' }
             ]
@@ -141,7 +141,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
     it 'responds 201 Created when the user is the school-teacher for the class' do
       authenticated_in_hydra_as(teacher)
-      school_class.update!(teacher_id: teacher.id)
+      school_class.update!(teachers: [ClassTeacher.new({ teacher_id: teacher.id })])
 
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)

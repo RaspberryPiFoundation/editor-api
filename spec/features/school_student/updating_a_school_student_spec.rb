@@ -5,6 +5,7 @@ require 'rails_helper'
 RSpec.describe 'Updating a school student', type: :request do
   before do
     authenticated_in_hydra_as(owner)
+    stub_profile_api_school_student # Add missing stub for the SSO check
     stub_profile_api_update_school_student
     stub_profile_api_create_safeguarding_flag
   end
@@ -18,7 +19,7 @@ RSpec.describe 'Updating a school student', type: :request do
     {
       school_student: {
         username: 'new-username',
-        password: 'new-password',
+        password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
         name: 'New Name'
       }
     }
@@ -26,12 +27,12 @@ RSpec.describe 'Updating a school student', type: :request do
 
   it 'creates the school owner safeguarding flag' do
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'does not create the school teacher safeguarding flag' do
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: owner.email, school_id: school.id)
   end
 
   it 'responds 204 No Content' do
@@ -52,7 +53,7 @@ RSpec.describe 'Updating a school student', type: :request do
     authenticated_in_hydra_as(teacher)
 
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
-    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner])
+    expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
   end
 
   it 'creates the school teacher safeguarding flag when the user is a school teacher' do
@@ -60,7 +61,7 @@ RSpec.describe 'Updating a school student', type: :request do
     authenticated_in_hydra_as(teacher)
 
     put("/api/schools/#{school.id}/students/#{student_id}", headers:, params:)
-    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher])
+    expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email, school_id: school.id)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
