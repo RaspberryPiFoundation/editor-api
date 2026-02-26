@@ -1,22 +1,46 @@
+# Version control
 .git
 .gitattributes
 .github
 .gitignore
 
-.env.example
-
+# CI/CD
 .circleci
 .clabot
 
+# Docker (no need to include itself)
+Dockerfile
+.dockerignore
+docker-compose.yml
+docker-compose.override.yml.example
+
+# Editor / IDE
+.vscode
+.devcontainer
+
+# Dev tooling
+.rspec
+.pryrc
+.ruby-lsp
+.tool-versions
+.DS_Store
+.rubocop.yml
+.rubocop_todo.yml
+.rubocop-https--*
+
+# Documentation
 *.md
 LICENSE
 COPYRIGHT
+docs
 
-.vscode
+# Environment
+.env.example
 
-Dockerfile
-.dockerignore
-
-*.yml
-
+# Tests
 spec
+
+# Runtime dirs (recreated at runtime)
+log
+tmp
+storage
