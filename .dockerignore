@@ -22,7 +22,6 @@ docker-compose.override.yml.example
 .rspec
 .pryrc
 .ruby-lsp
-.tool-versions
 .DS_Store
 .rubocop.yml
 .rubocop_todo.yml
