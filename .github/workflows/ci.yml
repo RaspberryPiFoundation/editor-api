@@ -25,8 +25,14 @@ jobs:
       - name: Install lint dependencies
         run: apt-get update && apt-get install --yes --no-install-recommends build-essential git libpq-dev pkg-config
 
+      - name: Set up Ruby and bundle cache
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .tool-versions
+          bundler-cache: true
+
       - name: Run RuboCop
-        run: bundle install && bundle exec rubocop --format progress
+        run: bundle exec rubocop --format progress
 
   test:
     runs-on: ubuntu-latest
@@ -72,6 +78,12 @@ jobs:
           apt-get update && apt-get install --yes --no-install-recommends
           build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick firefox-esr
 
+      - name: Set up Ruby and bundle cache
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .tool-versions
+          bundler-cache: true
+
       - name: Verify Firefox availability
         run: firefox --version
 
@@ -80,9 +92,6 @@ jobs:
           until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER"; do
             sleep 1
           done
-
-      - name: Install gems
-        run: bundle install
 
       - name: Database setup
         run: bin/rails db:setup --trace
@@ -101,75 +110,12 @@ jobs:
       - name: Build coverage comment
         if: always() && github.event_name == 'pull_request'
         id: coverage_comment
-        run: |
-          coverage='unavailable'
-          if [ -s coverage/.last_run.json ]; then
-            coverage=$(jq -r 'if .result.line then .result.line else .result.covered_percent end' coverage/.last_run.json)
-          fi
-
-          if [ -z "$coverage" ] || [ "$coverage" = 'null' ]; then
-            coverage='unavailable'
-          fi
-
-          run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-
-          if [ "$coverage" = 'unavailable' ]; then
-            message=$(cat <<EOF
-            ### Test coverage
-            SimpleCov coverage data was unavailable for this run.
-            Run: $run_url
-            EOF
-            )
-          else
-            message=$(cat <<EOF
-            ### Test coverage
-            $coverage% line coverage reported by SimpleCov.
-            Run: $run_url
-            EOF
-            )
-          fi
-
-          {
-            echo "message<<'EOF'"
-            echo "$message"
-            echo 'EOF'
-          } >> "$GITHUB_OUTPUT"
+        run: .github/scripts/build_coverage_comment.sh
 
       - name: Comment coverage on PR
         if: always() && github.event_name == 'pull_request'
         continue-on-error: true
-        uses: actions/github-script@v7
         env:
+          GITHUB_TOKEN: ${{ github.token }}
           COVERAGE_MESSAGE: ${{ steps.coverage_comment.outputs.message }}
-        with:
-          script: |
-            const marker = '<!-- simplecov-coverage -->';
-            const body = `${marker}\n${process.env.COVERAGE_MESSAGE}`;
-            const issue_number = context.payload.pull_request.number;
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number,
-              per_page: 100
-            });
-
-            const existing = comments.find((comment) =>
-              comment.user?.type === 'Bot' && comment.body?.includes(marker)
-            );
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number,
-                body
-              });
-            }
+        run: .github/scripts/post_coverage_comment.sh
