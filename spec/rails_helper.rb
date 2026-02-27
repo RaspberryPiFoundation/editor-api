@@ -121,9 +121,18 @@ RSpec.configure do |config|
     # or Capybara to talk to selenium etc.
     WebMock.allow_net_connect!
 
-    # Ensure we update the driver here, while we can connect to the network
-    Webdrivers::Geckodriver.update
-    driven_by :selenium_headless, using: :firefox
+    # Allow CI to fall back to Chrome when Firefox is unavailable.
+    system_test_browser = ENV.fetch('SYSTEM_TEST_BROWSER', 'firefox')
+    case system_test_browser
+    when 'firefox'
+      Webdrivers::Geckodriver.update
+      driven_by :selenium_headless, using: :firefox
+    when 'chrome'
+      Webdrivers::Chromedriver.update
+      driven_by :selenium_headless, using: :chrome
+    else
+      raise "Unsupported SYSTEM_TEST_BROWSER '#{system_test_browser}'"
+    end
 
     # Need to set the hostname, otherwise it defaults to www.example.com.
     default_url_options[:host] = Capybara.server_host
