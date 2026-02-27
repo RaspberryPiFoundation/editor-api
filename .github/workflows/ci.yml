@@ -16,36 +16,35 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    container:
+      image: ruby:3.4
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install lint dependencies
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libpq-dev
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .tool-versions
-          bundler-cache: true
+        run: apt-get update && apt-get install --yes --no-install-recommends build-essential git libpq-dev pkg-config
 
       - name: Run RuboCop
-        run: bundle exec rubocop --format progress
+        run: bundle install && bundle exec rubocop --format progress
 
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 45
+    container:
+      image: ruby:3.4
     permissions:
       contents: read
+      issues: write
       pull-requests: write
     env:
       RAILS_ENV: test
       POSTGRES_DB: choco_cake_test
       POSTGRES_PASSWORD: password
       POSTGRES_USER: choco
-      POSTGRES_HOST: 127.0.0.1
+      POSTGRES_HOST: postgres
       POSTGRES_PORT: '5432'
-      REDIS_URL: redis://127.0.0.1:6379/1
+      REDIS_URL: redis://redis:6379/1
       ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: primary-key
       ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: deterministic-key
       ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: derivation-salt
@@ -57,8 +56,6 @@ jobs:
           POSTGRES_DB: choco_cake_test
           POSTGRES_PASSWORD: password
           POSTGRES_USER: choco
-        ports:
-          - 5432:5432
         options: >-
           --health-cmd="pg_isready -U choco -d choco_cake_test"
           --health-interval=10s
@@ -66,38 +63,29 @@ jobs:
           --health-retries=5
       redis:
         image: redis:6.2-alpine
-        ports:
-          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install test dependencies
-        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends libpq-dev postgresql-client jq curl imagemagick
-
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: .tool-versions
-          bundler-cache: true
-
-      - name: Set up Firefox
-        id: setup_firefox
-        continue-on-error: true
-        uses: browser-actions/setup-firefox@v1
-
-      - name: Set up Chrome fallback
-        if: steps.setup_firefox.outcome == 'failure'
-        uses: browser-actions/setup-chrome@v1
+        run: >
+          apt-get update && apt-get install --yes --no-install-recommends
+          build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick firefox-esr chromium
 
       - name: Select system test browser
         run: |
-          if [ "${{ steps.setup_firefox.outcome }}" = "success" ]; then
+          if command -v firefox >/dev/null 2>&1; then
             echo "SYSTEM_TEST_BROWSER=firefox" >> "$GITHUB_ENV"
             echo "Using Firefox for system tests"
           else
+            echo "Firefox unavailable; falling back to Chrome"
             echo "SYSTEM_TEST_BROWSER=chrome" >> "$GITHUB_ENV"
-            echo "Falling back to Chrome for system tests"
+            chrome_bin="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
+            if [ -z "$chrome_bin" ]; then
+              echo "Chrome fallback requested, but no Chrome binary is available"
+              exit 1
+            fi
+            echo "CHROME_BIN=$chrome_bin" >> "$GITHUB_ENV"
           fi
 
       - name: Wait for DB
@@ -105,6 +93,9 @@ jobs:
           until pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U "$POSTGRES_USER"; do
             sleep 1
           done
+
+      - name: Install gems
+        run: bundle install
 
       - name: Database setup
         run: bin/rails db:setup --trace
@@ -153,8 +144,38 @@ Run: $run_url"
 
       - name: Comment coverage on PR
         if: always() && github.event_name == 'pull_request'
-        continue-on-error: true
-        uses: marocchino/sticky-pull-request-comment@v2
+        uses: actions/github-script@v7
+        env:
+          COVERAGE_MESSAGE: ${{ steps.coverage_comment.outputs.message }}
         with:
-          header: simplecov-coverage
-          message: ${{ steps.coverage_comment.outputs.message }}
+          script: |
+            const marker = '<!-- simplecov-coverage -->';
+            const body = `${marker}\n${process.env.COVERAGE_MESSAGE}`;
+            const issue_number = context.payload.pull_request.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number,
+              per_page: 100
+            });
+
+            const existing = comments.find((comment) =>
+              comment.user?.type === 'Bot' && comment.body?.includes(marker)
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number,
+                body
+              });
+            }
