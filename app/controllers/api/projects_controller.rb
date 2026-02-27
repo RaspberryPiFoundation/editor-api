@@ -18,7 +18,7 @@ module Api
 
     def show
       if !@project.school_id.nil? && @project.lesson_id.nil?
-        project_with_user = @project.with_user(current_user)
+        project_with_user = @project.with_student(current_user)
         @user = project_with_user[1]
       end
 

@@ -7,7 +7,7 @@ module SchoolStudent
         response = OperationResponse.new
         response[:school_students] = list_students(school, token, student_ids)
         response
-      rescue StandardError => e
+      rescue Faraday::Error => e
         Sentry.capture_exception(e)
         response[:error] = "Error listing school students: #{e}"
         response
@@ -17,6 +17,8 @@ module SchoolStudent
 
       def list_students(school, token, student_ids)
         student_ids ||= Role.student.where(school:).map(&:user_id)
+        return [] if student_ids.empty?
+
         students = ProfileApiClient.list_school_students(token:, school_id: school.id, student_ids:)
         students.map do |student|
           User.new(student.to_h.slice(:id, :username, :name, :email).merge(sso_providers: student.ssoProviders))

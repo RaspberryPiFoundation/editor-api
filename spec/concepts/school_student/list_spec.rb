@@ -84,13 +84,19 @@ RSpec.describe SchoolStudent::List, type: :unit do
         expect(response[:school_students]).to include(expected_user)
       end
     end
+
+    it 'skips the API call if student_ids is empty' do
+      response = described_class.call(school:, token:, student_ids: [])
+      expect(ProfileApiClient).not_to have_received(:list_school_students)
+      expect(response[:school_students].size).to eq(0)
+    end
   end
 
-  context 'when listing fails' do
+  context 'when listing fails due to a Faraday error' do
     let(:student_ids) { [123] }
 
     before do
-      allow(ProfileApiClient).to receive(:list_school_students).and_raise('Some API error')
+      allow(ProfileApiClient).to receive(:list_school_students).and_raise(Faraday::Error.new('Some API error'))
       allow(Sentry).to receive(:capture_exception)
     end
 
@@ -106,7 +112,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
 
     it 'sent the exception to Sentry' do
       described_class.call(school:, token:, student_ids:)
-      expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+      expect(Sentry).to have_received(:capture_exception).with(kind_of(Faraday::Error))
     end
   end
 end
