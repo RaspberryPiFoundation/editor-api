@@ -84,6 +84,12 @@ RSpec.describe SchoolStudent::List, type: :unit do
         expect(response[:school_students]).to include(expected_user)
       end
     end
+
+    it 'skips the API call if student_ids is empty' do
+      response = described_class.call(school:, token:, student_ids: [])
+      expect(ProfileApiClient).not_to have_received(:list_school_students)
+      expect(response[:school_students].size).to eq(0)
+    end
   end
 
   context 'when listing fails' do
