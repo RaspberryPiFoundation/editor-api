@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-json.array!(@projects_with_users) do |project, user|
+json.array!(@projects_with_students) do |project, user|
   json.call(
     project,
     :identifier,

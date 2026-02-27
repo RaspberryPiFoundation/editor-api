@@ -42,16 +42,16 @@ class Project < ApplicationRecord
     }
   )
 
-  def self.users(school, current_user)
+  def self.students(school, current_user)
     SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id).uniq)[:school_students] || []
   end
 
-  def self.with_users(school, current_user)
-    by_id = users(school, current_user).index_by(&:id)
+  def self.with_students(school, current_user)
+    by_id = students(school, current_user).index_by(&:id)
     all.map { |instance| [instance, by_id[instance.user_id]] }
   end
 
-  def with_user(current_user)
+  def with_student(current_user)
     # students cannot call the Profile API so do not even try
     return [self, nil] if current_user&.student?
 
