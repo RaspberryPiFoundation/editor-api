@@ -3,7 +3,6 @@
 require 'rails_helper'
 
 RSpec.describe 'Remix requests' do
-  let!(:original_project) { create(:project) }
   let(:project_params) do
     {
       name: original_project.name,
@@ -13,6 +12,7 @@ RSpec.describe 'Remix requests' do
   end
   let(:school) { create(:school) }
   let(:owner) { create(:owner, school:) }
+  let!(:original_project) { create(:project, school:, user_id: owner.id) }
 
   before do
     mock_phrase_generation
@@ -32,6 +32,8 @@ RSpec.describe 'Remix requests' do
 
     describe '#index' do
       before do
+        student_attributes = [{ id: authenticated_user.id, name: 'sally-student' }]
+        stub_profile_api_list_school_students(school:, student_attributes:)
         create_list(:project, 2, remixed_from_id: original_project.id, user_id: authenticated_user.id)
       end
 
@@ -40,9 +42,10 @@ RSpec.describe 'Remix requests' do
         expect(response).to have_http_status(:ok)
       end
 
-      it 'returns the list of projects' do
+      it 'returns the list of projects with student names' do
         get("/api/projects/#{original_project.identifier}/remixes", headers:)
         expect(response.parsed_body.length).to eq(2)
+        expect(response.parsed_body.first['user_name']).to eq('sally-student')
       end
 
       it 'returns 404 response if invalid project' do
