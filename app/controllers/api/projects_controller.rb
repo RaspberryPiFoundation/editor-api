@@ -4,12 +4,15 @@ require 'project_loader'
 
 module Api
   class ProjectsController < ApiController
+    include ActionController::Cookies
+
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
     before_action :verify_lesson_belongs_to_school, only: :create
     after_action :pagination_link_header, only: %i[index]
+    before_action :set_auth_cookie_for_scratch, only: %i[show]
 
     def index
       @paginated_projects = @projects.page(params[:page])
@@ -58,6 +61,18 @@ module Api
     end
 
     private
+
+    def set_auth_cookie_for_scratch
+      return unless @project.project_type == Project::Types::CODE_EDITOR_SCRATCH
+      return unless Flipper.enabled?(:cat_mode, school)
+
+      cookies[:scratch_auth] = {
+        value: request.headers['Authorization'],
+        secure: Rails.env.production?,
+        same_site: :strict,
+        http_only: true
+      }
+    end
 
     def verify_lesson_belongs_to_school
       return if base_params[:lesson_id].blank?
