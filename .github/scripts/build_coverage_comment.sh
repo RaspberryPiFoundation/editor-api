@@ -31,7 +31,8 @@ EOF
 fi
 
 {
-  echo "message<<'EOF'"
+  delimiter="COVERAGE_COMMENT_${RANDOM}_${RANDOM}"
+  echo "message<<${delimiter}"
   echo "${message}"
-  echo 'EOF'
+  echo "${delimiter}"
 } >> "${GITHUB_OUTPUT}"
