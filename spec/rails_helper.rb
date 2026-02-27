@@ -128,6 +128,7 @@ RSpec.configure do |config|
       Webdrivers::Geckodriver.update
       driven_by :selenium_headless, using: :firefox
     when 'chrome'
+      Selenium::WebDriver::Chrome.path = ENV['CHROME_BIN'] if ENV['CHROME_BIN']
       Webdrivers::Chromedriver.update
       driven_by :selenium_headless, using: :chrome
     else
