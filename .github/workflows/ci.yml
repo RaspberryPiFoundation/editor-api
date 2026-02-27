@@ -76,7 +76,10 @@ jobs:
       - name: Install test dependencies
         run: >
           sudo apt-get update && sudo apt-get install --yes --no-install-recommends
-          build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick firefox-esr
+          build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick
+
+      - name: Set up Firefox
+        uses: browser-actions/setup-firefox@v1
 
       - name: Set up Ruby and bundle cache
         uses: ruby/setup-ruby@v1
