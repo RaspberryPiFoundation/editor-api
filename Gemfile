@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.tool-versions'
 
-gem 'administrate', '~> 0.20.1'
+gem 'administrate', '~> 1.0.0'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'base64', '~> 0.3'
