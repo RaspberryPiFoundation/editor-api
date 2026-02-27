@@ -58,7 +58,6 @@
         "mikestead.dotenv",
         "ms-vscode.remote-repositories",
         "github.remotehub",
-        "circleci.circleci",
         "stylelint.vscode-stylelint",
         "christian-kohler.path-intellisense",
         "esbenp.prettier-vscode",

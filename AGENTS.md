@@ -34,7 +34,7 @@ docker compose up
 - Full suite: `docker compose run --rm api rspec`
 - Single spec: `docker compose run --rm api rspec spec/path/to/spec.rb`
 - Lint: `docker compose run --rm api bundle exec rubocop`
-- CI: CircleCI with Ruby 3.2, Postgres 12, Redis.
+- CI: GitHub Actions with Ruby 3.4, Postgres 12, Redis.
 
 ## Where to Look First
 - Routes: `config/routes.rb`. Auth: `config/initializers/omniauth.rb`, `app/helpers/authentication_helper.rb`, `app/controllers/concerns/identifiable.rb`.
