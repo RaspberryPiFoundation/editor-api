@@ -70,23 +70,10 @@ jobs:
       - name: Install test dependencies
         run: >
           apt-get update && apt-get install --yes --no-install-recommends
-          build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick firefox-esr chromium
+          build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick firefox-esr
 
-      - name: Select system test browser
-        run: |
-          if command -v firefox >/dev/null 2>&1; then
-            echo "SYSTEM_TEST_BROWSER=firefox" >> "$GITHUB_ENV"
-            echo "Using Firefox for system tests"
-          else
-            echo "Firefox unavailable; falling back to Chrome"
-            echo "SYSTEM_TEST_BROWSER=chrome" >> "$GITHUB_ENV"
-            chrome_bin="$(command -v google-chrome || command -v chromium || command -v chromium-browser || true)"
-            if [ -z "$chrome_bin" ]; then
-              echo "Chrome fallback requested, but no Chrome binary is available"
-              exit 1
-            fi
-            echo "CHROME_BIN=$chrome_bin" >> "$GITHUB_ENV"
-          fi
+      - name: Verify Firefox availability
+        run: firefox --version
 
       - name: Wait for DB
         run: |
