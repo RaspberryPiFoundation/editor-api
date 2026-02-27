@@ -18,5 +18,5 @@ Rails.application.configure do
   # The create_students_job queue is a serial queue that allows only one job at a time.
   # DO NOT change the value of create_students_job:1 without understanding the implications
   # of processing more than one user creation job at once.
-  config.good_job.queues = 'create_students_job:1;import_schools_job:1;default:5'
+  config.good_job.queues = 'create_students_job:1;import_schools_job:1;salesforce_sync:1,default:5'
 end
