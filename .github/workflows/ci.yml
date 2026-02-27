@@ -16,14 +16,12 @@ jobs:
   lint:
     runs-on: ubuntu-latest
     timeout-minutes: 20
-    container:
-      image: ruby:3.4
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install lint dependencies
-        run: apt-get update && apt-get install --yes --no-install-recommends build-essential git libpq-dev pkg-config
+        run: sudo apt-get update && sudo apt-get install --yes --no-install-recommends build-essential git libpq-dev pkg-config
 
       - name: Set up Ruby and bundle cache
         uses: ruby/setup-ruby@v1
@@ -37,8 +35,6 @@ jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    container:
-      image: ruby:3.4
     permissions:
       contents: read
       issues: write
@@ -48,9 +44,9 @@ jobs:
       POSTGRES_DB: choco_cake_test
       POSTGRES_PASSWORD: password
       POSTGRES_USER: choco
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: 127.0.0.1
       POSTGRES_PORT: '5432'
-      REDIS_URL: redis://redis:6379/1
+      REDIS_URL: redis://127.0.0.1:6379/1
       ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY: primary-key
       ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY: deterministic-key
       ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT: derivation-salt
@@ -62,6 +58,8 @@ jobs:
           POSTGRES_DB: choco_cake_test
           POSTGRES_PASSWORD: password
           POSTGRES_USER: choco
+        ports:
+          - 5432:5432
         options: >-
           --health-cmd="pg_isready -U choco -d choco_cake_test"
           --health-interval=10s
@@ -69,13 +67,15 @@ jobs:
           --health-retries=5
       redis:
         image: redis:6.2-alpine
+        ports:
+          - 6379:6379
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install test dependencies
         run: >
-          apt-get update && apt-get install --yes --no-install-recommends
+          sudo apt-get update && sudo apt-get install --yes --no-install-recommends
           build-essential git libpq-dev pkg-config postgresql-client jq curl imagemagick firefox-esr
 
       - name: Set up Ruby and bundle cache
