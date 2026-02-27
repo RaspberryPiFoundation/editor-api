@@ -127,13 +127,19 @@ jobs:
           run_url="${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
           if [ "$coverage" = 'unavailable' ]; then
-            message="### Test coverage
-SimpleCov coverage data was unavailable for this run.
-Run: $run_url"
+            message=$(cat <<EOF
+            ### Test coverage
+            SimpleCov coverage data was unavailable for this run.
+            Run: $run_url
+            EOF
+            )
           else
-            message="### Test coverage
-$coverage% line coverage reported by SimpleCov.
-Run: $run_url"
+            message=$(cat <<EOF
+            ### Test coverage
+            $coverage% line coverage reported by SimpleCov.
+            Run: $run_url
+            EOF
+            )
           fi
 
           {
