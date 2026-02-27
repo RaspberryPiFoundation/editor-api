@@ -42,13 +42,12 @@ class Project < ApplicationRecord
     }
   )
 
-  def self.users(current_user)
-    school = School.find_by(id: pluck(:school_id))
+  def self.users(school, current_user)
     SchoolStudent::List.call(school:, token: current_user.token, student_ids: pluck(:user_id).uniq)[:school_students] || []
   end
 
-  def self.with_users(current_user)
-    by_id = users(current_user).index_by(&:id)
+  def self.with_users(school, current_user)
+    by_id = users(school, current_user).index_by(&:id)
     all.map { |instance| [instance, by_id[instance.user_id]] }
   end
 

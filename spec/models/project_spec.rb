@@ -195,23 +195,23 @@ RSpec.describe Project, :versioning do
     end
 
     it 'returns User instances for the current scope' do
-      create(:project, user_id: student.id, school_id: school.id)
-      user = described_class.all.users(teacher).first
+      create(:project, school:, user_id: student.id)
+      user = described_class.all.users(school, teacher).first
       expect(user.name).to eq('School Student')
     end
 
     it 'ignores members where no profile account exists' do
-      user_id = SecureRandom.uuid
-      create(:project, user_id:)
+      stub_profile_api_list_school_students(school:, student_attributes: [])
+      create(:project, school:, user_id: student.id)
 
-      user = described_class.all.users(teacher).first
+      user = described_class.all.users(school, teacher).first
       expect(user).to be_nil
     end
 
     it 'ignores members not included in the current scope' do
-      create(:project)
+      create(:project, school:, user_id: student.id)
 
-      user = described_class.none.users(teacher).first
+      user = described_class.none.users(school, teacher).first
       expect(user).to be_nil
     end
   end
@@ -231,24 +231,24 @@ RSpec.describe Project, :versioning do
     it 'returns an array of class members paired with their User instance' do
       project = create(:project, user_id: student.id)
 
-      pair = described_class.all.with_users(teacher).first
-      user = described_class.all.users(teacher).first
+      pair = described_class.all.with_users(school, teacher).first
+      user = described_class.all.users(school, teacher).first
 
       expect(pair).to eq([project, user])
     end
 
     it 'returns nil values for members where no profile account exists' do
-      user_id = SecureRandom.uuid
-      project = create(:project, user_id:)
+      stub_profile_api_list_school_students(school:, student_attributes: [])
+      project = create(:project, school:, user_id: student.id)
 
-      pair = described_class.all.with_users(teacher).first
+      pair = described_class.all.with_users(school, teacher).first
       expect(pair).to eq([project, nil])
     end
 
     it 'ignores members not included in the current scope' do
       create(:project)
 
-      pair = described_class.none.with_users(teacher).first
+      pair = described_class.none.with_users(school, teacher).first
       expect(pair).to be_nil
     end
   end
@@ -266,16 +266,16 @@ RSpec.describe Project, :versioning do
     end
 
     it 'returns the class member paired with their User instance' do
-      project = create(:project, user_id: student.id)
+      project = create(:project, school:, user_id: student.id)
 
       pair = project.with_user(teacher)
-      user = described_class.all.users(teacher).first
+      user = described_class.all.users(school, teacher).first
 
       expect(pair).to eq([project, user])
     end
 
     it 'calls the Profile API to fetch the user' do
-      project = create(:project, user_id: student.id, school_id: school.id)
+      project = create(:project, school:, user_id: student.id)
 
       allow(SchoolStudent::List).to receive(:call).and_call_original
 
@@ -289,8 +289,8 @@ RSpec.describe Project, :versioning do
     end
 
     it 'returns a nil value if the member has no profile account' do
-      user_id = SecureRandom.uuid
-      project = create(:project, user_id:)
+      stub_profile_api_list_school_students(school:, student_attributes: [])
+      project = create(:project, school:, user_id: student.id)
 
       pair = project.with_user(teacher)
       expect(pair).to eq([project, nil])
