@@ -7,7 +7,7 @@ module SchoolStudent
         response = OperationResponse.new
         response[:school_students] = list_students(school, token, student_ids)
         response
-      rescue StandardError => e
+      rescue Faraday::Error => e
         Sentry.capture_exception(e)
         response[:error] = "Error listing school students: #{e}"
         response
