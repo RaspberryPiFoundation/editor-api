@@ -38,7 +38,7 @@ namespace :for_education do
       SchoolClass.where(id: [school_class_ids]).destroy_all
 
       # Destroy the school
-      School.find(school_id).destroy
+      School.where(id: school_id).destroy_all
 
       Rails.logger.info 'Done...'
     end
