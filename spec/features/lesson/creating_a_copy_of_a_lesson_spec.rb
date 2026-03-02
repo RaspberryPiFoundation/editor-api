@@ -55,7 +55,7 @@ RSpec.describe 'Creating a copy of a lesson', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     post("/api/lessons/#{lesson.id}/copy", headers:, params: { lesson: { name: ' ' } })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 401 Unauthorized when no token is given' do

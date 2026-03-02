@@ -70,7 +70,7 @@ RSpec.describe 'Create feedback requests', type: :request do
       end
 
       it 'returns unprocessable entity response' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'does not add the feedback to the school project' do

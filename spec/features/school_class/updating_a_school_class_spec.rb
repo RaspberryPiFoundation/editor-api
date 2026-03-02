@@ -53,7 +53,7 @@ RSpec.describe 'Updating a school class', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     put("/api/schools/#{school.id}/classes/#{school_class.id}", headers:, params: { school_class: { name: ' ' } })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 401 Unauthorized when no token is given' do

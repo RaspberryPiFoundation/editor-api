@@ -68,7 +68,7 @@ RSpec.describe 'School project complete requests', type: :request do
       end
 
       it 'completes unauthorized response' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'completes error message' do

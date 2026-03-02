@@ -181,7 +181,7 @@ RSpec.describe 'Creating a class member', type: :request do
 
     it 'responds 422 Unprocessable Entity' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'returns the error message in the operation response' do
