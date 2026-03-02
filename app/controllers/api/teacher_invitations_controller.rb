@@ -18,7 +18,7 @@ module Api
         @invitation.update!(accepted_at: Time.current) if @invitation.accepted_at.blank?
         head :ok
       else
-        render json: { error: role.errors }, status: :unprocessable_entity
+        render json: { error: role.errors }, status: :unprocessable_content
       end
     end
 

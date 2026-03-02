@@ -19,7 +19,7 @@ module Api
         @school_students = result[:school_students]
         render :index, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -31,7 +31,7 @@ module Api
       if result.success?
         head :no_content
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -41,7 +41,7 @@ module Api
                  error: StandardError,
                  error_type: :unprocessable_entity
                },
-               status: :unprocessable_entity
+               status: :unprocessable_content
         return
       end
 
@@ -57,7 +57,7 @@ module Api
         render json: {
           error: validation_result[:error],
           error_type: validation_result[:error_type]
-        }, status: :unprocessable_entity
+        }, status: :unprocessable_content
         return
       end
 
@@ -66,7 +66,7 @@ module Api
         enqueue_batches(students)
       rescue StandardError => e
         Rails.logger.error "Failed to enqueue GoodJob Batch: #{e}"
-        render json: { error: e, error_type: :batch_error }, status: :unprocessable_entity
+        render json: { error: e, error_type: :batch_error }, status: :unprocessable_content
         return
       end
 
@@ -105,7 +105,7 @@ module Api
       if result.success?
         head :no_content
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -133,7 +133,7 @@ module Api
                  error: 'No student IDs provided',
                  error_type: :unprocessable_entity
                },
-               status: :unprocessable_entity
+               status: :unprocessable_content
         return
       end
 

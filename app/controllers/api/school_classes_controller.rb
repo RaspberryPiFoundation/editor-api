@@ -30,7 +30,7 @@ module Api
         @school_class_with_teachers = result[:school_class].with_teachers
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -55,7 +55,7 @@ module Api
 
         render :import, formats: [:json], status: :created
       else
-        render json: { error: school_class_result[:error] }, status: :unprocessable_entity
+        render json: { error: school_class_result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -67,7 +67,7 @@ module Api
         @school_class_with_teachers = result[:school_class].with_teachers
         render :show, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -77,7 +77,7 @@ module Api
       if result.success?
         head :no_content
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
