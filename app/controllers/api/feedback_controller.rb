@@ -26,7 +26,7 @@ module Api
         @feedback = result[:feedback]
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -38,7 +38,7 @@ module Api
         @feedback = result[:feedback]
         render :show, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -48,7 +48,7 @@ module Api
       if result.success?
         head :no_content
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 

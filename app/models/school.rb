@@ -132,7 +132,7 @@ class School < ApplicationRecord
   # Ensure the school_roll_number is nil, not an empty string
   # Also normalize to uppercase for consistent validation
   def normalize_school_roll_number
-    self.school_roll_number = school_roll_number.blank? ? nil : school_roll_number.upcase
+    self.school_roll_number = (school_roll_number.presence&.upcase)
   end
 
   def verified_at_cannot_be_changed
