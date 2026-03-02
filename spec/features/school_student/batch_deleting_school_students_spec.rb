@@ -75,7 +75,7 @@ RSpec.describe 'Batch deleting school students', type: :request do
       delete "/api/schools/#{school.id}/students/batch",
              headers: headers
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       json = JSON.parse(response.body)
       expect(json['error']).to eq('No student IDs provided')
     end

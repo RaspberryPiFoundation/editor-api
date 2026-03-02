@@ -53,7 +53,7 @@ RSpec.describe 'Importing schools', type: :request do
       it 'responds 422 Unprocessable Entity' do
         post('/api/schools/import', headers:)
 
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
         data = JSON.parse(response.body, symbolize_names: true)
         expect(data[:error][:error_code]).to eq('CSV_FILE_REQUIRED')
       end

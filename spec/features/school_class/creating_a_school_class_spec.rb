@@ -78,7 +78,7 @@ RSpec.describe 'Creating a school class', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     post("/api/schools/#{school.id}/classes", headers:, params: { school_class: { name: ' ' } })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
