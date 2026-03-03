@@ -80,4 +80,4 @@ group :test do
   gem 'webmock'
 end
 
-gem 'flipper-ui', '~> 1.3'
+gem 'flipper-ui', '~> 1.4'
