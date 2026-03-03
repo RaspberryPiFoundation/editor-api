@@ -39,10 +39,6 @@ namespace :test_seeds do
       School.where(id: school_ids).destroy_all
 
       Rails.logger.info 'Done...'
-    rescue StandardError => e
-      pp "Failed: #{e.message}"
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
     end
   end
 
@@ -74,9 +70,6 @@ namespace :test_seeds do
         end
       end
       Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
     end
   end
 end

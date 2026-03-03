@@ -54,6 +54,43 @@ RSpec.describe 'Project show requests' do
       end
     end
 
+    context 'when setting scratch auth cookie' do
+      let(:project_type) { Project::Types::PYTHON }
+      let!(:project) { create(:project, school:, user_id: teacher.id, locale: nil, project_type:) }
+
+      before do
+        Flipper.disable :cat_mode
+        Flipper.disable_actor :cat_mode, school
+      end
+
+      it 'does not set auth cookie when project is not scratch' do
+        get("/api/projects/#{project.identifier}", headers:)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.cookies['scratch_auth']).to be_nil
+      end
+
+      context 'when project is code editor scratch' do
+        let(:project_type) { Project::Types::CODE_EDITOR_SCRATCH }
+
+        it 'does not set auth cookie when cat_mode is not enabled' do
+          get("/api/projects/#{project.identifier}", headers:)
+
+          expect(response).to have_http_status(:ok)
+          expect(response.cookies['scratch_auth']).to be_nil
+        end
+
+        it 'sets auth cookie to auth header' do
+          Flipper.enable_actor :cat_mode, school
+
+          get("/api/projects/#{project.identifier}", headers:)
+
+          expect(response).to have_http_status(:ok)
+          expect(cookies['scratch_auth']).to eq(UserProfileMock::TOKEN)
+        end
+      end
+    end
+
     context 'when loading a student\'s project' do
       let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
