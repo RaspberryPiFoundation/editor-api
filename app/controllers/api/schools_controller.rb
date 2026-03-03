@@ -25,7 +25,7 @@ module Api
         render json: {
           error: result[:error],
           error_types: result[:error_types]
-        }, status: :unprocessable_entity
+        }, status: :unprocessable_content
       end
     end
 
@@ -37,7 +37,7 @@ module Api
         @school = result[:school]
         render :show, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -47,7 +47,7 @@ module Api
       if result.success?
         head :no_content
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -56,7 +56,7 @@ module Api
 
       if params[:csv_file].blank?
         render json: { error: SchoolImportError.format_error(:csv_file_required, 'CSV file is required') },
-               status: :unprocessable_entity
+               status: :unprocessable_content
         return
       end
 
@@ -70,7 +70,7 @@ module Api
         @total_schools = result[:total_schools]
         render :import, formats: [:json], status: :accepted
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 

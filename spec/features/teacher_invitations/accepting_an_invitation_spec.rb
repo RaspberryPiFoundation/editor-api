@@ -73,7 +73,7 @@ RSpec.describe 'Accepting an invitations', type: :request do
         it 'responds 422 Unprocessable entity' do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'does not give the user the teacher role for the school to which they have been invited' do
@@ -108,7 +108,7 @@ RSpec.describe 'Accepting an invitations', type: :request do
         it 'responds 422 Unprocessable entity' do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'does not give the user the teacher role for the school to which they have been invited' do

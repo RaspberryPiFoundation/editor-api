@@ -66,7 +66,7 @@ RSpec.describe 'Creating a class member', type: :request do
 
         it 'responds 422 Unprocessable Entity' do
           post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns the error message from the operation response' do
@@ -132,7 +132,7 @@ RSpec.describe 'Creating a class member', type: :request do
 
         it 'responds 422 Unprocessable Entity' do
           post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: teacher_params)
-          expect(response).to have_http_status(:unprocessable_entity)
+          expect(response).to have_http_status(:unprocessable_content)
         end
 
         it 'returns the error message from the operation response' do
@@ -209,7 +209,7 @@ RSpec.describe 'Creating a class member', type: :request do
 
     it 'responds 422 Unprocessable Entity when params are invalid' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: invalid_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'returns the error message in the operation response' do

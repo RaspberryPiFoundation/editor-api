@@ -75,7 +75,7 @@ RSpec.describe 'Project update requests' do
 
       it 'returns error response' do
         put("/api/projects/#{project.identifier}", params:, headers:)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
 
@@ -84,7 +84,7 @@ RSpec.describe 'Project update requests' do
 
       it 'returns error response' do
         put("/api/projects/#{project.identifier}", params:, headers:)
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
     end
   end
@@ -146,7 +146,7 @@ RSpec.describe 'Project update requests' do
     it 'returns unprocessable entity if instructions updated' do
       params[:project][:instructions] = 'updated instructions'
       put("/api/projects/#{project.identifier}", params:, headers:)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 

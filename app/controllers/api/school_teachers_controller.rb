@@ -13,7 +13,7 @@ module Api
         @school_teachers = result[:school_teachers]
         render :index, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -23,7 +23,7 @@ module Api
       if result.success?
         head :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 

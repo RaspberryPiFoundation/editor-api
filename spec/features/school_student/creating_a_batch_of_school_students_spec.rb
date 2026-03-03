@@ -80,7 +80,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     expect do
       post("/api/schools/#{school.id}/students/batch", headers:, params:)
     end.not_to change(GoodJob::BatchRecord, :count)
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
 
     active_batches = GoodJob::BatchRecord.where(
       description: school.id,
@@ -126,12 +126,12 @@ RSpec.describe 'Creating a batch of school students', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     post("/api/schools/#{school.id}/students/batch", headers:, params: { school_students: [] })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 422 Unprocessable Entity with a suitable message when params are invalid' do
     post("/api/schools/#{school.id}/students/batch", headers:, params: bad_params)
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(response.body).to include('Decryption failed: iv must be 16 bytes')
   end
 
@@ -139,7 +139,7 @@ RSpec.describe 'Creating a batch of school students', type: :request do
     stub_profile_api_create_school_students_validation_error
     stub_profile_api_validate_students_with_validation_error
     post("/api/schools/#{school.id}/students/batch", headers:, params:)
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
     expect(response.body).to eq(
       {
         error: {

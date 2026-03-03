@@ -42,7 +42,7 @@ RSpec.describe 'Updating a lesson', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     put("/api/lessons/#{lesson.id}", headers:, params: { lesson: { name: ' ' } })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
@@ -125,7 +125,7 @@ RSpec.describe 'Updating a lesson', type: :request do
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

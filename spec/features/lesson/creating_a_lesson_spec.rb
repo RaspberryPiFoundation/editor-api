@@ -49,7 +49,7 @@ RSpec.describe 'Creating a lesson', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     post('/api/lessons', headers:, params: { lesson: { name: ' ' } })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
@@ -151,14 +151,14 @@ RSpec.describe 'Creating a lesson', type: :request do
       new_params = { lesson: params[:lesson].without(:school_id) }
 
       post('/api/lessons', headers:, params: new_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'responds 422 Unprocessable if school_class_id does not correspond to school_id' do
       new_params = { lesson: params[:lesson].merge(school_id: SecureRandom.uuid) }
 
       post('/api/lessons', headers:, params: new_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
@@ -183,7 +183,7 @@ RSpec.describe 'Creating a lesson', type: :request do
       new_params = { lesson: params[:lesson].merge(user_id:) }
 
       post('/api/lessons', headers:, params: new_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
   end
 end

@@ -74,7 +74,7 @@ RSpec.describe 'School project unsubmit requests', type: :request do
       end
 
       it 'returns unauthorized response' do
-        expect(response).to have_http_status(:unprocessable_entity)
+        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns error message' do
