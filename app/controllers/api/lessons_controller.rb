@@ -33,7 +33,7 @@ module Api
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -44,7 +44,7 @@ module Api
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -57,7 +57,7 @@ module Api
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 

@@ -17,7 +17,7 @@ module Api
         @class_members = result[:class_members]
         render :index, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -39,10 +39,10 @@ module Api
         @class_member = result[:class_members].first
         render :show, formats: [:json], status: :created
       else
-        render json: result.slice(:error, :errors), status: :unprocessable_entity
+        render json: result.slice(:error, :errors), status: :unprocessable_content
       end
     rescue ArgumentError => e
-      render json: { error: e.message }, status: :unprocessable_entity
+      render json: { error: e.message }, status: :unprocessable_content
     end
 
     def create_batch
@@ -53,7 +53,7 @@ module Api
       result = ClassMember::Create.call(school_class: @school_class, students:, teachers:)
 
       if result.failure? && result[:error].include?('No valid school members provided')
-        render json: result, status: :unprocessable_entity
+        render json: result, status: :unprocessable_content
       else
         successful = result[:class_members].map { |m| { success: true, user_id: m.user_id } }
         errors = result[:errors].map { |user_id, error| { success: false, user_id:, error: } }
@@ -67,7 +67,7 @@ module Api
       if result.success?
         head :no_content
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 

@@ -38,12 +38,9 @@ namespace :for_education do
       SchoolClass.where(id: [school_class_ids]).destroy_all
 
       # Destroy the school
-      School.find(school_id).destroy
+      School.where(id: school_id).destroy_all
 
       Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
     end
   end
 
@@ -60,9 +57,6 @@ namespace :for_education do
       create_school(creator_id, TEST_SCHOOL)
 
       Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
     end
   end
 
@@ -80,9 +74,6 @@ namespace :for_education do
       school = create_school(creator_id, TEST_SCHOOL)
       verify_school(school)
       Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
     end
   end
 
@@ -110,9 +101,6 @@ namespace :for_education do
         create_project(creator_id, school, lesson)
       end
       Rails.logger.info 'Done...'
-    rescue StandardError => e
-      Rails.logger.error "Failed: #{e.message}"
-      raise ActiveRecord::Rollback
     end
   end
 end

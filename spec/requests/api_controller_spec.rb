@@ -99,7 +99,7 @@ RSpec.describe ApiController do
     it 'responds with 422 Unprocessable entity status code' do
       get '/test'
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'responds with JSON including exception class & message' do

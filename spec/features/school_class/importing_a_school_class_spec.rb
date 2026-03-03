@@ -40,7 +40,7 @@ RSpec.describe 'Importing a school class', type: :request do
 
       post(import_url, headers:, params: params_missing_origin)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       error_response = JSON.parse(response.body)
       expect(error_response).to have_key('error')
       expect(error_response['error']).to include("Import origin can't be blank")
@@ -52,7 +52,7 @@ RSpec.describe 'Importing a school class', type: :request do
 
       post(import_url, headers:, params: params_missing_id)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       error_response = JSON.parse(response.body)
       expect(error_response).to have_key('error')
       expect(error_response['error']).to include("Import id can't be blank")
@@ -65,7 +65,7 @@ RSpec.describe 'Importing a school class', type: :request do
 
       post(import_url, headers:, params: params_missing_both)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       error_response = JSON.parse(response.body)
       expect(error_response).to have_key('error')
       expect(error_response['error']).to include("Import origin can't be blank")
@@ -77,7 +77,7 @@ RSpec.describe 'Importing a school class', type: :request do
 
       post(import_url, headers:, params: params_invalid_enum)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       error_response = JSON.parse(response.body)
       expect(error_response).to have_key('error')
       expect(error_response['error']).to include('Import origin is not included in the list')
@@ -89,7 +89,7 @@ RSpec.describe 'Importing a school class', type: :request do
 
       post(import_url, headers:, params: params_missing_name)
 
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
       error_response = JSON.parse(response.body)
       expect(error_response).to have_key('error')
       expect(error_response['error']).to include("Name can't be blank")

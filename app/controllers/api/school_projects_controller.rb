@@ -17,7 +17,7 @@ module Api
         @school_project = result[:school_project]
         render :show_status, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -28,7 +28,7 @@ module Api
         @school_project = result[:school_project]
         render :show_status, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -39,7 +39,7 @@ module Api
         @school_project = result[:school_project]
         render :show_status, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -50,7 +50,7 @@ module Api
         @school_project = result[:school_project]
         render :show_status, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -67,7 +67,7 @@ module Api
         @school_project = result[:school_project]
         render :finished, formats: [:json], status: :ok
       else
-        render json: { error: result[:error] }, status: :unprocessable_entity
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 

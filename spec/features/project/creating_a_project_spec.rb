@@ -53,7 +53,7 @@ RSpec.describe 'Creating a project', type: :request do
 
   it 'responds 422 Unprocessable Entity when params are invalid' do
     post('/api/projects', headers:, params: { project: { components: [{ name: ' ' }] } })
-    expect(response).to have_http_status(:unprocessable_entity)
+    expect(response).to have_http_status(:unprocessable_content)
   end
 
   it 'responds 401 Unauthorized when no token is given' do
@@ -168,21 +168,21 @@ RSpec.describe 'Creating a project', type: :request do
       new_params = { project: project.merge(user_id:) }
 
       post('/api/projects', headers:, params: new_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'responds 422 Unprocessable when lesson_id is provided but school_id is missing' do
       new_params = { project: params[:project].without(:school_id) }
 
       post('/api/projects', headers:, params: new_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'responds 422 Unprocessable when lesson_id does not correspond to school_id' do
       new_params = { project: params[:project].merge(lesson_id: SecureRandom.uuid) }
 
       post('/api/projects', headers:, params: new_params)
-      expect(response).to have_http_status(:unprocessable_entity)
+      expect(response).to have_http_status(:unprocessable_content)
     end
 
     it 'responds 403 Forbidden when the user is a school-owner for a different school' do
