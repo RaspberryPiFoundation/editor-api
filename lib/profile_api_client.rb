@@ -36,12 +36,21 @@ class ProfileApiClient
       @response_status = response.status
       @response_headers = response.headers
       @response_body = response.body
-
       super("Unexpected response from Profile API (status code #{response.status})")
     end
   end
 
   class << self
+    def check_auth(token:)
+      return true if ENV['BYPASS_OAUTH'].present?
+
+      response = connection(token).get('/api/v1/access')
+
+      response.status == 200
+    rescue Faraday::BadRequestError, Faraday::UnauthorizedError
+      false
+    end
+
     def create_school(token:, id:, code:)
       return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?
 
