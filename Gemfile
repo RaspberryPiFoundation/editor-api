@@ -28,7 +28,7 @@ gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
-gem 'omniauth-rails_csrf_protection', '~> 1.0.1'
+gem 'omniauth-rails_csrf_protection', '~> 2.0.1'
 gem 'omniauth-rpi',
     github: 'RaspberryPiFoundation/omniauth-rpi',
     tag: 'v1.3.1'
