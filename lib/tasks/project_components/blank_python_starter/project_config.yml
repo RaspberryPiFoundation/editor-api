@@ -1,6 +1,7 @@
 NAME: 'Blank Python Starter'
 IDENTIFIER: 'blank-python-starter'
 TYPE: 'python'
+LOCALE: 'global'
 COMPONENTS:
   - name: 'main'
     extension: 'py'

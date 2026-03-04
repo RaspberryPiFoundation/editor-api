@@ -5,7 +5,7 @@ class ProjectLoader
 
   def initialize(identifier, locales)
     @identifier = identifier
-    @locales = [*locales, 'en', nil]
+    @locales = [*locales, 'global', 'en', nil]
   end
 
   def load(include_images: false)

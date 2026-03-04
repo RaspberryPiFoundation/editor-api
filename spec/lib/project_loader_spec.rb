@@ -41,6 +41,14 @@ RSpec.describe ProjectLoader do
     end
   end
 
+  context 'when global project with identifier exists' do
+    let!(:global_project) { create(:project, identifier:, locale: 'global') }
+
+    it 'defaults to global' do
+      expect(loaded_project).to eq(global_project)
+    end
+  end
+
   context 'when no preferred locale or English versions but user version exists' do
     let!(:user_project) { create(:project, identifier:, locale: nil) }
 

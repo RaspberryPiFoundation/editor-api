@@ -18,7 +18,7 @@ class Locales
         pt-PT ro-RO ru-RU sh-ZW si-LK sk-SK sl-SI so-SO sq-AL sr-SP sv-SE sw-KE ta-IN te-IN th-TH tr-TR tt-RU uk-UA ur-PK vi-VN vls-BE xh-ZA zh-CN zh-TW
       ]
       I18n.default_locale = :en
-      I18n.available_locales = two_letter_locales + four_letter_locales
+      I18n.available_locales = two_letter_locales + four_letter_locales + [:global]
     end
   end
 end

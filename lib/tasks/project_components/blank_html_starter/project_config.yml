@@ -1,6 +1,7 @@
 NAME: 'Blank HTML & CSS Starter'
 IDENTIFIER: 'blank-html-starter'
 TYPE: 'html'
+LOCALE: 'global'
 COMPONENTS:
   - name: 'index'
     extension: 'html'
