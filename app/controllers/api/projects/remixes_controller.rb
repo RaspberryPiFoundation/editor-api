@@ -44,7 +44,9 @@ module Api
       end
 
       def load_and_authorize_remix
-        @project = Project.find_by!(remixed_from_id: project.id, user_id: current_user&.id)
+        @project = Project.where(remixed_from_id: project.id, user_id: current_user&.id)
+                          .order(created_at: :desc, updated_at: :desc)
+                          .first!
         authorize! :show, @project
       end
 
