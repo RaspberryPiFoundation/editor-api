@@ -53,7 +53,29 @@ services:
     platform: linux/amd64
     command: -u $SMEE_TUNNEL -t http://api:3009/github_webhooks
 
+  salesforce_connect:
+    image: ghcr.io/raspberrypifoundation/heroku-connect
+    volumes:
+      - salesforce_connect_data:/var/lib/postgres/data/
+    environment:
+      - POSTGRES_DB=salesforce_development
+      - POSTGRES_CLONE_DB=salesforce_test
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_USER=postgres
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -h 127.0.0.1 -U $${POSTGRES_USER} -d $${POSTGRES_DB}",
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    ports:
+      - "4101:5432"
+
 volumes:
   postgres-data:
   bundle-data-v2:
   node_modules:
+  salesforce_connect_data:
