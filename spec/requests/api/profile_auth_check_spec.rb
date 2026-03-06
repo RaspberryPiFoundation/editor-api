@@ -46,6 +46,21 @@ RSpec.describe 'Profile auth check API' do
       end
     end
 
+    context 'when the profile API returns forbidden' do
+      it 'returns can_use_profile_api: false' do
+        # Arrange
+        authenticated_in_hydra_as(student)
+        stub_request(:get, "#{ENV.fetch('IDENTITY_URL')}/api/v1/access").to_return(status: 403, headers:)
+
+        # Act
+        get '/api/profile_auth_check', headers: headers
+
+        # Assert
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body).to eq('can_use_profile_api' => false)
+      end
+    end
+
     context 'when there is no current user' do
       it 'returns can_use_profile_api: false' do
         # Arrange

@@ -47,7 +47,7 @@ class ProfileApiClient
       response = connection(token).get('/api/v1/access')
 
       response.status == 200
-    rescue Faraday::BadRequestError, Faraday::UnauthorizedError
+    rescue Faraday::BadRequestError, Faraday::UnauthorizedError, Faraday::ForbiddenError
       false
     end
 
