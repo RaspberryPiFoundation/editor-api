@@ -182,7 +182,7 @@ RSpec.describe Project, :versioning do
     end
   end
 
-  describe '.users' do
+  describe '.students' do
     let(:student) { create(:student, school:, name: 'School Student') }
     let(:teacher) { create(:teacher, school:) }
 
@@ -196,7 +196,7 @@ RSpec.describe Project, :versioning do
 
     it 'returns User instances for the current scope' do
       create(:project, school:, user_id: student.id)
-      user = described_class.all.users(school, teacher).first
+      user = described_class.all.students(school, teacher).first
       expect(user.name).to eq('School Student')
     end
 
@@ -204,19 +204,19 @@ RSpec.describe Project, :versioning do
       stub_profile_api_list_school_students(school:, student_attributes: [])
       create(:project, school:, user_id: student.id)
 
-      user = described_class.all.users(school, teacher).first
-      expect(user).to be_nil
+      student = described_class.all.students(school, teacher).first
+      expect(student).to be_nil
     end
 
     it 'ignores members not included in the current scope' do
       create(:project, school:, user_id: student.id)
 
-      user = described_class.none.users(school, teacher).first
-      expect(user).to be_nil
+      student = described_class.none.students(school, teacher).first
+      expect(student).to be_nil
     end
   end
 
-  describe '.with_users' do
+  describe '.with_students' do
     let(:student) { create(:student, school:) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -231,29 +231,29 @@ RSpec.describe Project, :versioning do
     it 'returns an array of class members paired with their User instance' do
       project = create(:project, user_id: student.id)
 
-      pair = described_class.all.with_users(school, teacher).first
-      user = described_class.all.users(school, teacher).first
+      pair = described_class.all.with_students(school, teacher).first
+      students = described_class.all.students(school, teacher).first
 
-      expect(pair).to eq([project, user])
+      expect(pair).to eq([project, students])
     end
 
     it 'returns nil values for members where no profile account exists' do
       stub_profile_api_list_school_students(school:, student_attributes: [])
       project = create(:project, school:, user_id: student.id)
 
-      pair = described_class.all.with_users(school, teacher).first
+      pair = described_class.all.with_students(school, teacher).first
       expect(pair).to eq([project, nil])
     end
 
     it 'ignores members not included in the current scope' do
       create(:project)
 
-      pair = described_class.none.with_users(school, teacher).first
+      pair = described_class.none.with_students(school, teacher).first
       expect(pair).to be_nil
     end
   end
 
-  describe '#with_user' do
+  describe '#with_student' do
     let(:student) { create(:student, school:) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -268,10 +268,10 @@ RSpec.describe Project, :versioning do
     it 'returns the class member paired with their User instance' do
       project = create(:project, school:, user_id: student.id)
 
-      pair = project.with_user(teacher)
-      user = described_class.all.users(school, teacher).first
+      pair = project.with_student(teacher)
+      student = described_class.all.students(school, teacher).first
 
-      expect(pair).to eq([project, user])
+      expect(pair).to eq([project, student])
     end
 
     it 'calls the Profile API to fetch the user' do
@@ -279,7 +279,7 @@ RSpec.describe Project, :versioning do
 
       allow(SchoolStudent::List).to receive(:call).and_call_original
 
-      project.with_user(teacher)
+      project.with_student(teacher)
 
       expect(SchoolStudent::List).to have_received(:call).with(
         school:,
@@ -292,7 +292,7 @@ RSpec.describe Project, :versioning do
       stub_profile_api_list_school_students(school:, student_attributes: [])
       project = create(:project, school:, user_id: student.id)
 
-      pair = project.with_user(teacher)
+      pair = project.with_student(teacher)
       expect(pair).to eq([project, nil])
     end
 
@@ -302,7 +302,7 @@ RSpec.describe Project, :versioning do
 
         allow(SchoolStudent::List).to receive(:call)
 
-        pair = project.with_user(student)
+        pair = project.with_student(student)
 
         expect(pair).to eq([project, nil])
         expect(SchoolStudent::List).not_to have_received(:call)

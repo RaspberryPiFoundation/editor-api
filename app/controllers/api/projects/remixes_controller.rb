@@ -9,7 +9,7 @@ module Api
 
       def index
         projects = Project.where(remixed_from_id: project.id).accessible_by(current_ability)
-        @projects_with_students = projects.includes(:school_project).with_users(project.school, current_user)
+        @projects_with_students = projects.includes(:school_project).with_students(project.school, current_user)
         render index: @projects_with_students, formats: [:json]
       end
 
