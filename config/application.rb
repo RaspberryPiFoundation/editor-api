@@ -48,8 +48,6 @@ module App
       g.test_framework :rspec
     end
 
-    config.assets.css_compressor = nil
-
     config.active_job.queue_adapter = :good_job
 
     config.to_prepare do
