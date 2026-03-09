@@ -119,7 +119,8 @@ module Api
             :name,
             :project_type,
             :locale,
-            { components: %i[id name extension content index default] }
+            { components: %i[id name extension content index default] },
+            { scratch_component: {} }
           ]
         }
       )

@@ -4,7 +4,14 @@ require 'rails_helper'
 
 RSpec.describe 'Showing a Scratch project', type: :request do
   it 'returns scratch project JSON' do
-    get '/api/scratch/projects/any-identifier'
+    project = create(
+      :project,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      locale: 'en'
+    )
+    create(:scratch_component, project: project)
+
+    get "/api/scratch/projects/#{project.identifier}"
 
     expect(response).to have_http_status(:ok)
 

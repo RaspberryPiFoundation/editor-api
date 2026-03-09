@@ -13,6 +13,7 @@ class Project < ApplicationRecord
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
   has_many :remixes, dependent: :nullify, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :parent
   has_many :components, -> { order(default: :desc, name: :asc) }, dependent: :destroy, inverse_of: :project
+  has_one :scratch_component, dependent: :destroy, inverse_of: :project, required: false
   has_many :project_errors, dependent: :nullify
   has_many_attached :images
   has_many_attached :videos
@@ -20,6 +21,7 @@ class Project < ApplicationRecord
   has_one :school_project, dependent: :destroy
 
   accepts_nested_attributes_for :components
+  accepts_nested_attributes_for :scratch_component
 
   before_validation :check_unique_not_null, on: :create
   before_validation :create_school_project_if_needed
@@ -67,6 +69,10 @@ class Project < ApplicationRecord
   # https://github.com/CanCanCommunity/cancancan/issues/774
   def components=(array)
     super(array.map { |o| o.is_a?(Hash) ? Component.new(o) : o })
+  end
+
+  def scratch_component=(value)
+    super(value.is_a?(Hash) ? ScratchComponent.new(value) : value)
   end
 
   def last_edited_at

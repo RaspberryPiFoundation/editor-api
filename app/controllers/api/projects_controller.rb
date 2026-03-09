@@ -117,6 +117,7 @@ module Api
         {
           components: %i[id name extension content index default]
         },
+        scratch_component: {},
         parent: {},
         image_list: []
       )
