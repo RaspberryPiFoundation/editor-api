@@ -159,12 +159,7 @@ Once you have completed the initial setup and have everything running in a conta
 
 then in a second terminal, create the ERD using:
 
-`docker-compose exec api /bin/bash`
-
-`bundle exec erd`
-
-`exit`
-
+`docker-compose exec api bundle exec erd`
 then copy the created ERD out of the container with:
 
 `docker ps` to get a container id for the running `editor-api:builder` container, e.g. `0123456789ab`
