@@ -23,8 +23,12 @@ class ApiController < ActionController::API
     render json: { error: 'Unauthorized' }, status: :unauthorized unless current_user
   end
 
-  def denied(exception)
-    render_error_as_json(exception, :forbidden)
+  def denied(_exception)
+    if current_user
+      render json: { error: 'Forbidden' }, status: :forbidden
+    else
+      render json: { error: 'Unauthorized' }, status: :unauthorized
+    end
   end
 
   def not_found(exception)

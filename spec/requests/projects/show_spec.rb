@@ -254,10 +254,10 @@ RSpec.describe 'Project show requests' do
         }.to_json
       end
 
-      it 'returns forbidden response' do
+      it 'returns unauthorized response' do
         get("/api/projects/#{project.identifier}", headers:)
 
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
       end
 
       it 'does not return the project json' do
