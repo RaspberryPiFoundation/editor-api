@@ -21,20 +21,31 @@ RSpec.describe 'Updating a Scratch project', type: :request do
   it 'responds 404 Not Found when cat_mode is not enabled' do
     authenticated_in_hydra_as(teacher)
 
-    put '/api/scratch/projects/any-identifier', params: { project: { targets: [] } }, headers: cookie_headers
+    put '/api/scratch/projects/any-identifier', params: { content: { targets: [] } }, headers: cookie_headers
 
     expect(response).to have_http_status(:not_found)
   end
 
   it 'updates a project when cat_mode is enabled and a cookie is provided' do
+    # Arrange
     authenticated_in_hydra_as(teacher)
     Flipper.enable_actor :cat_mode, school
+    project = create(
+      :project,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      locale: 'en'
+    )
+    create(:scratch_component, project: project)
 
-    put '/api/scratch/projects/any-identifier', params: { project: { targets: [] } }, headers: cookie_headers
+    # Act
+    put "/api/scratch/projects/#{project.identifier}", params: { content: { targets: ['some update'] } }, headers: cookie_headers
 
+    # Assert
     expect(response).to have_http_status(:ok)
 
     data = JSON.parse(response.body, symbolize_names: true)
     expect(data[:status]).to eq('ok')
+
+    expect(project.reload.scratch_component.content.to_h['targets']).to eq(['some update'])
   end
 end
