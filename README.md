@@ -162,9 +162,7 @@ then in a second terminal, create the ERD using:
 `docker-compose exec api bundle exec erd`
 then copy the created ERD out of the container with:
 
-`docker ps` to get a container id for the running `editor-api:builder` container, e.g. `0123456789ab`
-
-`docker cp 0123456789ab:/app/EditorAPI-ERD.pdf .`
+`docker cp "$(docker-compose ps -q api)":/app/EditorAPI-ERD.pdf .`
 
 ## Usage
 
