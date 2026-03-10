@@ -38,7 +38,7 @@ RSpec.describe 'Updating a Scratch project', type: :request do
     create(:scratch_component, project: project)
 
     # Act
-    put "/api/scratch/projects/#{project.identifier}", params: { content: { targets: ['some update'] } }, headers: cookie_headers
+    put "/api/scratch/projects/#{project.identifier}", params: { targets: ['some update'] }, headers: cookie_headers
 
     # Assert
     expect(response).to have_http_status(:ok)

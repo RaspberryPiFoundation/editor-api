@@ -12,7 +12,7 @@ module Api
       end
 
       def update
-        @project.scratch_component&.content = params[:content]
+        @project.scratch_component&.content = params
         @project.save
         render json: { status: 'ok' }, status: :ok
       end
