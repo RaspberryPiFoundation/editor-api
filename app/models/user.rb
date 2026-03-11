@@ -51,6 +51,10 @@ class User
     Role.student.exists?(user_id: id)
   end
 
+  def student_profile?
+    student? || parsed_roles.include?('school-student') || profile == 'student'
+  end
+
   def admin?
     parsed_roles.include?('editor-admin')
   end
@@ -107,7 +111,10 @@ class User
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)
 
-    args['id'] ||= auth['sub'].sub('student:', '')
+    if auth['sub'].present?
+      args['id'] ||= auth['sub'].sub('student:', '')
+      args['profile'] ||= 'student' if auth['sub'].start_with?('student:')
+    end
     args['token'] = token
 
     new(args)

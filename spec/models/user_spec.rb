@@ -118,6 +118,10 @@ RSpec.describe User do
       it 'returns a user without an email' do
         expect(user.email).to be_nil
       end
+
+      it 'marks the user profile as student from Hydra subject' do
+        expect(user.profile).to eq('student')
+      end
     end
 
     context 'when the access token is invalid' do
@@ -274,6 +278,33 @@ RSpec.describe User do
     it 'returns false when the user does not have a student role' do
       create(:owner_role, school:, user_id: user.id)
       expect(user).not_to be_student
+    end
+  end
+
+  describe '#student_profile?' do
+    it 'returns true when the user has a student role in editor-api' do
+      user = create(:user)
+      create(:student_role, school:, user_id: user.id)
+
+      expect(user).to be_student_profile
+    end
+
+    it 'returns true when Hydra marks the user as a school student' do
+      user = build(:user, roles: 'school-student')
+
+      expect(user).to be_student_profile
+    end
+
+    it 'returns true when the user profile is student' do
+      user = build(:user, profile: 'student')
+
+      expect(user).to be_student_profile
+    end
+
+    it 'returns false for non-student users' do
+      user = build(:user, roles: 'editor-admin', profile: nil)
+
+      expect(user).not_to be_student_profile
     end
   end
 
