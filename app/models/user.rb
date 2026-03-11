@@ -51,8 +51,8 @@ class User
     Role.student.exists?(user_id: id)
   end
 
-  def student_profile?
-    student? || parsed_roles.include?('school-student') || profile == 'student'
+  def student_account?
+    profile == 'student'
   end
 
   def admin?

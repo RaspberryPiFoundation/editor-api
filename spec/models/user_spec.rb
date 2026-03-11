@@ -281,30 +281,17 @@ RSpec.describe User do
     end
   end
 
-  describe '#student_profile?' do
-    it 'returns true when the user has a student role in editor-api' do
-      user = create(:user)
-      create(:student_role, school:, user_id: user.id)
-
-      expect(user).to be_student_profile
-    end
-
-    it 'returns true when Hydra marks the user as a school student' do
-      user = build(:user, roles: 'school-student')
-
-      expect(user).to be_student_profile
-    end
-
+  describe '#student_account?' do
     it 'returns true when the user profile is student' do
       user = build(:user, profile: 'student')
 
-      expect(user).to be_student_profile
+      expect(user).to be_student_account
     end
 
     it 'returns false for non-student users' do
       user = build(:user, roles: 'editor-admin', profile: nil)
 
-      expect(user).not_to be_student_profile
+      expect(user).not_to be_student_account
     end
   end
 

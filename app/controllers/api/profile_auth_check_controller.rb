@@ -16,7 +16,7 @@ module Api
 
     def profile_api_eligible_user?
       return false if current_user.blank?
-      return false if current_user.student_profile?
+      return false if current_user.student_account?
 
       true
     end
