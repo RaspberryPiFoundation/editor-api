@@ -36,7 +36,7 @@ Rails.application.routes.draw do
     namespace :scratch do
       resources :projects, only: %i[show update]
       get '/assets/internalapi/asset/:id(.:format)/get/' => 'assets#show'
-      post '/assets/:id' => 'assets#create'
+      post '/assets/:id(.:format)' => 'assets#create'
     end
 
     resource :default_project, only: %i[show] do
