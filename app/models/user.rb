@@ -1,14 +1,22 @@
 # frozen_string_literal: true
 
+require 'rpi_auth/models/account_types'
+
 class User
   include ActiveModel::Serialization
   include ActiveModel::Model
+
+  RPI_AUTH_ACCOUNT_TYPE_MODEL = Class.new do
+    include RpiAuth::Models::AccountTypes
+  end
+  private_constant :RPI_AUTH_ACCOUNT_TYPE_MODEL
 
   ATTRIBUTES = %w[
     country
     country_code
     email
     email_verified
+    auth_subject
     id
     name
     nickname
@@ -52,7 +60,7 @@ class User
   end
 
   def student_account?
-    profile == 'student'
+    self.class.student_account_subject?(student_account_subject)
   end
 
   def admin?
@@ -96,6 +104,7 @@ class User
     return nil unless auth
 
     args = auth.extra.raw_info.to_h.slice(*ATTRIBUTES)
+    args['auth_subject'] = auth.uid
     args['id'] = auth.uid
     args['token'] = auth.credentials&.token
 
@@ -110,13 +119,27 @@ class User
 
     auth = auth.stringify_keys
     args = auth.slice(*ATTRIBUTES)
+    args['auth_subject'] = auth['sub']
 
     if auth['sub'].present?
       args['id'] ||= auth['sub'].sub('student:', '')
-      args['profile'] ||= 'student' if auth['sub'].start_with?('student:')
+      args['profile'] ||= 'student' if student_account_subject?(auth['sub'])
     end
     args['token'] = token
 
     new(args)
+  end
+
+  def self.student_account_subject?(subject)
+    RPI_AUTH_ACCOUNT_TYPE_MODEL.new(user_id: subject).student_account?
+  end
+
+  private
+
+  def student_account_subject
+    return auth_subject if auth_subject.present?
+    return "student:#{id}" if profile == 'student'
+
+    id
   end
 end

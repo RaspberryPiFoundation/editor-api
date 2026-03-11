@@ -28,10 +28,14 @@ gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
 gem 'kaminari'
-gem 'omniauth-rails_csrf_protection', '~> 2.0.1'
+gem 'omniauth-rails_csrf_protection', '~> 1.0.0'
 gem 'omniauth-rpi',
     github: 'RaspberryPiFoundation/omniauth-rpi',
     tag: 'v1.3.1'
+gem 'rpi_auth',
+    github: 'RaspberryPiFoundation/rpi-auth',
+    tag: 'v4.4.0',
+    require: false
 gem 'open-uri'
 gem 'paper_trail'
 gem 'pg', '~> 1.6'

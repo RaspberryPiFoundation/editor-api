@@ -70,6 +70,10 @@ RSpec.describe User do
         expect(user.email).to eq 'school-owner@example.com'
       end
 
+      it 'stores the Hydra subject for account helpers' do
+        expect(user.auth_subject).to eq(owner.id)
+      end
+
       it 'returns a user without a username' do
         expect(user.username).to be_nil
       end
@@ -121,6 +125,10 @@ RSpec.describe User do
 
       it 'marks the user profile as student from Hydra subject' do
         expect(user.profile).to eq('student')
+      end
+
+      it 'stores the Hydra subject for account helpers' do
+        expect(user.auth_subject).to eq("student:#{student.id}")
       end
     end
 
@@ -282,14 +290,20 @@ RSpec.describe User do
   end
 
   describe '#student_account?' do
-    it 'returns true when the user profile is student' do
-      user = build(:user, profile: 'student')
+    it 'returns true when auth_subject has the student prefix' do
+      user = build(:user, auth_subject: 'student:abc', profile: nil)
+
+      expect(user).to be_student_account
+    end
+
+    it 'returns true for backward-compatible session users with profile student' do
+      user = build(:user, id: 'abc', auth_subject: nil, profile: 'student')
 
       expect(user).to be_student_account
     end
 
     it 'returns false for non-student users' do
-      user = build(:user, roles: 'editor-admin', profile: nil)
+      user = build(:user, auth_subject: 'abc', roles: 'editor-admin', profile: nil)
 
       expect(user).not_to be_student_account
     end
