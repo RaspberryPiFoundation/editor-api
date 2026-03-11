@@ -151,6 +151,20 @@ Handled in `config/initializers/cors.rb`.
 
 This API receives push event data from the [Raspberry Pi Learning](https://github.com/raspberrypilearning) organisation via webhooks. This data is used to create or update code projects related to the [Code Club Projects Site](https://projects.raspberrypi.org), and is processed using the `github_webhooks` gem in the `github_webhooks_controller`. For development purposes, these webhooks are mediated locally through `smee`, which runs in a Docker container.
 
+### Database Structure
+
+Once you have completed the initial setup and have everything running in a container, you can generate an Entity-Relationship Diagram (ERD) to help you to understand the database structure. In order to do this, start things up as usual in one terminal:
+
+`docker-compose up`
+
+then in a second terminal, create the ERD using:
+
+`docker-compose exec api bundle exec erd`
+
+then copy the created ERD out of the container with:
+
+`docker cp "$(docker-compose ps -q api)":/app/EditorAPI-ERD.pdf .`
+
 ## Usage
 
 ### Projects
