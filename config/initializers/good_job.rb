@@ -2,7 +2,7 @@
 
 Rails.application.config.to_prepare do
   GoodJob::ApplicationController.class_eval do
-    include AuthenticationHelper
+    include RpiAuth::Controllers::CurrentUser
 
     before_action :authenticate_admin
 

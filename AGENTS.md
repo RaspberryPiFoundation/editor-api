@@ -37,7 +37,7 @@ docker compose up
 - CI: GitHub Actions with Ruby 3.4, Postgres 12, Redis.
 
 ## Where to Look First
-- Routes: `config/routes.rb`. Auth: `config/initializers/omniauth.rb`, `app/helpers/authentication_helper.rb`, `app/controllers/concerns/identifiable.rb`.
+- Routes: `config/routes.rb`. Auth: `config/initializers/rpi_auth.rb`, `app/controllers/concerns/identifiable.rb`.
 - Permissions: `app/models/ability.rb`. Domain ops: `lib/concepts/**`. Models: `app/models/**`. GraphQL: `app/graphql/**`.
 
 ## Security

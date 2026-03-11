@@ -2,7 +2,7 @@
 
 module Admin
   class ApplicationController < Administrate::ApplicationController
-    include AuthenticationHelper
+    include RpiAuth::Controllers::CurrentUser
 
     before_action :authenticate_admin
 

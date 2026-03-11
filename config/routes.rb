@@ -106,7 +106,10 @@ Rails.application.routes.draw do
 
   root to: 'auth#index'
 
+  # rpi_auth adds OmniAuth middleware for this path; this route exists to keep
+  # the existing login_path helper and request specs.
   post '/auth/rpi', as: 'login'
-  get '/auth/callback', to: 'auth#callback', as: 'callback'
-  get '/logout', to: 'auth#destroy', as: 'logout'
+  # Backwards-compatible aliases for previous auth endpoints.
+  get '/auth/callback', to: 'rpi_auth/auth#callback', as: 'callback'
+  get '/logout', to: 'rpi_auth/auth#destroy', as: 'logout'
 end
