@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-json.array!(@projects_with_users) do |project, user|
+json.array!(@projects_with_students) do |project, student|
   json.call(
     project,
     :identifier,
@@ -11,7 +11,7 @@ json.array!(@projects_with_users) do |project, user|
     :last_edited_at
   )
 
-  json.user_name(user&.name)
+  json.user_name(student&.name)
   json.finished(project.school_project&.finished)
   json.status(project.school_project&.status)
 end

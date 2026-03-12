@@ -76,18 +76,40 @@ RSpec.describe ApiController do
       test_controller.error = CanCan::AccessDenied.new('foo')
     end
 
-    it 'responds with 403 Forbidden status code' do
-      get '/test'
+    context 'when current_user is not set' do
+      it 'responds with 401 Unauthorized status code' do
+        get '/test'
 
-      expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      it 'responds with JSON including error message' do
+        get '/test'
+
+        expect(response.parsed_body).to include(
+          'error' => 'Unauthorized'
+        )
+      end
     end
 
-    it 'responds with JSON including exception class & message' do
-      get '/test'
+    context 'when current_user is set' do
+      before do
+        allow(User).to receive(:from_token).and_return(User.new)
+      end
 
-      expect(response.parsed_body).to include(
-        'error' => 'CanCan::AccessDenied: foo'
-      )
+      it 'responds with 403 Forbidden status code' do
+        get '/test', headers: { 'Authorization' => 'secret' }
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'responds with JSON including error message' do
+        get '/test', headers: { 'Authorization' => 'secret' }
+
+        expect(response.parsed_body).to include(
+          'error' => 'Forbidden'
+        )
+      end
     end
   end
 
