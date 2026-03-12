@@ -11,16 +11,6 @@ module Api
       end
 
       def create
-        filename_with_extension = "#{params[:id]}.#{params[:format]}"
-
-        asset = ScratchAsset.new(filename: filename_with_extension)
-        asset.file.attach(
-          io: StringIO.new(params[:content].to_s),
-          filename: filename_with_extension
-        )
-
-        asset.save!
-
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
       end
     end
