@@ -85,9 +85,9 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'is idempotent' do
-      school = School.find_by(creator_id:)
-      owner_class = SchoolClass.joins(:teachers).find_by(school_id: school.id, teachers: { teacher_id: creator_id })
-      teacher_class = SchoolClass.joins(:teachers).find_by(school_id: school.id, teachers: { teacher_id: })
+      school = School.find_by!(creator_id:)
+      owner_class = SchoolClass.joins(:teachers).find_by!(school_id: school.id, teachers: { teacher_id: creator_id })
+      teacher_class = SchoolClass.joins(:teachers).find_by!(school_id: school.id, teachers: { teacher_id: })
 
       expect do
         task.reenable
