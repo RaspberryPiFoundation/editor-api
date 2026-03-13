@@ -44,32 +44,31 @@ namespace :test_seeds do
 
   desc 'Create a school with lessons and students'
   task create: :environment do
-    if School.find_by(code: TEST_SCHOOL)
+    if School.exists?(id: TEST_SCHOOL)
       puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
-      return
-    end
+    else
+      ActiveRecord::Base.transaction do
+        Rails.logger.info 'Attempting to seed data...'
+        creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+        teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
-    ActiveRecord::Base.transaction do
-      Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
-      teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
+        school = create_school(creator_id, TEST_SCHOOL)
+        verify_school(school)
+        assign_a_teacher(teacher_id, school)
 
-      school = create_school(creator_id, TEST_SCHOOL)
-      verify_school(school)
-      assign_a_teacher(teacher_id, school)
+        # for each of the owner and teacher, create a class and assign students
+        [creator_id, teacher_id].each do |user_id|
+          teacher_name = user_id == creator_id ? 'Jane Doe' : 'John Doe'
+          school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
+          assign_students(school_class, school)
 
-      # for each of the owner and teacher, create a class and assign students
-      [creator_id, teacher_id].each do |user_id|
-        teacher_name = user_id == creator_id ? 'Jane Doe' : 'John Doe'
-        school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
-        assign_students(school_class, school)
-
-        lessons = create_lessons(user_id, school, school_class)
-        lessons.each do |lesson|
-          create_project(user_id, school, lesson, 'print("Hello World!")')
+          lessons = create_lessons(user_id, school, school_class)
+          lessons.each do |lesson|
+            create_project(user_id, school, lesson, 'print("Hello World!")')
+          end
         end
+        Rails.logger.info 'Done...'
       end
-      Rails.logger.info 'Done...'
     end
   end
 end

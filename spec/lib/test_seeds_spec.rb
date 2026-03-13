@@ -84,6 +84,20 @@ RSpec.describe 'test_seeds', type: :task do
       expect(ClassTeacher.where(teacher_id:).length).to eq(1)
     end
 
+    it 'is idempotent' do
+      school = School.find_by(creator_id:)
+      owner_class = SchoolClass.joins(:teachers).find_by(school_id: school.id, teachers: { teacher_id: creator_id })
+      teacher_class = SchoolClass.joins(:teachers).find_by(school_id: school.id, teachers: { teacher_id: })
+
+      expect do
+        task.reenable
+        task.invoke
+      end.not_to change { [SchoolClass.where(school_id: school.id).count, Lesson.where(school_id: school.id).count, Project.where(school_id: school.id).count] }
+
+      expect(owner_class.reload.lessons.count).to eq(2)
+      expect(teacher_class.reload.lessons.count).to eq(2)
+    end
+
     it 'assigns students' do
       school_id = School.find_by(creator_id:).id
       school_class_id = SchoolClass.find_by(school_id:).id
