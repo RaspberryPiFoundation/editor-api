@@ -36,8 +36,10 @@ RSpec.describe 'test_seeds', type: :task do
 
   describe ':seed_a_school_with_lessons_and_students' do
     let(:task) { Rake::Task['test_seeds:create'] }
+    let(:seed_country_code) { nil }
 
     before do
+      allow(Faker::Address).to receive(:country_code).and_return(seed_country_code) if seed_country_code
       task.reenable
       task.invoke
     end
@@ -89,6 +91,21 @@ RSpec.describe 'test_seeds', type: :task do
       expect(ClassStudent.where(student_id: student_1, school_class_id:)).to exist
       expect(Role.student.where(user_id: student_2, school_id:)).to exist
       expect(ClassStudent.where(student_id: student_2, school_class_id:)).to exist
+    end
+
+    context 'when the seeded school is in the US' do
+      let(:seed_country_code) { 'US' }
+
+      it 'creates a valid school and owner lessons' do
+        school = School.find_by(creator_id:)
+        school_class = SchoolClass.joins(:teachers).find_by(school_id: school.id, teachers: { teacher_id: creator_id })
+
+        expect(school).to be_valid
+        expect(school.district_nces_id).to match(/\A\d{7}\z/)
+        expect(school.district_name).to be_present
+        expect(school_class).not_to be_nil
+        expect(Lesson.where(school_id: school.id, school_class_id: school_class.id).length).to eq(2)
+      end
     end
   end
 end
