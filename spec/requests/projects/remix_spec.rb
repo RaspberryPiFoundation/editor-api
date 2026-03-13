@@ -73,20 +73,20 @@ RSpec.describe 'Remix requests' do
       end
 
       context 'when multiple remixes exist for the same user and project' do
-        before do
+        let!(:oldest_remix) do
           create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id,
                            created_at: 2.days.ago, updated_at: 2.days.ago)
         end
 
-        let!(:newer_remix) do
+        before do
           create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id,
                            created_at: 1.hour.from_now, updated_at: 1.hour.from_now)
         end
 
-        it 'returns the most recently created remix' do
+        it 'returns the oldest created remix' do
           get("/api/projects/#{original_project.identifier}/remix", headers:)
 
-          expect(response.parsed_body['identifier']).to eq(newer_remix.identifier)
+          expect(response.parsed_body['identifier']).to eq(oldest_remix.identifier)
         end
       end
     end
@@ -120,19 +120,19 @@ RSpec.describe 'Remix requests' do
       end
 
       context 'when multiple remixes exist for the same user and project' do
-        before do
+        let!(:oldest_remix) do
           create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id,
                            created_at: 2.days.ago, updated_at: 2.days.ago)
         end
 
-        let!(:newer_remix) do
+        before do
           create(:project, remixed_from_id: original_project.id, user_id: authenticated_user.id,
                            created_at: 1.hour.from_now, updated_at: 1.hour.from_now)
         end
 
-        it 'returns the identifier of the most recently created remix' do
+        it 'returns the identifier of the oldest created remix' do
           get("/api/projects/#{original_project.identifier}/remix/identifier", headers:)
-          expect(response.parsed_body['identifier']).to eq(newer_remix.identifier)
+          expect(response.parsed_body['identifier']).to eq(oldest_remix.identifier)
         end
       end
     end

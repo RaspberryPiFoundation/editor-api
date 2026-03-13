@@ -3,6 +3,8 @@
 module Api
   module Projects
     class RemixesController < ApiController
+      include RemixSelection
+
       before_action :authorize_user
       load_and_authorize_resource :school, only: :index
       before_action :load_and_authorize_remix, only: %i[show show_identifier]
@@ -44,9 +46,9 @@ module Api
       end
 
       def load_and_authorize_remix
-        @project = Project.where(remixed_from_id: project.id, user_id: current_user&.id)
-                          .order(created_at: :desc, updated_at: :desc)
-                          .first!
+        @project = remix_for_user(project, current_user)
+        raise ActiveRecord::RecordNotFound unless @project
+
         authorize! :show, @project
       end
 
