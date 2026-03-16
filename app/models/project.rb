@@ -75,7 +75,7 @@ class Project < ApplicationRecord
 
   def last_edited_at
     # datetime that the project or one of its components was last updated
-    [updated_at, components.maximum(:updated_at)].compact.max
+    [updated_at, components.maximum(:updated_at), scratch_component&.updated_at].compact.max
   end
 
   def media
