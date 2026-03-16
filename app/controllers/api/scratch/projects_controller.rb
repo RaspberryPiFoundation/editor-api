@@ -12,7 +12,8 @@ module Api
       end
 
       def update
-        @project.scratch_component.content = params
+        scratch_content = params.permit!.slice(:meta, :targets, :monitors, :extensions)
+        @project.scratch_component&.content = scratch_content.to_unsafe_h
         @project.save!
         render json: { status: 'ok' }, status: :ok
       end
