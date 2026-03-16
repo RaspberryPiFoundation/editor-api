@@ -13,7 +13,7 @@ module Api
 
       def update
         @project.scratch_component&.content = params
-        @project.save
+        @project.save!
         render json: { status: 'ok' }, status: :ok
       end
     end
