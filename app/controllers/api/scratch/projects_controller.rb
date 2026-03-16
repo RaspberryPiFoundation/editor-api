@@ -8,11 +8,11 @@ module Api
       before_action :load_project, only: %i[show update]
 
       def show
-        render json: @project.scratch_component&.content
+        render json: @project.scratch_component.content
       end
 
       def update
-        @project.scratch_component&.content = params
+        @project.scratch_component.content = params
         @project.save!
         render json: { status: 'ok' }, status: :ok
       end
