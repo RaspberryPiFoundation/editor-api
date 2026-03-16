@@ -2,6 +2,8 @@
 
 module Api
   class LessonsController < ApiController
+    include RemixSelection
+
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
     load_and_authorize_resource :lesson
@@ -82,24 +84,17 @@ module Api
     end
 
     def user_remixes(lessons)
-      lessons.map do |lesson|
-        next nil unless lesson&.project&.remixes&.any?
-
-        user_remix(lesson)
-      end
+      lessons.map { |lesson| user_remix(lesson) }
     end
 
     def user_remix(lesson)
-      remixes = lesson&.project&.remixes
+      return nil unless lesson&.project&.remixes&.any?
 
-      remixes = remixes
-                .where(user_id: current_user.id)
-                .accessible_by(current_ability)
-                .order(created_at: :asc)
-
-      remixes = remixes.includes(school_project: :feedback) if current_user&.school_student?(school)
-
-      remixes.first
+      remix_for_user(
+        lesson.project,
+        current_user,
+        include_feedback: current_user&.school_student?(school)
+      )
     end
 
     def lesson_params
