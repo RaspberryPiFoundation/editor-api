@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 FactoryBot.define do
   factory :scratch_asset do
     sequence(:filename) { Random.hex }
