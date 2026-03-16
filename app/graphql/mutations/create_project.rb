@@ -10,7 +10,8 @@ module Mutations
     def resolve(**input)
       project_hash = input.merge(
         user_id: context[:current_user]&.id,
-        components: input[:components]&.map(&:to_h)
+        components: input[:components]&.map(&:to_h),
+        scratch_component: input[:scratch_component]&.to_h
       )
 
       response = Project::Create.call(project_hash:, current_user: context[:current_user])

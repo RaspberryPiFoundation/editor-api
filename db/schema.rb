@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_01_26_130135) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_09_104851) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -331,6 +331,14 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_26_130135) do
     t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true, where: "(rejected_at IS NULL)"
   end
 
+  create_table "scratch_components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.jsonb "content"
+    t.uuid "project_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_scratch_components_on_project_id", unique: true
+  end
+
   create_table "teacher_invitations", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.string "email_address"
     t.uuid "school_id", null: false
@@ -380,6 +388,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_01_26_130135) do
   add_foreign_key "school_project_transitions", "school_projects"
   add_foreign_key "school_projects", "projects"
   add_foreign_key "school_projects", "schools"
+  add_foreign_key "scratch_components", "projects"
   add_foreign_key "teacher_invitations", "schools"
   add_foreign_key "user_jobs", "good_jobs"
 end

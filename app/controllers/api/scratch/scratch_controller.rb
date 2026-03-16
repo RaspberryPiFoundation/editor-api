@@ -16,6 +16,11 @@ module Api
 
         raise ActiveRecord::RecordNotFound, 'Not Found'
       end
+
+      def load_project
+        project_loader = ProjectLoader.new(params[:id], [params[:locale]])
+        @project = project_loader.load
+      end
     end
   end
 end
