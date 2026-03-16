@@ -134,7 +134,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
-    context 'when user is logged in a and cat_mode is disabled' do
+    context 'when user is logged in and cat_mode is disabled' do
       before do
         authenticated_in_hydra_as(teacher)
         Flipper.disable :cat_mode
