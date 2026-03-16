@@ -20,7 +20,7 @@ class Project
         project_hash[:identifier] = PhraseIdentifier.generate unless current_user&.experience_cs_admin?
         new_project = Project.new(project_hash.except(:components, :scratch_component))
         new_project.components.build(project_hash[:components])
-        new_project.build_scratch_component(project_hash[:scratch_component])
+        new_project.build_scratch_component(project_hash[:scratch_component]) if project_hash[:scratch_component].present?
         new_project
       end
     end
