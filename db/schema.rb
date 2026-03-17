@@ -332,9 +332,10 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_10_161646) do
   end
 
   create_table "scratch_assets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
-    t.string "filename"
+    t.string "filename", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["filename"], name: "index_scratch_assets_on_filename", unique: true
   end
 
   create_table "scratch_components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
