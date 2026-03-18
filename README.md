@@ -107,6 +107,23 @@ Also avilable to override are: `SEEDING_TEACHER_ID`.
 
 > NOTE: The student ids and school id in the CM seeds are hard coded to match profile seed data.
 
+#### Test Users
+
+To create test users for development, run:
+
+```
+docker compose run --rm api rails test_seeds:create
+```
+
+This creates the following test accounts:
+
+**Clearcourt Secondary College** (test_seeds school):
+- **Owner**: `jane.doe@example.com`
+- **Teacher**: `john.doe@example.com`
+
+**User without a school**:
+- `jim.dun@example.com`
+
 #### Syncing the database from Production / Staging
 
 ##### Prerequisites
