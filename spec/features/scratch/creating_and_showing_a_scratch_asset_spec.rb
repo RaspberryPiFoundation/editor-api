@@ -19,7 +19,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       it 'redirects to the asset file URL' do
         make_request
 
-        expect(response).to redirect_to(rails_blob_url(scratch_asset.file, only_path: true))
+        expect(response).to redirect_to(rails_storage_redirect_url(scratch_asset.file, only_path: true))
       end
     end
   end

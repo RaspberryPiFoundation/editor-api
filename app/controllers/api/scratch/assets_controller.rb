@@ -8,7 +8,7 @@ module Api
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
-        redirect_to url_for(ScratchAsset.find_by!(filename: filename_with_extension).file)
+        redirect_to rails_storage_redirect_url(ScratchAsset.find_by!(filename: filename_with_extension).file)
       end
 
       def create
