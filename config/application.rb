@@ -59,6 +59,13 @@ module App
     config.api_only = false
 
     config.middleware.insert_before 0, CorpMiddleware
+
+    require 'rack/content_type_default'
+    config.middleware.insert_before(
+      Rack::Runtime,
+      Rack::ContentTypeDefault, :post, 'application/octet-stream', '/api/scratch/assets/.*'
+    )
+
     config.generators.system_tests = nil
 
     config.active_record.encryption.primary_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')

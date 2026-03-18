@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_09_104851) do
+ActiveRecord::Schema[7.2].define(version: 2026_03_10_161646) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -329,6 +329,13 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_09_104851) do
     t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true
     t.index ["reference"], name: "index_schools_on_reference", unique: true, where: "(rejected_at IS NULL)"
     t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true, where: "(rejected_at IS NULL)"
+  end
+
+  create_table "scratch_assets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.string "filename", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["filename"], name: "index_scratch_assets_on_filename", unique: true
   end
 
   create_table "scratch_components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
