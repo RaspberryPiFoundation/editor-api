@@ -69,7 +69,10 @@ class FilesystemProject
 
   def self.media(file, dir)
     filename = File.basename(file)
+    # rubocop:disable Style/FileOpen
+    # This is an issue but we can't easily fix it as the returned IO object is used elsewhere.
     io = File.open(dir.join(filename).to_s)
+    # rubocop:enable Style/FileOpen
     { filename:, io: }
   end
 end
