@@ -61,8 +61,10 @@ class FilesystemProject
     { name:, extension:, content: code, default: }
   end
 
-  def self.file_mime_type(file)
-    Marcel::MimeType.for(File.open(file), name: File.basename(file))
+  def self.file_mime_type(path)
+    File.open(path) do |file|
+      Marcel::MimeType.for(file, name: File.basename(path))
+    end
   end
 
   def self.media(file, dir)
