@@ -48,14 +48,14 @@ RSpec.describe ClassMember::Create, type: :unit do
 
   it 'assigns the student_id' do
     response = described_class.call(school_class:, students:, teachers:)
-    response_students = response[:class_members].select { |member| member.is_a?(ClassStudent) }
+    response_students = response[:class_members].grep(ClassStudent)
     expect(response_students.map(&:student_id)).to match_array(student_ids)
   end
 
   it 'assigns the teacher_id' do
     teacher_ids = teachers.map(&:id)
     response = described_class.call(school_class:, students:, teachers:)
-    response_teachers = response[:class_members].select { |member| member.is_a?(ClassTeacher) }
+    response_teachers = response[:class_members].grep(ClassTeacher)
     expect(response_teachers.map(&:teacher_id)).to match_array(teacher_ids)
   end
 
@@ -160,14 +160,14 @@ RSpec.describe ClassMember::Create, type: :unit do
 
         it 'assigns the successful students' do
           response = described_class.call(school_class:, students: new_students, teachers:)
-          response_students = response[:class_members].select { |member| member.is_a?(ClassStudent) }
+          response_students = response[:class_members].grep(ClassStudent)
           expect(response_students.map(&:student_id)).to match_array(student_ids)
         end
 
         it 'assigns the successful teachers' do
           teacher_ids = teachers.map(&:id)
           response = described_class.call(school_class:, students: new_students, teachers:)
-          response_teachers = response[:class_members].select { |member| member.is_a?(ClassTeacher) }
+          response_teachers = response[:class_members].grep(ClassTeacher)
           expect(response_teachers.map(&:teacher_id)).to match_array(teacher_ids)
         end
 

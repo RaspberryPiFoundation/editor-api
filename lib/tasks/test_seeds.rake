@@ -2,7 +2,6 @@
 
 require_relative 'seeds_helper'
 
-# rubocop:disable Rails/Output
 namespace :test_seeds do
   include SeedsHelper
 
@@ -72,4 +71,3 @@ namespace :test_seeds do
     end
   end
 end
-# rubocop:enable Rails/Output

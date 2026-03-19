@@ -239,7 +239,7 @@ RSpec.describe ProfileApiClient do
     end
 
     it 'raises 422 exception with the relevant message if 400 status code is returned' do
-      response = { errors: [message: 'The password is well dodgy'] }
+      response = { errors: [{ message: 'The password is well dodgy' }] }
       stub_request(:post, create_students_url)
         .to_return(status: 400, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
@@ -284,7 +284,7 @@ RSpec.describe ProfileApiClient do
     it_behaves_like 'a request that handles an unexpected response status', :post, url: -> { create_students_url }, status: 202
 
     it 'raises 422 exception with the relevant message if 400 status code is returned' do
-      response = { errors: [message: 'The password is well dodgy'] }
+      response = { errors: [{ message: 'The password is well dodgy' }] }
       stub_request(:post, create_students_url)
         .to_return(status: 400, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
@@ -356,7 +356,7 @@ RSpec.describe ProfileApiClient do
     it_behaves_like 'a request that handles an unexpected response status', :post, url: -> { create_students_sso_url }, status: 202
 
     it 'raises 422 exception with the relevant message if 400 status code is returned' do
-      response = { errors: [message: 'The password is well dodgy'] }
+      response = { errors: [{ message: 'The password is well dodgy' }] }
       stub_request(:post, create_students_sso_url)
         .to_return(status: 400, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
@@ -478,7 +478,7 @@ RSpec.describe ProfileApiClient do
     end
 
     it 'raises 422 exception with the relevant message if 400 status code is returned' do
-      response = { errors: [message: 'The username is well dodgy'] }
+      response = { errors: [{ message: 'The username is well dodgy' }] }
       stub_request(:patch, update_student_url)
         .to_return(status: 400, body: response.to_json, headers: { 'content-type' => 'application/json' })
 
