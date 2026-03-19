@@ -220,7 +220,7 @@ GEM
       thor (>= 1.0.0)
     graphiql-rails (1.10.5)
       railties
-    graphql (2.5.19)
+    graphql (2.5.21)
       base64
       fiber-storage
       logger
