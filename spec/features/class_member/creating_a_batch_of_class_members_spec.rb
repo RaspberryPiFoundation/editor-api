@@ -166,7 +166,7 @@ RSpec.describe 'Creating a class member', type: :request do
   end
 
   context "with users that don't exist in Profile" do
-    unknown_user_id = SecureRandom.uuid
+    let(:unknown_user_id) { SecureRandom.uuid }
 
     let(:invalid_params) do
       {
