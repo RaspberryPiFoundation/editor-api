@@ -5,7 +5,7 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.tool-versions'
 
-gem 'administrate', '~> 0.20.1'
+gem 'administrate', '~> 1.0.0'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'base64', '~> 0.3'
@@ -37,6 +37,7 @@ gem 'open-uri'
 gem 'paper_trail'
 gem 'pg', '~> 1.6'
 gem 'postmark-rails'
+gem 'propshaft'
 gem 'puma', '~> 7.2'
 gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
