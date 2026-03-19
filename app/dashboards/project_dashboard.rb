@@ -83,6 +83,6 @@ class ProjectDashboard < Administrate::BaseDashboard
   end
 
   def permitted_attributes
-    super + [images: []]
+    super + [{ images: [] }]
   end
 end
