@@ -265,7 +265,7 @@ RSpec.describe UploadJob do
     it 'raises DataNotFoundError' do
       expect do
         described_class.perform_now(payload)
-      end.to raise_error(DataNotFoundError)
+      end.to raise_error(UploadJob::DataNotFoundError)
     end
   end
 

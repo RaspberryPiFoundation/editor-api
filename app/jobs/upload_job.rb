@@ -4,10 +4,10 @@ require 'open-uri'
 require 'github_api'
 require 'locales'
 
-class InvalidDirectoryStructureError < StandardError; end
-class DataNotFoundError < StandardError; end
-
 class UploadJob < ApplicationJob
+  class InvalidDirectoryStructureError < StandardError; end
+  class DataNotFoundError < StandardError; end
+
   retry_on StandardError, wait: :polynomially_longer, attempts: 3 do |_job, e|
     Sentry.capture_exception(e)
     raise e
