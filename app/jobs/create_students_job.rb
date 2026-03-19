@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
-class ConcurrencyExceededForSchool < StandardError; end
-
 class CreateStudentsJob < ApplicationJob
+  class ConcurrencyExceededForSchool < StandardError; end
+
   retry_on StandardError, wait: :polynomially_longer, attempts: 3 do |_job, e|
     Sentry.capture_exception(e)
     raise e
