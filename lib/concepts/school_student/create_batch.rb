@@ -3,15 +3,13 @@
 module SchoolStudent
   class Error < StandardError; end
 
-  class ConcurrencyExceededForSchool < StandardError; end
-
   class CreateBatch
     class << self
       def call(school:, school_students_params:, token:)
         response = OperationResponse.new
         response[:job_id] = create_batch(school, school_students_params, token)
         response
-      rescue ConcurrencyExceededForSchool => e
+      rescue CreateStudentsJob::ConcurrencyExceededForSchool => e
         response[:error] = e
         response[:error_type] = :job_concurrency_error
         response

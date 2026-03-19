@@ -82,7 +82,7 @@ module Api
     # should assume the entire student import has failed.
     def enqueue_batches(students)
       # Raise if a batch is already in progress for this school.
-      raise ConcurrencyExceededForSchool if @school.import_in_progress?
+      raise CreateStudentsJob::ConcurrencyExceededForSchool if @school.import_in_progress?
 
       @batch = GoodJob::Batch.new(description: @school.id)
       @batch.enqueue do
