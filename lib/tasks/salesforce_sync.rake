@@ -7,4 +7,11 @@ namespace :salesforce_sync do
       Salesforce::SchoolSyncJob.perform_later(school_id:)
     end
   end
+
+  desc 'Sync all Roles to Salesforce'
+  task role: :environment do
+    Role.pluck(:id).each do |role_id|
+      Salesforce::RoleSyncJob.perform_later(role_id:)
+    end
+  end
 end

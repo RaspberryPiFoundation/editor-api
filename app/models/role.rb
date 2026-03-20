@@ -16,6 +16,8 @@ class Role < ApplicationRecord
     }
   )
 
+  after_commit :do_salesforce_sync, on: %i[create update]
+
   private
 
   def students_cannot_have_additional_roles
@@ -37,5 +39,12 @@ class Role < ApplicationRecord
     return if schools.empty? || (schools.any? && schools.first == school)
 
     errors.add(:base, 'Cannot create role as this user already has a role in a different school')
+  end
+
+  def do_salesforce_sync
+    return unless FeatureFlags.salesforce_sync?
+    return if student? # We never sync student roles to Salesforce
+
+    Salesforce::RoleSyncJob.perform_later(role_id: id)
   end
 end
