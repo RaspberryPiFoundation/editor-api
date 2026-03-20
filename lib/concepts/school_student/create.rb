@@ -25,8 +25,7 @@ module SchoolStudent
         validate(
           username:,
           password:,
-          name:,
-          school: (FeatureFlags.immediate_school_onboarding? ? nil : school)
+          name:
         )
 
         response = ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id:)
@@ -35,13 +34,10 @@ module SchoolStudent
         user_id
       end
 
-      def validate(username:, password:, name:, school: nil)
+      def validate(username:, password:, name:)
         raise ArgumentError, "username '#{username}' is invalid" if username.blank?
         raise ArgumentError, "password '#{password}' is invalid" if password.size < 8
         raise ArgumentError, "name '#{name}' is invalid" if name.blank?
-
-        return unless school
-        raise ArgumentError, 'school must be verified' unless school.verified?
       end
     end
   end

@@ -12,10 +12,7 @@ class SchoolVerificationService
     School.transaction do
       school.verify!
 
-      # TODO: Remove this line, once the feature flag is retired
-      success = FeatureFlags.immediate_school_onboarding? || SchoolOnboardingService.new(school).onboard(token: token)
-
-      # TODO: Remove this line, once the feature flag is retired
+      success = SchoolOnboardingService.new(school).onboard(token: token)
       raise ActiveRecord::Rollback unless success
     end
   rescue StandardError => e
@@ -23,8 +20,7 @@ class SchoolVerificationService
     Rails.logger.error { "Failed to verify school #{@school.id}: #{e.message}" }
     false
   else
-    # TODO: Return 'true', once the feature flag is retired
-    success
+    true
   end
 
   delegate :reject, to: :school
