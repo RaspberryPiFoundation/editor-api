@@ -7,7 +7,7 @@ class SchoolVerificationService
     @school = school
   end
 
-  def verify(token: nil)
+  def verify(token:)
     success = false
     School.transaction do
       school.verify!

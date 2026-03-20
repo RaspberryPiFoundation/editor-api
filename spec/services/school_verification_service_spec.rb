@@ -16,17 +16,17 @@ RSpec.describe SchoolVerificationService do
   describe '#verify' do
     describe 'when school can be saved' do
       it 'saves the school' do
-        service.verify
+        service.verify(token:)
         expect(school).to be_persisted
       end
 
       it 'sets verified_at to a date' do
-        service.verify
+        service.verify(token:)
         expect(school.reload.verified_at).to be_a(ActiveSupport::TimeWithZone)
       end
 
       it 'returns true' do
-        expect(service.verify).to be(true)
+        expect(service.verify(token:)).to be(true)
       end
     end
 
@@ -34,12 +34,12 @@ RSpec.describe SchoolVerificationService do
       let(:website) { 'invalid' }
 
       it 'does not save the school' do
-        service.verify
+        service.verify(token:)
         expect(school).not_to be_persisted
       end
 
       it 'returns false' do
-        expect(service.verify).to be(false)
+        expect(service.verify(token:)).to be(false)
       end
     end
   end
@@ -61,7 +61,7 @@ RSpec.describe SchoolVerificationService do
 
   describe 'when the school was previously verified' do
     before do
-      service.verify
+      service.verify(token:)
       service.reject
       school.reload
     end
