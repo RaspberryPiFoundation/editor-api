@@ -15,12 +15,12 @@ class SchoolVerificationService
       success = SchoolOnboardingService.new(school).onboard(token: token)
       raise ActiveRecord::Rollback unless success
     end
+
+    success
   rescue StandardError => e
     Sentry.capture_exception(e)
     Rails.logger.error { "Failed to verify school #{@school.id}: #{e.message}" }
     false
-  else
-    true
   end
 
   delegate :reject, to: :school
