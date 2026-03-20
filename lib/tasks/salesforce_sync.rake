@@ -14,4 +14,11 @@ namespace :salesforce_sync do
       Salesforce::RoleSyncJob.perform_later(role_id:)
     end
   end
+
+  desc 'Sync creator_agree_to_ux_contact for all Schools to Salesforce Contact'
+  task contact: :environment do
+    School.pluck(:id).each do |school_id|
+      Salesforce::ContactSyncJob.perform_later(school_id:)
+    end
+  end
 end
