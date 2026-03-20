@@ -7,24 +7,20 @@ class SchoolVerificationService
     @school = school
   end
 
-  def verify(token: nil)
+  def verify(token:)
     success = false
     School.transaction do
       school.verify!
 
-      # TODO: Remove this line, once the feature flag is retired
-      success = FeatureFlags.immediate_school_onboarding? || SchoolOnboardingService.new(school).onboard(token: token)
-
-      # TODO: Remove this line, once the feature flag is retired
+      success = SchoolOnboardingService.new(school).onboard(token: token)
       raise ActiveRecord::Rollback unless success
     end
+
+    success
   rescue StandardError => e
     Sentry.capture_exception(e)
     Rails.logger.error { "Failed to verify school #{@school.id}: #{e.message}" }
     false
-  else
-    # TODO: Return 'true', once the feature flag is retired
-    success
   end
 
   delegate :reject, to: :school
