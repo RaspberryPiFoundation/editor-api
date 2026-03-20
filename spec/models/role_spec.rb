@@ -165,4 +165,15 @@ RSpec.describe Role do
       end
     end
   end
+
+  describe 'salesforce sync' do
+    it 'enqueues a Salesforce::RoleSyncJob on create' do
+      expect { create(:role) }.to have_enqueued_job(Salesforce::RoleSyncJob)
+    end
+
+    it 'enqueues a Salesforce::RoleSyncJob on update' do
+      role = create(:role)
+      expect { role.update!(role: 'teacher') }.to have_enqueued_job(Salesforce::RoleSyncJob)
+    end
+  end
 end
