@@ -632,6 +632,26 @@ RSpec.describe School do
     end
   end
 
+  describe 'salesforce sync' do
+    it 'enqueues Salesforce::SchoolSyncJob on create' do
+      expect { create(:school) }.to have_enqueued_job(Salesforce::SchoolSyncJob)
+    end
+
+    it 'enqueues Salesforce::ContactSyncJob on create' do
+      expect { create(:school) }.to have_enqueued_job(Salesforce::ContactSyncJob)
+    end
+
+    it 'enqueues Salesforce::SchoolSyncJob on update' do
+      school = create(:school)
+      expect { school.update!(name: 'Updated Name') }.to have_enqueued_job(Salesforce::SchoolSyncJob)
+    end
+
+    it 'enqueues Salesforce::ContactSyncJob on update' do
+      school = create(:school)
+      expect { school.update!(name: 'Updated Name') }.to have_enqueued_job(Salesforce::ContactSyncJob)
+    end
+  end
+
   describe '#reopen' do
     it 'sets rejected_at to nil' do
       school.reject
