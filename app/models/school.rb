@@ -55,6 +55,8 @@ class School < ApplicationRecord
 
   after_create :generate_code!
 
+  after_commit :do_salesforce_sync, on: %i[create update]
+
   def self.find_for_user!(user)
     school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id, rejected_at: nil)
     raise ActiveRecord::RecordNotFound unless school
@@ -169,5 +171,12 @@ class School < ApplicationRecord
     # insert a space as the third-from-last character in the postcode, eg. SW1A1AA -> SW1A 1AA
     # ensures UK postcodes are always formatted correctly (as the inward code is always 3 chars long)
     self.postal_code = "#{cleaned_postal_code[0..-4]} #{cleaned_postal_code[-3..]}"
+  end
+
+  def do_salesforce_sync
+    return unless FeatureFlags.salesforce_sync?
+
+    Salesforce::SchoolSyncJob.perform_later(school_id: id)
+    Salesforce::ContactSyncJob.perform_later(school_id: id)
   end
 end
