@@ -7,7 +7,6 @@ RSpec.describe SchoolVerificationService do
   let(:school) { build(:school, creator_id: school_creator.id, website:) }
   let(:school_creator) { create(:user) }
   let(:service) { described_class.new(school) }
-  let(:token) { 'token' }
 
   before do
     allow(ProfileApiClient).to receive(:create_school)
