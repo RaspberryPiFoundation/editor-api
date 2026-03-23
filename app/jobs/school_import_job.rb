@@ -79,7 +79,7 @@ class SchoolImportJob < ApplicationJob
         school = result[:school]
 
         # Auto-verify the imported school using the verification service
-        SchoolVerificationService.new(school).verify(token: @token)
+        SchoolVerificationService.new(school).verify
 
         @results[:successful] << {
           name: school.name,
