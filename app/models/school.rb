@@ -57,7 +57,7 @@ class School < ApplicationRecord
   after_create :generate_code!, if: -> { FeatureFlags.immediate_school_onboarding? }
 
   def self.find_for_user!(user)
-    school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id)
+    school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id, rejected_at: nil)
     raise ActiveRecord::RecordNotFound unless school
 
     school
