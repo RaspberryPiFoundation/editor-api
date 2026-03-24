@@ -129,6 +129,49 @@ RSpec.describe Project::CreateRemix, type: :unit do
       end
     end
 
+    context 'when the original project has Scratch content' do
+      let!(:original_project) do
+        create(:project, project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: nil)
+      end
+      let(:original_scratch_project) do
+        {
+          meta: { semver: '3.0.0' },
+          targets: ['original target'],
+          monitors: [],
+          extensions: []
+        }
+      end
+
+      before do
+        create(:scratch_component, project: original_project, content: original_scratch_project)
+      end
+
+      context 'when new Scratch content is provided' do
+        let(:remixed_scratch_project) do
+          {
+            meta: { semver: '3.0.0' },
+            targets: ['remixed target'],
+            monitors: [],
+            extensions: ['pen']
+          }
+        end
+        let(:remix_params) do
+          {
+            name: 'My remixed project',
+            identifier: original_project.identifier,
+            scratch_component: {
+              content: remixed_scratch_project
+            }
+          }
+        end
+
+        it 'uses the supplied Scratch content' do
+          expect(create_remix[:project].scratch_component.content.to_h)
+            .to eq(remixed_scratch_project.deep_stringify_keys)
+        end
+      end
+    end
+
     context 'when user_id is not present' do
       let(:user_id) { nil }
       let(:params) { { project_id: original_project.identifier } }

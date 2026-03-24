@@ -23,7 +23,11 @@ class Project
       end
 
       def remix_project(response, params, user_id, original_project, remix_origin)
-        response[:project] = create_remix(original_project, params, user_id, remix_origin)
+        response[:project] = if scratch_project?(original_project)
+                               create_scratch_remix(original_project, params, user_id, remix_origin)
+                             else
+                               create_remix(original_project, params, user_id, remix_origin)
+                             end
         response[:project].save!
         response
       end
@@ -50,16 +54,28 @@ class Project
         remix
       end
 
+      def create_scratch_remix(original_project, params, user_id, remix_origin)
+        remix = format_project(original_project, params, user_id, remix_origin)
+        scratch_component = params.fetch(:scratch_component)
+        remix.build_scratch_component(content: scratch_component[:content] || scratch_component['content'])
+
+        remix
+      end
+
       def format_project(original_project, params, user_id, remix_origin)
         original_project.dup.tap do |proj|
           proj.identifier = PhraseIdentifier.generate
           proj.locale = nil
-          proj.name = params[:name]
+          proj.name = params[:name] || original_project.name
           proj.user_id = user_id
           proj.remixed_from_id = original_project.id
           proj.remix_origin = remix_origin
           proj.lesson_id = nil # Only the original can have a lesson id
         end
+      end
+
+      def scratch_project?(project)
+        project.project_type == Project::Types::CODE_EDITOR_SCRATCH
       end
     end
   end
