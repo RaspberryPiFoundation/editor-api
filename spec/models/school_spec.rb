@@ -417,12 +417,6 @@ RSpec.describe School do
     end
 
     describe 'code validations' do
-      around do |example|
-        ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
-          example.run
-        end
-      end
-
       it 'requires #code to be unique' do
         school # ensure existing school has a code
         another_school = build(:school)
@@ -532,12 +526,6 @@ RSpec.describe School do
   end
 
   describe 'code generation' do
-    around do |example|
-      ClimateControl.modify(ENABLE_IMMEDIATE_SCHOOL_ONBOARDING: 'true') do
-        example.run
-      end
-    end
-
     it 'automatically generates a code after creation' do
       new_school = described_class.create!(build(:school).attributes.except('id', 'created_at', 'updated_at'))
       expect(new_school.reload.code).to be_present
