@@ -36,10 +36,6 @@ RSpec.describe 'Schools', type: :request do
       expect(response.body).to include(I18n.t('administrate.actions.verify_school'))
     end
 
-    it 'includes link to reject school' do
-      expect(response.body).to include(I18n.t('administrate.actions.reject_school'))
-    end
-
     it 'does not include a link to search for this school by its ZIP code in the NCES public schools database' do
       expect(response.body).not_to include('Search for this school in the NCES database')
     end
@@ -52,10 +48,6 @@ RSpec.describe 'Schools', type: :request do
         expect(response.body).not_to include(I18n.t('administrate.actions.verify_school'))
       end
 
-      it 'does not include a link to reject school' do
-        expect(response.body).not_to include(I18n.t('administrate.actions.reject_school'))
-      end
-
       it 'does not include a link to reopen school' do
         expect(response.body).not_to include(I18n.t('administrate.actions.reopen_school'))
       end
@@ -66,10 +58,6 @@ RSpec.describe 'Schools', type: :request do
 
       it 'does not include a link to verify school' do
         expect(response.body).not_to include(I18n.t('administrate.actions.verify_school'))
-      end
-
-      it 'does not include a link to reject school' do
-        expect(response.body).not_to include(I18n.t('administrate.actions.reject_school'))
       end
 
       it 'includes link to reopen school' do
@@ -128,48 +116,6 @@ RSpec.describe 'Schools', type: :request do
 
       it 'displays failure message' do
         expect(response.body).to include(I18n.t('administrate.controller.verify_school.error'))
-      end
-    end
-  end
-
-  describe 'PUT #reject' do
-    let(:creator) { create(:user) }
-    let(:school) { create(:school, creator_id: creator.id) }
-    let(:rejection_result) { nil }
-    let(:verification_service) { instance_double(SchoolVerificationService, reject: rejection_result) }
-
-    before do
-      stub_user_info_api_for(creator)
-      allow(SchoolVerificationService).to receive(:new).with(school).and_return(verification_service)
-
-      patch reject_admin_school_path(school)
-    end
-
-    it 'redirects to school path' do
-      expect(response).to redirect_to(admin_school_path(school))
-    end
-
-    describe 'when rejection was successful' do
-      let(:rejection_result) { true }
-
-      before do
-        follow_redirect!
-      end
-
-      it 'displays success message' do
-        expect(response.body).to include(I18n.t('administrate.controller.reject_school.success'))
-      end
-    end
-
-    describe 'when rejection was unsuccessful' do
-      let(:rejection_result) { false }
-
-      before do
-        follow_redirect!
-      end
-
-      it 'displays failure message' do
-        expect(response.body).to include(I18n.t('administrate.controller.reject_school.error'))
       end
     end
   end

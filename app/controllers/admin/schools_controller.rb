@@ -14,18 +14,6 @@ module Admin
       redirect_to admin_school_path(requested_resource)
     end
 
-    def reject
-      service = SchoolVerificationService.new(requested_resource)
-
-      if service.reject
-        flash[:notice] = t('administrate.controller.reject_school.success')
-      else
-        flash[:error] = t('administrate.controller.reject_school.error')
-      end
-
-      redirect_to admin_school_path(requested_resource)
-    end
-
     def reopen
       service = SchoolVerificationService.new(requested_resource)
 
