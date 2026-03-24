@@ -31,7 +31,11 @@ class School < ApplicationRecord
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
             presence: true,
             if: :ireland?
-  validates :creator_id, presence: true, uniqueness: true
+  validates :creator_id,
+            presence: true,
+            uniqueness: {
+              conditions: -> { where(rejected_at: nil) }
+            }
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
   validates :creator_agree_responsible_safeguarding, presence: true, acceptance: true
@@ -52,7 +56,7 @@ class School < ApplicationRecord
   after_create :generate_code!
 
   def self.find_for_user!(user)
-    school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id)
+    school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id, rejected_at: nil)
     raise ActiveRecord::RecordNotFound unless school
 
     school

@@ -483,6 +483,14 @@ RSpec.describe School do
       user = build(:user)
       expect { described_class.find_for_user!(user) }.to raise_error(ActiveRecord::RecordNotFound)
     end
+
+    it('raises ActiveRecord::RecordNotFound if the user is the creator of a rejected school') do
+      creator = create(:user)
+      school.update!(creator_id: creator.id)
+      school.reject
+
+      expect { described_class.find_for_user!(creator) }.to raise_error(ActiveRecord::RecordNotFound)
+    end
   end
 
   describe '#verified?' do
