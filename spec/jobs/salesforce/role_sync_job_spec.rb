@@ -2,10 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe Salesforce::RoleSyncJob do
+RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
   subject(:perform_job) { described_class.perform_now(role_id: role.id) }
 
   let(:role) { create(:role) }
+
+  around do |example|
+    ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+  end
 
   context 'when the job has run' do
     before { perform_job }

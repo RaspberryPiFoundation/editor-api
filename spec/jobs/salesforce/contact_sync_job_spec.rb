@@ -2,11 +2,15 @@
 
 require 'rails_helper'
 
-RSpec.describe Salesforce::ContactSyncJob do
+RSpec.describe Salesforce::ContactSyncJob, :requires_salesforce_db do
   subject(:perform_job) { described_class.perform_now(school_id: school.id) }
 
   let(:school) { create(:school, creator_agree_to_ux_contact: true) }
   let!(:sf_contact) { create(:salesforce_contact, pi_accounts_unique_id__c: school.creator_id) }
+
+  around do |example|
+    ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+  end
 
   it 'sets experiencecsagreetouxcontact__c from school.creator_agree_to_ux_contact' do
     perform_job

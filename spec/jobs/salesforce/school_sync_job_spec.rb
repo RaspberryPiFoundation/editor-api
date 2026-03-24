@@ -2,10 +2,14 @@
 
 require 'rails_helper'
 
-RSpec.describe Salesforce::SchoolSyncJob do
+RSpec.describe Salesforce::SchoolSyncJob, :requires_salesforce_db do
   subject(:perform_job) { described_class.perform_now(school_id: school.id) }
 
   let(:school) { create(:school) }
+
+  around do |example|
+    ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+  end
 
   context 'when the job has run' do
     before { perform_job }

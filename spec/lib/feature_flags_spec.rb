@@ -36,9 +36,9 @@ RSpec.describe FeatureFlags do
   end
 
   describe '.salesforce_sync?' do
-    it 'returns true when ENV is not set' do
+    it 'returns false when ENV is not set' do
       ClimateControl.modify(SALESFORCE_ENABLED: nil) do
-        expect(described_class.salesforce_sync?).to be(true)
+        expect(described_class.salesforce_sync?).to be(false)
       end
     end
 

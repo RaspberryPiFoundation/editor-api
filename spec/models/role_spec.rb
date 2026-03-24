@@ -167,6 +167,10 @@ RSpec.describe Role do
   end
 
   describe 'salesforce sync' do
+    around do |example|
+      ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+    end
+
     it 'enqueues a Salesforce::RoleSyncJob on create' do
       expect { create(:role) }.to have_enqueued_job(Salesforce::RoleSyncJob)
     end

@@ -629,6 +629,10 @@ RSpec.describe School do
   end
 
   describe 'salesforce sync' do
+    around do |example|
+      ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+    end
+
     it 'enqueues Salesforce::SchoolSyncJob on create' do
       expect { create(:school) }.to have_enqueued_job(Salesforce::SchoolSyncJob)
     end

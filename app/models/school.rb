@@ -55,7 +55,7 @@ class School < ApplicationRecord
 
   after_create :generate_code!
 
-  after_commit :do_salesforce_sync, on: %i[create update]
+  after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? }
 
   def self.find_for_user!(user)
     school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id, rejected_at: nil)
@@ -174,8 +174,6 @@ class School < ApplicationRecord
   end
 
   def do_salesforce_sync
-    return unless FeatureFlags.salesforce_sync?
-
     Salesforce::SchoolSyncJob.perform_later(school_id: id)
     Salesforce::ContactSyncJob.perform_later(school_id: id)
   end

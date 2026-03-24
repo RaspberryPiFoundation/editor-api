@@ -16,7 +16,7 @@ class Role < ApplicationRecord
     }
   )
 
-  after_commit :do_salesforce_sync, on: %i[create update]
+  after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? && !student? }
 
   private
 
@@ -42,9 +42,6 @@ class Role < ApplicationRecord
   end
 
   def do_salesforce_sync
-    return unless FeatureFlags.salesforce_sync?
-    return if student? # We never sync student roles to Salesforce
-
     Salesforce::RoleSyncJob.perform_later(role_id: id)
   end
 end

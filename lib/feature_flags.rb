@@ -6,6 +6,6 @@ module FeatureFlags
   end
 
   def self.salesforce_sync?
-    ENV['SALESFORCE_ENABLED'] != 'false'
+    ENV['SALESFORCE_ENABLED'] == 'true'
   end
 end
