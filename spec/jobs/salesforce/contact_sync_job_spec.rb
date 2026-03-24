@@ -12,9 +12,9 @@ RSpec.describe Salesforce::ContactSyncJob, :requires_salesforce_db do
     ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
   end
 
-  it 'sets experiencecsagreetouxcontact__c from school.creator_agree_to_ux_contact' do
+  it 'sets editoragreetouxcontact__c from school.creator_agree_to_ux_contact' do
     perform_job
-    expect(sf_contact.reload.experiencecsagreetouxcontact__c).to be(true)
+    expect(sf_contact.reload.editoragreetouxcontact__c).to be(true)
   end
 
   it 'saves the contact' do
@@ -36,7 +36,7 @@ RSpec.describe Salesforce::ContactSyncJob, :requires_salesforce_db do
       allow(Salesforce::Contact).to receive(:find_by)
         .with(pi_accounts_unique_id__c: school.creator_id)
         .and_return(sf_contact_double)
-      allow(sf_contact_double).to receive(:experiencecsagreetouxcontact__c=)
+      allow(sf_contact_double).to receive(:editoragreetouxcontact__c=)
       allow(sf_contact_double).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
     end
 
@@ -53,9 +53,9 @@ RSpec.describe Salesforce::ContactSyncJob, :requires_salesforce_db do
     end
 
     it 'discards the job without syncing' do
-      sf_contact.update!(experiencecsagreetouxcontact__c: false)
+      sf_contact.update!(editoragreetouxcontact__c: false)
       perform_job
-      expect(sf_contact.reload.experiencecsagreetouxcontact__c).to be(false)
+      expect(sf_contact.reload.editoragreetouxcontact__c).to be(false)
     end
   end
 

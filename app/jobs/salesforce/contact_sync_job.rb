@@ -10,7 +10,7 @@ module Salesforce
       sf_contact = Salesforce::Contact.find_by(pi_accounts_unique_id__c: school.creator_id)
       raise SalesforceRecordNotFound, "Contact not found for creator_id: #{school.creator_id}" unless sf_contact
 
-      sf_contact.experiencecsagreetouxcontact__c = school.creator_agree_to_ux_contact
+      sf_contact.editoragreetouxcontact__c = school.creator_agree_to_ux_contact
       sf_contact.save!
     end
 
