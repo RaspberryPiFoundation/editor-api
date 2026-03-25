@@ -18,7 +18,7 @@ module Api
         return render json: { error: I18n.t('errors.admin.unauthorized') }, status: :unauthorized unless current_ability.can?(:show, original_project)
 
         remix_params = create_params
-        return render json: { error: I18n.t('errors.project.remixing.invalid_params') }, status: :bad_request if remix_params[:scratch_component].blank?
+        return render json: { error: I18n.t('errors.project.remixing.invalid_params') }, status: :bad_request if remix_params.dig(:scratch_component, :content).blank?
 
         remix_origin = request.origin || request.referer
 
@@ -55,11 +55,10 @@ module Api
       end
 
       def create_params
-        {}.tap do |hash|
-          hash[:identifier] = source_project_identifier
-          scratch_content = scratch_content_params
-          hash[:scratch_component] = { content: scratch_content } if scratch_content.present?
-        end
+        {
+          identifier: source_project_identifier,
+          scratch_component: { content: scratch_content_params }
+        }
       end
 
       def load_original_project(identifier)
@@ -67,17 +66,13 @@ module Api
         original_project = project_loader.load
 
         raise ActiveRecord::RecordNotFound, I18n.t('errors.project.not_found') unless original_project
-        raise ActiveRecord::RecordNotFound, I18n.t('errors.project.not_found') unless valid_original_project?(original_project)
+        raise ActiveRecord::RecordNotFound, I18n.t('errors.project.not_found') unless original_project.scratch_project?
 
         original_project
       end
 
       def scratch_content_params
         params.slice(:meta, :targets, :monitors, :extensions).to_unsafe_h
-      end
-
-      def valid_original_project?(project)
-        project.project_type == Project::Types::CODE_EDITOR_SCRATCH
       end
     end
   end

@@ -82,6 +82,10 @@ class Project < ApplicationRecord
     images + videos + audio
   end
 
+  def scratch_project?
+    project_type == Types::CODE_EDITOR_SCRATCH
+  end
+
   private
 
   def check_unique_not_null
