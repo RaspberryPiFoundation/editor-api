@@ -4,12 +4,13 @@ module IdentifiableByCookie
   extend ActiveSupport::Concern
   include ActionController::Cookies
 
-  def identify_user
-    token = cookies[:scratch_auth]
-    User.from_token(token:) if token
+  included do
+    before_action :load_current_user
+    attr_reader :current_user
   end
 
-  def current_user
-    @current_user ||= identify_user
+  def load_current_user
+    token = cookies[:scratch_auth]
+    @current_user = User.from_token(token:) if token
   end
 end

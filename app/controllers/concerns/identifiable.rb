@@ -3,12 +3,13 @@
 module Identifiable
   extend ActiveSupport::Concern
 
-  def identify_user
-    token = request.headers['Authorization']
-    User.from_token(token:) if token
+  included do
+    before_action :load_current_user
+    attr_reader :current_user
   end
 
-  def current_user
-    @current_user ||= identify_user
+  def load_current_user
+    token = request.headers['Authorization']
+    @current_user = User.from_token(token:) if token
   end
 end
