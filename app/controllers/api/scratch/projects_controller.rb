@@ -62,13 +62,7 @@ module Api
       end
 
       def load_original_project(identifier)
-        project_loader = ProjectLoader.new(identifier, [params[:locale]])
-        original_project = project_loader.load
-
-        raise ActiveRecord::RecordNotFound, I18n.t('errors.project.not_found') unless original_project
-        raise ActiveRecord::RecordNotFound, I18n.t('errors.project.not_found') unless original_project.scratch_project?
-
-        original_project
+        Project.find_by!(identifier:, project_type: Project::Types::CODE_EDITOR_SCRATCH)
       end
 
       def scratch_content_params
