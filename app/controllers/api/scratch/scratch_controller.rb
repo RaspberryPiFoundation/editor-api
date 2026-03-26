@@ -18,8 +18,7 @@ module Api
       end
 
       def load_project
-        project_loader = ProjectLoader.new(params[:id], [params[:locale]])
-        @project = project_loader.load
+        @project = Project.find_by!(identifier: params[:id], project_type: Project::Types::CODE_EDITOR_SCRATCH)
       end
     end
   end
