@@ -63,7 +63,7 @@ module Api
     private
 
     def set_auth_cookie_for_scratch
-      return unless @project.project_type == Project::Types::CODE_EDITOR_SCRATCH
+      return unless @project.scratch_project?
       return unless Flipper.enabled?(:cat_mode, school)
 
       cookies[:scratch_auth] = {

@@ -7,14 +7,36 @@ default: &default
   password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
   pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
 
+salesforce_connect: &salesforce_connect
+  adapter: postgresql
+  encoding: unicode
+  host: <%= ENV.fetch('SALESFORCE_CONNECT_HOST', ENV.fetch('POSTGRES_HOST', 'db')) %>
+  port: <%= ENV.fetch('SALESFORCE_CONNECT_PORT', ENV.fetch('POSTGRES_PORT', '5432')) %>
+  username: <%= ENV.fetch('SALESFORCE_CONNECT_USER', ENV.fetch('POSTGRES_USER', 'no_pg_user_set')) %>
+  password: <%= ENV.fetch('SALESFORCE_CONNECT_PASSWORD', ENV.fetch('POSTGRES_PASSWORD', '')) %>
+  pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
+  database_tasks: false
+
 development:
-  <<: *default
-  database: <%= ENV.fetch('POSTGRES_DB', 'choco_cake_development') %>
+  default:
+    <<: *default
+    database: <%= ENV.fetch('POSTGRES_DB', 'choco_cake_development') %>
+  salesforce_connect:
+    <<: *salesforce_connect
+    database: <%= ENV.fetch('SALESFORCE_CONNECT_DB', ENV.fetch('POSTGRES_DB', 'choco_cake_development')) %>
 
 test:
-  <<: *default
-  database: <%= ENV.fetch('POSTGRES_DB', 'choco_cake_test') %>
+  default:
+    <<: *default
+    database: <%= ENV.fetch('POSTGRES_DB', 'choco_cake_test') %>
+  salesforce_connect:
+    <<: *salesforce_connect
+    database: <%= ENV.fetch('SALESFORCE_CONNECT_DB', ENV.fetch('POSTGRES_DB', 'choco_cake_test')) %>
 
 production:
-  <<: *default
-  url: <%= ENV['DATABASE_URL'] %>
+  default:
+    <<: *default
+    url: <%= ENV['DATABASE_URL'] %>
+  salesforce_connect:
+    <<: *salesforce_connect
+    url: <%= ENV['SALESFORCE_CONNECT_URL'] %>

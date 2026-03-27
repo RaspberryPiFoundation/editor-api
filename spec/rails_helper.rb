@@ -72,6 +72,10 @@ RSpec.configure do |config|
     metadata[:type] = :graphql_query
   end
 
+  # Salesforce integration specs require the Heroku Connect service (i.e. SALESFORCE_CONNECT_DB
+  # must be set). Skip them automatically when running locally without the service.
+  config.filter_run_excluding requires_salesforce_db: true unless ENV.key?('SALESFORCE_CONNECT_DB')
+
   # Filter lines from Rails gems in backtraces.
   config.filter_rails_from_backtrace!
   # arbitrary gems may also be filtered via:

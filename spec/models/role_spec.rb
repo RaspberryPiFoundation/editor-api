@@ -165,4 +165,35 @@ RSpec.describe Role do
       end
     end
   end
+
+  describe 'salesforce sync' do
+    around do |example|
+      ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+    end
+
+    it 'enqueues a Salesforce::RoleSyncJob on create' do
+      expect { create(:role) }.to have_enqueued_job(Salesforce::RoleSyncJob)
+    end
+
+    it 'enqueues a Salesforce::RoleSyncJob on update' do
+      role = create(:role)
+      expect { role.update!(role: 'teacher') }.to have_enqueued_job(Salesforce::RoleSyncJob)
+    end
+
+    context 'when SALESFORCE_ENABLED is false' do
+      around do |example|
+        ClimateControl.modify(SALESFORCE_ENABLED: 'false') { example.run }
+      end
+
+      it 'does not enqueue Salesforce::RoleSyncJob on create' do
+        expect { create(:role) }.not_to have_enqueued_job(Salesforce::RoleSyncJob)
+      end
+    end
+
+    context 'when the role is a student role' do
+      it 'does not enqueue Salesforce::RoleSyncJob on create' do
+        expect { create(:student_role) }.not_to have_enqueued_job(Salesforce::RoleSyncJob)
+      end
+    end
+  end
 end

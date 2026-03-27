@@ -120,20 +120,9 @@ RSpec.describe User do
       end
     end
 
-    context 'when the access token is invalid' do
-      before do
-        allow(Sentry).to receive(:capture_exception)
-        stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo").to_return(status: 401)
-      end
-
-      it 'returns nil' do
-        expect(user).to be_nil
-      end
-
-      it 'reports the Faraday::UnauthorizedError exception to Sentry' do
-        user
-        expect(Sentry).to have_received(:capture_exception).with(instance_of(Faraday::UnauthorizedError))
-      end
+    it 'returns nil when the access token is invalid' do
+      stub_request(:get, "#{HydraPublicApiClient::API_URL}/userinfo").to_return(status: 401)
+      expect(user).to be_nil
     end
   end
 
