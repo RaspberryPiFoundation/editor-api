@@ -7,6 +7,8 @@ class ScratchAssetImporter
 
   attr_reader :asset_base_url, :asset_names
 
+  ASSET_FETCHING_DELAY = 0.2
+
   def initialize(asset_names, asset_base_url)
     @asset_names = asset_names
     @asset_base_url = asset_base_url
@@ -23,6 +25,7 @@ class ScratchAssetImporter
   def import_asset(asset_name)
     return if ScratchAsset.exists?(filename: asset_name)
 
+    sleep(ASSET_FETCHING_DELAY)
     asset = connection.get("#{asset_name}/get/")
     ScratchAsset.create!(filename: asset_name).file.attach(io: StringIO.new(asset.body), filename: asset_name)
   rescue StandardError => e
@@ -33,5 +36,9 @@ class ScratchAssetImporter
     @connection ||= Faraday.new(url: asset_base_url) do |faraday|
       faraday.response :raise_error
     end
+  end
+
+  def show_progress?
+    !Rails.env.test?
   end
 end
