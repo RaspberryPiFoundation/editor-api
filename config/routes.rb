@@ -15,7 +15,6 @@ Rails.application.routes.draw do
     resources :schools, only: %i[index show edit update] do
       member do
         post :verify
-        patch :reject
         patch :reopen
       end
     end

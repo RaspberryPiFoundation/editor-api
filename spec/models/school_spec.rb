@@ -193,8 +193,7 @@ RSpec.describe School do
 
     it 'allows reference reuse when original school is rejected' do
       school.reference = '100000'
-      school.save!
-      school.reject
+      school.rejected_at = Time.zone.now
 
       new_school = build(:school, reference: '100000')
       expect(new_school).to be_valid
@@ -260,7 +259,7 @@ RSpec.describe School do
 
     it 'allows district_nces_id reuse when original school is rejected' do
       us_school.district_nces_id = '0100000'
-      us_school.reject
+      us_school.rejected_at = Time.zone.now
 
       new_school = build(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000')
       expect(new_school).to be_valid
@@ -331,7 +330,7 @@ RSpec.describe School do
     end
 
     it 'allows school_roll_number reuse when original school is rejected' do
-      ireland_school.reject
+      ireland_school.rejected_at = Time.zone.now
 
       new_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
       expect(new_school).to be_valid
@@ -400,12 +399,12 @@ RSpec.describe School do
 
     it 'cannot have #rejected_at set when #verified_at is present' do
       school.verify!
-      school.reject
+      school.rejected_at = Time.zone.now
       expect(school.errors[:rejected_at]).to include('must be blank')
     end
 
     it 'cannot have #verified_at set when #rejected_at is present' do
-      school.reject
+      school.rejected_at = Time.zone.now
       school.update(verified_at: Time.zone.now)
       expect(school.errors[:verified_at]).to include('must be blank')
     end
@@ -487,7 +486,7 @@ RSpec.describe School do
     it('raises ActiveRecord::RecordNotFound if the user is the creator of a rejected school') do
       creator = create(:user)
       school.update!(creator_id: creator.id)
-      school.reject
+      school.rejected_at = Time.zone.now
 
       expect { described_class.find_for_user!(creator) }.to raise_error(ActiveRecord::RecordNotFound)
     end
@@ -617,17 +616,6 @@ RSpec.describe School do
     end
   end
 
-  describe '#reject' do
-    it 'sets rejected_at to the current time' do
-      school.reject
-      expect(school.rejected_at).to be_within(1.second).of(Time.zone.now)
-    end
-
-    it 'returns true on successful rejection' do
-      expect(school.reject).to be(true)
-    end
-  end
-
   describe 'salesforce sync' do
     around do |example|
       ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
@@ -668,13 +656,13 @@ RSpec.describe School do
 
   describe '#reopen' do
     it 'sets rejected_at to nil' do
-      school.reject
+      school.rejected_at = Time.zone.now
       school.reopen
       expect(school.rejected_at).to be_nil
     end
 
     it 'returns true on successful reopening' do
-      school.reject
+      school.rejected_at = Time.zone.now
       expect(school.reopen).to be(true)
     end
 

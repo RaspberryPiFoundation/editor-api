@@ -43,25 +43,9 @@ RSpec.describe SchoolVerificationService do
     end
   end
 
-  describe '#reject' do
-    before do
-      service.reject
-      school.reload
-    end
-
-    it 'sets verified_at to nil' do
-      expect(school.verified_at).to be_nil
-    end
-
-    it 'sets rejected_at to a date' do
-      expect(school.rejected_at).to be_a(ActiveSupport::TimeWithZone)
-    end
-  end
-
   describe 'when the school was previously verified' do
     before do
       service.verify
-      service.reject
       school.reload
     end
 

@@ -96,10 +96,6 @@ class School < ApplicationRecord
     end
   end
 
-  def reject
-    update(rejected_at: Time.zone.now)
-  end
-
   def reopen
     return false unless rejected?
 
