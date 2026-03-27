@@ -32,7 +32,7 @@ gem 'kaminari'
 gem 'omniauth-rails_csrf_protection', '~> 2.0.1'
 gem 'omniauth-rpi',
     github: 'RaspberryPiFoundation/omniauth-rpi',
-    tag: 'v1.3.1'
+    tag: 'v1.4.1'
 gem 'open-uri'
 gem 'paper_trail'
 gem 'pg', '~> 1.6'
