@@ -37,8 +37,4 @@ class ScratchAssetImporter
       faraday.response :raise_error
     end
   end
-
-  def show_progress?
-    !Rails.env.test?
-  end
 end
