@@ -17,7 +17,10 @@ class ScratchAssetImporter
   end
 
   def import
+    bar = ProgressBar.create(format: '%t: |%B| %c of %C %E', total: asset_names.count) if show_progress?
+
     asset_names.each do |asset_name|
+      bar.increment if show_progress?
       import_asset(asset_name)
     end
   end
