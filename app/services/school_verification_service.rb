@@ -17,6 +17,5 @@ class SchoolVerificationService
     true
   end
 
-  delegate :reject, to: :school
   delegate :reopen, to: :school
 end

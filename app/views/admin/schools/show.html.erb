@@ -45,15 +45,6 @@ as well as a link to its edit page.
       style: "background-color: darkorange; margin: 5px;",
       data: { confirm: t("administrate.actions.confirm_reopen_school") }
     ) unless page.resource.verified? || !page.resource.rejected? %>
-
-    <%= link_to(
-      t("administrate.actions.reject_school"),
-      reject_admin_school_path(page.resource),
-      class: "button button--danger",
-      method: :patch,
-      style: "background-color: hsla(0, 88%, 33%, 1); margin: 5px 5px 5px 0;",
-      data: { confirm: t("administrate.actions.confirm_reject_school") }
-    ) unless page.resource.verified? || page.resource.rejected? %>
   </div>
 </header>
 
