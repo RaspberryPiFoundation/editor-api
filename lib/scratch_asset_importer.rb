@@ -1,0 +1,47 @@
+require 'ruby-progressbar'
+
+class ScratchAssetImporter
+  def self.import(...)
+    new(...).import
+  end
+
+  attr_reader :asset_base_url, :asset_names
+
+  ASSET_FETCHING_DELAY = 0.2
+
+  def initialize(asset_names, asset_base_url)
+    @asset_names = asset_names
+    @asset_base_url = asset_base_url
+  end
+
+  def import
+    bar = ProgressBar.create(format: '%t: |%B| %c of %C %E', total: asset_names.count) if show_progress?
+
+    asset_names.each do |asset_name|
+      bar.increment if show_progress?
+      import_asset(asset_name)
+    end
+  end
+
+  private
+
+  def import_asset(asset_name)
+    return if ScratchAsset.exists?(filename: asset_name)
+
+    sleep(ASSET_FETCHING_DELAY)
+    asset = connection.get("#{asset_name}/get/")
+    ScratchAsset.create!(filename: asset_name).file.attach(io: StringIO.new(asset.body), filename: asset_name)
+  rescue StandardError => e
+    Rails.logger.error("Failed to import asset #{asset_name}: #{e.message}")
+  end
+
+  def connection
+    @connection ||= Faraday.new(url: asset_base_url) do |faraday|
+      faraday.response :raise_error
+    end
+  end
+
+  def show_progress?
+    !Rails.env.test?
+  end
+end

@@ -635,6 +635,7 @@ DEPENDENCIES
   rubocop-rspec_rails
   ruby-lsp
   ruby-lsp-rspec (~> 0.1.29)
+  ruby-progressbar (~> 1.13)
   selenium-webdriver
   sentry-rails
   shoulda-matchers (~> 7.0)

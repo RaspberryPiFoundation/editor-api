@@ -42,6 +42,7 @@ gem 'puma', '~> 7.2'
 gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
 gem 'rails', '~> 7.1'
+gem 'ruby-progressbar', '~> 1.13', require: false
 gem 'sentry-rails'
 gem 'statesman'
 
