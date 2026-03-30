@@ -22,6 +22,11 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
                                           "Expected #{sf_field} to equal role.#{role_field}"
       end
     end
+
+    it 'sets editor_type__c from the school user_origin' do
+      sf_role = Salesforce::Role.find_by(affiliation_id__c: role.id)
+      expect(sf_role.editor_type__c).to eq(role.school.user_origin)
+    end
   end
 
   context 'when the Salesforce role fails to save' do
@@ -30,6 +35,7 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
     before do
       allow(Salesforce::Role).to receive(:find_or_initialize_by).with(affiliation_id__c: role.id).and_return(sf_role)
       allow(sf_role).to receive(:attributes=)
+      allow(sf_role).to receive(:editor_type__c=)
       allow(sf_role).to receive(:save!).and_raise(ActiveRecord::RecordInvalid)
     end
 

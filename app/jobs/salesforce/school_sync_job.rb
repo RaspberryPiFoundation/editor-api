@@ -12,6 +12,7 @@ module Salesforce
       addressline2__c: :address_line_2,
       editormunicipality__c: :municipality,
       editoradministrativearea__c: :administrative_area,
+      editortype__c: :user_origin,
       postcode__c: :postal_code,
       countrycode__c: :country_code,
       verifiedat__c: :verified_at,
@@ -19,17 +20,18 @@ module Salesforce
       updatedat__c: :updated_at,
       rejectedat__c: :rejected_at,
       website__c: :website,
-      userorigin__c: :user_origin,
       districtnamesupplied__c: :district_name,
       ncesid__c: :district_nces_id,
       schoolrollnumber__c: :school_roll_number
     }.freeze
 
-    def perform(school_id:)
+    def perform(school_id:, is_create: false)
       school = ::School.find(school_id)
 
       sf_school = Salesforce::School.find_or_initialize_by(editoruuid__c: school_id)
       sf_school.attributes = sf_school_attributes(school:)
+      sf_school.status__c = 'New' if is_create
+
       sf_school.save!
     end
 
@@ -37,7 +39,7 @@ module Salesforce
 
     def sf_school_attributes(school:)
       mapped_attributes(school:).to_h do |sf_field, value|
-        value = 'for_education' if sf_field == :userorigin__c && value.nil?
+        value = ::School.new.user_origin if sf_field == :editortype__c && value.nil?
         value = truncate_value(sf_field:, value:) if value.is_a?(String)
 
         [sf_field, value]

@@ -619,8 +619,11 @@ RSpec.describe School do
       ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
     end
 
-    it 'enqueues Salesforce::SchoolSyncJob on create' do
-      expect { create(:school) }.to have_enqueued_job(Salesforce::SchoolSyncJob)
+    it 'enqueues Salesforce::SchoolSyncJob exactly once on create, with is_create: true' do
+      expect { create(:school) }
+        .to have_enqueued_job(Salesforce::SchoolSyncJob)
+        .exactly(1).times
+        .with(hash_including(is_create: true))
     end
 
     it 'enqueues Salesforce::ContactSyncJob on create' do
@@ -629,7 +632,7 @@ RSpec.describe School do
 
     it 'enqueues Salesforce::SchoolSyncJob on update' do
       school = create(:school)
-      expect { school.update!(name: 'Updated Name') }.to have_enqueued_job(Salesforce::SchoolSyncJob)
+      expect { school.update!(name: 'Updated Name') }.to have_enqueued_job(Salesforce::SchoolSyncJob).with(hash_including(is_create: false))
     end
 
     it 'enqueues Salesforce::ContactSyncJob on update' do
