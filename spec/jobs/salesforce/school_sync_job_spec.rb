@@ -6,6 +6,7 @@ RSpec.describe Salesforce::SchoolSyncJob, :requires_salesforce_db do
   subject(:perform_job) { described_class.perform_now(school_id: school.id) }
 
   let(:school) { create(:school) }
+  let(:perform_job_as_create) { described_class.perform_now(school_id: school.id, is_create: true) }
 
   around do |example|
     ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
@@ -21,6 +22,11 @@ RSpec.describe Salesforce::SchoolSyncJob, :requires_salesforce_db do
         expect(sf_school.send(sf_field)).to eq(expected),
                                             "Expected #{sf_field} to equal school.#{school_field}"
       end
+    end
+
+    it 'does not set status__c when is_create is false' do
+      sf_school = Salesforce::School.find_by(editoruuid__c: school.id)
+      expect(sf_school.status__c).to be_nil
     end
 
     context 'when an address field is very long' do
@@ -49,6 +55,15 @@ RSpec.describe Salesforce::SchoolSyncJob, :requires_salesforce_db do
         sf_school = Salesforce::School.find_by(editoruuid__c: school.id)
         expect(sf_school.rejectedat__c).to eq(school.rejected_at)
       end
+    end
+  end
+
+  context 'when is_create is true' do
+    before { perform_job_as_create }
+
+    it 'sets status__c to "New"' do
+      sf_school = Salesforce::School.find_by(editoruuid__c: school.id)
+      expect(sf_school.status__c).to eq('New')
     end
   end
 

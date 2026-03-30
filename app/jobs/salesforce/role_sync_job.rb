@@ -20,6 +20,13 @@ module Salesforce
 
       sf_role = Salesforce::Role.find_or_initialize_by(affiliation_id__c: role_id)
       sf_role.attributes = sf_role_attributes(role:)
+
+      # We also have a field on the Contact_Editor_Affiliation in Salesforce
+      # called Editor_Type__c - this is mapped to the value of role.school.user_origin
+      # If, for any reason, we can't get that, we fall back to the School model's default
+      # value for user_origin. ::School.new never persists to the DB.
+      sf_role.editor_type__c = role.school&.user_origin || ::School.new.user_origin
+
       sf_role.save!
     end
 

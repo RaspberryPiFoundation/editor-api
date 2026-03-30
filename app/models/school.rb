@@ -55,7 +55,8 @@ class School < ApplicationRecord
 
   after_create :generate_code!
 
-  after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? }
+  after_commit -> { do_salesforce_sync(is_create: true) }, on: :create, if: -> { FeatureFlags.salesforce_sync? }
+  after_commit -> { do_salesforce_sync(is_create: false) }, on: :update, if: -> { FeatureFlags.salesforce_sync? }
 
   def self.find_for_user!(user)
     school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id, rejected_at: nil)
@@ -169,8 +170,8 @@ class School < ApplicationRecord
     self.postal_code = "#{cleaned_postal_code[0..-4]} #{cleaned_postal_code[-3..]}"
   end
 
-  def do_salesforce_sync
-    Salesforce::SchoolSyncJob.perform_later(school_id: id)
+  def do_salesforce_sync(is_create:)
+    Salesforce::SchoolSyncJob.perform_later(school_id: id, is_create:)
     Salesforce::ContactSyncJob.perform_later(school_id: id)
   end
 end
