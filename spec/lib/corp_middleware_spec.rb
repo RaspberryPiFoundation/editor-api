@@ -18,6 +18,12 @@ describe CorpMiddleware do
     expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
   end
 
+  it 'sets the Cross-Origin-Resource-Policy header for requests to scratch assets' do
+    _status, headers, _response = middleware.call(env.merge('PATH_INFO' => '/api/scratch/assets/internalapi/asset/123/get/'))
+
+    expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
+  end
+
   it 'sets the Cross-Origin-Resource-Policy header for regex origin' do
     allow(ENV).to receive(:[]).with('ALLOWED_ORIGINS').and_return('/test\.com/')
 

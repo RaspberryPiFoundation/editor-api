@@ -12,7 +12,7 @@ class CorpMiddleware
     request_origin = env['HTTP_HOST']
     allowed_origins = OriginParser.parse_origins
 
-    if env['PATH_INFO'].start_with?('/rails/active_storage') && allowed_origins.any? do |origin|
+    if env['PATH_INFO'].start_with?('/rails/active_storage', '/api/scratch/assets/internalapi/asset/') && allowed_origins.any? do |origin|
          origin.is_a?(Regexp) ? origin =~ request_origin : origin == request_origin
        end
       headers['Cross-Origin-Resource-Policy'] = 'cross-origin'
