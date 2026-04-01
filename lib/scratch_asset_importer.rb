@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'ruby-progressbar'
+require 'stringio'
 
 class ScratchAssetImporter
   def self.import(...)
