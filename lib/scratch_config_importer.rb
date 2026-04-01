@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-require 'ruby-progressbar'
-
 class ScratchConfigImporter
   def self.import(...)
     new(...).import
