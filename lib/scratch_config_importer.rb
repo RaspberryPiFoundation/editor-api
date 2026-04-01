@@ -13,10 +13,16 @@ class ScratchConfigImporter
   end
 
   def import
-    config = Faraday.get(asset_config_url).body
+    config = connection.get.body
     asset_config = JSON.parse(config, symbolize_names: true)
     asset_names = extract_asset_names(asset_config)
     ScratchAssetImporter.import(asset_names, asset_base_url)
+  end
+
+  def connection
+    Faraday.new(url: asset_config_url) do |faraday|
+      faraday.response :raise_error
+    end
   end
 
   private
