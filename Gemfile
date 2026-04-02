@@ -41,7 +41,7 @@ gem 'propshaft'
 gem 'puma', '~> 7.2'
 gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
-gem 'rails', '~> 7.1'
+gem 'rails', '~> 8.1'
 gem 'sentry-rails'
 gem 'statesman'
 
