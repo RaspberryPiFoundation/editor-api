@@ -3,12 +3,15 @@
 module Api
   module Scratch
     class AssetsController < ScratchController
+      include ActiveStorage::SetCurrent
+
       skip_before_action :authorize_user, only: [:show]
       skip_before_action :check_scratch_feature, only: [:show]
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
-        redirect_to rails_storage_redirect_url(ScratchAsset.find_by!(filename: filename_with_extension).file)
+        scratch_asset = ScratchAsset.find_by!(filename: filename_with_extension)
+        redirect_to scratch_asset.file.url(content_type: scratch_asset.file.content_type), allow_other_host: true
       end
 
       def create

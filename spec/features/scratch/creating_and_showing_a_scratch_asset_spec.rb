@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a Scratch asset', type: :request do
   let(:basename) { 'test_image_1' }
+  let(:svg_filename) { 'test_svg_image.svg' }
   let(:format) { 'png' }
   let(:filename) { "#{basename}.#{format}" }
   let(:school) { create(:school) }
@@ -11,15 +12,35 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
   let(:cookie_headers) { { 'Cookie' => "scratch_auth=#{UserProfileMock::TOKEN}" } }
 
   describe 'GET #show' do
-    let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/' }
+    context 'when the asset is PNG' do
+      before do
+        create(:scratch_asset, :with_file, filename:, asset_path: file_fixture(filename))
+      end
 
-    context 'when the asset exists' do
-      let!(:scratch_asset) { create(:scratch_asset, :with_file, filename:, asset_path: file_fixture(filename)) }
+      let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/' }
 
-      it 'redirects to the asset file URL' do
+      it 'serves the file with png content type' do
         make_request
 
-        expect(response).to redirect_to(rails_storage_redirect_url(scratch_asset.file, only_path: true))
+        follow_redirect! while response.redirect?
+
+        expect(response.media_type).to eq('image/png')
+      end
+    end
+
+    context 'when the asset is SVG' do
+      before do
+        create(:scratch_asset, :with_file, filename: svg_filename, asset_path: file_fixture(svg_filename))
+      end
+
+      let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_svg_image.svg/get/' }
+
+      it 'serves the file with image/svg+xml content type' do
+        make_request
+
+        follow_redirect! while response.redirect?
+
+        expect(response.media_type).to eq('image/svg+xml')
       end
     end
   end
