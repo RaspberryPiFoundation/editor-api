@@ -4,6 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Creating a Scratch asset', type: :request do
   let(:basename) { 'test_image_1' }
+  let(:svg_filename) { 'test_svg_image.svg' }
   let(:format) { 'png' }
   let(:filename) { "#{basename}.#{format}" }
   let(:school) { create(:school) }
@@ -12,7 +13,10 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
 
   describe 'GET #show' do
     context 'when the asset is PNG' do
-      let!(:scratch_asset) { create(:scratch_asset, :with_file, filename:, asset_path: file_fixture(filename)) }
+      before do
+        create(:scratch_asset, :with_file, filename:, asset_path: file_fixture(filename))
+      end
+
       let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/' }
 
       it 'serves the file with png content type' do
@@ -25,8 +29,10 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
     end
 
     context 'when the asset is SVG' do
-      let(:svg_filename) { 'test_svg_image.svg' }
-      let!(:scratch_asset) { create(:scratch_asset, :with_file, filename: svg_filename, asset_path: file_fixture(svg_filename)) }
+      before do
+        create(:scratch_asset, :with_file, filename: svg_filename, asset_path: file_fixture(svg_filename))
+      end
+
       let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_svg_image.svg/get/' }
 
       it 'serves the file with image/svg+xml content type' do
