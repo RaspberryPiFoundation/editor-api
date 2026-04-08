@@ -39,7 +39,6 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         expect(response.media_type).to eq('image/svg+xml')
       end
     end
-
   end
 
   describe 'POST #create' do
