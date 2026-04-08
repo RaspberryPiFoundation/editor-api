@@ -52,6 +52,7 @@ namespace :test_seeds do
         teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
         school = create_school(creator_id, TEST_SCHOOL)
+        Flipper.enable_actor :cat_mode, school
         verify_school(school)
         assign_a_teacher(teacher_id, school)
 
