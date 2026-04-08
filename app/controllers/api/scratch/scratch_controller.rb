@@ -3,8 +3,6 @@
 module Api
   module Scratch
     class ScratchController < ApiController
-      include IdentifiableByCookie
-
       before_action :authorize_user
       before_action :check_scratch_feature
 

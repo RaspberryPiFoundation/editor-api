@@ -7,7 +7,7 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
   let(:teacher) { create(:teacher, school:) }
   let(:headers) do
     {
-      'Cookie' => "scratch_auth=#{UserProfileMock::TOKEN}",
+      'Authorization' => UserProfileMock::TOKEN,
       'Origin' => 'editor.com'
     }
   end
@@ -49,7 +49,7 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
     )
   end
 
-  it 'responds 401 Unauthorized when no cookie is provided' do
+  it 'responds 401 Unauthorized when no Authorization header is provided' do
     make_request(request_headers: {})
 
     expect(response).to have_http_status(:unauthorized)

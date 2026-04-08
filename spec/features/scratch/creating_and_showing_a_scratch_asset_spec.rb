@@ -9,7 +9,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
   let(:filename) { "#{basename}.#{format}" }
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
-  let(:cookie_headers) { { 'Cookie' => "scratch_auth=#{UserProfileMock::TOKEN}" } }
+  let(:auth_headers) { { 'Authorization' => UserProfileMock::TOKEN } }
 
   describe 'GET #show' do
     context 'when the asset is PNG' do
@@ -17,10 +17,8 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         create(:scratch_asset, :with_file, filename:, asset_path: file_fixture(filename))
       end
 
-      let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/' }
-
       it 'serves the file with png content type' do
-        make_request
+        get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/'
 
         follow_redirect! while response.redirect?
 
@@ -33,22 +31,21 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         create(:scratch_asset, :with_file, filename: svg_filename, asset_path: file_fixture(svg_filename))
       end
 
-      let(:make_request) { get '/api/scratch/assets/internalapi/asset/test_svg_image.svg/get/' }
-
       it 'serves the file with image/svg+xml content type' do
-        make_request
+        get '/api/scratch/assets/internalapi/asset/test_svg_image.svg/get/'
 
         follow_redirect! while response.redirect?
 
         expect(response.media_type).to eq('image/svg+xml')
       end
     end
+
   end
 
   describe 'POST #create' do
     let(:upload) { File.binread(file_fixture(filename)) }
     let(:make_request) do
-      post '/api/scratch/assets/test_image_1.png', headers: { 'Content-Type' => 'application/octet-stream' }.merge(cookie_headers), params: upload
+      post '/api/scratch/assets/test_image_1.png', headers: { 'Content-Type' => 'application/octet-stream' }.merge(auth_headers), params: upload
     end
 
     context 'when user is logged in and cat_mode is enabled' do
@@ -59,54 +56,42 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
 
       it 'creates a new asset' do
-        # Arrange
         Flipper.enable_actor :cat_mode, school
 
-        # Act & Assert
         expect { make_request }.to change(ScratchAsset, :count).by(1)
       end
 
       it 'sets the filename on the asset' do
-        # Arrange
         Flipper.enable_actor :cat_mode, school
 
-        # Act & Assert
         make_request
         expect(ScratchAsset.last.filename).to eq(filename)
       end
 
       it 'attaches the uploaded file to the asset' do
-        # Arrange
         Flipper.enable_actor :cat_mode, school
 
-        # Act & Assert
         make_request
         expect(ScratchAsset.last.file).to be_attached
       end
 
       it 'stores the content of the file in the attachment' do
-        # Arrange
         Flipper.enable_actor :cat_mode, school
 
-        # Act & Assert
         make_request
         expect(ScratchAsset.last.file.download).to eq(upload)
       end
 
       it 'responds with 201 Created' do
-        # Arrange
         Flipper.enable_actor :cat_mode, school
 
-        # Act & Assert
         make_request
         expect(response).to have_http_status(:created)
       end
 
       it 'includes the status and filename (without extension) in the response' do
-        # Arrange
         Flipper.enable_actor :cat_mode, school
 
-        # Act & Assert
         make_request
         expect(response.parsed_body).to include(
           'status' => 'ok',
@@ -124,28 +109,22 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         end
 
         it 'does not update the content of the file in the attachment' do
-          # Arrange
           Flipper.enable_actor :cat_mode, school
 
-          # Act & Assert
           make_request
           expect(ScratchAsset.last.file.download).to eq(original_upload)
         end
 
         it 'responds with 201 Created' do
-          # Arrange
           Flipper.enable_actor :cat_mode, school
 
-          # Act & Assert
           make_request
           expect(response).to have_http_status(:created)
         end
 
         it 'includes the status and filename (without extension) in the response' do
-          # Arrange
           Flipper.enable_actor :cat_mode, school
 
-          # Act & Assert
           make_request
           expect(response.parsed_body).to include(
             'status' => 'ok',
@@ -163,10 +142,8 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
 
       it 'responds 404 Not Found when cat_mode is not enabled' do
-        # Act
-        post '/api/scratch/assets/example.svg', headers: cookie_headers
+        post '/api/scratch/assets/example.svg', headers: auth_headers
 
-        # Assert
         expect(response).to have_http_status(:not_found)
       end
     end
