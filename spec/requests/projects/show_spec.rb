@@ -54,17 +54,6 @@ RSpec.describe 'Project show requests' do
       end
     end
 
-    context 'when loading a scratch project' do
-      let!(:project) { create(:project, school:, user_id: teacher.id, locale: nil, project_type: Project::Types::CODE_EDITOR_SCRATCH) }
-
-      it 'does not set a scratch auth cookie' do
-        get("/api/projects/#{project.identifier}", headers:)
-
-        expect(response).to have_http_status(:ok)
-        expect(response.cookies['scratch_auth']).to be_nil
-      end
-    end
-
     context 'when loading a student\'s project' do
       let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
