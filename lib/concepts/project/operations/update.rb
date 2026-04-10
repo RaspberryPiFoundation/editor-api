@@ -83,8 +83,8 @@ class Project
         return if response.failure?
 
         ActiveRecord::Base.transaction do
-          response[:project].save!
           response[:project].components.where(id: response[:component_ids_to_delete]).destroy_all
+          response[:project].save!
         end
       end
     end
