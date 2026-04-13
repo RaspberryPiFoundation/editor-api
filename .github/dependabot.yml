@@ -2,5 +2,7 @@ version: 2
 updates:
 - package-ecosystem: "bundler"
   directory: "/" # Location of package manifests
+  cooldown:
+    default-days: 10
   schedule:
     interval: "daily"
