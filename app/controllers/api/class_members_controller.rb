@@ -87,7 +87,7 @@ module Api
     end
 
     def class_member_params
-      params.require(:class_member).permit(:user_id, :type)
+      params.expect(class_member: %i[user_id type])
     end
 
     def create_batch_params

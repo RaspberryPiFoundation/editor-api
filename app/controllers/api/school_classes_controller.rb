@@ -192,11 +192,11 @@ module Api
 
     def school_class_params
       # A school teacher may only create classes they own.
-      params.require(:school_class).permit(:name, :description)
+      params.expect(school_class: %i[name description])
     end
 
     def import_school_class_params
-      params.require(:school_class).permit(:name, :description, :import_origin, :import_id)
+      params.expect(school_class: %i[name description import_origin import_id])
     end
 
     def import_school_students_params

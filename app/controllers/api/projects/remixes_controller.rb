@@ -67,17 +67,19 @@ module Api
       end
 
       def remix_params
-        params.require(:project)
-              .permit(:name,
-                      :identifier,
-                      :project_type,
-                      :locale,
-                      :user_id,
-                      :videos,
-                      :audio,
-                      :instructions,
-                      image_list: [],
-                      components: %i[id name extension content index])
+        params
+          .expect(project: [:name,
+                            :identifier,
+                            :project_type,
+                            :locale,
+                            :user_id,
+                            :videos,
+                            :audio,
+                            :instructions,
+                            {
+                              image_list: [],
+                              components: [%i[id name extension content index]]
+                            }])
       end
     end
   end
