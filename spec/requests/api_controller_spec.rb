@@ -46,7 +46,7 @@ RSpec.describe ApiController do
       get '/test'
 
       expect(response.parsed_body).to include(
-        'error' => 'ActionController::ParameterMissing: param is missing or the value is empty: foo'
+        'error' => 'ActionController::ParameterMissing: param is missing or the value is empty or invalid: foo'
       )
     end
   end
