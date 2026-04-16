@@ -108,6 +108,7 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :truncation
 
     DatabaseCleaner.cleaning do
+      Rake::Task.clear
       Rails.application.load_tasks
       example.run
       Rake::Task.clear
