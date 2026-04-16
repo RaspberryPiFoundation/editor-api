@@ -19,6 +19,30 @@ RSpec.describe 'Showing a Scratch project', type: :request do
     expect(data).to have_key(:targets)
   end
 
+  it 'returns the stage target first when stored targets are out of order' do
+    project = create(
+      :project,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      locale: 'en'
+    )
+    create(
+      :scratch_component,
+      project:,
+      content: {
+        targets: [
+          { name: 'Sprite1', isStage: false },
+          { name: 'Stage', isStage: true },
+          { name: 'Sprite2', isStage: false }
+        ]
+      }
+    )
+
+    get "/api/scratch/projects/#{project.identifier}"
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body.fetch('targets').pluck('name')).to eq(%w[Stage Sprite1 Sprite2])
+  end
+
   it 'returns a 404 if project does not exist' do
     get '/api/scratch/projects/non_existent_project'
 
