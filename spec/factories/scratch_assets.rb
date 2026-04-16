@@ -3,6 +3,8 @@
 FactoryBot.define do
   factory :scratch_asset do
     sequence(:filename) { Random.hex }
+    project { nil }
+    uploaded_user_id { project&.user_id }
 
     trait :with_file do
       transient { asset_path { file_fixture('test_image_1.png') } }

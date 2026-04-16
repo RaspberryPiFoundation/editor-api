@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_03_23_152328) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_10_110000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -337,7 +337,11 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_23_152328) do
     t.string "filename", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["filename"], name: "index_scratch_assets_on_filename", unique: true
+    t.uuid "project_id"
+    t.uuid "uploaded_user_id"
+    t.index ["filename"], name: "index_scratch_assets_on_global_filename", unique: true, where: "(project_id IS NULL)"
+    t.index ["project_id", "uploaded_user_id", "filename"], name: "index_scratch_assets_on_project_uploaded_user_and_filename", unique: true, where: "(project_id IS NOT NULL)"
+    t.index ["project_id"], name: "index_scratch_assets_on_project_id"
   end
 
   create_table "scratch_components", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -397,6 +401,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_03_23_152328) do
   add_foreign_key "school_project_transitions", "school_projects"
   add_foreign_key "school_projects", "projects"
   add_foreign_key "school_projects", "schools"
+  add_foreign_key "scratch_assets", "projects"
   add_foreign_key "scratch_components", "projects"
   add_foreign_key "teacher_invitations", "schools"
   add_foreign_key "user_jobs", "good_jobs"
