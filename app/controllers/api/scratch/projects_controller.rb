@@ -12,7 +12,7 @@ module Api
       before_action :ensure_create_is_a_remix, only: %i[create]
 
       def show
-        render json: scratch_project_content_with_stage_first(@project.scratch_component.content.to_h)
+        render json: @project.scratch_component.content_with_stage_first
       end
 
       def create
@@ -80,19 +80,6 @@ module Api
 
       def scratch_content_params
         params.slice(:meta, :targets, :monitors, :extensions).to_unsafe_h
-      end
-
-      def scratch_project_content_with_stage_first(content)
-        targets = content['targets']
-        return content unless targets.is_a?(Array)
-
-        # Scratch expects the stage target first and can fail to load otherwise.
-        stage_targets, other_targets = targets.partition do |target|
-          target.is_a?(Hash) && (target['isStage'] || target[:isStage])
-        end
-        return content if stage_targets.empty?
-
-        content.merge('targets' => stage_targets + other_targets)
       end
 
       def move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project:)
