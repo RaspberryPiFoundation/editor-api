@@ -27,7 +27,7 @@ module Api
           scratch_component = existing_remix.scratch_component || existing_remix.build_scratch_component
           scratch_component.content = scratch_content_params
           existing_remix.save!
-          reassign_uploaded_scratch_assets(original_project:, remix_project: existing_remix)
+          move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project: existing_remix)
 
           return render json: { status: 'ok', 'content-name': existing_remix.identifier }, status: :ok
         end
@@ -42,7 +42,7 @@ module Api
         )
 
         if result.success?
-          reassign_uploaded_scratch_assets(original_project:, remix_project: result[:project])
+          move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project: result[:project])
           render json: { status: 'ok', 'content-name': result[:project].identifier }, status: :ok
         else
           render json: { error: result[:error] }, status: :bad_request
@@ -95,38 +95,23 @@ module Api
         content.merge('targets' => stage_targets + other_targets)
       end
 
-      def reassign_uploaded_scratch_assets(original_project:, remix_project:)
-        uploaded_user_id = current_user.id
-        return if skip_scratch_asset_reassignment?(
-          original_project:,
-          remix_project:,
-          uploaded_user_id:
-        )
+      def move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project:)
+        return if original_project.blank? || remix_project.blank? || original_project.id == remix_project.id
 
-        ScratchAsset.where(project: original_project, uploaded_user_id:).find_each do |source_asset|
-          reassign_uploaded_scratch_asset(
-            source_asset:,
-            remix_project:,
-            uploaded_user_id:
-          )
+        # Before a remix exists, new uploads are temporarily saved against the original project.
+        ScratchAsset.where(project: original_project, uploaded_user_id: current_user.id).find_each do |pending_upload|
+          move_pending_scratch_upload_to_remix(pending_upload, remix_project)
         end
       end
 
-      def skip_scratch_asset_reassignment?(original_project:, remix_project:, uploaded_user_id:)
-        original_project.blank? ||
-          remix_project.blank? ||
-          uploaded_user_id.blank? ||
-          original_project.id == remix_project.id
-      end
-
-      def reassign_uploaded_scratch_asset(source_asset:, remix_project:, uploaded_user_id:)
-        if ScratchAsset.exists?(project: remix_project, uploaded_user_id:, filename: source_asset.filename)
-          source_asset.destroy!
+      def move_pending_scratch_upload_to_remix(pending_upload, remix_project)
+        if ScratchAsset.exists?(project: remix_project, uploaded_user_id: pending_upload.uploaded_user_id, filename: pending_upload.filename)
+          pending_upload.destroy!
         else
-          source_asset.update!(project: remix_project)
+          pending_upload.update!(project: remix_project)
         end
       rescue ActiveRecord::RecordNotUnique
-        source_asset.destroy!
+        pending_upload.destroy!
       end
     end
   end
