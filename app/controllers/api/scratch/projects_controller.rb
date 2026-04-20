@@ -110,8 +110,6 @@ module Api
             uploaded_user_id:
           )
         end
-      rescue StandardError => e
-        Sentry.capture_exception(e)
       end
 
       def skip_scratch_asset_reassignment?(original_project:, remix_project:, uploaded_user_id:)
