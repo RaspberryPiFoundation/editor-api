@@ -86,6 +86,20 @@ class Project < ApplicationRecord
     project_type == Types::CODE_EDITOR_SCRATCH
   end
 
+  def self_and_ancestors
+    projects = []
+    current_project = self
+    seen_ids = []
+
+    while current_project && seen_ids.exclude?(current_project.id)
+      projects << current_project
+      seen_ids << current_project.id
+      current_project = current_project.parent
+    end
+
+    projects
+  end
+
   private
 
   def check_unique_not_null

@@ -3,6 +3,8 @@
 module Api
   module Scratch
     class ProjectsController < ScratchController
+      include RemixSelection
+
       skip_before_action :authorize_user, only: [:show]
       skip_before_action :check_scratch_feature, only: [:show]
       before_action :load_project, only: %i[show update]
@@ -10,7 +12,7 @@ module Api
       before_action :ensure_create_is_a_remix, only: %i[create]
 
       def show
-        render json: @project.scratch_component.content
+        render json: @project.scratch_component.content_with_stage_first
       end
 
       def create
@@ -19,6 +21,16 @@ module Api
 
         remix_params = create_params
         return render json: { error: I18n.t('errors.project.remixing.invalid_params') }, status: :bad_request if remix_params.dig(:scratch_component, :content).blank?
+
+        existing_remix = remix_for_user(original_project, current_user)
+        if existing_remix
+          scratch_component = existing_remix.scratch_component || existing_remix.build_scratch_component
+          scratch_component.content = scratch_content_params
+          existing_remix.save!
+          move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project: existing_remix)
+
+          return render json: { status: 'ok', 'content-name': existing_remix.identifier }, status: :ok
+        end
 
         remix_origin = request.origin || request.referer
 
@@ -30,6 +42,7 @@ module Api
         )
 
         if result.success?
+          move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project: result[:project])
           render json: { status: 'ok', 'content-name': result[:project].identifier }, status: :ok
         else
           render json: { error: result[:error] }, status: :bad_request
@@ -67,6 +80,25 @@ module Api
 
       def scratch_content_params
         params.slice(:meta, :targets, :monitors, :extensions).to_unsafe_h
+      end
+
+      def move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project:)
+        return if original_project.blank? || remix_project.blank? || original_project.id == remix_project.id
+
+        # Before a remix exists, new uploads are temporarily saved against the original project.
+        ScratchAsset.where(project: original_project, uploaded_user_id: current_user.id).find_each do |pending_upload|
+          move_pending_scratch_upload_to_remix(pending_upload, remix_project)
+        end
+      end
+
+      def move_pending_scratch_upload_to_remix(pending_upload, remix_project)
+        if ScratchAsset.exists?(project: remix_project, uploaded_user_id: pending_upload.uploaded_user_id, filename: pending_upload.filename)
+          pending_upload.destroy!
+        else
+          pending_upload.update!(project: remix_project)
+        end
+      rescue ActiveRecord::RecordNotUnique
+        pending_upload.destroy!
       end
     end
   end

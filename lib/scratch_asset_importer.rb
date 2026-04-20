@@ -29,11 +29,13 @@ class ScratchAssetImporter
   private
 
   def import_asset(asset_name)
-    return if ScratchAsset.exists?(filename: asset_name)
+    return if ScratchAsset.global_assets.exists?(filename: asset_name)
 
     sleep(ASSET_FETCHING_DELAY)
     asset = connection.get("#{asset_name}/get/")
-    ScratchAsset.create!(filename: asset_name).file.attach(io: StringIO.new(asset.body), filename: asset_name)
+    ScratchAsset.create!(filename: asset_name, project_id: nil, uploaded_user_id: nil)
+                .file
+                .attach(io: StringIO.new(asset.body), filename: asset_name)
   rescue StandardError => e
     Rails.logger.error("Failed to import asset #{asset_name}: #{e.message}")
   end
