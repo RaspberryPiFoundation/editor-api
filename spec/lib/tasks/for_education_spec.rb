@@ -88,6 +88,20 @@ RSpec.describe 'for_education', type: :task do
       expect(projects.length).to eq(2)
     end
 
+    it 'does not add more lessons or projects when run again' do
+      allow($stdout).to receive(:puts)
+
+      expect do
+        task.reenable
+        task.invoke
+      end.not_to change {
+        [
+          Lesson.where(school_id: school.id).count,
+          Project.where(school_id: school.id).count
+        ]
+      }
+    end
+
     it 'assigns a teacher' do
       expect(Role.teacher.where(user_id: teacher_id, school_id: school.id)).to exist
     end

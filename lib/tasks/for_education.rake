@@ -29,13 +29,13 @@ namespace :for_education do
 
       # Destroy the project and then the lesson itself (The lesson's `before_destroy` prevents us using destroy)
       lesson_ids = Lesson.where(school_id:).pluck(:id)
-      Project.where(lesson_id: [lesson_ids]).destroy_all
-      Lesson.where(id: [lesson_ids]).delete_all
+      Project.where(lesson_id: lesson_ids).destroy_all
+      Lesson.where(id: lesson_ids).delete_all
 
       # Destroy the class members and then the class itself
       school_class_ids = SchoolClass.where(school_id:).pluck(:id)
-      ClassStudent.where(school_class_id: [school_class_ids]).destroy_all
-      SchoolClass.where(id: [school_class_ids]).destroy_all
+      ClassStudent.where(school_class_id: school_class_ids).destroy_all
+      SchoolClass.where(id: school_class_ids).destroy_all
 
       # Destroy the school
       School.where(id: school_id).destroy_all
@@ -46,9 +46,9 @@ namespace :for_education do
 
   desc 'Create an unverified school'
   task seed_an_unverified_school: :environment do
-    if School.find_by(code: TEST_SCHOOL)
-      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
-      return
+    if School.exists?(id: TEST_SCHOOL)
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over."
+      next
     end
 
     ActiveRecord::Base.transaction do
@@ -62,9 +62,9 @@ namespace :for_education do
 
   desc 'Create a verified school'
   task seed_a_verified_school: :environment do
-    if School.find_by(code: TEST_SCHOOL)
-      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
-      return
+    if School.exists?(id: TEST_SCHOOL)
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over."
+      next
     end
 
     ActiveRecord::Base.transaction do
@@ -79,9 +79,9 @@ namespace :for_education do
 
   desc 'Create a school with lessons and students'
   task seed_a_school_with_lessons_and_students: :environment do
-    if School.find_by(code: TEST_SCHOOL)
-      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
-      return
+    if School.exists?(id: TEST_SCHOOL)
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over."
+      next
     end
 
     ActiveRecord::Base.transaction do
