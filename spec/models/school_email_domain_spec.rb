@@ -30,7 +30,7 @@ RSpec.describe SchoolEmailDomain do
       duplicate = described_class.new(school:, domain: 'EXAMPLE.EDU')
       duplicate.valid?
 
-      expect(duplicate.errors[:domain]).to include('has already been taken')
+      expect(duplicate.errors.of_kind?(:domain, :taken)).to be(true)
     end
 
     it 'allows the same domain for a different school' do
