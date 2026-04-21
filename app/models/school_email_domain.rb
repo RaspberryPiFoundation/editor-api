@@ -4,6 +4,7 @@ class SchoolEmailDomain < ApplicationRecord
   belongs_to :school
 
   validates :domain, presence: true
+  validates :domain, uniqueness: { scope: :school_id }
 
   before_validation :format_domain
 
