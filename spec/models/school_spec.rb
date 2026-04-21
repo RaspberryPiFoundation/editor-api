@@ -35,6 +35,12 @@ RSpec.describe School do
       expect(school.roles.size).to eq(2)
     end
 
+    it 'has many school email domains' do
+      SchoolEmailDomain.create!(school:, domain: 'example.edu')
+      SchoolEmailDomain.create!(school:, domain: 'other.edu')
+      expect(school.school_email_domains.size).to eq(2)
+    end
+
     context 'when a school is destroyed' do
       let!(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
@@ -87,6 +93,11 @@ RSpec.describe School do
       it 'nullifies the school_id field on roles' do
         school.destroy!
         expect(role.reload.school_id).to be_nil
+      end
+
+      it 'also destroys school email domains' do
+        SchoolEmailDomain.create!(school:, domain: 'example.edu')
+        expect { school.destroy! }.to change(SchoolEmailDomain, :count).by(-1)
       end
     end
   end
