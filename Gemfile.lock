@@ -614,6 +614,7 @@ DEPENDENCIES
   postmark-rails
   propshaft
   pry-byebug
+  public_suffix (~> 7.0)
   puma (~> 7.2)
   rack-cors
   rack_content_type_default (~> 1.1)
