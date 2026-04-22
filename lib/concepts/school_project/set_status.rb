@@ -6,11 +6,15 @@ class SchoolProject
       def call(school_project:, status:, user_id:)
         response = OperationResponse.new
         response[:school_project] = school_project
+
+        unless response[:school_project].can_transition_to?(status)
+          message = "Cannot transition from '#{response[:school_project].status}' to '#{status}'"
+          response[:error] = message
+          return response
+        end
+
         response[:school_project].transition_status_to!(status, user_id)
-        response
-      rescue StandardError => e
-        Sentry.capture_exception(e)
-        response[:error] = e.message
+
         response
       end
     end
