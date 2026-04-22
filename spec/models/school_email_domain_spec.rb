@@ -10,7 +10,31 @@ RSpec.describe SchoolEmailDomain do
   it { is_expected.to belong_to(:school) }
   it { is_expected.to validate_presence_of(:domain) }
 
+  describe 'public suffix list validation' do
+    it 'rejects domains that are not valid under the public suffix list' do
+      record = described_class.new(school:, domain: 'com')
+      record.valid?
+
+      expect(record).not_to be_valid
+      expect(record.errors.of_kind?(:domain, :invalid)).to be(true)
+    end
+  end
+
   describe 'domain normalisation' do
+    it 'takes the host from an http URL before other normalisation' do
+      record = described_class.new(school:, domain: 'http://mail.school.edu/path?query=1')
+      record.valid?
+
+      expect(record.domain).to eq('mail.school.edu')
+    end
+
+    it 'takes the host from an https URL before other normalisation' do
+      record = described_class.new(school:, domain: 'https://EXAMPLE.EDU/')
+      record.valid?
+
+      expect(record.domain).to eq('example.edu')
+    end
+
     it 'downcases the domain' do
       record = described_class.new(school:, domain: 'EXAMPLE.EDU')
       record.valid?
