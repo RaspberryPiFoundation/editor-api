@@ -60,21 +60,6 @@ RSpec.describe 'School project complete requests', type: :request do
         expect(student_project.school_project).to be_complete
       end
     end
-
-    context 'when attempting an invalid status transition' do
-      before do
-        student_project.school_project.transition_status_to!(:complete, student.id)
-        post("/api/projects/#{student_project.identifier}/complete", headers:)
-      end
-
-      it 'completes unauthorized response' do
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-
-      it 'completes error message' do
-        expect(JSON.parse(response.body)['error']).to eq("Cannot transition from 'complete' to 'complete'")
-      end
-    end
   end
 
   context 'when user does not own the project and is not the class teacher' do

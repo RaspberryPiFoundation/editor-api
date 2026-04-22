@@ -40,7 +40,7 @@ class SchoolProject < ApplicationRecord
     state_machine.in_state?(:returned)
   end
 
-  delegate :can_transition_to?, :history, to: :state_machine
+  delegate :can_transition_to?, :history, :in_state?, to: :state_machine
 
   private
 
