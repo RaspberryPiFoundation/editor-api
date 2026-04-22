@@ -27,7 +27,14 @@ RSpec.describe SchoolProject::SetStatus, type: :unit do
     it 'returns an error when transitioning to an invalid status' do
       response = described_class.call(school_project:, status: :returned, user_id: student.id)
       expect(response.success?).to be(false)
-      expect(response[:error]).to eq("Cannot transition from #{school_project.status} to returned")
+      expect(response[:error]).to eq("Cannot transition from '#{school_project.status}' to 'returned'")
+    end
+
+    it 'is successful when transitioning to the same status' do
+      school_project.transition_status_to!(:submitted, student.id)
+      response = described_class.call(school_project:, status: :submitted, user_id: student.id)
+      expect(response.success?).to be(true)
+      expect(school_project.status).to eq('submitted')
     end
   end
 end
