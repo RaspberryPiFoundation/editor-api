@@ -1,31 +1,39 @@
 # frozen_string_literal: true
 
-require 'uri'
-
 class SchoolEmailDomain < ApplicationRecord
   belongs_to :school
 
   validates :domain, presence: true
   validates :domain, uniqueness: { scope: :school_id }
 
-  before_validation :validate_domain
+  before_validation :normalise_domain
+  validate :validate_public_suffix
 
   private
 
-  def validate_domain
-    self.domain = format_domain
-  end
-
-  def format_domain
+  def normalise_domain
     return if domain.nil?
 
-    str = domain.to_s.strip.sub(/\A@+/, '')
+    self.domain = build_normalised_domain_string(domain)
+  end
+
+  # Uses the Public Suffix List via the public_suffix gem: values must be a real
+  # hostname with a registrable name, not a bare suffix like com or co.uk.
+  # https://publicsuffix.org
+  def validate_public_suffix
+    return if domain.blank?
+
+    errors.add(:domain, :invalid) unless PublicSuffix.valid?(domain)
+  end
+
+  def build_normalised_domain_string(raw)
+    str = raw.to_s.strip.sub(/\A@+/, '')
     str = uri_host_if_http_url(str) || str
-    return str.downcase
+    str.downcase
   end
 
   def uri_host_if_http_url(str)
-    return unless str.match?(/\Ahttps?:\/\//i)
+    return unless str.match?(%r{\Ahttps?://}i)
 
     uri = URI.parse(str)
     uri.host if uri.is_a?(URI::HTTP) && uri.host.present?
