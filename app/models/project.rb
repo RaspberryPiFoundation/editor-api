@@ -19,6 +19,7 @@ class Project < ApplicationRecord
   has_many_attached :videos
   has_many_attached :audio
   has_one :school_project, dependent: :destroy
+  has_one :submitted_school_project, -> { in_state(:submitted) }, class_name: 'SchoolProject', dependent: :destroy, inverse_of: :project
 
   accepts_nested_attributes_for :components
   accepts_nested_attributes_for :scratch_component

@@ -86,14 +86,20 @@ RSpec.describe 'Listing lessons', type: :request do
   end
 
   it 'includes the submitted_count for each lesson' do
+    student_2 = create(:student, school:)
+    create(:class_student, school_class:, student_id: student_2.id)
+
     lesson.update!(school_class_id: school_class.id)
-    remix = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
-    remix.school_project.transition_status_to!(:submitted, student.id)
+
+    [student, student_2].each do |student|
+      remix = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      remix.school_project.transition_status_to!(:submitted, student.id)
+    end
 
     get("/api/lessons?school_class_id=#{school_class.id}", headers:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data.first[:submitted_count]).to eq(1)
+    expect(data.first[:submitted_count]).to eq(2)
   end
 
   context 'when filtering by project_identifier' do

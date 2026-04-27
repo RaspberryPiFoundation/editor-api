@@ -11,13 +11,15 @@ module Api
     def index
       accessible_lessons = filtered_lessons_scope
                            .accessible_by(current_ability)
-                           .includes(project: :remixes)
-      @lessons_with_users = accessible_lessons.with_users
 
       if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
+        accessible_lessons = accessible_lessons.includes(project: { remixes: %i[submitted_school_project] })
+        @lessons_with_users = accessible_lessons.with_users
         render :teacher_index, formats: [:json], status: :ok
       else
         remixes = user_remixes(accessible_lessons)
+        accessible_lessons = accessible_lessons.includes(project: :remixes)
+        @lessons_with_users = accessible_lessons.with_users
         @lessons_with_users_and_remixes = @lessons_with_users.zip(remixes)
         render :student_index, formats: [:json], status: :ok
       end
