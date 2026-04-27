@@ -36,5 +36,27 @@ RSpec.describe SchoolProject::SetStatus, type: :unit do
       expect(response.success?).to be(true)
       expect(school_project.status).to eq('submitted')
     end
+
+    it 'retries when transition raises a "Statesman::TransitionConflictError" error' do
+      call_count = 0
+      allow(school_project).to receive(:transition_status_to!).and_wrap_original do |original, *args|
+        call_count += 1
+        raise Statesman::TransitionConflictError if call_count == 1
+
+        original.call(*args)
+      end
+
+      response = described_class.call(school_project:, status: :submitted, user_id: student.id)
+      expect(response.success?).to be(true)
+      expect(school_project.status).to eq('submitted')
+    end
+
+    it 'raises the "Statesman::TransitionConflictError" error after 2 attempts' do
+      allow(school_project).to receive(:transition_status_to!).and_raise(Statesman::TransitionConflictError).twice
+
+      expect do
+        described_class.call(school_project:, status: :submitted, user_id: student.id)
+      end.to raise_error(Statesman::TransitionConflictError)
+    end
   end
 end
