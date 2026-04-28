@@ -7,7 +7,8 @@ module Api
 
       before_action :authorize_user
       load_and_authorize_resource :school, only: :index
-      before_action :load_and_authorize_remix, only: %i[show show_identifier]
+      before_action :load_and_authorize_remix, only: :show
+      before_action :load_and_authorize_remix_identifier, only: :show_identifier
 
       def index
         projects = Project.where(remixed_from_id: project.id).accessible_by(current_ability)
@@ -47,6 +48,19 @@ module Api
 
       def load_and_authorize_remix
         @project = remix_for_user(project, current_user)
+        raise ActiveRecord::RecordNotFound unless @project
+
+        authorize! :show, @project
+      end
+
+      def load_and_authorize_remix_identifier
+        @project =
+          if project.remixed_from_id.present?
+            project if project.user_id == current_user.id
+          else
+            remix_for_user(project, current_user)
+          end
+
         raise ActiveRecord::RecordNotFound unless @project
 
         authorize! :show, @project
