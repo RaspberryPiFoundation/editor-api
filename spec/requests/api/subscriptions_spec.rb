@@ -15,6 +15,24 @@ RSpec.describe 'Subscriptions API' do
       }
     end
 
+    let(:submitter_result_success) do
+      Subscriptions::PardotFormHandlerSubmitter::Result.new(success?: true)
+    end
+    let(:submitter_result_failure) do
+      Subscriptions::PardotFormHandlerSubmitter::Result.new(
+        success?: false,
+        status: :service_unavailable,
+        error_code: 'subscription_provider_unavailable',
+        message: 'Subscription provider is currently unavailable.'
+      )
+    end
+    let(:submitter) { instance_double(Subscriptions::PardotFormHandlerSubmitter) }
+
+    before do
+      allow(Subscriptions::PardotFormHandlerSubmitter).to receive(:new).and_return(submitter)
+      allow(submitter).to receive(:call).and_return(submitter_result_success)
+    end
+
     it 'returns success for a valid payload' do
       post(path, params: payload, as: :json)
 
@@ -22,6 +40,13 @@ RSpec.describe 'Subscriptions API' do
       expect(response.parsed_body).to include(
         'ok' => true,
         'message' => 'Subscription accepted'
+      )
+      expect(submitter).to have_received(:call).with(
+        form_payload: {
+          'email' => 'teacher@example.com',
+          'test_opt_in' => true,
+          'privacy_policy' => true
+        }
       )
     end
 
@@ -50,6 +75,19 @@ RSpec.describe 'Subscriptions API' do
       post(path, params: {}, as: :json)
 
       expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'returns provider error status/message when provider submission fails' do
+      allow(submitter).to receive(:call).and_return(submitter_result_failure)
+
+      post(path, params: payload, as: :json)
+
+      expect(response).to have_http_status(:service_unavailable)
+      expect(response.parsed_body).to include(
+        'ok' => false,
+        'error_code' => 'subscription_provider_unavailable',
+        'message' => 'Subscription provider is currently unavailable.'
+      )
     end
   end
 end
