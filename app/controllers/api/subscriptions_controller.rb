@@ -6,19 +6,19 @@ module Api
       payload = subscription_params.to_h
       errors = validation_errors_for(payload)
 
-      Rails.logger.warn(
-        "[subscriptions#create] payload=#{payload.inspect} result=#{errors.empty? ? 'success' : 'failure'}"
-      )
-
       if errors.empty?
         submit_result = subscriptions_submitter.call(form_payload: payload)
         if submit_result.success?
+          Rails.logger.info('[subscriptions#create] outcome=success')
           render json: {
             ok: true,
             message: 'Subscription accepted',
             subscription: payload
           }, status: :ok
         else
+          Rails.logger.warn(
+            "[subscriptions#create] outcome=failure error_code=#{submit_result.error_code}"
+          )
           render json: {
             ok: false,
             error_code: submit_result.error_code,
@@ -26,6 +26,7 @@ module Api
           }, status: submit_result.status
         end
       else
+        Rails.logger.warn('[subscriptions#create] outcome=failure error_code=subscription_validation_failed')
         render json: {
           ok: false,
           error_code: 'subscription_validation_failed',

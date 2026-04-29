@@ -24,8 +24,8 @@ module Subscriptions
         "classification=#{classification_for(response)}"
       )
       classify_response(response)
-    rescue Faraday::Error
-      # Sentry.capture_exception(e)
+    rescue Faraday::Error => e
+      Sentry.capture_exception(e)
       Result.new(
         success?: false,
         status: :service_unavailable,
