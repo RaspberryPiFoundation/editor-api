@@ -26,6 +26,14 @@ RSpec.describe 'Subscriptions API' do
         message: 'Subscription provider is currently unavailable.'
       )
     end
+    let(:submitter_result_rejected) do
+      Subscriptions::PardotFormHandlerSubmitter::Result.new(
+        success?: false,
+        status: :bad_gateway,
+        error_code: 'subscription_provider_rejected',
+        message: 'Subscription provider rejected the request.'
+      )
+    end
     let(:submitter) { instance_double(Subscriptions::PardotFormHandlerSubmitter) }
 
     before do
@@ -87,6 +95,19 @@ RSpec.describe 'Subscriptions API' do
         'ok' => false,
         'error_code' => 'subscription_provider_unavailable',
         'message' => 'Subscription provider is currently unavailable.'
+      )
+    end
+
+    it 'returns provider rejection shape when provider rejects request' do
+      allow(submitter).to receive(:call).and_return(submitter_result_rejected)
+
+      post(path, params: payload, as: :json)
+
+      expect(response).to have_http_status(:bad_gateway)
+      expect(response.parsed_body).to include(
+        'ok' => false,
+        'error_code' => 'subscription_provider_rejected',
+        'message' => 'Subscription provider rejected the request.'
       )
     end
   end
