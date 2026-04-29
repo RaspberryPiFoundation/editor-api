@@ -6,9 +6,9 @@ module Subscriptions
 
     REQUEST_TIMEOUT_SECONDS = 10
     OPEN_TIMEOUT_SECONDS = 5
-    SUCCESS_STATUS_CODES = [200, 302].freeze
-    SUCCESS_LOCATION_PATTERNS = ['/success'].freeze
-    ERROR_LOCATION_PATTERNS = ['/error'].freeze
+    SUCCESS_STATUS_CODE = 200
+    ERROR_BODY_PATTERNS = ['error page'].freeze
+    SUCCESS_BODY_PATTERNS = ['success page'].freeze
 
     def initialize(endpoint_url:)
       @endpoint_url = endpoint_url
@@ -64,10 +64,11 @@ module Subscriptions
     end
 
     def classify_response(response)
-      return reject_result unless SUCCESS_STATUS_CODES.include?(response.status)
-      return Result.new(success?: true) if response.status == 200
-      return reject_result if redirect_to_error_location?(response)
-      return Result.new(success?: true) if redirect_to_success_location?(response)
+      body = response_body(response)
+
+      return reject_result if error_body?(body)
+      return reject_result unless response.status == SUCCESS_STATUS_CODE
+      return Result.new(success?: true) if success_body?(body)
 
       ambiguous_result
     end
@@ -90,14 +91,16 @@ module Subscriptions
       )
     end
 
-    def redirect_to_success_location?(response)
-      location = redirect_location(response)
-      SUCCESS_LOCATION_PATTERNS.any? { |pattern| location.include?(pattern) }
+    def error_body?(body)
+      ERROR_BODY_PATTERNS.any? { |pattern| body.include?(pattern) }
     end
 
-    def redirect_to_error_location?(response)
-      location = redirect_location(response)
-      ERROR_LOCATION_PATTERNS.any? { |pattern| location.include?(pattern) }
+    def success_body?(body)
+      SUCCESS_BODY_PATTERNS.any? { |pattern| body.include?(pattern) }
+    end
+
+    def response_body(response)
+      response.body.to_s.downcase
     end
 
     def redirect_location(response)
@@ -105,12 +108,13 @@ module Subscriptions
     end
 
     def classification_for(response)
-      return 'rejected_status' unless SUCCESS_STATUS_CODES.include?(response.status)
-      return 'accepted_200' if response.status == 200
-      return 'rejected_error_redirect' if redirect_to_error_location?(response)
-      return 'accepted_success_redirect' if redirect_to_success_location?(response)
+      body = response_body(response)
 
-      'ambiguous_redirect'
+      return 'rejected_error_body' if error_body?(body)
+      return 'rejected_status' unless response.status == SUCCESS_STATUS_CODE
+      return 'accepted_success_body' if success_body?(body)
+
+      'ambiguous_response'
     end
   end
 end
