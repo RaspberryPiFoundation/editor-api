@@ -11,11 +11,20 @@ module Api
       )
 
       if errors.empty?
-        render json: {
-          ok: true,
-          message: 'Subscription accepted',
-          subscription: payload
-        }, status: :ok
+        submit_result = subscriptions_submitter.call(subscription_payload: payload)
+        if submit_result.success?
+          render json: {
+            ok: true,
+            message: 'Subscription accepted',
+            subscription: payload
+          }, status: :ok
+        else
+          render json: {
+            ok: false,
+            error_code: submit_result.error_code,
+            message: submit_result.message
+          }, status: submit_result.status
+        end
       else
         render json: {
           ok: false,
@@ -31,6 +40,23 @@ module Api
 
     def subscription_params
       params.require(:subscription).permit(:email, :test_opt_in, :privacy_policy)
+    end
+
+    def subscriptions_submitter
+      @subscriptions_submitter ||= Subscriptions::PardotApiSubmitter.new(
+        subscription_url: Rails.configuration.x.subscriptions.pardot_api_subscription_url,
+        business_unit_id: Rails.configuration.x.subscriptions.pardot_business_unit_id,
+        token_provider: subscriptions_token_provider
+      )
+    end
+
+    def subscriptions_token_provider
+      @subscriptions_token_provider ||= Subscriptions::PardotTokenProvider.new(
+        auth_url: Rails.configuration.x.subscriptions.pardot_auth_url,
+        client_id: Rails.configuration.x.subscriptions.pardot_client_id,
+        client_secret: Rails.configuration.x.subscriptions.pardot_client_secret,
+        scope: Rails.configuration.x.subscriptions.pardot_auth_scope
+      )
     end
 
     def validation_errors_for(payload)

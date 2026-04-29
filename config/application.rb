@@ -69,5 +69,12 @@ module App
     config.active_record.encryption.primary_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')
     config.active_record.encryption.deterministic_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY')
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT')
+
+    config.x.subscriptions.pardot_api_subscription_url = ENV.fetch('PARDOT_API_SUBSCRIPTION_URL', '')
+    config.x.subscriptions.pardot_business_unit_id = ENV.fetch('PARDOT_BUSINESS_UNIT_ID', '')
+    config.x.subscriptions.pardot_auth_url = ENV.fetch('PARDOT_AUTH_URL', '')
+    config.x.subscriptions.pardot_client_id = ENV.fetch('PARDOT_CLIENT_ID', '')
+    config.x.subscriptions.pardot_client_secret = ENV.fetch('PARDOT_CLIENT_SECRET', '')
+    config.x.subscriptions.pardot_auth_scope = ENV.fetch('PARDOT_AUTH_SCOPE', '')
   end
 end
