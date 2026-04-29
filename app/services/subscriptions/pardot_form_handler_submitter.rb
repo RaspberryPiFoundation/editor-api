@@ -17,7 +17,7 @@ module Subscriptions
     def call(form_payload:)
       return missing_configuration_result if endpoint_url.blank?
 
-      response = faraday.post(endpoint_url, form_payload)
+      response = faraday.post(endpoint_url, provider_payload(form_payload))
       Rails.logger.info(
         "[subscriptions#provider] status=#{response.status} " \
         "location=#{redirect_location(response)} " \
@@ -53,6 +53,14 @@ module Subscriptions
         error_code: 'subscription_provider_not_configured',
         message: 'Subscription provider endpoint is not configured.'
       )
+    end
+
+    def provider_payload(form_payload)
+      # Map internal API contract to Pardot Form Handler external field names.
+      {
+        'email' => form_payload['email'],
+        'Tester' => form_payload['test_opt_in']
+      }.compact
     end
 
     def classify_response(response)
