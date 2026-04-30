@@ -3,108 +3,149 @@
 require 'rails_helper'
 
 RSpec.describe SchoolEmailDomain do
-  subject { described_class.new(school:, domain: 'example.edu') }
+  subject(:school_email_domain) { described_class.create!(school:, domain:) }
 
   let(:school) { create(:school, creator_id: SecureRandom.uuid) }
+  let(:domain) { 'example.edu' }
 
-  it { is_expected.to belong_to(:school) }
-  it { is_expected.to validate_presence_of(:domain) }
+  describe 'associations' do
+    it { is_expected.to belong_to(:school) }
+    it { is_expected.to validate_presence_of(:domain) }
+    it { is_expected.to be_valid }
+  end
 
-  describe 'domain normalisation' do
-    it 'takes the host from an http URL before other normalisation' do
-      record = described_class.new(school:, domain: 'http://mail.school.edu/path?query=1')
-      record.valid?
+  context 'with a valid domain' do
+    describe 'domain normalisation' do
+      context 'when given a full url' do
+        let(:domain) { 'http://mail.school.edu/path?query=1' }
 
-      expect(record.domain).to eq('mail.school.edu')
+        it 'extracts the host' do
+          expect(school_email_domain.domain).to eq('mail.school.edu')
+        end
+      end
+
+      context 'when given a full https url' do
+        let(:domain) { 'https://mail.school.edu/path' }
+
+        it 'extracts the host' do
+          expect(school_email_domain.domain).to eq('mail.school.edu')
+        end
+      end
+
+      context 'when given a domain with a trailing dot' do
+        let(:domain) { 'EXAMPLE.EDU.' }
+
+        it 'stores the host without the trailing dot' do
+          expect(school_email_domain.domain).to eq('example.edu')
+        end
+      end
+
+      context 'when given a capitalised host' do
+        let(:domain) { 'EXAMPLE.EDU' }
+
+        it 'downcases the host' do
+          expect(school_email_domain.domain).to eq('example.edu')
+        end
+      end
+
+      context 'with a leading @' do
+        let(:domain) { '@example.edu' }
+
+        it 'removes the @' do
+          expect(school_email_domain.domain).to eq('example.edu')
+        end
+      end
     end
 
-    it 'takes the host from an https URL before other normalisation' do
-      record = described_class.new(school:, domain: 'https://EXAMPLE.EDU/')
-      record.valid?
+    describe 'public suffix list validation' do
+      context 'when there is at least one registrable label before the public suffix' do
+        let(:domain) { 'example.edu' }
 
-      expect(record.domain).to eq('example.edu')
+        it 'accepts the domain' do
+          expect(school_email_domain.domain).to eq('example.edu')
+        end
+      end
+
+      context 'when there is a subdomain before a valid public suffix' do
+        let(:domain) { 'mail.example.edu' }
+
+        it 'accepts the domain' do
+          expect(school_email_domain.domain).to eq('mail.example.edu')
+        end
+      end
+
+      context 'when there is a hostname under a multi-part public suffix' do
+        let(:domain) { 'school.example.co.uk' }
+
+        it 'accepts the domain' do
+          expect(school_email_domain.domain).to eq('school.example.co.uk')
+        end
+      end
+
+      context 'when given a district-style host with a multi-part public suffix' do
+        let(:domain) { 'school.k12.tx.us' }
+
+        it 'accepts the domain' do
+          expect(school_email_domain.domain).to eq('school.k12.tx.us')
+        end
+      end
     end
 
-    it 'downcases the domain' do
-      record = described_class.new(school:, domain: 'EXAMPLE.EDU')
-      record.valid?
+    describe 'domain uniqueness' do
+      context 'when the proposed domain matches the existing record' do
+        subject(:school_email_domain) { described_class.new(school:, domain:) }
 
-      expect(record.domain).to eq('example.edu')
-    end
+        let(:domain) { 'example.edu' }
 
-    it 'removes a leading @' do
-      record = described_class.new(school:, domain: '@example.edu')
-      record.valid?
+        before do
+          described_class.create!(school:, domain: 'example.edu')
+          school_email_domain.valid?
+        end
 
-      expect(record.domain).to eq('example.edu')
+        it 'rejects the duplicate' do
+          expect(school_email_domain).not_to be_valid
+        end
+
+        it 'records :taken on domain' do
+          expect(school_email_domain.errors.of_kind?(:domain, :taken)).to be(true)
+        end
+      end
+
+      context 'when the proposed domain matches after normalisation' do
+        subject(:school_email_domain) { described_class.new(school:, domain:) }
+
+        let(:domain) { 'http://EXAMPLE.EDU' }
+
+        before do
+          described_class.create!(school:, domain: 'example.edu')
+          school_email_domain.valid?
+        end
+
+        it 'rejects the duplicate' do
+          expect(school_email_domain).not_to be_valid
+        end
+
+        it 'records :taken on domain' do
+          expect(school_email_domain.errors.of_kind?(:domain, :taken)).to be(true)
+        end
+      end
+
+      it 'allows the same domain for a different school' do
+        described_class.create!(school:, domain: 'example.edu')
+        other_school = create(:school, creator_id: SecureRandom.uuid)
+        other_school_email_domain = described_class.new(school: other_school, domain: 'example.edu')
+
+        expect(other_school_email_domain).to be_valid
+      end
     end
   end
 
-  describe 'public suffix list validation' do
-    context 'when the hostname is only a suffix' do
-      it 'rejects com' do
-        record = described_class.new(school:, domain: 'com')
-        record.valid?
-
-        expect(record).not_to be_valid
-        expect(record.errors.of_kind?(:domain, :invalid)).to be(true)
-      end
-
-      it 'rejects edu' do
-        record = described_class.new(school:, domain: 'edu')
-        record.valid?
-
-        expect(record).not_to be_valid
-        expect(record.errors.of_kind?(:domain, :invalid)).to be(true)
-      end
-
-      it 'rejects co.uk' do
-        record = described_class.new(school:, domain: 'co.uk')
-        record.valid?
-
-        expect(record).not_to be_valid
-        expect(record.errors.of_kind?(:domain, :invalid)).to be(true)
-      end
-    end
-
-    context 'when there is at least one registrable label before the public suffix' do
-      it 'accepts a typical school-style .edu domain' do
-        record = described_class.new(school:, domain: 'example.edu')
-        expect(record).to be_valid
-      end
-
-      it 'accepts a subdomain' do
-        record = described_class.new(school:, domain: 'mail.example.edu')
-        expect(record).to be_valid
-      end
-
-      it 'accepts a hostname under a multi-part public suffix' do
-        record = described_class.new(school:, domain: 'school.example.co.uk')
-        expect(record).to be_valid
-      end
-
-      it 'accepts district-style hosts' do
-        record = described_class.new(school:, domain: 'school.k12.tx.us')
-        expect(record).to be_valid
-      end
-    end
-  end
-
-  describe 'domain uniqueness' do
-    it 'rejects a duplicate domain for the same school after normalisation' do
-      described_class.create!(school:, domain: 'example.edu')
-      duplicate = described_class.new(school:, domain: 'EXAMPLE.EDU')
-      duplicate.valid?
-
-      expect(duplicate.errors.of_kind?(:domain, :taken)).to be(true)
-    end
-
-    it 'allows the same domain for a different school' do
-      described_class.create!(school:, domain: 'example.edu')
-      other_school = create(:school, creator_id: SecureRandom.uuid)
-      other = described_class.new(school: other_school, domain: 'example.edu')
-
-      expect(other).to be_valid
-    end
+  context 'with an invalid domain' do
+    it { is_expected.not_to allow_value('').for(:domain) }
+    it { is_expected.not_to allow_value('   ').for(:domain) }
+    it { is_expected.not_to allow_value('edu').for(:domain) }
+    it { is_expected.not_to allow_value('com').for(:domain) }
+    it { is_expected.not_to allow_value('co.uk').for(:domain) }
+    it { is_expected.not_to allow_value('http://invalid uri').for(:domain) }
   end
 end

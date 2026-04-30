@@ -6,38 +6,26 @@ class SchoolEmailDomain < ApplicationRecord
   validates :domain, presence: true
   validates :domain, uniqueness: { scope: :school_id }
 
-  before_validation :normalise_domain
-  validate :validate_public_suffix
+  before_validation :validate_domain
 
   private
 
-  def normalise_domain
-    return if domain.nil?
-
-    self.domain = build_normalised_domain_string(domain)
-  end
-
-  # Uses the Public Suffix List via the public_suffix gem: values must be a real
-  # hostname with a registrable name, not a bare suffix like com or co.uk.
-  # https://publicsuffix.org
-  def validate_public_suffix
+  def validate_domain
     return if domain.blank?
 
-    errors.add(:domain, :invalid) unless PublicSuffix.valid?(domain)
-  end
+    value = domain.strip.downcase
+    # Add a scheme unless it already has one, so URI can parse it
+    value = "http://#{value}" unless %r{\A[a-z][a-z0-9+\-.]*://}i.match?(value)
+    uri = URI.parse(value)
+    host = uri.host&.delete_suffix('.')
+    return if host.blank?
 
-  def build_normalised_domain_string(raw)
-    str = raw.to_s.strip.sub(/\A@+/, '')
-    str = uri_host_if_http_url(str) || str
-    str.downcase
-  end
-
-  def uri_host_if_http_url(str)
-    return unless str.match?(%r{\Ahttps?://}i)
-
-    uri = URI.parse(str)
-    uri.host if uri.is_a?(URI::HTTP) && uri.host.present?
+    if PublicSuffix.valid?(host)
+      self.domain = host
+    else
+      errors.add(:domain, :invalid)
+    end
   rescue URI::InvalidURIError
-    nil
+    errors.add(:domain, :invalid)
   end
 end
