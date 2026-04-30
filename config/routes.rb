@@ -99,6 +99,7 @@ Rails.application.routes.draw do
     resources :features, only: %i[index]
 
     resources :profile_auth_check, only: %i[index]
+    resources :subscriptions, only: %i[create]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
