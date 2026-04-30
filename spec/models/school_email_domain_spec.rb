@@ -143,9 +143,11 @@ RSpec.describe SchoolEmailDomain do
   context 'with an invalid domain' do
     it { is_expected.not_to allow_value('').for(:domain) }
     it { is_expected.not_to allow_value('   ').for(:domain) }
+    it { is_expected.not_to allow_value('http://').for(:domain) }
     it { is_expected.not_to allow_value('edu').for(:domain) }
     it { is_expected.not_to allow_value('com').for(:domain) }
     it { is_expected.not_to allow_value('co.uk').for(:domain) }
     it { is_expected.not_to allow_value('http://invalid uri').for(:domain) }
+    it { is_expected.not_to allow_value('-wrong.edu').for(:domain) }
   end
 end
