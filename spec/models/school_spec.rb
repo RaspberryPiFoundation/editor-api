@@ -682,4 +682,21 @@ RSpec.describe School do
       expect(school.reopen).to be(false)
     end
   end
+
+  describe '#valid_domain?' do
+    let(:valid_domain) { 'valid.edu' }
+    let(:invalid_domain) { 'invalid.edu' }
+
+    before do
+      SchoolEmailDomain.create!(school:, domain: valid_domain)
+    end
+
+    it 'returns true when school has registered the email domain' do
+      expect(school.valid_domain?(valid_domain)).to be(true)
+    end
+
+    it 'returns false when school has not registered the email domain' do
+      expect(school.valid_domain?(invalid_domain)).to be(false)
+    end
+  end
 end
