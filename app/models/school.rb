@@ -117,6 +117,10 @@ class School < ApplicationRecord
                         .exists?(description: id)
   end
 
+  def valid_domain?(candidate_domain)
+    school_email_domains.exists?(domain: candidate_domain)
+  end
+
   private
 
   # Ensure the reference is nil, not an empty string
