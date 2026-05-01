@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_10_110000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_29_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -205,6 +205,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_10_110000) do
     t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "submitted_projects_count", default: 0, null: false
     t.index ["archived_at"], name: "index_lessons_on_archived_at"
     t.index ["copied_from_id"], name: "index_lessons_on_copied_from_id"
     t.index ["name"], name: "index_lessons_on_name"

@@ -14,4 +14,7 @@ class SchoolProjectStateMachine
   transition from: :submitted, to: %i[unsubmitted returned complete]
   transition from: :returned, to: %i[submitted complete]
   transition from: :complete, to: [:unsubmitted]
+
+  after_transition(to: :submitted, &:recalculate_lesson_submitted_projects_count!)
+  after_transition(from: :submitted, &:recalculate_lesson_submitted_projects_count!)
 end

@@ -8,6 +8,8 @@ class Lesson < ApplicationRecord
   belongs_to :parent, optional: true, class_name: :Lesson, foreign_key: :copied_from_id, inverse_of: :copies
   has_many :copies, dependent: :nullify, class_name: :Lesson, foreign_key: :copied_from_id, inverse_of: :parent
   has_one :project, dependent: :destroy
+  has_many :remixes, through: :project
+  has_many :school_projects, through: :remixes
   accepts_nested_attributes_for :project
 
   before_validation :assign_school_from_school_class
@@ -36,6 +38,11 @@ class Lesson < ApplicationRecord
     return 0 unless project
 
     project.remixes.count { |remix| remix.school_project&.submitted? }
+  end
+
+  def recalculate_submitted_projects_count!
+    count = school_projects.in_state(:submitted).count
+    update!(submitted_projects_count: count)
   end
 
   private
