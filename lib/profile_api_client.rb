@@ -7,7 +7,7 @@ class ProfileApiClient
   }.freeze
 
   # rubocop:disable Naming/MethodName
-  School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
+  School = Data.define(:id, :schoolCode, :studentEmailDomains, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :schoolId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
   # rubocop:enable Naming/MethodName
@@ -51,13 +51,14 @@ class ProfileApiClient
       false
     end
 
-    def create_school(token:, id:, code:)
-      return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?
+    def create_school(token:, id:, code:, school_email_domains: [])
+      return { 'id' => id, 'schoolCode' => code, 'studentEmailDomains' => school_email_domains } if ENV['BYPASS_OAUTH'].present?
 
       response = connection(token).post('/api/v1/schools') do |request|
         request.body = {
           id:,
-          schoolCode: code
+          schoolCode: code,
+          studentEmailDomains: school_email_domains
         }
       end
 
@@ -212,6 +213,21 @@ class ProfileApiClient
 
       unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 204
+    end
+
+    def update_school_email_domains(token:, school_id:, school_email_domains: [])
+      return { 'id' => school_id, 'studentEmailDomains' => school_email_domains } if ENV['BYPASS_OAUTH'].present?
+
+      response = connection(token).patch("/api/v1/schools/#{school_id}") do |request|
+        request.body = {
+          studentEmailDomains: school_email_domains
+        }
+      end
+
+      unauthorized!(response)
+      raise UnexpectedResponse, response unless response.status == 200
+
+      School.new(**response.body)
     end
 
     private
