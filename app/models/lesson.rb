@@ -34,12 +34,6 @@ class Lesson < ApplicationRecord
     [self, User.from_userinfo(ids: user_id).first]
   end
 
-  def submitted_count
-    return 0 unless project
-
-    project.remixes.count { |remix| remix.school_project&.submitted? }
-  end
-
   def recalculate_submitted_projects_count!
     with_lock do
       count = school_projects.in_state(:submitted).count
