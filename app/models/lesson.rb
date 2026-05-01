@@ -41,8 +41,10 @@ class Lesson < ApplicationRecord
   end
 
   def recalculate_submitted_projects_count!
-    count = school_projects.in_state(:submitted).count
-    update!(submitted_projects_count: count)
+    with_lock do
+      count = school_projects.in_state(:submitted).count
+      update!(submitted_projects_count: count)
+    end
   end
 
   private
