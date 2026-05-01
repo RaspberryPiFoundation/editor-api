@@ -9,16 +9,16 @@ module Api
     load_and_authorize_resource :lesson
 
     def index
-      accessible_lessons = filtered_lessons_scope
-                           .accessible_by(current_ability)
-                           .includes(project: :remixes)
-      @lessons_with_users = accessible_lessons.with_users
+      accessible_lessons = filtered_lessons_scope.accessible_by(current_ability)
 
       if current_user&.school_teacher?(school) || current_user&.school_owner?(school)
+        accessible_lessons = accessible_lessons.includes(:project)
+        @lessons_with_users = accessible_lessons.with_users
         render :teacher_index, formats: [:json], status: :ok
       else
         remixes = user_remixes(accessible_lessons)
-        @lessons_with_users_and_remixes = @lessons_with_users.zip(remixes)
+        accessible_lessons = accessible_lessons.includes(project: :remixes)
+        @lessons_with_users_and_remixes = accessible_lessons.with_users.zip(remixes)
         render :student_index, formats: [:json], status: :ok
       end
     end
