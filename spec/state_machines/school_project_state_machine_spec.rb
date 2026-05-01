@@ -16,6 +16,21 @@ RSpec.describe SchoolProjectStateMachine do
   end
 
   describe 'transitions' do
+    it 'recalculates the parent lesson submitted projects count' do
+      teacher = create(:teacher, school:)
+      lesson = create(:lesson, school:, user_id: teacher.id)
+      remix = create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
+      state_machine = described_class.new(remix.school_project, transition_class: SchoolProjectTransition)
+
+      expect do
+        state_machine.transition_to!(:submitted)
+      end.to change { lesson.reload.submitted_projects_count }.from(0).to(1)
+
+      expect do
+        state_machine.transition_to!(:returned)
+      end.to change { lesson.reload.submitted_projects_count }.from(1).to(0)
+    end
+
     context 'when in unsubmitted state' do
       it 'can transition to submitted' do
         expect(state_machine.can_transition_to?(:submitted)).to be true

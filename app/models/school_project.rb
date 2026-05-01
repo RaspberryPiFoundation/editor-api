@@ -11,6 +11,10 @@ class SchoolProject < ApplicationRecord
     initial_state: :unsubmitted
   ]
 
+  def lesson
+    project.lesson || project.parent&.lesson
+  end
+
   def status
     state_machine.current_state
   end
@@ -21,6 +25,10 @@ class SchoolProject < ApplicationRecord
 
   def unread_feedback?
     feedback.exists?(read_at: nil)
+  end
+
+  def recalculate_lesson_submitted_projects_count!(_transition = nil)
+    lesson&.recalculate_submitted_projects_count!
   end
 
   # Add convenience methods for each state
