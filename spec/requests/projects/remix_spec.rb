@@ -106,6 +106,12 @@ RSpec.describe 'Remix requests' do
         expect(response.parsed_body['identifier']).to eq(remixed_project.identifier)
       end
 
+      it 'returns the supplied identifier when it already belongs to the user remix' do
+        get("/api/projects/#{remixed_project.identifier}/remix/identifier", headers:)
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body['identifier']).to eq(remixed_project.identifier)
+      end
+
       it 'returns 404 response if invalid project' do
         get('/api/projects/no-such-project/remix/identifier', headers:)
         expect(response).to have_http_status(:not_found)
@@ -116,6 +122,17 @@ RSpec.describe 'Remix requests' do
         authenticated_in_hydra_as(another_user)
 
         get("/api/projects/#{original_project.identifier}/remix/identifier", headers:)
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it 'returns 404 if the supplied remix identifier belongs to another user' do
+        another_user_remix = create(
+          :project,
+          remixed_from_id: original_project.id,
+          user_id: create(:owner, school:).id
+        )
+
+        get("/api/projects/#{another_user_remix.identifier}/remix/identifier", headers:)
         expect(response).to have_http_status(:not_found)
       end
 

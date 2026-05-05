@@ -23,8 +23,7 @@ Bundler.require(*Rails.groups)
 
 module App
   class Application < Rails::Application
-    # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 7.1
+    config.load_defaults 7.2
 
     config.add_autoload_paths_to_load_path = false
 
@@ -69,5 +68,7 @@ module App
     config.active_record.encryption.primary_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')
     config.active_record.encryption.deterministic_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY')
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT')
+
+    config.x.subscriptions.pardot_form_handler_url = ENV.fetch('PARDOT_SUBSCRIPTION_URL', '')
   end
 end
