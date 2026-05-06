@@ -10,7 +10,8 @@ RSpec.describe 'Subscriptions API' do
         subscription: {
           email: 'teacher@example.com',
           test_opt_in: true,
-          privacy_policy: true
+          privacy_policy: true,
+          turnstile_token: 'test-token'
         }
       }
     end
@@ -109,6 +110,54 @@ RSpec.describe 'Subscriptions API' do
         'error_code' => 'subscription_provider_rejected',
         'message' => 'Subscription provider rejected the request.'
       )
+    end
+
+    describe 'Cloudflare Turnstile integration' do
+      let(:request_url) { 'https://challenges.cloudflare.com/turnstile/v0/siteverify' }
+  
+      before do
+        allow(Rails.configuration.x.cloudflare_turnstile).to receive(:enabled).and_return(true)
+        allow(Rails.configuration.x.cloudflare_turnstile).to receive(:secret_key).and_return('test-secret')
+      end
+
+      it 'returns 422 when turnstile token is missing' do
+        post(path, params: payload.deep_merge(subscription: { turnstile_token: '' }), as: :json)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
+      end
+
+      it 'returns 422 when turnstile verification fails' do
+        stub_request(:post, request_url)
+          .with(
+            body: hash_including(
+              secret: 'test-secret',
+              response: 'test-token'
+            )
+          )
+          .to_return(status: 200, body: { success: false }.to_json)
+
+        post(path, params: payload, as: :json)
+
+        expect(response).to have_http_status(:unprocessable_content)
+        expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
+      end
+
+      it 'allows request through if turnstile verification is unavailable' do
+        stub_request(:post, request_url)
+          .with(
+            body: hash_including(
+              secret: 'test-secret',
+              response: 'test-token'
+            )
+          )
+          .to_timeout
+
+        post(path, params: payload, as: :json)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body['ok']).to eq(true)
+      end
     end
   end
 end
