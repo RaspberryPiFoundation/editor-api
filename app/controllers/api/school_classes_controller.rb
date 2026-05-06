@@ -81,6 +81,14 @@ module Api
       end
     end
 
+    def regenerate_join_code
+      @school_class.regenerate_join_code!
+      @school_class_with_teachers = @school_class.with_teachers
+      render :show, formats: [:json], status: :ok
+    rescue ActiveRecord::RecordInvalid => e
+      render json: { error: e.message }, status: :unprocessable_content
+    end
+
     private
 
     def render_student_index(school_classes)
