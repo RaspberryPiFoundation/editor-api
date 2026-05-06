@@ -700,4 +700,36 @@ RSpec.describe School do
       expect(school.valid_domain?(unregistered_domain)).to be(false)
     end
   end
+
+  describe '#valid_email?' do
+    before do
+      SchoolEmailDomain.create!(school:, domain: 'valid.edu')
+    end
+
+    it 'returns true when the email domain is registered for the school' do
+      expect(school.valid_email?('user@valid.edu')).to be(true)
+    end
+
+    it 'returns false when the email domain is not registered for the school' do
+      expect(school.valid_email?('user@other.edu')).to be(false)
+    end
+
+    it 'normalizes case and surrounding whitespace on the domain' do
+      expect(school.valid_email?('User@VALID.EDU  ')).to be(true)
+    end
+
+    it 'returns false when the email is blank' do
+      expect(school.valid_email?('')).to be(false)
+      expect(school.valid_email?(nil)).to be(false)
+    end
+
+    it 'returns false when the email has no @ separator' do
+      expect(school.valid_email?('not-an-email')).to be(false)
+    end
+
+    it 'returns false when the local part or domain is missing' do
+      expect(school.valid_email?('@valid.edu')).to be(false)
+      expect(school.valid_email?('user@')).to be(false)
+    end
+  end
 end
