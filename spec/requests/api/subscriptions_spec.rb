@@ -114,10 +114,12 @@ RSpec.describe 'Subscriptions API' do
 
     describe 'Cloudflare Turnstile integration' do
       let(:request_url) { 'https://challenges.cloudflare.com/turnstile/v0/siteverify' }
-  
+
       before do
-        allow(Rails.configuration.x.cloudflare_turnstile).to receive(:enabled).and_return(true)
-        allow(Rails.configuration.x.cloudflare_turnstile).to receive(:secret_key).and_return('test-secret')
+        allow(Rails.configuration.x.cloudflare_turnstile).to receive_messages(
+          enabled: true,
+          secret_key: 'test-secret'
+        )
       end
 
       it 'returns 422 when turnstile token is missing' do
@@ -156,7 +158,7 @@ RSpec.describe 'Subscriptions API' do
         post(path, params: payload, as: :json)
 
         expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['ok']).to eq(true)
+        expect(response.parsed_body['ok']).to be(true)
       end
     end
   end
