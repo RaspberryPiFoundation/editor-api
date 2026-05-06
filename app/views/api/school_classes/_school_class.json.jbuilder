@@ -9,7 +9,8 @@ json.call(
   :created_at,
   :updated_at,
   :import_origin,
-  :import_id
+  :import_id,
+  :join_code
 )
 
 json.teachers(teachers) do |teacher|

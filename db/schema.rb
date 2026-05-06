@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_20_104937) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_20_104939) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -264,7 +264,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_20_104937) do
     t.string "code"
     t.integer "import_origin"
     t.string "import_id"
+    t.string "join_code"
     t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
+    t.index ["join_code"], name: "index_school_classes_on_join_code", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
