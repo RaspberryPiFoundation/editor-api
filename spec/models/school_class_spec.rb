@@ -262,6 +262,82 @@ RSpec.describe SchoolClass, :versioning do
     end
   end
 
+  describe '#assign_join_code' do
+    it 'assigns a join code if not already present' do
+      school_class = build(:school_class, join_code: nil, school:)
+      school_class.assign_join_code
+      expect(school_class.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'does not assign a join code if already present' do
+      school_class = build(:school_class, join_code: 'BAFA1234', school:)
+      school_class.assign_join_code
+      expect(school_class.join_code).to eq('BAFA1234')
+    end
+
+    it 'retries until a unique join code is found' do
+      create(:school_class, join_code: 'BAFA1234', school:)
+      allow(JoinCodeGenerator).to receive(:generate).and_return('BAFA1234', 'BAFA1234', 'CAFE5678')
+
+      new_class = build(:school_class, join_code: nil, school:)
+      new_class.assign_join_code
+
+      expect(new_class.join_code).to eq('CAFE5678')
+      expect(JoinCodeGenerator).to have_received(:generate).exactly(3).times
+    end
+  end
+
+  describe '#regenerate_join_code!' do
+    it 'generates a new join code' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      old_join_code = school_class.join_code
+      school_class.regenerate_join_code!
+      expect(school_class.join_code).not_to eq(old_join_code)
+      expect(school_class.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'persists the new join code' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      school_class.regenerate_join_code!
+      expect(school_class.reload.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+  end
+
+  describe 'join_code validations' do
+    subject(:school_class) { build(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:) }
+
+    it 'assigns join code before validating' do
+      school_class.join_code = nil
+      school_class.valid?
+      expect(school_class.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'requires a globally unique join code' do
+      school_class.save!
+      other_school = create(:school)
+      school_class_with_duplicate = build(:school_class, school: other_school, join_code: school_class.join_code)
+      school_class_with_duplicate.valid?
+      expect(school_class_with_duplicate.errors[:join_code]).to include('has already been taken')
+    end
+
+    it 'requires a valid join code format' do
+      school_class.join_code = 'invalid'
+      expect(school_class).not_to be_valid
+    end
+
+    it 'accepts a valid join code format' do
+      school_class.join_code = 'BAFA1234'
+      expect(school_class).to be_valid
+    end
+
+    it 'allows the join code to be changed' do
+      school_class.join_code = 'BAFA1234'
+      school_class.save!
+      school_class.join_code = 'CAFE5678'
+      expect(school_class).to be_valid
+    end
+  end
+
   describe '#submitted_projects_count' do
     it 'returns 0 if there are no lessons' do
       school_class = create(:school_class, teacher_ids: [teacher.id], school:)

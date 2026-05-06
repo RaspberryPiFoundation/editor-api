@@ -265,7 +265,9 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_29_120000) do
     t.string "code"
     t.integer "import_origin"
     t.string "import_id"
+    t.string "join_code"
     t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
+    t.index ["join_code"], name: "index_school_classes_on_join_code", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
