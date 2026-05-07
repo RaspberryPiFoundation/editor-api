@@ -7,7 +7,8 @@ module Api
     API_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
 
     def create
-      payload = subscription_params.to_h
+      # turnstile token is only used for bot check so strip it out before validation and submission
+      payload = subscription_params.except(:turnstile_token).to_h
       errors = validation_errors_for(payload)
 
       if errors.empty?
@@ -45,6 +46,7 @@ module Api
 
     def check_cloudflare_turnstile
       return unless Rails.configuration.x.cloudflare_turnstile.enabled
+      return if params[:subscription].blank?
       return if valid_turnstile_token?
 
       Rails.logger.warn('[subscriptions#create] outcome=failure error_code=turnstile_verification_failed')
@@ -65,6 +67,9 @@ module Api
           secret: Rails.configuration.x.cloudflare_turnstile.secret_key,
           response: token,
           remoteip: request.remote_ip
+        },
+        {
+          request: { timeout: 5, open_timeout: 2 }
         }
       )
       unless response.success?
@@ -82,7 +87,7 @@ module Api
     end
 
     def subscription_params
-      params.require(:subscription).permit(:email, :test_opt_in, :privacy_policy)
+      params.require(:subscription).permit(:email, :test_opt_in, :privacy_policy, :turnstile_token)
     end
 
     def subscriptions_submitter
