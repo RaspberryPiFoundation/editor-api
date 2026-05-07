@@ -118,7 +118,10 @@ class School < ApplicationRecord
   end
 
   def valid_domain?(candidate_domain)
-    school_email_domains.exists?(domain: candidate_domain)
+    validated_domain = SchoolEmailDomainValidator.call(candidate_domain)
+    school_email_domains.exists?(domain: validated_domain)
+  rescue ::SchoolEmailDomainValidator::Error
+    false
   end
 
   private

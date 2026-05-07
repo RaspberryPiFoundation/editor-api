@@ -685,7 +685,8 @@ RSpec.describe School do
 
   describe '#valid_domain?' do
     let(:valid_domain) { 'valid.edu' }
-    let(:invalid_domain) { 'invalid.edu' }
+    let(:unregistered_domain) { 'invalid.edu' }
+    let(:invalid_domain) { 'not a domain' }
 
     before do
       SchoolEmailDomain.create!(school:, domain: valid_domain)
@@ -696,7 +697,7 @@ RSpec.describe School do
     end
 
     it 'returns false when school has not registered the email domain' do
-      expect(school.valid_domain?(invalid_domain)).to be(false)
+      expect(school.valid_domain?(unregistered_domain)).to be(false)
     end
   end
 end

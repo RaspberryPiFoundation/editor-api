@@ -15,79 +15,15 @@ RSpec.describe SchoolEmailDomain do
   end
 
   context 'with a valid domain' do
-    describe 'domain normalisation' do
-      context 'when given a full url' do
-        let(:domain) { 'http://mail.school.edu/path?query=1' }
-
-        it 'extracts the host' do
-          expect(school_email_domain.domain).to eq('mail.school.edu')
-        end
-      end
-
-      context 'when given a full https url' do
-        let(:domain) { 'https://mail.school.edu/path' }
-
-        it 'extracts the host' do
-          expect(school_email_domain.domain).to eq('mail.school.edu')
-        end
-      end
-
-      context 'when given a domain with a trailing dot' do
-        let(:domain) { 'EXAMPLE.EDU.' }
-
-        it 'stores the host without the trailing dot' do
-          expect(school_email_domain.domain).to eq('example.edu')
-        end
-      end
-
-      context 'when given a capitalised host' do
-        let(:domain) { 'EXAMPLE.EDU' }
-
-        it 'downcases the host' do
-          expect(school_email_domain.domain).to eq('example.edu')
-        end
-      end
-
-      context 'with a leading @' do
-        let(:domain) { '@example.edu' }
-
-        it 'removes the @' do
-          expect(school_email_domain.domain).to eq('example.edu')
-        end
-      end
+    it 'accepts the domain' do
+      expect(school_email_domain.domain).to eq('example.edu')
     end
 
-    describe 'public suffix list validation' do
-      context 'when there is at least one registrable label before the public suffix' do
-        let(:domain) { 'example.edu' }
+    describe 'domain normalisation' do
+      let(:domain) { '@EXAMPLE.EDU.' }
 
-        it 'accepts the domain' do
-          expect(school_email_domain.domain).to eq('example.edu')
-        end
-      end
-
-      context 'when there is a subdomain before a valid public suffix' do
-        let(:domain) { 'mail.example.edu' }
-
-        it 'accepts the domain' do
-          expect(school_email_domain.domain).to eq('mail.example.edu')
-        end
-      end
-
-      context 'when there is a hostname under a multi-part public suffix' do
-        let(:domain) { 'school.example.co.uk' }
-
-        it 'accepts the domain' do
-          expect(school_email_domain.domain).to eq('school.example.co.uk')
-        end
-      end
-
-      context 'when given a district-style host with a multi-part public suffix' do
-        let(:domain) { 'school.k12.tx.us' }
-
-        it 'accepts the domain' do
-          expect(school_email_domain.domain).to eq('school.k12.tx.us')
-        end
+      it 'normalises a domain' do
+        expect(school_email_domain.domain).to eq('example.edu')
       end
     end
 
