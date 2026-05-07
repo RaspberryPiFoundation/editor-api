@@ -38,8 +38,10 @@ RSpec.describe 'Subscriptions API' do
     let(:submitter) { instance_double(Subscriptions::PardotFormHandlerSubmitter) }
 
     before do
+      allow(Rails.configuration.x.cloudflare_turnstile).to receive(:enabled).and_return(false)
       allow(Subscriptions::PardotFormHandlerSubmitter).to receive(:new).and_return(submitter)
       allow(submitter).to receive(:call).and_return(submitter_result_success)
+      allow(Sentry).to receive(:capture_exception)
     end
 
     it 'returns success for a valid payload' do
@@ -113,7 +115,9 @@ RSpec.describe 'Subscriptions API' do
     end
 
     describe 'Cloudflare Turnstile integration' do
-      let(:request_url) { 'https://challenges.cloudflare.com/turnstile/v0/siteverify' }
+      let(:request_url) { Api::SubscriptionsController::API_URL }
+      let(:turnstile_request_body) { { 'secret' => 'test-secret', 'response' => 'test-token', 'remoteip' => '127.0.0.1' } }
+      let(:post_params) { payload }
 
       before do
         allow(Rails.configuration.x.cloudflare_turnstile).to receive_messages(
@@ -122,43 +126,84 @@ RSpec.describe 'Subscriptions API' do
         )
       end
 
-      it 'returns 422 when turnstile token is missing' do
-        post(path, params: payload.deep_merge(subscription: { turnstile_token: '' }), as: :json)
+      shared_examples 'turnstile verification failure' do
+        it 'returns 422 with turnstile_verification_failed error code' do
+          post(path, params: post_params, as: :json)
 
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
+        end
       end
 
-      it 'returns 422 when turnstile verification fails' do
-        stub_request(:post, request_url)
-          .with(
-            body: hash_including(
-              secret: 'test-secret',
-              response: 'test-token'
-            )
-          )
-          .to_return(status: 200, body: { success: false }.to_json)
+      shared_examples 'fail-open turnstile response' do
+        it 'allows the request through' do
+          post(path, params: payload, as: :json)
 
-        post(path, params: payload, as: :json)
-
-        expect(response).to have_http_status(:unprocessable_content)
-        expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['ok']).to be(true)
+        end
       end
 
-      it 'allows request through if turnstile verification is unavailable' do
-        stub_request(:post, request_url)
-          .with(
-            body: hash_including(
-              secret: 'test-secret',
-              response: 'test-token'
-            )
-          )
-          .to_timeout
+      context 'when turnstile token is missing' do
+        let(:post_params) { payload.deep_merge(subscription: { turnstile_token: '' }) }
 
-        post(path, params: payload, as: :json)
+        it_behaves_like 'turnstile verification failure'
+      end
 
-        expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['ok']).to be(true)
+      context 'when turnstile verification fails' do
+        before do
+          stub_request(:post, request_url)
+            .with(body: turnstile_request_body)
+            .to_return(status: 200, body: { success: false }.to_json)
+        end
+
+        it_behaves_like 'turnstile verification failure'
+      end
+
+      context 'when turnstile verification times out' do
+        before do
+          stub_request(:post, request_url)
+            .with(body: turnstile_request_body)
+            .to_timeout
+        end
+
+        it 'allows the request through and reports to Sentry' do
+          post(path, params: payload, as: :json)
+
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['ok']).to be(true)
+          expect(Sentry).to have_received(:capture_exception).with(be_a(Faraday::Error))
+        end
+      end
+
+      context 'when Cloudflare returns a server error' do
+        before do
+          stub_request(:post, request_url)
+            .with(body: turnstile_request_body)
+            .to_return(status: 500, body: 'Internal Server Error')
+        end
+
+        it_behaves_like 'fail-open turnstile response'
+      end
+
+      context 'when Cloudflare returns malformed JSON' do
+        before do
+          stub_request(:post, request_url)
+            .with(body: turnstile_request_body)
+            .to_return(status: 200, body: 'not-json')
+        end
+
+        it_behaves_like 'fail-open turnstile response'
+      end
+
+      context 'when turnstile token is valid' do
+        before do
+          stub_request(:post, request_url)
+            .with(body: turnstile_request_body)
+            .to_return(status: 200, body: { success: true }.to_json)
+        end
+
+        it_behaves_like 'fail-open turnstile response'
       end
     end
   end

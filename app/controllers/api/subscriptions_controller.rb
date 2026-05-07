@@ -67,8 +67,15 @@ module Api
           remoteip: request.remote_ip
         }
       )
+      unless response.success?
+        Rails.logger.warn("[subscriptions#create] turnstile verification skipped: HTTP #{response.status}")
+        return true # fail open
+      end
+
       JSON.parse(response.body)['success'] == true
-    rescue StandardError
+    rescue Faraday::Error, JSON::ParserError => e
+      Sentry.capture_exception(e)
+      Rails.logger.warn("[subscriptions#create] turnstile verification error: #{e.message}")
       # Fail open to allow the request through if verification is unavailable
       # due to network issues, Cloudflare downtime or malformed responses etc.
       true
