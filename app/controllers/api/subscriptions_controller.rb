@@ -61,15 +61,12 @@ module Api
       token = params.dig(:subscription, :turnstile_token)
       return false if token.blank?
 
-      response = Faraday.post(
+      response = turnstile_connection.post(
         API_URL,
         {
           secret: Rails.configuration.x.cloudflare_turnstile.secret_key,
           response: token,
           remoteip: request.remote_ip
-        },
-        {
-          request: { timeout: 5, open_timeout: 2 }
         }
       )
       unless response.success?
@@ -84,6 +81,14 @@ module Api
       # Fail open to allow the request through if verification is unavailable
       # due to network issues, Cloudflare downtime or malformed responses etc.
       true
+    end
+
+    def turnstile_connection
+      Faraday.new do |f|
+        f.request :url_encoded
+        f.options.timeout = 5
+        f.options.open_timeout = 2
+      end
     end
 
     def subscription_params
