@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2026_04_10_110000) do
+ActiveRecord::Schema[7.2].define(version: 2026_04_20_104939) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pgcrypto"
   enable_extension "plpgsql"
@@ -264,8 +264,19 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_10_110000) do
     t.string "code"
     t.integer "import_origin"
     t.string "import_id"
+    t.string "join_code"
     t.index ["code", "school_id"], name: "index_school_classes_on_code_and_school_id", unique: true
+    t.index ["join_code"], name: "index_school_classes_on_join_code", unique: true
     t.index ["school_id"], name: "index_school_classes_on_school_id"
+  end
+
+  create_table "school_email_domains", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id", null: false
+    t.string "domain", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "domain"], name: "index_school_email_domains_on_school_id_and_domain", unique: true
+    t.index ["school_id"], name: "index_school_email_domains_on_school_id"
   end
 
   create_table "school_import_results", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -398,6 +409,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_10_110000) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "school_email_domains", "schools"
   add_foreign_key "school_project_transitions", "school_projects"
   add_foreign_key "school_projects", "projects"
   add_foreign_key "school_projects", "schools"
