@@ -4,8 +4,6 @@ module Api
   class SubscriptionsController < ApiController
     before_action :check_cloudflare_turnstile, only: :create
 
-    API_URL = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
-
     def create
       # turnstile token is only used for bot check so strip it out before validation and submission
       payload = subscription_params.except(:turnstile_token).to_h
@@ -47,7 +45,14 @@ module Api
     def check_cloudflare_turnstile
       return unless Rails.configuration.x.cloudflare_turnstile.enabled
       return if params[:subscription].blank?
-      return if valid_turnstile_token?
+
+      turnstile_check = Subscriptions::TurnstileVerifier.new(
+        token: params.dig(:subscription, :turnstile_token),
+        remote_ip: request.remote_ip,
+        secret_key: Rails.configuration.x.cloudflare_turnstile.secret_key
+      )
+
+      return if turnstile_check.passed?
 
       Rails.logger.warn('[subscriptions#create] outcome=failure error_code=turnstile_verification_failed')
       render json: {
@@ -55,40 +60,6 @@ module Api
         error_code: 'turnstile_verification_failed',
         message: 'Bot protection check failed. Please try again.'
       }, status: :unprocessable_content
-    end
-
-    def valid_turnstile_token?
-      token = params.dig(:subscription, :turnstile_token)
-      return false if token.blank?
-
-      response = turnstile_connection.post(
-        API_URL,
-        {
-          secret: Rails.configuration.x.cloudflare_turnstile.secret_key,
-          response: token,
-          remoteip: request.remote_ip
-        }
-      )
-      unless response.success?
-        Rails.logger.warn("[subscriptions#create] turnstile verification skipped: HTTP #{response.status}")
-        return true # fail open
-      end
-
-      JSON.parse(response.body)['success'] == true
-    rescue Faraday::Error, JSON::ParserError => e
-      Sentry.capture_exception(e)
-      Rails.logger.warn("[subscriptions#create] turnstile verification error: #{e.message}")
-      # Fail open to allow the request through if verification is unavailable
-      # due to network issues, Cloudflare downtime or malformed responses etc.
-      true
-    end
-
-    def turnstile_connection
-      Faraday.new do |f|
-        f.request :url_encoded
-        f.options.timeout = 5
-        f.options.open_timeout = 2
-      end
     end
 
     def subscription_params

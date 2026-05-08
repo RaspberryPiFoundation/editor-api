@@ -115,27 +115,27 @@ RSpec.describe 'Subscriptions API' do
     end
 
     describe 'Cloudflare Turnstile integration' do
-      let(:request_url) { Api::SubscriptionsController::API_URL }
-      let(:turnstile_request_body) { { 'secret' => 'test-secret', 'response' => 'test-token', 'remoteip' => '127.0.0.1' } }
-      let(:post_params) { payload }
+      let(:turnstile_check) { instance_double(Subscriptions::TurnstileVerifier, passed?: true) }
 
       before do
         allow(Rails.configuration.x.cloudflare_turnstile).to receive_messages(
           enabled: true,
           secret_key: 'test-secret'
         )
+        allow(Subscriptions::TurnstileVerifier).to receive(:new).and_return(turnstile_check)
       end
 
-      shared_examples 'turnstile verification failure' do
-        it 'returns 422 with turnstile_verification_failed error code' do
-          post(path, params: post_params, as: :json)
+      it 'passes the token, remote IP and secret key to the verifier' do
+        post(path, params: payload, as: :json)
 
-          expect(response).to have_http_status(:unprocessable_content)
-          expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
-        end
+        expect(Subscriptions::TurnstileVerifier).to have_received(:new).with(
+          token: 'test-token',
+          remote_ip: '127.0.0.1',
+          secret_key: 'test-secret'
+        )
       end
 
-      shared_examples 'fail-open turnstile response' do
+      context 'when the turnstile check passes' do
         it 'allows the request through' do
           post(path, params: payload, as: :json)
 
@@ -144,66 +144,15 @@ RSpec.describe 'Subscriptions API' do
         end
       end
 
-      context 'when turnstile token is missing' do
-        let(:post_params) { payload.deep_merge(subscription: { turnstile_token: '' }) }
+      context 'when the turnstile check fails' do
+        before { allow(turnstile_check).to receive(:passed?).and_return(false) }
 
-        it_behaves_like 'turnstile verification failure'
-      end
-
-      context 'when turnstile verification fails' do
-        before do
-          stub_request(:post, request_url)
-            .with(body: turnstile_request_body)
-            .to_return(status: 200, body: { success: false }.to_json)
-        end
-
-        it_behaves_like 'turnstile verification failure'
-      end
-
-      context 'when turnstile verification times out' do
-        before do
-          stub_request(:post, request_url)
-            .with(body: turnstile_request_body)
-            .to_timeout
-        end
-
-        it 'allows the request through and reports to Sentry' do
+        it 'returns 422 with turnstile_verification_failed error code' do
           post(path, params: payload, as: :json)
 
-          expect(response).to have_http_status(:ok)
-          expect(response.parsed_body['ok']).to be(true)
-          expect(Sentry).to have_received(:capture_exception).with(be_a(Faraday::Error))
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
         end
-      end
-
-      context 'when Cloudflare returns a server error' do
-        before do
-          stub_request(:post, request_url)
-            .with(body: turnstile_request_body)
-            .to_return(status: 500, body: 'Internal Server Error')
-        end
-
-        it_behaves_like 'fail-open turnstile response'
-      end
-
-      context 'when Cloudflare returns malformed JSON' do
-        before do
-          stub_request(:post, request_url)
-            .with(body: turnstile_request_body)
-            .to_return(status: 200, body: 'not-json')
-        end
-
-        it_behaves_like 'fail-open turnstile response'
-      end
-
-      context 'when turnstile token is valid' do
-        before do
-          stub_request(:post, request_url)
-            .with(body: turnstile_request_body)
-            .to_return(status: 200, body: { success: true }.to_json)
-        end
-
-        it_behaves_like 'fail-open turnstile response'
       end
     end
   end
