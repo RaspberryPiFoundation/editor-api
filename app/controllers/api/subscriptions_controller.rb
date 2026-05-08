@@ -2,8 +2,11 @@
 
 module Api
   class SubscriptionsController < ApiController
+    before_action :check_cloudflare_turnstile, only: :create
+
     def create
-      payload = subscription_params.to_h
+      # turnstile token is only used for bot check so strip it out before validation and submission
+      payload = subscription_params.except(:turnstile_token).to_h
       errors = validation_errors_for(payload)
 
       if errors.empty?
@@ -39,8 +42,28 @@ module Api
 
     private
 
+    def check_cloudflare_turnstile
+      return unless Rails.configuration.x.cloudflare_turnstile.enabled
+      return if params[:subscription].blank?
+
+      turnstile_check = Subscriptions::TurnstileVerifier.new(
+        token: params.dig(:subscription, :turnstile_token),
+        remote_ip: request.remote_ip,
+        secret_key: Rails.configuration.x.cloudflare_turnstile.secret_key
+      )
+
+      return if turnstile_check.passed?
+
+      Rails.logger.warn('[subscriptions#create] outcome=failure error_code=turnstile_verification_failed')
+      render json: {
+        ok: false,
+        error_code: 'turnstile_verification_failed',
+        message: 'Bot protection check failed. Please try again.'
+      }, status: :unprocessable_content
+    end
+
     def subscription_params
-      params.require(:subscription).permit(:email, :test_opt_in, :privacy_policy)
+      params.require(:subscription).permit(:email, :test_opt_in, :privacy_policy, :turnstile_token)
     end
 
     def subscriptions_submitter

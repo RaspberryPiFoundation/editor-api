@@ -10,7 +10,8 @@ RSpec.describe 'Subscriptions API' do
         subscription: {
           email: 'teacher@example.com',
           test_opt_in: true,
-          privacy_policy: true
+          privacy_policy: true,
+          turnstile_token: 'test-token'
         }
       }
     end
@@ -37,8 +38,10 @@ RSpec.describe 'Subscriptions API' do
     let(:submitter) { instance_double(Subscriptions::PardotFormHandlerSubmitter) }
 
     before do
+      allow(Rails.configuration.x.cloudflare_turnstile).to receive(:enabled).and_return(false)
       allow(Subscriptions::PardotFormHandlerSubmitter).to receive(:new).and_return(submitter)
       allow(submitter).to receive(:call).and_return(submitter_result_success)
+      allow(Sentry).to receive(:capture_exception)
     end
 
     it 'returns success for a valid payload' do
@@ -109,6 +112,48 @@ RSpec.describe 'Subscriptions API' do
         'error_code' => 'subscription_provider_rejected',
         'message' => 'Subscription provider rejected the request.'
       )
+    end
+
+    describe 'Cloudflare Turnstile integration' do
+      let(:turnstile_check) { instance_double(Subscriptions::TurnstileVerifier, passed?: true) }
+
+      before do
+        allow(Rails.configuration.x.cloudflare_turnstile).to receive_messages(
+          enabled: true,
+          secret_key: 'test-secret'
+        )
+        allow(Subscriptions::TurnstileVerifier).to receive(:new).and_return(turnstile_check)
+      end
+
+      it 'passes the token, remote IP and secret key to the verifier' do
+        post(path, params: payload, as: :json)
+
+        expect(Subscriptions::TurnstileVerifier).to have_received(:new).with(
+          token: 'test-token',
+          remote_ip: '127.0.0.1',
+          secret_key: 'test-secret'
+        )
+      end
+
+      context 'when the turnstile check passes' do
+        it 'allows the request through' do
+          post(path, params: payload, as: :json)
+
+          expect(response).to have_http_status(:ok)
+          expect(response.parsed_body['ok']).to be(true)
+        end
+      end
+
+      context 'when the turnstile check fails' do
+        before { allow(turnstile_check).to receive(:passed?).and_return(false) }
+
+        it 'returns 422 with turnstile_verification_failed error code' do
+          post(path, params: payload, as: :json)
+
+          expect(response).to have_http_status(:unprocessable_content)
+          expect(response.parsed_body['error_code']).to eq('turnstile_verification_failed')
+        end
+      end
     end
   end
 end

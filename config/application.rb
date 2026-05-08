@@ -70,5 +70,8 @@ module App
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT')
 
     config.x.subscriptions.pardot_form_handler_url = ENV.fetch('PARDOT_SUBSCRIPTION_URL', '')
+
+    config.x.cloudflare_turnstile.secret_key = ENV.fetch('CLOUDFLARE_TURNSTILE_SECRET_KEY', nil)
+    config.x.cloudflare_turnstile.enabled = ENV['CLOUDFLARE_TURNSTILE_SECRET_KEY'].present?
   end
 end
