@@ -616,7 +616,7 @@ DEPENDENCIES
   puma (~> 8.0)
   rack-cors
   rack_content_type_default (~> 1.1)
-  rails (~> 8.0.4)
+  rails (~> 8.0.5)
   rails-erd
   rspec
   rspec-rails

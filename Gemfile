@@ -41,7 +41,7 @@ gem 'propshaft'
 gem 'puma', '~> 8.0'
 gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
-gem 'rails', '~> 8.0.4'
+gem 'rails', '~> 8.0.5'
 gem 'ruby-progressbar', '~> 1.13', require: false
 gem 'sentry-rails'
 gem 'statesman'
