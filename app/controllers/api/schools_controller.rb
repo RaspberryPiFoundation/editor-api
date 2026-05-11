@@ -77,26 +77,26 @@ module Api
     private
 
     def school_params
-      params.require(:school).permit(
-        :name,
-        :website,
-        :reference,
-        :district_name,
-        :district_nces_id,
-        :school_roll_number,
-        :address_line_1,
-        :address_line_2,
-        :municipality,
-        :administrative_area,
-        :postal_code,
-        :country_code,
-        :creator_role,
-        :creator_department,
-        :creator_agree_authority,
-        :creator_agree_terms_and_conditions,
-        :creator_agree_to_ux_contact,
-        :creator_agree_responsible_safeguarding,
-        :user_origin
+      params.expect(
+        school: %i[name
+                   website
+                   reference
+                   district_name
+                   district_nces_id
+                   school_roll_number
+                   address_line_1
+                   address_line_2
+                   municipality
+                   administrative_area
+                   postal_code
+                   country_code
+                   creator_role
+                   creator_department
+                   creator_agree_authority
+                   creator_agree_terms_and_conditions
+                   creator_agree_to_ux_contact
+                   creator_agree_responsible_safeguarding
+                   user_origin]
       )
     end
   end

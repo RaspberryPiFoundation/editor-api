@@ -63,7 +63,7 @@ module Api
     end
 
     def subscription_params
-      params.require(:subscription).permit(:email, :test_opt_in, :privacy_policy, :turnstile_token)
+      params.expect(subscription: %i[email test_opt_in privacy_policy turnstile_token])
     end
 
     def subscriptions_submitter
