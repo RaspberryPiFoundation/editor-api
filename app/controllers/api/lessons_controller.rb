@@ -29,15 +29,20 @@ module Api
     end
 
     def create
-      result = Lesson::Create.call(lesson_params:)
-
-      if result.success?
-        @lesson_with_user = result[:lesson].with_user
-        render :show, formats: [:json], status: :created
+      if params[:lesson_projects].present?
+        results = params[:lesson_projects].map { |lp| Lesson::Create.call(lesson_params: bulk_lesson_params(lp)) }
+        render json: results.map { |r| r.success? ? { lesson: r[:lesson].with_user } : { error: r[:error] } },
+               status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_content
+        result = Lesson::Create.call(lesson_params:)
+        if result.success?
+          @lesson_with_user = result[:lesson].with_user
+          render :show, formats: [:json], status: :created
+        else
+          render json: { error: result[:error] }, status: :unprocessable_content
+        end
       end
-    end
+    end    
 
     def create_copy
       result = Lesson::CreateCopy.call(lesson: @lesson, lesson_params:)
@@ -99,6 +104,26 @@ module Api
 
     def lesson_params
       base_params.merge(user_id: current_user.id)
+    end
+
+    def bulk_lesson_params(lesson_project)
+      lesson_project.permit(
+        :school_id,
+        :school_class_id,
+        :name,
+        :description,
+        :visibility,
+        :due_date,
+        {
+          project_attributes: [
+            :name,
+            :project_type,
+            :locale,
+            { components: %i[id name extension content index default] },
+            { scratch_component: {} }
+          ]
+        }
+      ).merge(user_id: current_user.id)
     end
 
     def base_params

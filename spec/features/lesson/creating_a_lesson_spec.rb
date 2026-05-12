@@ -117,6 +117,56 @@ RSpec.describe 'Creating a lesson', type: :request do
     end
   end
 
+  context 'when bulk creating lessons via lesson_projects' do
+    let(:lesson_project_params) do
+      [
+        {
+          name: 'Lesson 1',
+          school_id: school.id,
+          project_attributes: { name: 'Project 1', project_type: Project::Types::CODE_EDITOR_SCRATCH }
+        },
+        {
+          name: 'Lesson 2',
+          school_id: school.id,
+          project_attributes: { name: 'Project 2', project_type: Project::Types::CODE_EDITOR_SCRATCH }
+        }
+      ]
+    end
+
+    it 'responds 201 Created' do
+      post('/api/lessons', headers:, params: { lesson_projects: lesson_project_params })
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'creates one lesson per entry' do
+      expect {
+        post('/api/lessons', headers:, params: { lesson_projects: lesson_project_params })
+      }.to change(Lesson, :count).by(2)
+    end
+
+    context 'when some entries are invalid' do
+      let(:invalid_lesson_project_params) do
+        lesson_project_params + [{ name: ' ' }]
+      end
+      
+      it 'responds 201 Created' do
+        post('/api/lessons', headers:, params: { lesson_projects: invalid_lesson_project_params })
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'includes an error entry for the failed lesson' do
+        post('/api/lessons', headers:, params: { lesson_projects: invalid_lesson_project_params })
+        expect(response.parsed_body.any? { |entry| entry['error'].present? }).to be true
+      end
+
+      it 'still creates the valid lessons' do
+        expect {
+          post('/api/lessons', headers:, params: { lesson_projects: invalid_lesson_project_params })
+        }.to change(Lesson, :count).by(2)
+      end
+    end
+  end
+
   context 'when the lesson is associated with a school class' do
     let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
     let(:school) { create(:school) }
