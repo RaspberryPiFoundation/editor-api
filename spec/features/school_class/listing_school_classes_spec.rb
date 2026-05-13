@@ -49,18 +49,20 @@ RSpec.describe 'Listing school classes', type: :request do
 
     it 'responds with the school classes JSON' do
       data = get_classes
-      expect(data.first[:name]).to eq('Test School Class')
+      expect(find_school_class_by_name(data, 'Test School Class')).to be_present
     end
 
     it 'responds with the teachers JSON' do
       data = get_classes
-      expect(data.first[:teachers].first[:name]).to eq('School Teacher')
+      school_class = find_school_class_by_name(data, 'Test School Class')
+      expect(school_class[:teachers].first[:name]).to eq('School Teacher')
     end
 
     it "skips teachers if the user profile doesn't exist" do
       stub_user_info_api_for_unknown_users(user_id: teacher.id)
       data = get_classes
-      expect(data.first[:teachers].first).to be_nil
+      school_class = find_school_class_by_name(data, 'Test School Class')
+      expect(school_class[:teachers].first).to be_nil
     end
 
     it 'responds 401 Unauthorized when no token is given' do

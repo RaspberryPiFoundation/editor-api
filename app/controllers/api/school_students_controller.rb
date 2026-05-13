@@ -167,7 +167,7 @@ module Api
     end
 
     def school_student_params
-      params.require(:school_student).permit(:username, :password, :name)
+      params.expect(school_student: %i[username password name])
     end
 
     def school_students_params

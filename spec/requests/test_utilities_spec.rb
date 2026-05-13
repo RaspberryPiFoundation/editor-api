@@ -20,9 +20,10 @@ RSpec.describe 'POST /test/reseed' do
     DatabaseCleaner.strategy = :transaction
 
     DatabaseCleaner.cleaning do
-      Rails.application.load_tasks
+      Rake::Task.tasks.each(&:reenable)
       example.run
-      Rake::Task.clear
+    ensure
+      Rake::Task.tasks.each(&:reenable)
     end
   end
 

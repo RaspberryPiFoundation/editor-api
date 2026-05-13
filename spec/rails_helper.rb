@@ -108,14 +108,16 @@ RSpec.configure do |config|
     DatabaseCleaner.strategy = :truncation
 
     DatabaseCleaner.cleaning do
-      Rake::Task.clear
-      Rails.application.load_tasks
+      Rake::Task.tasks.each(&:reenable)
       example.run
-      Rake::Task.clear
+    ensure
+      Rake::Task.tasks.each(&:reenable)
     end
   end
 
   config.before(:suite) do
+    Rails.application.load_tasks
+
     db_config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
     Rails.logger.debug { "Running tests in environment: #{Rails.env}" }
     Rails.logger.debug { "Running tests against the database: #{db_config.database}" }

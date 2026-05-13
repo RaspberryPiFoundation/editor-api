@@ -46,9 +46,9 @@ module Api
     end
 
     def google_token_params
-      params.require(:google_auth).require(:code)
-      params.require(:google_auth).require(:redirect_uri)
-      params.require(:google_auth).permit(:code, :redirect_uri)
+      google_auth_params = params.expect(google_auth: %i[code redirect_uri])
+      google_auth_params.require(%i[code redirect_uri])
+      google_auth_params
     end
   end
 end

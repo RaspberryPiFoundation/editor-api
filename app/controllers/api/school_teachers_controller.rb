@@ -30,7 +30,7 @@ module Api
     private
 
     def school_teacher_params
-      params.require(:school_teacher).permit(:email_address)
+      params.expect(school_teacher: [:email_address])
     end
   end
 end

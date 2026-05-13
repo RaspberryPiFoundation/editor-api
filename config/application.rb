@@ -23,7 +23,7 @@ Bundler.require(*Rails.groups)
 
 module App
   class Application < Rails::Application
-    config.load_defaults 7.2
+    config.load_defaults 8.0
 
     config.add_autoload_paths_to_load_path = false
 
