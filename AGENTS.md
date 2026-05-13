@@ -1,5 +1,5 @@
 # Project Overview
-- Rails 7.1 monolith for the Raspberry Pi Code Editor API (REST + GraphQL), served at `editor-api.raspberrypi.org`.
+- Rails 8.1 monolith for the Raspberry Pi Code Editor API (REST + GraphQL), served at `editor-api.raspberrypi.org`.
 - Primary runtime via Docker; API listens on port 3009.
 
 ## Architecture
