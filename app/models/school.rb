@@ -117,6 +117,10 @@ class School < ApplicationRecord
                         .exists?(description: id)
   end
 
+  def sso_enabled?
+    school_email_domains.present?
+  end
+
   def valid_domain?(candidate_domain)
     validated_domain = SchoolEmailDomainValidator.call(candidate_domain)
     school_email_domains.exists?(domain: validated_domain)
