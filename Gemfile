@@ -9,7 +9,7 @@ gem 'administrate', '~> 1.0.0'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
 gem 'base64', '~> 0.3'
-gem 'bootsnap', require: false
+gem 'bootsnap', '>= 1.24.4', require: false
 gem 'cancancan', '~> 3.3'
 gem 'countries'
 gem 'csv', '~> 3.3'
