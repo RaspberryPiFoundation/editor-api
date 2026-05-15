@@ -1,4 +1,4 @@
-FROM ruby:3.4.8-slim-trixie AS base
+FROM ruby:4.0.4-slim-trixie AS base
 RUN gem install bundler \
   && apt-get update \
   && apt-get upgrade --yes \
