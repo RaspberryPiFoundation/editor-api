@@ -118,7 +118,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
     bigdecimal (4.1.2)
-    bootsnap (1.24.1)
+    bootsnap (1.24.3)
       msgpack (~> 1.2)
     builder (3.3.0)
     bullet (8.1.1)
