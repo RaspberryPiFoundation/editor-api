@@ -6,6 +6,7 @@ class School < ApplicationRecord
   has_many :projects, dependent: :nullify
   has_many :roles, dependent: :nullify
   has_many :school_projects, dependent: :nullify
+  has_many :school_email_domains, dependent: :destroy
 
   VALID_URL_REGEX = %r{\A(?:https?://)?(?:www.)?[a-z0-9]+([-.]{1}[a-z0-9]+)*\.[a-z]{2,63}(\.[a-z]{2,63})*(/.*)?\z}ix
 
@@ -114,6 +115,13 @@ class School < ApplicationRecord
     GoodJob::BatchRecord.where(finished_at: nil)
                         .where(discarded_at: nil)
                         .exists?(description: id)
+  end
+
+  def valid_domain?(candidate_domain)
+    validated_domain = SchoolEmailDomainValidator.call(candidate_domain)
+    school_email_domains.exists?(domain: validated_domain)
+  rescue ::SchoolEmailDomainValidator::Error
+    false
   end
 
   private

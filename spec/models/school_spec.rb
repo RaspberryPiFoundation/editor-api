@@ -35,6 +35,12 @@ RSpec.describe School do
       expect(school.roles.size).to eq(2)
     end
 
+    it 'has many school email domains' do
+      SchoolEmailDomain.create!(school:, domain: 'example.edu')
+      SchoolEmailDomain.create!(school:, domain: 'other.edu')
+      expect(school.school_email_domains.size).to eq(2)
+    end
+
     context 'when a school is destroyed' do
       let!(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
@@ -87,6 +93,11 @@ RSpec.describe School do
       it 'nullifies the school_id field on roles' do
         school.destroy!
         expect(role.reload.school_id).to be_nil
+      end
+
+      it 'also destroys school email domains' do
+        SchoolEmailDomain.create!(school:, domain: 'example.edu')
+        expect { school.destroy! }.to change(SchoolEmailDomain, :count).by(-1)
       end
     end
   end
@@ -669,6 +680,24 @@ RSpec.describe School do
 
     it 'returns false when trying to reopen a non-rejected school' do
       expect(school.reopen).to be(false)
+    end
+  end
+
+  describe '#valid_domain?' do
+    let(:valid_domain) { 'valid.edu' }
+    let(:unregistered_domain) { 'invalid.edu' }
+    let(:invalid_domain) { 'not a domain' }
+
+    before do
+      SchoolEmailDomain.create!(school:, domain: valid_domain)
+    end
+
+    it 'returns true when school has registered the email domain' do
+      expect(school.valid_domain?(valid_domain)).to be(true)
+    end
+
+    it 'returns false when school has not registered the email domain' do
+      expect(school.valid_domain?(unregistered_domain)).to be(false)
     end
   end
 end
