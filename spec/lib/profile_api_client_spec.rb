@@ -58,7 +58,7 @@ RSpec.describe ProfileApiClient do
       stub_request(:post, create_school_url)
         .to_return(
           status: 201,
-          body: '{"id":"","schoolCode":"","updatedAt":"","createdAt":"","discardedAt":""}',
+          body: '{"id":"","schoolCode":"","updatedAt":"","createdAt":"","discardedAt":"","studentEmailDomains":[]}',
           headers: { 'content-type' => 'application/json' }
         )
     end
@@ -67,14 +67,15 @@ RSpec.describe ProfileApiClient do
     it_behaves_like 'a request that handles standard HTTP errors', :post, url: -> { create_school_url }
     it_behaves_like 'a request that handles an unexpected response status', :post, url: -> { "#{api_url}/api/v1/schools" }, status: 200
 
-    it 'sends the school id and code in the request body as json' do
+    it 'sends the school id, code and studentEmailDomains in the request body as json' do
       create_school_response
-      expected_body = { id: school.id, schoolCode: school.code }.to_json
+      expected_body = { id: school.id, schoolCode: school.code, studentEmailDomains: [] }.to_json
       expect(WebMock).to have_requested(:post, create_school_url).with(body: expected_body)
     end
 
     it 'returns the created school if successful' do
-      data = { id: 'id', schoolCode: 'code', updatedAt: '2024-07-09T10:31:13.196Z', createdAt: '2024-07-09T10:31:13.196Z', discardedAt: nil }
+      data = { id: 'id', schoolCode: 'code', updatedAt: '2024-07-09T10:31:13.196Z', createdAt: '2024-07-09T10:31:13.196Z', discardedAt: nil,
+               studentEmailDomains: [] }
       expected = ProfileApiClient::School.new(**data)
       stub_request(:post, create_school_url)
         .to_return(status: 201, body: data.to_json, headers: { 'Content-Type' => 'application/json' })
@@ -91,8 +92,8 @@ RSpec.describe ProfileApiClient do
         expect(WebMock).not_to have_requested(:post, create_school_url)
       end
 
-      it 'returns the id and code of the school supplied' do
-        expected = { 'id' => school.id, 'schoolCode' => school.code }
+      it 'returns the id, code and email domains of the school supplied' do
+        expected = { 'id' => school.id, 'schoolCode' => school.code, 'studentEmailDomains' => [] }
         expect(create_school_response).to eq(expected)
       end
     end
@@ -556,6 +557,64 @@ RSpec.describe ProfileApiClient do
 
     def school_student
       described_class.school_student(token:, school_id: school.id, student_id:)
+    end
+  end
+
+  describe '.update_school_email_domains' do
+    subject(:update_school_email_domains_response) { update_school_email_domains }
+
+    let(:school) { build(:school, id: SecureRandom.uuid, code: SecureRandom.uuid) }
+    let(:update_school_email_domains_url) { "#{api_url}/api/v1/schools/#{school.id}" }
+    let(:school_email_domains) { ['student.example.edu', 'mail.example.org'] }
+
+    before do
+      stub_request(:patch, update_school_email_domains_url)
+        .to_return(
+          status: 200,
+          body: '{"id":"","schoolCode":"","updatedAt":"","createdAt":"","discardedAt":"","studentEmailDomains":[]}',
+          headers: { 'content-type' => 'application/json' }
+        )
+    end
+
+    it_behaves_like 'an authenticated JSON API request', :patch, url: -> { update_school_email_domains_url }
+    it_behaves_like 'a request that handles standard HTTP errors', :patch, url: -> { update_school_email_domains_url }
+    it_behaves_like 'a request that handles an unexpected response status', :patch, url: -> { "#{api_url}/api/v1/schools/#{school.id}" }, status: 201
+
+    it 'sends studentEmailDomains in the JSON body' do
+      update_school_email_domains_response
+      expected_body = { studentEmailDomains: school_email_domains }.to_json
+      expect(WebMock).to have_requested(:patch, update_school_email_domains_url).with(body: expected_body)
+    end
+
+    it 'returns a school if successful' do
+      data = { id: 'id', schoolCode: 'code', updatedAt: '2024-07-09T10:31:13.196Z', createdAt: '2024-07-09T10:31:13.196Z', discardedAt: nil,
+               studentEmailDomains: school_email_domains }
+      expected = ProfileApiClient::School.new(**data)
+      stub_request(:patch, update_school_email_domains_url)
+        .to_return(status: 200, body: data.to_json, headers: { 'Content-Type' => 'application/json' })
+      expect(update_school_email_domains_response).to eq(expected)
+    end
+
+    describe 'when BYPASS_OAUTH is true' do
+      before do
+        allow(ENV).to receive(:[]).with('BYPASS_OAUTH').and_return(true)
+      end
+
+      it 'does not make a request to Profile API' do
+        update_school_email_domains_response
+        expect(WebMock).not_to have_requested(:patch, update_school_email_domains_url)
+      end
+
+      it 'returns the id and email domains of the school supplied' do
+        expected = { 'id' => school.id, 'studentEmailDomains' => school_email_domains }
+        expect(update_school_email_domains_response).to eq(expected)
+      end
+    end
+
+    private
+
+    def update_school_email_domains
+      described_class.update_school_email_domains(token:, school_id: school.id, school_email_domains:)
     end
   end
 end
