@@ -50,6 +50,8 @@ module SchoolEmailDomainValidator
   end
 
   def self.validate_host(host)
+    # School email domains are sent to Profile, which validates them using a "fully qualified domain name" regex
+    # Any changes to accounts_host_format must align with the pattern that Profile applies in its app/lib/fqdn.js
     accounts_host_format =
       /\A\s*(?:[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?\.)+[A-Za-z]{2,63}\s*\z/i
 
