@@ -58,19 +58,8 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'could not be generated')
   end
 
-  def submitted_count
-    return 0 if lessons.empty?
-
-    Lesson
-      .joins(project: { remixes: { school_project: :school_project_transitions } })
-      .where(school_class_id: id)
-      .where(
-        school_project_transitions: {
-          to_state: 'submitted',
-          most_recent: true
-        }
-      )
-      .count
+  def submitted_projects_count
+    lessons.to_a.sum(&:submitted_projects_count)
   end
 
   private

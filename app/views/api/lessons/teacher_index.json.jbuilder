@@ -2,5 +2,5 @@
 
 json.array!(@lessons_with_users) do |lesson, user|
   json.partial! 'lesson', lesson: lesson, user: user
-  json.submitted_count(lesson.submitted_count)
+  json.submitted_count(lesson.submitted_projects_count)
 end

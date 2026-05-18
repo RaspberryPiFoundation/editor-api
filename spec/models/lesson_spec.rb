@@ -206,10 +206,13 @@ RSpec.describe Lesson do
     end
   end
 
-  describe '#submitted_count' do
-    it 'returns 0 if there is no project' do
-      lesson = create(:lesson, project: nil)
-      expect(lesson.submitted_count).to eq(0)
+  describe '#recalculate_submitted_projects_count!' do
+    it 'sets the submitted projects count to 0 if there is no project' do
+      lesson = create(:lesson, project: nil, submitted_projects_count: 3)
+
+      lesson.recalculate_submitted_projects_count!
+
+      expect(lesson.reload.submitted_projects_count).to eq(0)
     end
 
     it 'returns the count of submitted remixes of the lesson project' do
@@ -224,7 +227,10 @@ RSpec.describe Lesson do
 
       create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id) # Not submitted
 
-      expect(lesson.submitted_count).to eq(2)
+      lesson.update!(submitted_projects_count: 0)
+      lesson.recalculate_submitted_projects_count!
+
+      expect(lesson.reload.submitted_projects_count).to eq(2)
     end
   end
 
