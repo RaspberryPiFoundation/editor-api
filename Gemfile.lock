@@ -118,7 +118,7 @@ GEM
       aws-eventstream (~> 1, >= 1.0.2)
     base64 (0.3.0)
     bigdecimal (4.1.2)
-    bootsnap (1.24.1)
+    bootsnap (1.24.4)
       msgpack (~> 1.2)
     builder (3.3.0)
     bullet (8.1.1)
@@ -183,6 +183,7 @@ GEM
       logger
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
+    ffi (1.17.2)
     ffi (1.17.2-aarch64-linux-gnu)
     ffi (1.17.2-arm64-darwin)
     ffi (1.17.2-x86_64-linux-gnu)
@@ -579,7 +580,7 @@ DEPENDENCIES
   awesome_print
   aws-sdk-s3
   base64 (~> 0.3)
-  bootsnap
+  bootsnap (>= 1.24.4)
   bullet
   cancancan (~> 3.3)
   capybara
@@ -643,7 +644,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-  ruby 3.4.8
+  ruby 4.0.4
 
 BUNDLED WITH
   4.0.10
