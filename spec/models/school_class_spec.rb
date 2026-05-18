@@ -270,19 +270,19 @@ RSpec.describe SchoolClass, :versioning do
     end
 
     it 'does not assign a join code if already present' do
-      school_class = build(:school_class, join_code: 'BAFA1234', school:)
+      school_class = build(:school_class, join_code: 'B123-C456', school:)
       school_class.assign_join_code
-      expect(school_class.join_code).to eq('BAFA1234')
+      expect(school_class.join_code).to eq('B123-C456')
     end
 
     it 'retries until a unique join code is found' do
-      create(:school_class, join_code: 'BAFA1234', school:)
-      allow(JoinCodeGenerator).to receive(:generate).and_return('BAFA1234', 'BAFA1234', 'CAFE5678')
+      create(:school_class, join_code: 'B123-C456', school:)
+      allow(JoinCodeGenerator).to receive(:generate).and_return('B123-C456', 'B123-C456', 'C789-D012')
 
       new_class = build(:school_class, join_code: nil, school:)
       new_class.assign_join_code
 
-      expect(new_class.join_code).to eq('CAFE5678')
+      expect(new_class.join_code).to eq('C789-D012')
       expect(JoinCodeGenerator).to have_received(:generate).exactly(3).times
     end
   end
@@ -326,14 +326,14 @@ RSpec.describe SchoolClass, :versioning do
     end
 
     it 'accepts a valid join code format' do
-      school_class.join_code = 'BAFA1234'
+      school_class.join_code = 'B123-C456'
       expect(school_class).to be_valid
     end
 
     it 'allows the join code to be changed' do
-      school_class.join_code = 'BAFA1234'
+      school_class.join_code = 'B123-C456'
       school_class.save!
-      school_class.join_code = 'CAFE5678'
+      school_class.join_code = 'C789-D012'
       expect(school_class).to be_valid
     end
   end

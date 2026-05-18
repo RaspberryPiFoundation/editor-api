@@ -4,7 +4,7 @@ require 'rails_helper'
 
 RSpec.describe 'Join endpoint' do
   let(:school) { create(:school, code: '12-34-56') }
-  let(:school_class) { create(:school_class, school:, join_code: 'BAFA2345') }
+  let(:school_class) { create(:school_class, school:, join_code: 'B123-C456') }
   let(:student) { create(:user, email: 'student@example.edu') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
@@ -18,10 +18,10 @@ RSpec.describe 'Join endpoint' do
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'normalizes the join code by stripping non-alphanumerics' do
+    it 'finds the class when the code is given without a hyphen' do
       school_class # force creation before the request
 
-      get '/api/join/BAFA-2345'
+      get '/api/join/B123C456'
 
       expect(response).to have_http_status(:ok)
       data = JSON.parse(response.body, symbolize_names: true)

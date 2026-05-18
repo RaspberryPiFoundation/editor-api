@@ -1,49 +1,29 @@
 # frozen_string_literal: true
 
 class JoinCodeGenerator
-  # Removed letters that commonly form offensive words:
-  # Removed vowels: None (need all 5 for readability)
-  # Removed consonants: K (dick, fuck), X (sex), Z (rarely used anyway)
+  # Omit K, X, Z — commonly confused or offensive in short codes.
   CONSONANTS = %w[B C D F G H J L M N P Q R S T V W Y].freeze
-  VOWELS = %w[A E I O U].freeze
 
-  # Format: CVDDCVDD (e.g., CE18LI80)
-  # C = Consonant, V = Vowel, D = Digit
-  FORMAT_REGEX = /\A[A-Z][A-Z0-9]{7}\z/
+  # Format: CDDD-CDDD (e.g., B123-C456). C = consonant from CONSONANTS, D = digit.
+  FORMAT_REGEX = Regexp.new("\\A(?:#{CONSONANTS.join('|')})\\d{3}-(?:#{CONSONANTS.join('|')})\\d{3}\\z").freeze
 
   cattr_accessor :random
 
   self.random ||= Random.new
 
-  # List of offensive letter patterns to avoid (consonant-vowel pairs)
-  OFFENSIVE_PATTERNS = %w[
-    AS BA BO BU DA DI FU HO PO SH TA TI VA
-  ].freeze
-
   def self.generate
-    max_attempts = 100
-    max_attempts.times do
-      code = [
-        CONSONANTS.sample(random: random),
-        VOWELS.sample(random: random),
-        format('%02d', random.rand(100)),
-        CONSONANTS.sample(random: random),
-        VOWELS.sample(random: random),
-        format('%02d', random.rand(100))
-      ].join
-
-      # Extract the CV patterns (positions 0-1 and 4-5)
-      first_cv = code[0, 2]
-      second_cv = code[4, 2]
-
-      # Check if either CV pair matches offensive patterns
-      next if OFFENSIVE_PATTERNS.include?(first_cv)
-      next if OFFENSIVE_PATTERNS.include?(second_cv)
-
-      return code
+    seg = lambda do
+      "#{CONSONANTS.sample(random: random)}#{format('%03d', random.rand(1000))}"
     end
 
-    # Fallback if we couldn't generate a clean code after max_attempts
-    raise 'Unable to generate non-offensive join code'
+    "#{seg.call}-#{seg.call}"
+  end
+
+  # Canonical hyphenated form for DB lookup; accepts typed codes with or without a hyphen.
+  def self.normalize(raw)
+    alnum = raw.to_s.upcase.gsub(/[^A-Z0-9]/, '')
+    return alnum if alnum.length != 8
+
+    "#{alnum[0]}#{alnum[1, 3]}-#{alnum[4]}#{alnum[5, 3]}"
   end
 end

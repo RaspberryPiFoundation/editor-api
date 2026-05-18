@@ -25,8 +25,7 @@ module Api
     private
 
     def find_school_and_class
-      normalized = params[:join_code].to_s.upcase.gsub(/[^A-Z0-9]/, '')
-      @school_class = SchoolClass.find_by!(join_code: normalized)
+      @school_class = SchoolClass.find_by!(join_code: JoinCodeGenerator.normalize(params[:join_code]))
       @school = @school_class.school
     end
 
