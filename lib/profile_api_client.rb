@@ -7,7 +7,6 @@ class ProfileApiClient
   }.freeze
 
   # rubocop:disable Naming/MethodName
-  SafeguardingFlag = Data.define(:id, :userId, :schoolId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
   # rubocop:enable Naming/MethodName
 
@@ -187,15 +186,6 @@ class ProfileApiClient
 
       unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 204
-    end
-
-    def safeguarding_flags(token:)
-      response = connection(token).get('/api/v1/safeguarding-flags')
-
-      unauthorized!(response)
-      raise UnexpectedResponse, response unless response.status == 200
-
-      response.body.map { |flag| SafeguardingFlag.new(**flag.symbolize_keys) }
     end
 
     def create_safeguarding_flag(token:, flag:, email:, school_id:)

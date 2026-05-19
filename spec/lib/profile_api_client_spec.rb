@@ -104,43 +104,6 @@ RSpec.describe ProfileApiClient do
     end
   end
 
-  describe '.safeguarding_flags' do
-    subject(:safeguarding_flags_response) { list_safeguarding_flags }
-
-    let(:list_safeguarding_flags_url) { "#{api_url}/api/v1/safeguarding-flags" }
-
-    before do
-      stub_request(:get, list_safeguarding_flags_url).to_return(status: 200, body: '[]', headers: { 'content-type' => 'application/json' })
-    end
-
-    it_behaves_like 'an authenticated API request', :get, url: -> { list_safeguarding_flags_url }
-    it_behaves_like 'a request that handles standard HTTP errors', :get, url: -> { list_safeguarding_flags_url }
-    it_behaves_like 'a request that handles an unexpected response status', :get, url: -> { list_safeguarding_flags_url }, status: 201
-
-    it 'returns list of safeguarding flags if successful' do
-      flag = {
-        id: '7ac79585-e187-4d2f-bf0c-a1cbe72ecc9a',
-        userId: '583ba872-b16e-46e1-9f7d-df89d267550d',
-        flag: 'school:owner',
-        email: 'user@example.com',
-        createdAt: '2024-07-01T12:49:18.926Z',
-        updatedAt: '2024-07-01T12:49:18.926Z',
-        discardedAt: nil,
-        schoolId: SecureRandom.uuid
-      }
-      expected = ProfileApiClient::SafeguardingFlag.new(**flag)
-      stub_request(:get, list_safeguarding_flags_url)
-        .to_return(status: 200, body: [flag].to_json, headers: { 'content-type' => 'application/json' })
-      expect(safeguarding_flags_response).to eq([expected])
-    end
-
-    private
-
-    def list_safeguarding_flags
-      described_class.safeguarding_flags(token:)
-    end
-  end
-
   describe '.create_safeguarding_flag' do
     subject(:create_safeguarding_flag_response) { create_safeguarding_flag }
 
