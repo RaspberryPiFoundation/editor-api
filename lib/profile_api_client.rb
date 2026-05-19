@@ -255,7 +255,9 @@ class ProfileApiClient
       symbolized_attrs[:email] ||= nil
       symbolized_attrs[:ssoProviders] ||= []
 
-      Student.new(**symbolized_attrs)
+      allowed_keys = ProfileApiClient::Student.members
+
+      Student.new(**symbolized_attrs.slice(*allowed_keys))
     end
 
     def unauthorized!(response)

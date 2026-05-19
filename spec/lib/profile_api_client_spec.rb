@@ -515,6 +515,15 @@ RSpec.describe ProfileApiClient do
       expect(school_student_response).to eq(expected)
     end
 
+    it 'returns student even if response contains unexpected keys' do
+      data = { id: student_id, schoolId: school.id, name: 'name', username: 'username', email: 'test@example.com', ssoProviders: [], createdAt: '', updatedAt: '', discardedAt: '' }
+      response = data.merge({ unexpectedKey: 'unexpectedValue' })
+      expected = ProfileApiClient::Student.new(**data)
+      stub_request(:get, student_url)
+        .to_return(status: 200, body: response.to_json, headers: { 'content-type' => 'application/json' })
+      expect(school_student_response).to eq(expected)
+    end
+
     private
 
     def school_student
