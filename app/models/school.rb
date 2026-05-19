@@ -117,7 +117,7 @@ class School < ApplicationRecord
                         .exists?(description: id)
   end
 
-  def sso_enabled?
+  def auto_join_enabled?
     school_email_domains.present?
   end
 
