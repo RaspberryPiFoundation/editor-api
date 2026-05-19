@@ -70,22 +70,32 @@ RSpec.describe 'Join endpoint' do
         expect(data[:status]).to eq('wrong_school')
       end
 
-      it 'returns status: not_a_student when the user is a teacher of this school' do
+      it 'returns status: joinable_as_teacher when the user is a teacher of this school not yet in the class' do
         create(:teacher_role, school:, user_id: student.id)
 
         get "/api/join/#{school_class.join_code}", headers: headers
 
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('not_a_student')
+        expect(data[:status]).to eq('joinable_as_teacher')
       end
 
-      it 'returns status: not_a_student when the user is an owner of this school' do
+      it 'returns status: already_member when the user is already a teacher in the class' do
+        create(:teacher_role, school:, user_id: student.id)
+        ClassTeacher.create!(school_class:, teacher_id: student.id)
+
+        get "/api/join/#{school_class.join_code}", headers: headers
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:status]).to eq('already_member')
+      end
+
+      it 'returns status: owner when the user is an owner of this school' do
         create(:owner_role, school:, user_id: student.id)
 
         get "/api/join/#{school_class.join_code}", headers: headers
 
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('not_a_student')
+        expect(data[:status]).to eq('owner')
       end
 
       it 'returns status: not_a_student for a teacher of a different school (not wrong_school)' do
@@ -204,26 +214,47 @@ RSpec.describe 'Join endpoint' do
         end
       end
 
-      it 'responds with 403 not_a_student when the user is a teacher of the school' do
+      it 'adds the user to the class as a teacher and returns a redirect URL' do
         create(:teacher_role, school:, user_id: student.id)
+        school_class # force creation before the request
+
+        expect do
+          post "/api/join/#{school_class.join_code}", headers: headers
+        end.to change(ClassTeacher, :count).by(1)
+
+        expect(response).to have_http_status(:ok)
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
+        expect(ClassTeacher.exists?(school_class:, teacher_id: student.id)).to be(true)
+        expect(ClassStudent.exists?(school_class:, student_id: student.id)).to be(false)
+        expect(Role.where(user_id: student.id, school:).pluck(:role)).to eq(['teacher'])
+      end
+
+      it 'is idempotent when the user is already a teacher in the class' do
+        create(:teacher_role, school:, user_id: student.id)
+        ClassTeacher.create!(school_class:, teacher_id: student.id)
+
+        expect do
+          post "/api/join/#{school_class.join_code}", headers: headers
+        end.not_to change(ClassTeacher, :count)
+
+        expect(response).to have_http_status(:ok)
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
+      end
+
+      it 'redirects an owner into the class without adding them to it' do
+        create(:owner_role, school:, user_id: student.id)
 
         expect do
           post "/api/join/#{school_class.join_code}", headers: headers
         end.not_to change(ClassStudent, :count)
 
-        expect(response).to have_http_status(:forbidden)
+        expect(response).to have_http_status(:ok)
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:error]).to eq('not_a_student')
-      end
-
-      it 'responds with 403 not_a_student when the user is an owner of the school' do
-        create(:owner_role, school:, user_id: student.id)
-
-        post "/api/join/#{school_class.join_code}", headers: headers
-
-        expect(response).to have_http_status(:forbidden)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:error]).to eq('not_a_student')
+        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
+        expect(ClassTeacher.exists?(school_class:, teacher_id: student.id)).to be(false)
+        expect(Role.where(user_id: student.id, school:).pluck(:role)).to eq(['owner'])
       end
 
       it 'responds with 404 when the join code does not exist' do
