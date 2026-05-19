@@ -269,6 +269,15 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_29_120000) do
     t.index ["school_id"], name: "index_school_classes_on_school_id"
   end
 
+  create_table "school_email_domains", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "school_id", null: false
+    t.string "domain", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id", "domain"], name: "index_school_email_domains_on_school_id_and_domain", unique: true
+    t.index ["school_id"], name: "index_school_email_domains_on_school_id"
+  end
+
   create_table "school_import_results", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.uuid "job_id", null: false
     t.uuid "user_id", null: false
@@ -399,6 +408,7 @@ ActiveRecord::Schema[7.2].define(version: 2026_04_29_120000) do
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"
+  add_foreign_key "school_email_domains", "schools"
   add_foreign_key "school_project_transitions", "school_projects"
   add_foreign_key "school_projects", "projects"
   add_foreign_key "school_projects", "schools"
