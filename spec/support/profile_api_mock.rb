@@ -30,12 +30,13 @@ module ProfileApiMock
     allow(ProfileApiClient).to receive(:create_school_student).and_return(created: [user_id])
   end
 
-  def stub_profile_api_create_school(id: SecureRandom.uuid, code: '99-12-34')
+  def stub_profile_api_create_school(id: SecureRandom.uuid, code: '99-12-34', student_email_domains: [])
     now = Time.current.to_fs(:iso8601) # rubocop:disable Naming/VariableNumber
     allow(ProfileApiClient).to receive(:create_school).and_return(
       ProfileApiClient::School.new(
         id:,
         schoolCode: code,
+        studentEmailDomains: student_email_domains,
         updatedAt: now,
         createdAt: now,
         discardedAt: nil
