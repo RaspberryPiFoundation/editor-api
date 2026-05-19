@@ -73,13 +73,12 @@ RSpec.describe ProfileApiClient do
       expect(WebMock).to have_requested(:post, create_school_url).with(body: expected_body)
     end
 
-    it 'returns the created school if successful' do
+    it 'returns true if successful' do
       data = { id: 'id', schoolCode: 'code', updatedAt: '2024-07-09T10:31:13.196Z', createdAt: '2024-07-09T10:31:13.196Z', discardedAt: nil,
                studentEmailDomains: [] }
-      expected = ProfileApiClient::School.new(**data)
       stub_request(:post, create_school_url)
         .to_return(status: 201, body: data.to_json, headers: { 'Content-Type' => 'application/json' })
-      expect(create_school_response).to eq(expected)
+      expect(create_school_response).to be(true)
     end
 
     describe 'when BYPASS_OAUTH is true' do
@@ -586,13 +585,12 @@ RSpec.describe ProfileApiClient do
       expect(WebMock).to have_requested(:patch, update_school_email_domains_url).with(body: expected_body)
     end
 
-    it 'returns a school if successful' do
+    it 'returns true if successful' do
       data = { id: 'id', schoolCode: 'code', updatedAt: '2024-07-09T10:31:13.196Z', createdAt: '2024-07-09T10:31:13.196Z', discardedAt: nil,
                studentEmailDomains: school_email_domains }
-      expected = ProfileApiClient::School.new(**data)
       stub_request(:patch, update_school_email_domains_url)
         .to_return(status: 200, body: data.to_json, headers: { 'Content-Type' => 'application/json' })
-      expect(update_school_email_domains_response).to eq(expected)
+      expect(update_school_email_domains_response).to be(true)
     end
 
     describe 'when BYPASS_OAUTH is true' do

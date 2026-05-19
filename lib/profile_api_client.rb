@@ -7,7 +7,6 @@ class ProfileApiClient
   }.freeze
 
   # rubocop:disable Naming/MethodName
-  School = Data.define(:id, :schoolCode, :studentEmailDomains, :updatedAt, :createdAt, :discardedAt)
   SafeguardingFlag = Data.define(:id, :userId, :schoolId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
   # rubocop:enable Naming/MethodName
@@ -65,7 +64,7 @@ class ProfileApiClient
       unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 201
 
-      School.new(**response.body)
+      true
     end
 
     def school_student(token:, school_id:, student_id:)
@@ -227,7 +226,7 @@ class ProfileApiClient
       unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 200
 
-      School.new(**response.body)
+      true
     end
 
     private
