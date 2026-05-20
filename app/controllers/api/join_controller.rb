@@ -96,14 +96,21 @@ module Api
     end
 
     def add_student_to_school_and_class
-      Role.create!(school: @school, user_id: current_user.id, role: :student) unless Role.exists?(school: @school, user_id: current_user.id)
-      ClassStudent.create!(school_class: @school_class, student_id: current_user.id)
+      ActiveRecord::Base.transaction do
+        Role.find_or_create_by!(school: @school, user_id: current_user.id, role: :student)
+        ClassStudent.find_or_create_by!(school_class: @school_class, student_id: current_user.id)
+      end
+    rescue ActiveRecord::RecordNotUnique
+      # Concurrent join request for the same user/class — DB unique index
+      # caught a race we couldn't catch at validation time. Already enrolled.
     end
 
     def add_user_to_class_as_teacher
       class_teacher = @school_class.teachers.build(teacher_id: current_user.id)
       class_teacher.teacher = current_user
       class_teacher.save!
+    rescue ActiveRecord::RecordNotUnique
+      # Concurrent join request for the same teacher/class — already enrolled.
     end
   end
 end
