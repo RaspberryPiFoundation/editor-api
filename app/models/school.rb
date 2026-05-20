@@ -118,7 +118,7 @@ class School < ApplicationRecord
   end
 
   def auto_join_enabled?
-    school_email_domains.present?
+    school_email_domains.exists?
   end
 
   def valid_domain?(candidate_domain)
