@@ -285,6 +285,16 @@ RSpec.describe SchoolClass, :versioning do
       expect(new_class.join_code).to eq('C789-D012')
       expect(JoinCodeGenerator).to have_received(:generate).exactly(3).times
     end
+
+    it 'adds an error if a unique join code cannot be generated in 5 retries' do
+      create(:school_class, join_code: 'B123-C456', school:)
+      allow(JoinCodeGenerator).to receive(:generate).and_return(*(['B123-C456'] * 5))
+
+      new_class = build(:school_class, join_code: nil, school:)
+      new_class.assign_join_code
+
+      expect(new_class.errors[:join_code]).to include('could not be generated')
+    end
   end
 
   describe '#regenerate_join_code!' do
@@ -300,6 +310,25 @@ RSpec.describe SchoolClass, :versioning do
       school_class = create(:school_class, teacher_ids: [teacher.id], school:)
       school_class.regenerate_join_code!
       expect(school_class.reload.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'retries on a unique-index race against another writer' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      # Simulate a TOCTOU race: the in-memory uniqueness checks pass (the
+      # competing writer hasn't committed yet), but the DB unique index
+      # rejects the first save attempt.
+      call_count = 0
+      allow(school_class).to receive(:save!).and_wrap_original do |original, *args|
+        call_count += 1
+        raise ActiveRecord::RecordNotUnique, 'duplicate key' if call_count == 1
+
+        original.call(*args)
+      end
+      allow(JoinCodeGenerator).to receive(:generate).and_return('Y888-Y888', 'W999-W999')
+
+      school_class.regenerate_join_code!
+
+      expect(school_class.reload.join_code).to eq('W999-W999')
     end
   end
 

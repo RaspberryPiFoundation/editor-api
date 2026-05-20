@@ -63,13 +63,19 @@ class SchoolClass < ApplicationRecord
   def assign_join_code
     return if join_code.present?
 
-    loop do
+    5.times do
       self.join_code = JoinCodeGenerator.generate
-      break if join_code_is_unique?
+      return if join_code_is_unique?
     end
+
+    errors.add(:join_code, 'could not be generated')
   end
 
   def regenerate_join_code!
+    self.join_code = nil
+    assign_join_code
+    save!
+  rescue ActiveRecord::RecordNotUnique
     self.join_code = nil
     assign_join_code
     save!
