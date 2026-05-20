@@ -58,7 +58,7 @@ RSpec.describe 'Regenerating a school class join code', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 403 Forbidden when the user is a school-owner for a different school' do
+  it 'responds 403 Forbidden when the user is a member of a different school' do
     other_school = create(:school)
     other_class = create(:school_class, school: other_school)
 
