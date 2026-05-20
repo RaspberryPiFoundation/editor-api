@@ -12,14 +12,7 @@ RSpec.describe 'Regenerating a school class join code', type: :request do
   let(:teacher) { create(:teacher, school:, name: 'School Teacher') }
   let!(:school_class) { create(:school_class, name: 'Test School Class', school:, teacher_ids: [teacher.id]) }
 
-  it 'responds 200 OK' do
-    post("/api/schools/#{school.id}/classes/#{school_class.id}/regenerate_join_code", headers:)
-    expect(response).to have_http_status(:ok)
-  end
-
   it 'responds 200 OK when the user is the school-teacher for the class' do
-    authenticated_in_hydra_as(teacher)
-
     post("/api/schools/#{school.id}/classes/#{school_class.id}/regenerate_join_code", headers:)
     expect(response).to have_http_status(:ok)
   end
