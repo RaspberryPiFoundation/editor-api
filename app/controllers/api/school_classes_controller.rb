@@ -85,8 +85,8 @@ module Api
       @school_class.regenerate_join_code!
       @school_class_with_teachers = @school_class.with_teachers
       render :show, formats: [:json], status: :ok
-    rescue ActiveRecord::RecordInvalid => e
-      render json: { error: e.message }, status: :unprocessable_content
+    rescue ActiveRecord::RecordInvalid
+      render json: { error: @school_class.errors.full_messages.to_sentence }, status: :unprocessable_content
     end
 
     private
