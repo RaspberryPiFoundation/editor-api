@@ -13,6 +13,7 @@ RSpec.describe 'test_seeds', type: :task do
   describe ':destroy' do
     let(:task) { Rake::Task['test_seeds:destroy'] }
     let(:school) { create(:school, creator_id:, id: school_id) }
+    let(:scratch_project_id) { ScratchAsset.first.project_id }
 
     before do
       create(:role, user_id: creator_id, school:)
@@ -23,10 +24,11 @@ RSpec.describe 'test_seeds', type: :task do
       lesson = create(:lesson, school_id: school.id, user_id: creator_id)
       lesson.project.update!(project_type: Project::Types::CODE_EDITOR_SCRATCH)
       create(:scratch_asset, project: lesson.project)
-      @scratch_project_id = lesson.project.id
     end
 
     it 'destroys all seed data' do
+      scratch_project_id
+
       task.invoke
       expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
       expect(School.where(creator_id:)).not_to exist
@@ -34,7 +36,7 @@ RSpec.describe 'test_seeds', type: :task do
       expect(SchoolClass.where(school_id: school.id)).not_to exist
       expect(Lesson.where(school_id: school.id)).not_to exist
       expect(Project.where(school_id: school.id)).not_to exist
-      expect(ScratchAsset.where(project_id: @scratch_project_id)).not_to exist
+      expect(ScratchAsset.where(project_id: scratch_project_id)).not_to exist
     end
   end
 
