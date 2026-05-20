@@ -106,9 +106,9 @@ module Api
     end
 
     def add_user_to_class_as_teacher
-      class_teacher = @school_class.teachers.build(teacher_id: current_user.id)
-      class_teacher.teacher = current_user
-      class_teacher.save!
+      ClassTeacher.find_or_create_by!(school_class: @school_class, teacher_id: current_user.id) do |class_teacher|
+        class_teacher.teacher = current_user
+      end
     rescue ActiveRecord::RecordNotUnique
       # Concurrent join request for the same teacher/class — already enrolled.
     end
