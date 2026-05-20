@@ -98,11 +98,16 @@ module Api
     def add_student_to_school_and_class
       ActiveRecord::Base.transaction do
         Role.find_or_create_by!(school: @school, user_id: current_user.id, role: :student)
-        ClassStudent.find_or_create_by!(school_class: @school_class, student_id: current_user.id)
+        ClassStudent.find_or_create_by!(school_class: @school_class, student_id: current_user.id) do |class_student|
+          class_student.student = current_user
+        end
       end
     rescue ActiveRecord::RecordNotUnique
       # Concurrent join request for the same user/class — DB unique index
       # caught a race we couldn't catch at validation time. Already enrolled.
+    rescue ActiveRecord::RecordInvalid => e
+      raise unless e.record.errors.of_kind?(:student_id, :taken)
+      # Concurrent join request raced the in-memory uniqueness validator. Already enrolled.
     end
 
     def add_user_to_class_as_teacher
