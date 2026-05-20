@@ -116,6 +116,9 @@ module Api
       end
     rescue ActiveRecord::RecordNotUnique
       # Concurrent join request for the same teacher/class — already enrolled.
+    rescue ActiveRecord::RecordInvalid => e
+      raise unless e.record.errors.of_kind?(:teacher_id, :taken)
+      # Concurrent join raced the in-memory uniqueness validator. Already enrolled.
     end
   end
 end
