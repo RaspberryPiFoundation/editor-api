@@ -14,6 +14,7 @@ class Project < ApplicationRecord
   has_many :remixes, dependent: :nullify, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :parent
   has_many :components, -> { order(default: :desc, name: :asc) }, dependent: :destroy, inverse_of: :project
   has_one :scratch_component, dependent: :destroy, inverse_of: :project, required: false
+  has_many :scratch_assets, dependent: :destroy
   has_many :project_errors, dependent: :nullify
   has_many_attached :images
   has_many_attached :videos

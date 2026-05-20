@@ -20,7 +20,10 @@ RSpec.describe 'test_seeds', type: :task do
       create(:teacher_role, user_id: creator_id, school:)
       school_class = create(:school_class, school_id: school.id, teacher_ids: [creator_id])
       create(:class_student, student_id: student_1, school_class_id: school_class.id)
-      create(:lesson, school_id: school.id, user_id: creator_id)
+      lesson = create(:lesson, school_id: school.id, user_id: creator_id)
+      lesson.project.update!(project_type: Project::Types::CODE_EDITOR_SCRATCH)
+      create(:scratch_asset, project: lesson.project)
+      @scratch_project_id = lesson.project.id
     end
 
     it 'destroys all seed data' do
@@ -31,6 +34,7 @@ RSpec.describe 'test_seeds', type: :task do
       expect(SchoolClass.where(school_id: school.id)).not_to exist
       expect(Lesson.where(school_id: school.id)).not_to exist
       expect(Project.where(school_id: school.id)).not_to exist
+      expect(ScratchAsset.where(project_id: @scratch_project_id)).not_to exist
     end
   end
 
