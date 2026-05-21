@@ -3,7 +3,7 @@
 require_relative 'seeds_helper'
 
 namespace :scratch_assets do
-  desc 'Import scratch assets'
+  desc 'Import scratch assets, see https://github.com/RaspberryPiFoundation/digital-editor-issues/issues/1229#issuecomment-4144077069 for usage'
   task import_all: %i[import_backdrops import_costumes import_sounds import_sprites]
 
   task import_backdrops: :environment do
