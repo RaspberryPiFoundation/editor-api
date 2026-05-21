@@ -261,6 +261,17 @@ RSpec.describe 'Join endpoint' do
         post '/api/join/INVALID123', headers: headers
         expect(response).to have_http_status(:not_found)
       end
+
+      # rubocop:disable RSpec/AnyInstance
+      it 'responds with 500 when action_status returns an unexpected value' do
+        allow_any_instance_of(Api::JoinController).to receive(:action_status).and_return(:something_unexpected)
+
+        post "/api/join/#{school_class.join_code}", headers: headers
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(response.body).to include('Unexpected join action_status')
+      end
+      # rubocop:enable RSpec/AnyInstance
     end
   end
 end

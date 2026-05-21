@@ -19,9 +19,11 @@ module Api
       when :joinable_as_teacher
         add_user_to_class_as_teacher
         render json: { redirect_url: class_redirect_path }, status: :ok
-      else
+      when :joinable
         add_student_to_school_and_class
         render json: { redirect_url: class_redirect_path }, status: :ok
+      else
+        raise "Unexpected join action_status: #{action_status.inspect}"
       end
     end
 
