@@ -2,33 +2,36 @@
 
 require 'ruby-progressbar'
 require 'stringio'
+require 'aws-sdk-s3'
 
 class ScratchAssetImporter
-  def self.import(...)
-    new(...).import
+  class << self
+    def import_all(asset_names, asset_base_url)
+      bar = ProgressBar.create(format: '%t: |%B| %c of %C %E', total: asset_names.count) if show_progress?
+
+      asset_names.each do |asset_name|
+        bar.increment if show_progress?
+        new(asset_name, asset_base_url).import
+      end
+    end
+
+    private
+
+    def show_progress?
+      !Rails.env.test?
+    end
   end
 
-  attr_reader :asset_base_url, :asset_names
+  attr_reader :asset_base_url, :asset_name
 
   ASSET_FETCHING_DELAY = 0.2
 
-  def initialize(asset_names, asset_base_url)
-    @asset_names = asset_names
+  def initialize(asset_name, asset_base_url)
+    @asset_name = asset_name
     @asset_base_url = asset_base_url
   end
 
   def import
-    bar = ProgressBar.create(format: '%t: |%B| %c of %C %E', total: asset_names.count) if show_progress?
-
-    asset_names.each do |asset_name|
-      bar.increment if show_progress?
-      import_asset(asset_name)
-    end
-  end
-
-  private
-
-  def import_asset(asset_name)
     return if ScratchAsset.global_assets.exists?(filename: asset_name)
 
     sleep(ASSET_FETCHING_DELAY)
@@ -44,9 +47,5 @@ class ScratchAssetImporter
     @connection ||= Faraday.new(url: asset_base_url) do |faraday|
       faraday.response :raise_error
     end
-  end
-
-  def show_progress?
-    !Rails.env.test?
   end
 end
