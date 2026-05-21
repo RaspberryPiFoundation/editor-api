@@ -41,60 +41,11 @@ module Api
     end
 
     def action_status
-      @action_status ||= compute_action_status
-    end
-
-    def compute_action_status
-      return :already_member if user_is_member_of_class?
-      return existing_user_join_status if user_has_role_in_school?
-
-      new_user_join_status
-    end
-
-    # The user already has a role in this school: which one decides the status.
-    def existing_user_join_status
-      return :owner if user_is_owner_of_school?
-      return :joinable_as_teacher if user_is_teacher_of_school?
-
-      :joinable # student is the only remaining role for this school
-    end
-
-    # The user has no role in this school yet: may they join as a new student?
-    def new_user_join_status
-      return :not_a_student if user_has_non_student_role?
-      return :wrong_school if user_in_different_school?
-      return :domain_mismatch unless @school.email_domain_in_school_domains?(current_user.email)
-
-      :joinable
+      @action_status ||= JoinStatusService.new(school: @school, school_class: @school_class, user: current_user).call
     end
 
     def class_redirect_path
       "/school/#{@school.code}/class/#{@school_class.code}"
-    end
-
-    def user_is_member_of_class?
-      ClassStudent.exists?(school_class: @school_class, student_id: current_user.id) ||
-        ClassTeacher.exists?(school_class: @school_class, teacher_id: current_user.id)
-    end
-
-    def user_is_owner_of_school?
-      Role.exists?(school: @school, user_id: current_user.id, role: Role.roles[:owner])
-    end
-
-    def user_is_teacher_of_school?
-      Role.exists?(school: @school, user_id: current_user.id, role: Role.roles[:teacher])
-    end
-
-    def user_has_role_in_school?
-      Role.exists?(school: @school, user_id: current_user.id)
-    end
-
-    def user_has_non_student_role?
-      Role.where(user_id: current_user.id).where.not(role: Role.roles[:student]).exists?
-    end
-
-    def user_in_different_school?
-      Role.where(user_id: current_user.id).where.not(school_id: @school.id).exists?
     end
 
     def add_student_to_school_and_class
