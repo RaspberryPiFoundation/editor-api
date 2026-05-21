@@ -16,7 +16,7 @@ class ScratchConfigImporter
     config = connection.get.body
     asset_config = JSON.parse(config, symbolize_names: true)
     asset_names = extract_asset_names(asset_config)
-    ScratchAssetImporter.import(asset_names, asset_base_url)
+    ScratchAssetImporter.import_all(asset_names, asset_base_url)
   end
 
   def connection
