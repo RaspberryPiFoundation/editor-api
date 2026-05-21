@@ -63,7 +63,7 @@ module Api
     def new_user_join_status
       return :not_a_student if user_has_non_student_role?
       return :wrong_school if user_in_different_school?
-      return :domain_mismatch unless @school.valid_email?(current_user.email)
+      return :domain_mismatch unless @school.email_domain_in_school_domains?(current_user.email)
 
       :joinable
     end

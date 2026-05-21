@@ -128,7 +128,7 @@ class School < ApplicationRecord
     false
   end
 
-  def valid_email?(email)
+  def email_domain_in_school_domains?(email)
     return false if email.blank?
 
     local, separator, domain = email.to_s.rpartition('@')
