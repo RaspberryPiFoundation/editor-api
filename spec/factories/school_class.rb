@@ -4,6 +4,7 @@ FactoryBot.define do
   factory :school_class do
     sequence(:name) { |n| "Class #{n}" }
     code { ForEducationCodeGenerator.generate }
+    join_code { JoinCodeGenerator.generate }
 
     transient do
       teacher_ids { [SecureRandom.uuid] }

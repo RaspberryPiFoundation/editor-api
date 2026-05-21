@@ -117,11 +117,24 @@ class School < ApplicationRecord
                         .exists?(description: id)
   end
 
+  def auto_join_enabled?
+    school_email_domains.exists?
+  end
+
   def valid_domain?(candidate_domain)
     validated_domain = SchoolEmailDomainValidator.call(candidate_domain)
     school_email_domains.exists?(domain: validated_domain)
   rescue ::SchoolEmailDomainValidator::Error
     false
+  end
+
+  def email_domain_in_school_domains?(email)
+    return false if email.blank?
+
+    local, separator, domain = email.to_s.rpartition('@')
+    return false if separator.empty? || local.blank? || domain.blank?
+
+    valid_domain?(domain.strip.downcase)
   end
 
   private
