@@ -59,5 +59,51 @@ RSpec.describe ScratchAssetImporter do
       expect(ScratchAsset.find_by(filename: '123abc.png')).not_to be_present
       expect(ScratchAsset.find_by(filename: '456xyz.png')).to be_present
     end
+
+    describe 'syncing to editor asset bucket' do
+      let(:s3_client) { instance_double(Aws::S3::Client) }
+
+      around do |example|
+        editor_asset_env_vars = {
+          EDITOR_ASSETS_BUCKET: 'test-bucket',
+          EDITOR_ASSETS_ACCESS_KEY_ID: 'test-access-key-id',
+          EDITOR_ASSETS_SECRET_ACCESS_KEY: 'test-secret-access-key',
+          EDITOR_ASSETS_ENDPOINT: 'https://r2.example.com'
+        }
+        ClimateControl.modify(editor_asset_env_vars) do
+          example.run
+        end
+      end
+
+      before do
+        allow(Aws::S3::Client).to receive(:new).and_return(s3_client)
+        allow(s3_client).to receive(:head_object).and_raise(Aws::S3::Errors::NotFound.new(nil, nil))
+        allow(s3_client).to receive(:put_object)
+      end
+
+      it 'saves asset to editor asset bucket if it does not exist' do
+        image = Rails.root.join('spec/fixtures/files/test_image_1.png').read
+        stub_request(:get, 'https://example.net/internalapi/asset/123abc.png/get/').to_return(status: 200, body: image)
+
+        described_class.import_all(['123abc.png'], 'https://example.net/internalapi/asset/')
+
+        expect(s3_client).to have_received(:put_object).with(
+          bucket: 'test-bucket',
+          key: 'internalapi/asset/123abc.png/get/',
+          body: instance_of(StringIO),
+          content_type: 'image/png'
+        )
+      end
+
+      it 'does not save asset to editor asset bucket if it already exists' do
+        image = Rails.root.join('spec/fixtures/files/test_image_1.png').read
+        stub_request(:get, 'https://example.net/internalapi/asset/123abc.png/get/').to_return(status: 200, body: image)
+
+        allow(s3_client).to receive(:head_object).with(bucket: 'test-bucket', key: 'internalapi/asset/123abc.png/get/').and_return(true)
+
+        described_class.import_all(['123abc.png'], 'https://example.net/internalapi/asset/')
+        expect(s3_client).not_to have_received(:put_object)
+      end
+    end
   end
 end
