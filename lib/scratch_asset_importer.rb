@@ -64,7 +64,8 @@ class ScratchAssetImporter
       bucket: ENV.fetch('EDITOR_ASSETS_BUCKET'),
       key: asset_key,
       body:,
-      content_type: asset_content_type
+      content_type: asset_content_type,
+      cache_control: 'public, max-age=604800'
     )
   end
 
