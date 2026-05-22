@@ -91,7 +91,8 @@ RSpec.describe ScratchAssetImporter do
           bucket: 'test-bucket',
           key: 'internalapi/asset/123abc.png/get/',
           body: instance_of(StringIO),
-          content_type: 'image/png'
+          content_type: 'image/png',
+          cache_control: 'public, max-age=604800'
         )
       end
 
