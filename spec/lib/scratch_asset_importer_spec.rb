@@ -105,6 +105,17 @@ RSpec.describe ScratchAssetImporter do
         described_class.import_all(['123abc.png'], 'https://example.net/internalapi/asset/')
         expect(s3_client).not_to have_received(:put_object)
       end
+
+      it 'raises if asset is an unknown mimetype' do
+        image = Rails.root.join('spec/fixtures/files/unknown_mime_type.xyz').read
+        stub_request(:get, 'https://example.net/internalapi/asset/unknown_mime_type.xyz/get/').to_return(status: 200, body: image)
+
+        expect do
+          described_class.import_all(['unknown_mime_type.xyz'], 'https://example.net/internalapi/asset/')
+        end.to raise_error('Unknown content type for extension: xyz')
+
+        expect(s3_client).not_to have_received(:put_object)
+      end
     end
   end
 end

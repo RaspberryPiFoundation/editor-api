@@ -34,7 +34,7 @@ class ScratchAssetImporter
   def import
     create_scratch_asset
     save_to_editor_asset_bucket
-  rescue StandardError => e
+  rescue Faraday::Error => e
     Rails.logger.error("Failed to import asset #{asset_name}: #{e.message}")
   end
 
@@ -84,7 +84,10 @@ class ScratchAssetImporter
 
   def asset_content_type
     extension = File.extname(asset_name).delete('.')
-    Mime::Type.lookup_by_extension(extension).to_s
+    mime_type = Mime::Type.lookup_by_extension(extension)
+    raise "Unknown content type for extension: #{extension}" unless mime_type
+
+    mime_type.to_s
   end
 
   def s3_client
