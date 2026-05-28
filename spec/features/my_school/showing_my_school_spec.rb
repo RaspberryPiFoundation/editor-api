@@ -20,7 +20,7 @@ RSpec.describe 'Showing my school', type: :request do
     school_json = school.to_json(only: %i[
                                    id name website reference address_line_1 address_line_2 municipality administrative_area postal_code country_code code verified_at created_at updated_at district_name district_nces_id school_roll_number
                                  ])
-    expected_data = JSON.parse(school_json, symbolize_names: true).merge(roles: ['owner'], import_in_progress: school.import_in_progress?, auto_join_enabled: school.auto_join_enabled?)
+    expected_data = JSON.parse(school_json, symbolize_names: true).merge(roles: ['owner'], import_in_progress: school.import_in_progress?, auto_join_enabled: school.auto_join_enabled?, scratch_enabled: false)
 
     get('/api/school', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
