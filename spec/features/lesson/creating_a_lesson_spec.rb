@@ -186,4 +186,44 @@ RSpec.describe 'Creating a lesson', type: :request do
       expect(response).to have_http_status(:unprocessable_content)
     end
   end
+
+  describe 'working with Scratch projects' do
+    let(:params) do
+      {
+        lesson: {
+          name: 'Test Lesson',
+          school_id: school.id,
+          project_attributes: {
+            name: 'Hello Scratch project',
+            project_type: Project::Types::CODE_EDITOR_SCRATCH,
+            scratch_component: {
+              content: {
+                example_data: 'true'
+              }
+            }
+          }
+        }
+      }
+    end
+
+    it 'creates a lesson with a scratch component when school has Scratch enabled' do
+      school.update!(scratch_enabled: true)
+      post('/api/lessons', headers:, params:)
+      expect(response).to have_http_status(:created)
+
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      lesson_id = data[:id]
+
+      project = Lesson.find(lesson_id).project
+      expect(project.project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
+      expect(project.scratch_component.content).to eq({ 'example_data' => 'true' })
+    end
+
+    it 'returns forbidden when school does not have Scratch enabled' do
+      school.update!(scratch_enabled: false)
+      post('/api/lessons', headers:, params:)
+      expect(response).to have_http_status(:forbidden)
+    end
+  end
 end

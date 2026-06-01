@@ -6,6 +6,7 @@ module Api
 
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
+    before_action :verify_can_create_scratch_projects, only: %i[create create_copy]
     load_and_authorize_resource :lesson
 
     def index
@@ -83,6 +84,12 @@ module Api
       raise ParameterError, 'school_class_id does not correspond to school_id'
     end
 
+    def verify_can_create_scratch_projects
+      return unless scratch_project? && !school.scratch_enabled?
+
+      render json: { error: 'Forbidden' }, status: :forbidden
+    end
+
     def user_remixes(lessons)
       lessons.map { |lesson| user_remix(lesson) }
     end
@@ -95,6 +102,10 @@ module Api
         current_user,
         include_feedback: current_user&.school_student?(school)
       )
+    end
+
+    def scratch_project?
+      base_params.dig(:project_attributes, :project_type) == Project::Types::CODE_EDITOR_SCRATCH
     end
 
     def lesson_params
