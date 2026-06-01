@@ -36,9 +36,6 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
   before do
     mock_phrase_generation('new-project-id')
     create(:scratch_component, project: original_project)
-
-    Flipper.disable :cat_mode
-    Flipper.disable_actor :cat_mode, school
   end
 
   def make_request(query: request_query, request_headers: headers, request_params: scratch_project)
@@ -56,18 +53,18 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 404 Not Found when cat_mode is not enabled' do
-    authenticated_in_hydra_as(teacher)
+  it 'responds 404 Not Found when user is not part of a school' do
+    user = create(:user)
+    authenticated_in_hydra_as(user)
 
     make_request
 
     expect(response).to have_http_status(:not_found)
   end
 
-  context 'when authenticated and cat_mode is enabled' do
+  context 'when authenticated and part of a school' do
     before do
       authenticated_in_hydra_as(teacher)
-      Flipper.enable_actor :cat_mode, school
     end
 
     it 'responds 403 Forbidden when not remixing' do

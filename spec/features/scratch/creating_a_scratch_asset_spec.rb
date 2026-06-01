@@ -10,12 +10,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       create(:scratch_component, project: scratch_project)
     end
   end
-  let(:auth_headers) { { 'Authorization' => UserProfileMock::TOKEN } }
-  let(:project_headers) { auth_headers.merge('X-Project-ID' => project.identifier) }
-
-  before do
-    Flipper.enable_actor :cat_mode, school
-  end
+  let(:headers) { { 'Authorization' => UserProfileMock::TOKEN, 'X-Project-ID' => project.identifier } }
 
   it 'responds 401 Unauthorized when no Authorization header is provided' do
     post '/api/scratch/assets/example.svg', headers: { 'X-Project-ID' => project.identifier }
@@ -23,20 +18,19 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 404 Not Found when cat_mode is not enabled' do
-    authenticated_in_hydra_as(teacher)
-    Flipper.disable :cat_mode
-    Flipper.disable_actor :cat_mode, school
+  it 'responds 404 Not Found when user is not part of a school' do
+    user = create(:user)
+    authenticated_in_hydra_as(user)
 
-    post '/api/scratch/assets/example.svg', headers: project_headers
+    post '/api/scratch/assets/example.svg', headers: headers
 
     expect(response).to have_http_status(:not_found)
   end
 
-  it 'creates an asset when cat_mode is enabled and the required headers are provided' do
+  it 'creates an asset when user is part of a school and the required headers are provided' do
     authenticated_in_hydra_as(teacher)
 
-    post '/api/scratch/assets/example.svg', headers: project_headers
+    post '/api/scratch/assets/example.svg', headers: headers
 
     expect(response).to have_http_status(:created)
 

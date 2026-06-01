@@ -7,28 +7,14 @@ RSpec.describe 'Updating a Scratch project', type: :request do
   let(:teacher) { create(:teacher, school:) }
   let(:auth_headers) { { 'Authorization' => UserProfileMock::TOKEN } }
 
-  before do
-    Flipper.disable :cat_mode
-    Flipper.disable_actor :cat_mode, school
-  end
-
   it 'responds 401 Unauthorized when no Authorization header is provided' do
     put '/api/scratch/projects/any-identifier', params: { project: { targets: [] } }
 
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 404 Not Found when cat_mode is not enabled' do
+  it 'updates a project when an Authorization header is provided' do
     authenticated_in_hydra_as(teacher)
-
-    put '/api/scratch/projects/any-identifier', params: { content: { targets: [] } }, headers: auth_headers
-
-    expect(response).to have_http_status(:not_found)
-  end
-
-  it 'updates a project when cat_mode is enabled and an Authorization header is provided' do
-    authenticated_in_hydra_as(teacher)
-    Flipper.enable_actor :cat_mode, school
     project = create(
       :project,
       project_type: Project::Types::CODE_EDITOR_SCRATCH,

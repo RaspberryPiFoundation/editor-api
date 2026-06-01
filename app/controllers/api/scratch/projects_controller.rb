@@ -5,10 +5,7 @@ module Api
     class ProjectsController < ScratchController
       include RemixSelection
 
-      skip_before_action :authorize_user, only: [:show]
-      skip_before_action :check_scratch_feature, only: [:show]
       before_action :load_project, only: %i[show update]
-
       before_action :ensure_create_is_a_remix, only: %i[create]
 
       def show
