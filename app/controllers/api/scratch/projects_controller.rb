@@ -48,6 +48,7 @@ module Api
       end
 
       def update
+        authorize! :update, @project
         @project.scratch_component&.content = scratch_content_params
         @project.save!
         render json: { status: 'ok' }, status: :ok
