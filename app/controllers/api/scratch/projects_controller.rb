@@ -97,6 +97,10 @@ module Api
       rescue ActiveRecord::RecordNotUnique
         pending_upload.destroy!
       end
+
+      def load_project
+        @project = Project.find_by!(identifier: params[:id], project_type: Project::Types::CODE_EDITOR_SCRATCH)
+      end
     end
   end
 end
