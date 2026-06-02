@@ -5,18 +5,19 @@ module Api
     class ProjectsController < ScratchController
       include RemixSelection
 
-      before_action :load_project, only: %i[show update]
+      before_action :load_project, except: %i[create]
+      authorize_resource :project, except: %i[create]
+
       before_action :ensure_create_is_a_remix, only: %i[create]
+      before_action :load_original_project, only: %i[create]
+      authorize_resource :original_project, only: %i[create]
 
       def show
-        authorize! :show, @project
         render json: @project.scratch_component.content_with_stage_first
       end
 
       def create
-        original_project = load_original_project(source_project_identifier)
-        return render json: { error: I18n.t('errors.admin.unauthorized') }, status: :unauthorized unless current_ability.can?(:show, original_project)
-
+        original_project = @original_project
         remix_params = create_params
         return render json: { error: I18n.t('errors.project.remixing.invalid_params') }, status: :bad_request if remix_params.dig(:scratch_component, :content).blank?
 
@@ -48,7 +49,6 @@ module Api
       end
 
       def update
-        authorize! :update, @project
         @project.scratch_component&.content = scratch_content_params
         @project.save!
         render json: { status: 'ok' }, status: :ok
@@ -73,8 +73,8 @@ module Api
         }
       end
 
-      def load_original_project(identifier)
-        Project.find_by!(identifier:, project_type: Project::Types::CODE_EDITOR_SCRATCH)
+      def load_original_project
+        @original_project = Project.find_by!(identifier: source_project_identifier, project_type: Project::Types::CODE_EDITOR_SCRATCH)
       end
 
       def scratch_content_params

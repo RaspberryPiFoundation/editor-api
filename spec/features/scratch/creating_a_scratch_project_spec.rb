@@ -93,13 +93,13 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
-    it 'responds 401 Unauthorized when the user cannot access the original project' do
+    it 'responds 403 Forbidden when the user cannot access the original project' do
       inaccessible_project = create(:project, project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: nil)
       create(:scratch_component, project: inaccessible_project)
 
       make_request(query: { original_id: inaccessible_project.identifier, is_remix: '1' })
 
-      expect(response).to have_http_status(:unauthorized)
+      expect(response).to have_http_status(:forbidden)
     end
 
     it 'responds 400 Bad Request when no Scratch content is submitted' do

@@ -6,10 +6,10 @@ module Api
       include ActiveStorage::SetCurrent
 
       prepend_before_action :load_project_from_header, only: %i[show create]
+      authorize_resource :project_from_header
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
-        authorize! :show, @project_from_header
 
         scratch_asset = ScratchAsset.find_visible_to_project(
           project: @project_from_header,
@@ -22,8 +22,6 @@ module Api
       end
 
       def create
-        authorize! :show, @project_from_header
-
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
         scratch_asset = ScratchAsset.find_or_initialize_by(
           project: @project_from_header,
