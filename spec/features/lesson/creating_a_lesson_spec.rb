@@ -94,6 +94,7 @@ RSpec.describe 'Creating a lesson', type: :request do
       new_params = { lesson: params[:lesson].merge(user_id: 'ignored') }
 
       post('/api/lessons', headers:, params: new_params)
+      expect(response).to have_http_status(:created)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:user_id]).to eq(teacher.id)

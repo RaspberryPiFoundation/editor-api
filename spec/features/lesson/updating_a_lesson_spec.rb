@@ -117,15 +117,17 @@ RSpec.describe 'Updating a lesson', type: :request do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'responds 422 Unprocessable Entity when trying to re-assign the lesson to a different class' do
+    it 'does not allow re-assigning the lesson to a different class' do
       school = create(:school, id: SecureRandom.uuid)
       teacher = create(:teacher, school:)
       school_class = create(:school_class, school:, teacher_ids: [teacher.id])
 
       new_params = { lesson: params[:lesson].merge(school_class_id: school_class.id) }
       put("/api/lessons/#{lesson.id}", headers:, params: new_params)
+      expect(response).to have_http_status(:ok)
 
-      expect(response).to have_http_status(:unprocessable_content)
+      lesson.reload
+      expect(lesson.school_class_id).not_to eq(school_class.id)
     end
   end
 end
