@@ -380,10 +380,19 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
-    it 'responds 401 unauthorized when user is not part of a school' do
+    it 'responds 401 unauthorized when user is not signed in' do
       post '/api/scratch/assets/example.svg', headers: { 'X-Project-ID' => project.identifier }
 
       expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'responds 404 Not Found when user is not part of a school' do
+      user = create(:user)
+      authenticated_in_hydra_as(user)
+
+      post '/api/scratch/assets/example.svg', headers: project_headers
+
+      expect(response).to have_http_status(:not_found)
     end
   end
 
