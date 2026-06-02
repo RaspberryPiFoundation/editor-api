@@ -9,6 +9,7 @@ module Api
       before_action :ensure_create_is_a_remix, only: %i[create]
 
       def show
+        authorize! :show, @project
         render json: @project.scratch_component.content_with_stage_first
       end
 
