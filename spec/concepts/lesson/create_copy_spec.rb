@@ -109,6 +109,78 @@ RSpec.describe Lesson::CreateCopy, type: :unit do
     expect(copied_component.content).to eq(original_component.content)
   end
 
+  context 'when the project is a Scratch project' do
+    let(:copied_teacher_id) { SecureRandom.uuid }
+    let(:lesson_params) { { user_id: copied_teacher_id } }
+    let(:scratch_content) do
+      {
+        targets: [
+          {
+            isStage: true,
+            costumes: [
+              {
+                assetId: 'teacher_asset',
+                md5ext: 'teacher_asset.png',
+                dataFormat: 'png'
+              }
+            ]
+          }
+        ],
+        monitors: [],
+        extensions: [],
+        meta: {}
+      }
+    end
+
+    before do
+      lesson.project.update!(project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: nil)
+      create(:scratch_component, project: lesson.project, content: scratch_content)
+    end
+
+    it 'copies the Scratch component content' do
+      response = described_class.call(lesson:, lesson_params:)
+      copied_project = response[:lesson].reload.project
+
+      expect(copied_project.scratch_component.content.to_h)
+        .to eq(scratch_content.deep_stringify_keys)
+    end
+
+    it 'copies only teacher-owned Scratch assets to the new project owner' do
+      create_scratch_asset(
+        filename: 'teacher_asset.png',
+        project: lesson.project,
+        uploaded_user_id: teacher_id,
+        body: 'teacher-body'
+      )
+      create_scratch_asset(
+        filename: 'student_asset.png',
+        project: lesson.project,
+        uploaded_user_id: SecureRandom.uuid,
+        body: 'student-body'
+      )
+
+      response = described_class.call(lesson:, lesson_params:)
+      copied_project = response[:lesson].reload.project
+      copied_asset = ScratchAsset.find_by!(
+        filename: 'teacher_asset.png',
+        project: copied_project,
+        uploaded_user_id: copied_teacher_id
+      )
+
+      visible_asset = ScratchAsset.find_visible_to_project(
+        project: copied_project,
+        user: User.new(id: SecureRandom.uuid),
+        filename: 'teacher_asset.png'
+      )
+
+      expect(copied_asset.file.download).to eq('teacher-body')
+      expect(visible_asset).to eq(copied_asset)
+      expect(
+        ScratchAsset.find_by(filename: 'student_asset.png', project: copied_project)
+      ).to be_nil
+    end
+  end
+
   context 'when creating a copy fails' do
     let(:lesson_params) { { name: ' ' } }
 
@@ -133,6 +205,12 @@ RSpec.describe Lesson::CreateCopy, type: :unit do
     it 'sent the exception to Sentry' do
       described_class.call(lesson:, lesson_params:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
+    end
+  end
+
+  def create_scratch_asset(filename:, project:, uploaded_user_id:, body:)
+    ScratchAsset.create!(filename:, project:, uploaded_user_id:).tap do |asset|
+      asset.file.attach(io: StringIO.new(body), filename:, content_type: 'image/png')
     end
   end
 end

@@ -5,8 +5,13 @@ class Lesson
     class << self
       def call(lesson:, lesson_params:)
         response = OperationResponse.new
-        response[:lesson] = build_copy(lesson, lesson_params)
-        response[:lesson].save!
+
+        Lesson.transaction do
+          response[:lesson] = build_copy(lesson, lesson_params)
+          response[:lesson].save!
+          copy_scratch_assets(lesson.project, response[:lesson].project)
+        end
+
         response
       rescue StandardError => e
         Sentry.capture_exception(e)
@@ -39,7 +44,29 @@ class Lesson
           project_copy.components.build({ name: component.name, extension: component.extension, content: component.content })
         end
 
+        copy_scratch_component(project, project_copy)
+
         project_copy
+      end
+
+      def copy_scratch_component(project, project_copy)
+        return unless project.scratch_project? && project.scratch_component
+
+        project_copy.build_scratch_component(content: project.scratch_component.content.deep_dup)
+      end
+
+      def copy_scratch_assets(project, project_copy)
+        return unless project.scratch_project?
+
+        project.scratch_assets.where(uploaded_user_id: project.user_id).find_each do |scratch_asset|
+          next unless scratch_asset.file.attached?
+
+          scratch_asset_copy = project_copy.scratch_assets.create!(
+            filename: scratch_asset.filename,
+            uploaded_user_id: project_copy.user_id
+          )
+          scratch_asset_copy.file.attach(scratch_asset.file.blob)
+        end
       end
     end
   end
