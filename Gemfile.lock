@@ -121,7 +121,7 @@ GEM
     bootsnap (1.24.5)
       msgpack (~> 1.2)
     builder (3.3.0)
-    bullet (8.1.1)
+    bullet (8.1.2)
       activesupport (>= 3.0.0)
       uniform_notifier (~> 1.11)
     byebug (13.0.0)
@@ -246,7 +246,7 @@ GEM
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
     jmespath (1.6.2)
-    json (2.19.5)
+    json (2.19.8)
     jwt (2.10.2)
       base64
     kaminari (1.2.2)
