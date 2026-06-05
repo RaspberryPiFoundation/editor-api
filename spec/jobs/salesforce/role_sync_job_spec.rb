@@ -78,6 +78,11 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
     it 'retries the job' do
       expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
     end
+
+    it 'does not write the affiliation to the mirror' do
+      perform_job
+      expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
+    end
   end
 
   context 'when the parent Contact is not yet synced to Salesforce' do
