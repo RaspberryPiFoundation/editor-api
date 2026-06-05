@@ -1,0 +1,9 @@
+NAME: "scratch integration test"
+IDENTIFIER: "editor-scratch-testing-starter"
+TYPE: "code_editor_scratch"
+COMPONENTS:
+  - name: "main"
+    extension: "sb3"
+    location: "main.sb3"
+    index: 0
+    default: true
