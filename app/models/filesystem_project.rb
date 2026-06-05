@@ -3,7 +3,7 @@
 require 'yaml'
 
 class FilesystemProject
-  CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
+  CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css', '.sb3'].freeze
   PROJECTS_ROOT = Rails.root.join('lib/tasks/project_components')
   PROJECT_CONFIG = 'project_config.yml'
 
