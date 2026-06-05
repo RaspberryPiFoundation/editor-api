@@ -6,6 +6,7 @@ module Api
 
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
+    before_action :verify_can_create_scratch_projects, only: %i[create create_copy]
     load_and_authorize_resource :lesson
 
     def index
@@ -29,7 +30,7 @@ module Api
     end
 
     def create
-      result = Lesson::Create.call(lesson_params:)
+      result = Lesson::Create.call(lesson_params: create_params)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
@@ -40,7 +41,7 @@ module Api
     end
 
     def create_copy
-      result = Lesson::CreateCopy.call(lesson: @lesson, lesson_params:)
+      result = Lesson::CreateCopy.call(lesson: @lesson, lesson_params: create_params)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
@@ -53,7 +54,7 @@ module Api
     def update
       # TODO: Consider removing user_id from the lesson_params for update so users can update other users' lessons without changing ownership
       # OR consider dropping user_id on lessons and using teacher id/ids on the class instead
-      result = Lesson::Update.call(lesson: @lesson, lesson_params:)
+      result = Lesson::Update.call(lesson: @lesson, lesson_params: update_params)
 
       if result.success?
         @lesson_with_user = result[:lesson].with_user
@@ -77,10 +78,16 @@ module Api
     end
 
     def verify_school_class_belongs_to_school
-      return if base_params[:school_class_id].blank?
-      return if school&.classes&.pluck(:id)&.include?(base_params[:school_class_id])
+      return if create_params[:school_class_id].blank?
+      return if school&.classes&.pluck(:id)&.include?(create_params[:school_class_id])
 
       raise ParameterError, 'school_class_id does not correspond to school_id'
+    end
+
+    def verify_can_create_scratch_projects
+      return unless scratch_project? && !school.scratch_enabled?
+
+      render json: { error: 'Forbidden' }, status: :forbidden
     end
 
     def user_remixes(lessons)
@@ -97,11 +104,21 @@ module Api
       )
     end
 
-    def lesson_params
-      base_params.merge(user_id: current_user.id)
+    def scratch_project?
+      create_params.dig(:project_attributes, :project_type) == Project::Types::CODE_EDITOR_SCRATCH
     end
 
-    def base_params
+    def update_params
+      params.fetch(:lesson, {}).permit(
+        :name,
+        :visibility,
+        {
+          project_attributes: [:name]
+        }
+      )
+    end
+
+    def create_params
       params.fetch(:lesson, {}).permit(
         :school_id,
         :school_class_id,
@@ -118,7 +135,7 @@ module Api
             { scratch_component: {} }
           ]
         }
-      )
+      ).merge(user_id: current_user.id)
     end
 
     def school_owner?
@@ -126,7 +143,7 @@ module Api
     end
 
     def school
-      @school ||= @lesson&.school || School.find_by(id: base_params[:school_id]) || SchoolClass.find_by(id: params[:school_class_id])&.school
+      @school ||= @lesson&.school || School.find_by(id: create_params[:school_id]) || SchoolClass.find_by(id: params[:school_class_id])&.school
     end
   end
 end
