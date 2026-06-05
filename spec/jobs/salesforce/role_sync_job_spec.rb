@@ -6,6 +6,12 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
   subject(:perform_job) { described_class.perform_now(role_id: role.id) }
 
   let(:role) { create(:role) }
+  let!(:sf_school) do
+    create(:salesforce_school, editoruuid__c: role.school_id, sfid: SecureRandom.alphanumeric(18))
+  end
+  let!(:sf_contact) do
+    create(:salesforce_contact, pi_accounts_unique_id__c: role.user_id, sfid: SecureRandom.alphanumeric(18))
+  end
 
   around do |example|
     ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
@@ -48,6 +54,58 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
     let(:role) { create(:student_role) }
 
     it 'does not create a Salesforce role record' do
+      perform_job
+      expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
+    end
+  end
+
+  context 'when the parent Editor__c is not yet synced to Salesforce' do
+    before { sf_school.update!(sfid: nil) }
+
+    it 'retries the job to defer the affiliation write' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
+    end
+
+    it 'does not write the affiliation to the mirror' do
+      perform_job
+      expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
+    end
+  end
+
+  context 'when there is no Salesforce::School row for the role school' do
+    before { sf_school.destroy }
+
+    it 'retries the job' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
+    end
+
+    it 'does not write the affiliation to the mirror' do
+      perform_job
+      expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
+    end
+  end
+
+  context 'when the parent Contact is not yet synced to Salesforce' do
+    before { sf_contact.update!(sfid: nil) }
+
+    it 'retries the job to defer the affiliation write' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
+    end
+
+    it 'does not write the affiliation to the mirror' do
+      perform_job
+      expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
+    end
+  end
+
+  context 'when there is no Salesforce::Contact row for the role user' do
+    before { sf_contact.destroy }
+
+    it 'retries the job' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
+    end
+
+    it 'does not write the affiliation to the mirror' do
       perform_job
       expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
     end

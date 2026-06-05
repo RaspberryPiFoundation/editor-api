@@ -18,6 +18,15 @@ module Salesforce
 
       return if role.student?
 
+      # The Contact_Editor_Affiliation__c row uses Salesforce external-ID lookups to resolve
+      # its parent Editor__c (school) and Contact (user). If either parent has not yet been
+      # pushed to Salesforce, Heroku Connect rejects the INSERT permanently with a
+      # "Foreign key external ID ... not found" error and the row is stuck FAILED in the
+      # mirror. Raising SalesforceRecordNotFound here defers the affiliation write via the
+      # SalesforceSyncJob retry_on, giving the parent records time to land in Salesforce.
+      ensure_parent_synced!(Salesforce::School, :editoruuid__c, role.school_id, 'Editor__c')
+      ensure_parent_synced!(Salesforce::Contact, :pi_accounts_unique_id__c, role.user_id, 'Contact')
+
       sf_role = Salesforce::Role.find_or_initialize_by(affiliation_id__c: role_id)
       sf_role.attributes = sf_role_attributes(role:)
 
@@ -31,6 +40,13 @@ module Salesforce
     end
 
     private
+
+    def ensure_parent_synced!(model, external_id_field, external_id, label)
+      return if model.where(external_id_field => external_id).where.not(sfid: nil).exists?
+
+      raise SalesforceRecordNotFound,
+            "#{label} not yet synced for #{external_id_field}: #{external_id}"
+    end
 
     def sf_role_attributes(role:)
       mapped_attributes(role:).to_h do |sf_field, value|
