@@ -62,13 +62,12 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
   context 'when the parent Editor__c is not yet synced to Salesforce' do
     before { sf_school.update!(sfid: nil) }
 
-    it 'raises SalesforceRecordNotFound to defer the affiliation write' do
-      expect { perform_job }
-        .to raise_error(Salesforce::SalesforceSyncJob::SalesforceRecordNotFound, /Editor__c not yet synced/)
+    it 'retries the job to defer the affiliation write' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
     end
 
     it 'does not write the affiliation to the mirror' do
-      expect { perform_job }.to raise_error(Salesforce::SalesforceSyncJob::SalesforceRecordNotFound)
+      perform_job
       expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
     end
   end
@@ -76,22 +75,20 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
   context 'when there is no Salesforce::School row for the role school' do
     before { sf_school.destroy }
 
-    it 'raises SalesforceRecordNotFound' do
-      expect { perform_job }
-        .to raise_error(Salesforce::SalesforceSyncJob::SalesforceRecordNotFound, /Editor__c not yet synced/)
+    it 'retries the job' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
     end
   end
 
   context 'when the parent Contact is not yet synced to Salesforce' do
     before { sf_contact.update!(sfid: nil) }
 
-    it 'raises SalesforceRecordNotFound to defer the affiliation write' do
-      expect { perform_job }
-        .to raise_error(Salesforce::SalesforceSyncJob::SalesforceRecordNotFound, /Contact not yet synced/)
+    it 'retries the job to defer the affiliation write' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
     end
 
     it 'does not write the affiliation to the mirror' do
-      expect { perform_job }.to raise_error(Salesforce::SalesforceSyncJob::SalesforceRecordNotFound)
+      perform_job
       expect(Salesforce::Role.find_by(affiliation_id__c: role.id)).to be_nil
     end
   end
@@ -99,9 +96,8 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
   context 'when there is no Salesforce::Contact row for the role user' do
     before { sf_contact.destroy }
 
-    it 'raises SalesforceRecordNotFound' do
-      expect { perform_job }
-        .to raise_error(Salesforce::SalesforceSyncJob::SalesforceRecordNotFound, /Contact not yet synced/)
+    it 'retries the job' do
+      expect { perform_job }.to have_enqueued_job(described_class).with(role_id: role.id)
     end
   end
 
