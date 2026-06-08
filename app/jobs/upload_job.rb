@@ -131,6 +131,11 @@ class UploadJob < ApplicationJob
     }
 
     files.each do |file|
+      if file.extension == '.sb3'
+        categories[:components] << component(file, project_dir, locale, repository, owner)
+        next
+      end
+
       mime_type = file_mime_type(file)
 
       case mime_type
@@ -150,9 +155,11 @@ class UploadJob < ApplicationJob
     categories
   end
 
-  def component(file)
+  def component(file, project_dir = nil, locale = nil, repository = nil, owner = nil)
     name = file.name.chomp(file.extension)
     extension = file.extension[1..]
+    return { name:, extension:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open } if extension == 'sb3'
+
     content = file.object.text
     default = file.name == 'main.py'
     { name:, extension:, content:, default: }
@@ -160,9 +167,12 @@ class UploadJob < ApplicationJob
 
   def media(file, project_dir, locale, repository, owner)
     filename = file.name
+    { filename:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
+  end
+
+  def file_url(file, project_dir, locale, repository, owner)
     directory = project_dir.name
-    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
-    { filename:, io: URI.parse(url).open }
+    "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{file.name}"
   end
 
   def repository(payload)
