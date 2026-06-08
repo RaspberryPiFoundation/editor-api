@@ -11,7 +11,8 @@ class FilesystemProject
     PROJECTS_ROOT.each_child do |dir|
       proj_config = YAML.safe_load_file(dir.join(PROJECT_CONFIG).to_s)
 
-      files = dir.children.reject { |file| file.basename.to_s == 'project_config.yml' }
+      files = dir.children.reject { |file| file.basename.to_s == PROJECT_CONFIG }
+      files = configured_scratch_files(files, dir, proj_config) if proj_config['TYPE'] == Project::Types::CODE_EDITOR_SCRATCH
       categorized_files = categorize_files(files, dir)
 
       project_importer = ProjectImporter.new(name: proj_config['NAME'], identifier: proj_config['IDENTIFIER'],
@@ -53,9 +54,18 @@ class FilesystemProject
     categories
   end
 
+  def self.configured_scratch_files(files, dir, proj_config)
+    configured_locations = Array(proj_config['COMPONENTS']).pluck('location')
+    return files if configured_locations.empty?
+
+    files.reject { |file| File.extname(file) == '.sb3' && configured_locations.exclude?(file.basename.to_s) }
+  end
+
   def self.component(file, dir)
     name = File.basename(file, '.*')
     extension = File.extname(file).delete('.')
+    return { name:, extension:, file_path: dir.join(File.basename(file)).to_s } if extension == 'sb3'
+
     code = File.read(dir.join(File.basename(file)).to_s)
     default = (File.basename(file) == 'main.py')
     { name:, extension:, content: code, default: }
