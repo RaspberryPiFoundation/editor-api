@@ -9,14 +9,16 @@ class Sb3Parser
   class MissingProjectJsonError < StandardError; end
   class MissingAssetError < StandardError; end
 
-  attr_reader :file_path
+  attr_reader :component, :file_path, :io
 
-  def initialize(file_path:)
-    @file_path = file_path
+  def initialize(component: nil, file_path: nil)
+    @component = component
+    @file_path = component&.fetch(:file_path, nil) || file_path
+    @io = component&.fetch(:io, nil)
   end
 
   def parse
-    Zip::File.open(file_path) do |zip_file|
+    open_zip do |zip_file|
       project_json = project_json_entry(zip_file)
       content = JSON.parse(project_json.get_input_stream.read)
 
@@ -30,6 +32,15 @@ class Sb3Parser
   end
 
   private
+
+  def open_zip
+    return Zip::File.open(file_path) { |zip_file| yield zip_file } if file_path
+
+    io.rewind if io.respond_to?(:rewind)
+    result = nil
+    Zip::File.open_buffer(io.read) { |zip_file| result = yield zip_file }
+    result
+  end
 
   def project_json_entry(zip_file)
     zip_file.find_entry('project.json') || raise(MissingProjectJsonError, 'project.json not found in SB3 archive')
