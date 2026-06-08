@@ -4,6 +4,23 @@ module Api
   class LessonsController < ApiController
     include RemixSelection
 
+    LESSON_ATTRIBUTES = %i[
+      school_id
+      school_class_id
+      name
+      description
+      visibility
+      due_date
+    ].freeze
+
+    PROJECT_ATTRIBUTES = [
+      :name,
+      :project_type,
+      :locale,
+      { components: %i[id name extension content index default] },
+      { scratch_component: {} }
+    ].freeze
+
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
     before_action :verify_can_create_scratch_projects, only: %i[create create_copy]
@@ -151,44 +168,15 @@ module Api
     end
 
     def bulk_create_params(lesson_project)
-      lesson_project.permit(
-        :school_id,
-        :school_class_id,
-        :name,
-        :description,
-        :visibility,
-        :due_date,
-        :origin_identifier,
-        {
-          project_attributes: [
-            :name,
-            :project_type,
-            :locale,
-            { components: %i[id name extension content index default] },
-            { scratch_component: {} }
-          ]
-        }
-      ).merge(user_id: current_user.id)
+      permit_lesson_params(lesson_project, :origin_identifier).merge(user_id: current_user.id)
     end
 
     def create_params
-      params.fetch(:lesson, {}).permit(
-        :school_id,
-        :school_class_id,
-        :name,
-        :description,
-        :visibility,
-        :due_date,
-        {
-          project_attributes: [
-            :name,
-            :project_type,
-            :locale,
-            { components: %i[id name extension content index default] },
-            { scratch_component: {} }
-          ]
-        }
-      ).merge(user_id: current_user.id)
+      permit_lesson_params(params.fetch(:lesson, {})).merge(user_id: current_user.id)
+    end
+
+    def permit_lesson_params(source, *extra)
+      source.permit(*LESSON_ATTRIBUTES, *extra, project_attributes: PROJECT_ATTRIBUTES)
     end
 
     def school_owner?
