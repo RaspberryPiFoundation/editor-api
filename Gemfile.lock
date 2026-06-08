@@ -183,6 +183,9 @@ GEM
       logger
     faraday-net_http (3.4.2)
       net-http (~> 0.5)
+    ffi (1.17.4-aarch64-linux-gnu)
+    ffi (1.17.4-arm64-darwin)
+    ffi (1.17.4-x86_64-linux-gnu)
     fiber-storage (1.0.1)
     flipper (1.4.2)
       concurrent-ruby (< 2)
@@ -497,6 +500,9 @@ GEM
     ruby-lsp-rspec (0.1.29)
       ruby-lsp (~> 0.26.0)
     ruby-progressbar (1.13.0)
+    ruby-vips (2.3.0)
+      ffi (~> 1.12)
+      logger
     rubyzip (3.0.2)
     sanitize (7.0.0)
       crass (~> 1.0.2)
@@ -625,6 +631,7 @@ DEPENDENCIES
   ruby-lsp
   ruby-lsp-rspec (~> 0.1.29)
   ruby-progressbar (~> 1.13)
+  ruby-vips
   selenium-webdriver
   sentry-rails
   shoulda-matchers (~> 7.0)
