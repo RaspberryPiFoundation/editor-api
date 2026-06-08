@@ -11,6 +11,13 @@ class SchoolProject < ApplicationRecord
     initial_state: :unsubmitted
   ]
 
+  # Experience CS marks Scratch projects complete by flipping school_projects.finished
+  # (Concept::SchoolProject::SetFinished, bypassing the state machine). That's invisible
+  # to the state-machine after_transition callbacks, so without this hook the parent
+  # lesson's Lesson__c.numberofcompletedprojects__c in Salesforce would never reflect
+  # Experience CS completions. The job reads Lesson#finished_projects_count live.
+  after_commit :enqueue_salesforce_lesson_sync, on: :update, if: :saved_change_to_finished?
+
   def lesson
     project.lesson || project.parent&.lesson
   end

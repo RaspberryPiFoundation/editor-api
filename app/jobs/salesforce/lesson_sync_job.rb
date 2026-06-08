@@ -31,7 +31,11 @@ module Salesforce
         teacherprojecttitle__c: lesson.project&.name,
         teacherprojecttype__c: lesson.project&.project_type,
         numberofassignedprojects__c: lesson.remixes.count,
-        numberofcompletedprojects__c: lesson.submitted_projects_count,
+        # "Completed" in Salesforce is the union of the two completion flows: state-machine
+        # submitted (Code Editor: Python/HTML) plus Experience CS finished (Scratch). The two
+        # flows are mutually exclusive in practice (Code Editor never sets `finished`;
+        # Experience CS never transitions the state machine), so a plain sum is safe.
+        numberofcompletedprojects__c: lesson.submitted_projects_count + lesson.finished_projects_count,
         lastsyncdate__c: Time.current
       ).to_h do |sf_field, value|
         value = truncate_value(sf_field:, value:) if value.is_a?(String)

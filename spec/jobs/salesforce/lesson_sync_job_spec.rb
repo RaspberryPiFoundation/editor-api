@@ -56,15 +56,33 @@ RSpec.describe Salesforce::LessonSyncJob, :requires_salesforce_db do
     end
   end
 
-  context 'when syncing numberofcompletedprojects__c' do
-    before do
+  describe 'numberofcompletedprojects__c' do
+    let(:student) { create(:student, school:) }
+
+    it 'syncs the cached submitted_projects_count when there are no Experience CS finishes' do
       lesson.update!(submitted_projects_count: 7)
       perform_job
-    end
-
-    it 'syncs the cached submitted_projects_count' do
       sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
       expect(sf_lesson.numberofcompletedprojects__c).to eq(7)
+    end
+
+    it 'syncs the Experience CS finished count when there are no state-machine submissions' do
+      finished_remix = create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
+      finished_remix.school_project.update!(finished: true)
+      perform_job
+      sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
+      expect(sf_lesson.numberofcompletedprojects__c).to eq(1)
+    end
+
+    it 'sums state-machine submissions and Experience CS finishes' do
+      lesson.update!(submitted_projects_count: 4)
+      2.times do
+        finished_remix = create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
+        finished_remix.school_project.update!(finished: true)
+      end
+      perform_job
+      sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
+      expect(sf_lesson.numberofcompletedprojects__c).to eq(6)
     end
   end
 
