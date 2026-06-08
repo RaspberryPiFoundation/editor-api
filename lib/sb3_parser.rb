@@ -26,15 +26,14 @@ class Sb3Parser
         scratch_component: { content: }
         # assets: assets(zip_file, extract_asset_names(content))
       }
-      pp output
       output
     end
   end
 
   private
 
-  def open_zip
-    return Zip::File.open(file_path) { |zip_file| yield zip_file } if file_path
+  def open_zip(&)
+    return Zip::File.open(file_path, &) if file_path
 
     io.rewind if io.respond_to?(:rewind)
     result = nil
