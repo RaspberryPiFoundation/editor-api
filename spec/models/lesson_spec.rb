@@ -233,4 +233,35 @@ RSpec.describe Lesson do
       expect(lesson.reload.submitted_projects_count).to eq(2)
     end
   end
+
+  describe 'salesforce sync' do
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
+
+    around do |example|
+      ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+    end
+
+    it 'enqueues Salesforce::LessonSyncJob on create when the lesson belongs to a class' do
+      expect do
+        create(:lesson, school:, school_class:, user_id: teacher.id)
+      end.to have_enqueued_job(Salesforce::LessonSyncJob)
+    end
+
+    it 'does not enqueue Salesforce::LessonSyncJob for library lessons' do
+      expect { create(:lesson, school:, user_id: teacher.id) }
+        .not_to have_enqueued_job(Salesforce::LessonSyncJob)
+    end
+
+    context 'when SALESFORCE_ENABLED is false' do
+      around do |example|
+        ClimateControl.modify(SALESFORCE_ENABLED: 'false') { example.run }
+      end
+
+      it 'does not enqueue Salesforce::LessonSyncJob on create' do
+        expect do
+          create(:lesson, school:, school_class:, user_id: teacher.id)
+        end.not_to have_enqueued_job(Salesforce::LessonSyncJob)
+      end
+    end
+  end
 end

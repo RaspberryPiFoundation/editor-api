@@ -31,6 +31,15 @@ class SchoolProject < ApplicationRecord
     lesson&.recalculate_submitted_projects_count!
   end
 
+  def enqueue_salesforce_lesson_sync(_transition = nil)
+    return unless FeatureFlags.salesforce_sync?
+
+    lesson_id = lesson&.id
+    return if lesson_id.blank?
+
+    Salesforce::LessonSyncJob.perform_later(lesson_id:)
+  end
+
   # Add convenience methods for each state
   def unsubmitted?
     state_machine.in_state?(:unsubmitted)

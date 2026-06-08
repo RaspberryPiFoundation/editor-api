@@ -31,6 +31,8 @@ class SchoolClass < ApplicationRecord
     }
   )
 
+  after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? }
+
   def self.teachers
     teacher_ids = all.map(&:teacher_ids).flatten.uniq
     User.from_userinfo(ids: teacher_ids)
@@ -86,6 +88,10 @@ class SchoolClass < ApplicationRecord
   end
 
   private
+
+  def do_salesforce_sync
+    Salesforce::SchoolClassSyncJob.perform_later(school_class_id: id)
+  end
 
   def school_class_has_at_least_one_teacher
     return if teachers.present?
