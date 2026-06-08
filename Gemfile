@@ -44,6 +44,7 @@ gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
 gem 'rails', '~> 8.1.3'
 gem 'ruby-progressbar', '~> 1.13', require: false
+gem 'ruby-vips'
 gem 'sentry-rails'
 gem 'statesman'
 
