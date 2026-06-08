@@ -12,10 +12,9 @@ class SchoolProject < ApplicationRecord
   ]
 
   # Experience CS marks Scratch projects complete by flipping school_projects.finished
-  # (Concept::SchoolProject::SetFinished, bypassing the state machine). That's invisible
-  # to the state-machine after_transition callbacks, so without this hook the parent
-  # lesson's Lesson__c.numberofcompletedprojects__c in Salesforce would never reflect
-  # Experience CS completions. The job reads Lesson#finished_projects_count live.
+  # directly (bypassing the state machine), so the parent lesson needs an explicit
+  # re-sync when this column changes. State-machine transitions are picked up via
+  # Lesson#recalculate_submitted_projects_count! → Lesson#after_commit, not here.
   after_commit :enqueue_salesforce_lesson_sync, on: :update, if: :saved_change_to_finished?
 
   def lesson
@@ -38,7 +37,7 @@ class SchoolProject < ApplicationRecord
     lesson&.recalculate_submitted_projects_count!
   end
 
-  def enqueue_salesforce_lesson_sync(_transition = nil)
+  def enqueue_salesforce_lesson_sync
     return unless FeatureFlags.salesforce_sync?
 
     lesson_id = lesson&.id

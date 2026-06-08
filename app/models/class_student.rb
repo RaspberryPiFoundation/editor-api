@@ -26,9 +26,9 @@ class ClassStudent < ApplicationRecord
 
   private
 
-  # Roster changes only affect Classroom.numberofmembers__c — Lesson.numberofassignedprojects__c
-  # is driven by remix Project creation (see Project#enqueue_lesson_sync_for_remix), not by
-  # students joining or leaving a class.
+  # Re-sync the parent SchoolClass when students join or leave so its synced member
+  # count stays current. Lesson-level counts are driven by remix Project creation, not
+  # class membership, so we don't fan out to lessons here.
   def do_salesforce_sync
     Salesforce::SchoolClassSyncJob.perform_later(school_class_id: school_class_id)
   end

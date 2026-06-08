@@ -44,13 +44,6 @@ class Lesson < ApplicationRecord
     end
   end
 
-  # Counts Experience CS Scratch completions for this lesson. Experience CS marks a
-  # project complete by flipping school_projects.finished via Concept::SchoolProject::SetFinished,
-  # bypassing the Statesman state machine entirely — so submitted_projects_count never
-  # sees these. Read live (no cached column) because the only consumer is LessonSyncJob,
-  # which is per-lesson concurrency-limited; if a non-sync reader ever needs this, add a
-  # cached column then. Summed with submitted_projects_count in LessonSyncJob to derive
-  # Lesson__c.numberofcompletedprojects__c.
   def finished_projects_count
     school_projects.where(finished: true).count
   end

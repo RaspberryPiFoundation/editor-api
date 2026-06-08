@@ -18,10 +18,9 @@ class ClassTeacher < ApplicationRecord
     }
   )
 
-  # Create/destroy refresh the parent classroom mirror (numberofmembers__c).
-  # Create also publishes the new affiliation row; destroy can't republish a
-  # deleted row. The brand-new-class case races SchoolClassSyncJob; the race
-  # is covered by SalesforceSyncJob#ensure_parent_synced! + retry_on.
+  # Re-sync the parent SchoolClass on add/remove so its synced teacher/member counts
+  # stay current. Only :create syncs the ClassTeacher itself — a destroyed record has
+  # nothing to publish.
   after_commit :enqueue_school_class_sync, on: %i[create destroy], if: -> { FeatureFlags.salesforce_sync? }
   after_commit :enqueue_class_teacher_sync, on: :create, if: -> { FeatureFlags.salesforce_sync? }
 

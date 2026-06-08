@@ -46,10 +46,10 @@ class Project < ApplicationRecord
     }
   )
 
-  # A remix Project is created the first time a student saves work on a lesson, which is
-  # exactly when `lesson.remixes.count` (Salesforce numberofassignedprojects__c) changes.
-  # Triggering the sync here keeps that count fresh without scanning every lesson in the
-  # class on every roster change.
+  # A remix Project is created the first time a student saves work on a lesson, which
+  # is when the parent lesson's started-projects count changes. Triggering the sync
+  # here keeps the count event-driven instead of recomputing it on class membership
+  # changes.
   after_commit :enqueue_lesson_sync_for_remix,
                on: :create,
                if: -> { FeatureFlags.salesforce_sync? && remixed_from_id.present? }
