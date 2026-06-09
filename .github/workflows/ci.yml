@@ -30,6 +30,7 @@ jobs:
         with:
           ruby-version: .tool-versions
           bundler-cache: true
+          cache-version: 1
 
       - name: Run RuboCop
         run: bundle exec rubocop --format progress
@@ -111,6 +112,7 @@ jobs:
         with:
           ruby-version: .tool-versions
           bundler-cache: true
+          cache-version: 1
 
       - name: Verify Firefox availability
         run: firefox --version
