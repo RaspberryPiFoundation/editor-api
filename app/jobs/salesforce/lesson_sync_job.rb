@@ -30,10 +30,7 @@ module Salesforce
       mapped_attributes(lesson:).merge(
         teacherprojecttitle__c: lesson.project&.name,
         teacherprojecttype__c: lesson.project&.project_type,
-        # SF field is named "assigned" but lessons aren't assigned to individual students
-        # in editor-api — `remixes.count` is the number of students who have started work
-        # (a remix Project is created on first save).
-        numberofassignedprojects__c: lesson.remixes.count,
+        numberofassignedprojects__c: assigned_projects_count(lesson),
         # Sum of the two completion paths: state-machine `:submitted` (Code Editor flow)
         # and `school_projects.finished` (Experience CS flow). They are mutually exclusive
         # per project, so the sum is safe.
@@ -50,6 +47,14 @@ module Salesforce
       FIELD_MAPPINGS.transform_values do |lesson_field|
         lesson.send(lesson_field)
       end
+    end
+
+    # A lesson is "assigned" to every student in its class iff it's visible to them
+    # (visibility == 'students'). Other visibilities aren't assigned to students at all.
+    def assigned_projects_count(lesson)
+      return 0 unless lesson.visibility == 'students'
+
+      lesson.school_class.students.count
     end
 
     def concurrency_key_id = arguments.first.with_indifferent_access[:lesson_id]

@@ -27,10 +27,16 @@ class ClassStudent < ApplicationRecord
   private
 
   # Re-sync the parent SchoolClass when students join or leave so its synced member
-  # count stays current. Lesson-level counts are driven by remix Project creation, not
-  # class membership, so we don't fan out to lessons here.
+  # count stays current, and fan out to every lesson in the class that's visible to
+  # students — those carry an assigned-students count that depends on class membership.
+  # Query via `school_class_id` rather than the `school_class` association: on cascading
+  # destroy the after_commit fires after the parent row has been deleted, so the
+  # association would resolve to nil. The FK is still readable on the in-memory record.
   def do_salesforce_sync
     Salesforce::SchoolClassSyncJob.perform_later(school_class_id: school_class_id)
+    Lesson.where(school_class_id: school_class_id, visibility: 'students').find_each do |lesson|
+      Salesforce::LessonSyncJob.perform_later(lesson_id: lesson.id)
+    end
   end
 
   def student_has_the_school_student_role_for_the_school

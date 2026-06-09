@@ -43,16 +43,39 @@ RSpec.describe Salesforce::LessonSyncJob, :requires_salesforce_db do
     end
   end
 
-  context 'when the lesson project has a remix' do
+  describe 'numberofassignedprojects__c' do
+    let(:students) { Array.new(3) { create(:student, school:) } }
+
     before do
-      student = create(:student, school:)
-      create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
-      perform_job
+      students.each { |s| create(:class_student, school_class:, student_id: s.id) }
     end
 
-    it 'syncs numberofassignedprojects__c from the remix count' do
+    it 'syncs the class student count when visibility is students' do
+      lesson.update!(visibility: 'students')
+      perform_job
       sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
-      expect(sf_lesson.numberofassignedprojects__c).to eq(1)
+      expect(sf_lesson.numberofassignedprojects__c).to eq(3)
+    end
+
+    it 'syncs zero when visibility is teachers' do
+      lesson.update!(visibility: 'teachers')
+      perform_job
+      sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
+      expect(sf_lesson.numberofassignedprojects__c).to eq(0)
+    end
+
+    it 'syncs zero when visibility is private' do
+      lesson.update!(visibility: 'private')
+      perform_job
+      sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
+      expect(sf_lesson.numberofassignedprojects__c).to eq(0)
+    end
+
+    it 'syncs zero when visibility is public' do
+      lesson.update!(visibility: 'public')
+      perform_job
+      sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
+      expect(sf_lesson.numberofassignedprojects__c).to eq(0)
     end
   end
 
