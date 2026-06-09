@@ -61,7 +61,7 @@ class ProjectImporter
     components.each do |component|
       next unless component[:extension] == 'sb3'
 
-      parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component)
+      parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
       project.scratch_component = ScratchComponent.new(content: parsed_content) if parsed_content
     end
   end
