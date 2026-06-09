@@ -21,6 +21,9 @@ class Lesson < ApplicationRecord
   validate :user_has_the_school_owner_or_school_teacher_role_for_the_school
   validate :user_is_the_school_teacher_for_the_school_class
 
+  after_commit :do_salesforce_sync, on: %i[create update],
+                                    if: -> { FeatureFlags.salesforce_sync? && school_class_id.present? }
+
   def self.users
     User.from_userinfo(ids: pluck(:user_id))
   end
@@ -41,7 +44,15 @@ class Lesson < ApplicationRecord
     end
   end
 
+  def finished_projects_count
+    school_projects.where(finished: true).count
+  end
+
   private
+
+  def do_salesforce_sync
+    Salesforce::LessonSyncJob.perform_later(lesson_id: id)
+  end
 
   def assign_school_from_school_class
     self.school ||= school_class&.school

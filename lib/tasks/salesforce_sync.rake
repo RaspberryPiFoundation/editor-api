@@ -21,4 +21,25 @@ namespace :salesforce_sync do
       Salesforce::ContactSyncJob.perform_later(school_id: school.id)
     end
   end
+
+  desc 'Sync all SchoolClasses to Salesforce'
+  task school_class: :environment do
+    SchoolClass.find_each do |school_class|
+      Salesforce::SchoolClassSyncJob.perform_later(school_class_id: school_class.id)
+    end
+  end
+
+  desc 'Sync all ClassTeacher affiliations to Salesforce'
+  task class_teacher: :environment do
+    ClassTeacher.find_each do |class_teacher|
+      Salesforce::ClassTeacherSyncJob.perform_later(class_teacher_id: class_teacher.id)
+    end
+  end
+
+  desc 'Sync all classroom Lessons to Salesforce'
+  task lesson: :environment do
+    Lesson.where.not(school_class_id: nil).find_each do |lesson|
+      Salesforce::LessonSyncJob.perform_later(lesson_id: lesson.id)
+    end
+  end
 end

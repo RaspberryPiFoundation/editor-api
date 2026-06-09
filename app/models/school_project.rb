@@ -11,6 +11,12 @@ class SchoolProject < ApplicationRecord
     initial_state: :unsubmitted
   ]
 
+  # Experience CS marks Scratch projects complete by flipping school_projects.finished
+  # directly (bypassing the state machine), so the parent lesson needs an explicit
+  # re-sync when this column changes. State-machine transitions are picked up via
+  # Lesson#recalculate_submitted_projects_count! → Lesson#after_commit, not here.
+  after_commit :enqueue_salesforce_lesson_sync, on: :update, if: :saved_change_to_finished?
+
   def lesson
     project.lesson || project.parent&.lesson
   end
@@ -29,6 +35,15 @@ class SchoolProject < ApplicationRecord
 
   def recalculate_lesson_submitted_projects_count!(_transition = nil)
     lesson&.recalculate_submitted_projects_count!
+  end
+
+  def enqueue_salesforce_lesson_sync
+    return unless FeatureFlags.salesforce_sync?
+
+    lesson_id = lesson&.id
+    return if lesson_id.blank?
+
+    Salesforce::LessonSyncJob.perform_later(lesson_id:)
   end
 
   # Add convenience methods for each state
