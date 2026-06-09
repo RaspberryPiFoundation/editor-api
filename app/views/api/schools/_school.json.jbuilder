@@ -17,7 +17,8 @@ json.call(
   :country_code,
   :verified_at,
   :created_at,
-  :updated_at
+  :updated_at,
+  :scratch_enabled
 )
 
 include_roles = local_assigns.fetch(:roles, false)
@@ -30,3 +31,4 @@ include_user_origin = local_assigns.fetch(:user_origin, false)
 json.user_origin(school.user_origin) if include_user_origin
 
 json.import_in_progress school.import_in_progress?
+json.auto_join_enabled school.auto_join_enabled?

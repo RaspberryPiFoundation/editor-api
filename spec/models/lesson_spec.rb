@@ -232,5 +232,84 @@ RSpec.describe Lesson do
 
       expect(lesson.reload.submitted_projects_count).to eq(2)
     end
+
+    it 'ignores remixes marked finished via the Experience CS flow' do
+      # finished=true is the Scratch / Experience CS completion signal and is counted
+      # separately via Lesson#finished_projects_count. The Statesman-only column must
+      # stay clean of it.
+      student = create(:student, school:)
+      lesson = create(:lesson, school:, user_id: teacher.id)
+
+      finished_remix = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      finished_remix.school_project.update!(finished: true)
+
+      lesson.update!(submitted_projects_count: 0)
+      lesson.recalculate_submitted_projects_count!
+
+      expect(lesson.reload.submitted_projects_count).to eq(0)
+    end
+  end
+
+  describe '#finished_projects_count' do
+    it 'returns 0 when no remixes exist' do
+      lesson = create(:lesson, user_id: teacher.id)
+
+      expect(lesson.finished_projects_count).to eq(0)
+    end
+
+    it 'counts remixes whose school_project has finished = true' do
+      student = create(:student, school:)
+      lesson = create(:lesson, school:, user_id: teacher.id)
+
+      finished = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      finished.school_project.update!(finished: true)
+
+      create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id) # not finished
+
+      expect(lesson.finished_projects_count).to eq(1)
+    end
+
+    it 'does not count state-machine submitted remixes' do
+      # Code Editor (state-machine) submissions are counted by submitted_projects_count;
+      # they must not double up via this method.
+      student = create(:student, school:)
+      lesson = create(:lesson, school:, user_id: teacher.id)
+
+      submitted = create(:project, school:, remixed_from_id: lesson.project.id, user_id: student.id)
+      submitted.school_project.transition_status_to!(:submitted, submitted.user_id)
+
+      expect(lesson.finished_projects_count).to eq(0)
+    end
+  end
+
+  describe 'salesforce sync' do
+    let(:school_class) { create(:school_class, teacher_ids: [teacher.id], school:) }
+
+    around do |example|
+      ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+    end
+
+    it 'enqueues Salesforce::LessonSyncJob on create when the lesson belongs to a class' do
+      expect do
+        create(:lesson, school:, school_class:, user_id: teacher.id)
+      end.to have_enqueued_job(Salesforce::LessonSyncJob)
+    end
+
+    it 'does not enqueue Salesforce::LessonSyncJob for library lessons' do
+      expect { create(:lesson, school:, user_id: teacher.id) }
+        .not_to have_enqueued_job(Salesforce::LessonSyncJob)
+    end
+
+    context 'when SALESFORCE_ENABLED is false' do
+      around do |example|
+        ClimateControl.modify(SALESFORCE_ENABLED: 'false') { example.run }
+      end
+
+      it 'does not enqueue Salesforce::LessonSyncJob on create' do
+        expect do
+          create(:lesson, school:, school_class:, user_id: teacher.id)
+        end.not_to have_enqueued_job(Salesforce::LessonSyncJob)
+      end
+    end
   end
 end

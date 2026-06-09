@@ -5,7 +5,7 @@ require 'scratch_asset_importer'
 
 RSpec.describe ScratchConfigImporter do
   before do
-    allow(ScratchAssetImporter).to receive(:import)
+    allow(ScratchAssetImporter).to receive(:import_all)
   end
 
   describe '.import' do
@@ -15,7 +15,7 @@ RSpec.describe ScratchConfigImporter do
 
       described_class.import('https://example.com/config/backdrops.json', 'https://example.net/internalapi/asset/')
 
-      expect(ScratchAssetImporter).to have_received(:import).with(['123abc.png'], 'https://example.net/internalapi/asset/')
+      expect(ScratchAssetImporter).to have_received(:import_all).with(['123abc.png'], 'https://example.net/internalapi/asset/')
     end
 
     it 'handles assets nested under sounds and costumes' do
@@ -33,7 +33,7 @@ RSpec.describe ScratchConfigImporter do
 
       described_class.import('https://example.com/config/sprites.json', 'https://example.net/internalapi/asset/')
 
-      expect(ScratchAssetImporter).to have_received(:import).with(['123abc.png', '456xyz.png'], 'https://example.net/internalapi/asset/')
+      expect(ScratchAssetImporter).to have_received(:import_all).with(['123abc.png', '456xyz.png'], 'https://example.net/internalapi/asset/')
     end
   end
 end

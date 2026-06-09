@@ -262,6 +262,111 @@ RSpec.describe SchoolClass, :versioning do
     end
   end
 
+  describe '#assign_join_code' do
+    it 'assigns a join code if not already present' do
+      school_class = build(:school_class, join_code: nil, school:)
+      school_class.assign_join_code
+      expect(school_class.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'does not assign a join code if already present' do
+      school_class = build(:school_class, join_code: 'B123-C456', school:)
+      school_class.assign_join_code
+      expect(school_class.join_code).to eq('B123-C456')
+    end
+
+    it 'retries until a unique join code is found' do
+      create(:school_class, join_code: 'B123-C456', school:)
+      allow(JoinCodeGenerator).to receive(:generate).and_return('B123-C456', 'B123-C456', 'C789-D012')
+
+      new_class = build(:school_class, join_code: nil, school:)
+      new_class.assign_join_code
+
+      expect(new_class.join_code).to eq('C789-D012')
+      expect(JoinCodeGenerator).to have_received(:generate).exactly(3).times
+    end
+
+    it 'adds an error if a unique join code cannot be generated in 5 retries' do
+      create(:school_class, join_code: 'B123-C456', school:)
+      allow(JoinCodeGenerator).to receive(:generate).and_return(*(['B123-C456'] * 5))
+
+      new_class = build(:school_class, join_code: nil, school:)
+      new_class.assign_join_code
+
+      expect(new_class.errors[:join_code]).to include('could not be generated')
+    end
+  end
+
+  describe '#regenerate_join_code!' do
+    it 'generates a new join code' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      old_join_code = school_class.join_code
+      school_class.regenerate_join_code!
+      expect(school_class.join_code).not_to eq(old_join_code)
+      expect(school_class.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'persists the new join code' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      school_class.regenerate_join_code!
+      expect(school_class.reload.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'retries on a unique-index race against another writer' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      # Simulate a TOCTOU race: the in-memory uniqueness checks pass (the
+      # competing writer hasn't committed yet), but the DB unique index
+      # rejects the first save attempt.
+      call_count = 0
+      allow(school_class).to receive(:save!).and_wrap_original do |original, *args|
+        call_count += 1
+        raise ActiveRecord::RecordNotUnique, 'duplicate key' if call_count == 1
+
+        original.call(*args)
+      end
+      allow(JoinCodeGenerator).to receive(:generate).and_return('Y888-Y888', 'W999-W999')
+
+      school_class.regenerate_join_code!
+
+      expect(school_class.reload.join_code).to eq('W999-W999')
+    end
+  end
+
+  describe 'join_code validations' do
+    subject(:school_class) { build(:school_class, teacher_ids: [teacher.id, second_teacher.id], school:) }
+
+    it 'assigns join code before validating' do
+      school_class.join_code = nil
+      school_class.valid?
+      expect(school_class.join_code).to match(JoinCodeGenerator::FORMAT_REGEX)
+    end
+
+    it 'requires a globally unique join code' do
+      school_class.save!
+      other_school = create(:school)
+      school_class_with_duplicate = build(:school_class, school: other_school, join_code: school_class.join_code)
+      school_class_with_duplicate.valid?
+      expect(school_class_with_duplicate.errors[:join_code]).to include('has already been taken')
+    end
+
+    it 'requires a valid join code format' do
+      school_class.join_code = 'invalid'
+      expect(school_class).not_to be_valid
+    end
+
+    it 'accepts a valid join code format' do
+      school_class.join_code = 'B123-C456'
+      expect(school_class).to be_valid
+    end
+
+    it 'allows the join code to be changed' do
+      school_class.join_code = 'B123-C456'
+      school_class.save!
+      school_class.join_code = 'C789-D012'
+      expect(school_class).to be_valid
+    end
+  end
+
   describe '#submitted_projects_count' do
     it 'returns 0 if there are no lessons' do
       school_class = create(:school_class, teacher_ids: [teacher.id], school:)
@@ -283,6 +388,38 @@ RSpec.describe SchoolClass, :versioning do
 
     it 'enables auditing' do
       expect(school_class.versions.length).to(eq(1))
+    end
+  end
+
+  describe 'salesforce sync' do
+    around do |example|
+      ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
+    end
+
+    # Create enqueues the job twice — once from SchoolClass#after_commit and once from
+    # the initial ClassTeacher#after_commit, both committing in the same transaction.
+    # Duplicates collapse at execution thanks to good_job_control_concurrency_with on
+    # the SalesforceSyncJob base, so .at_least(:once) is the right assertion.
+    it 'enqueues Salesforce::SchoolClassSyncJob on create' do
+      expect { create(:school_class, teacher_ids: [teacher.id], school:) }
+        .to have_enqueued_job(Salesforce::SchoolClassSyncJob).at_least(:once)
+    end
+
+    it 'enqueues Salesforce::SchoolClassSyncJob on update' do
+      school_class = create(:school_class, teacher_ids: [teacher.id], school:)
+      expect { school_class.update!(name: 'Updated class name') }
+        .to have_enqueued_job(Salesforce::SchoolClassSyncJob)
+    end
+
+    context 'when SALESFORCE_ENABLED is false' do
+      around do |example|
+        ClimateControl.modify(SALESFORCE_ENABLED: 'false') { example.run }
+      end
+
+      it 'does not enqueue Salesforce::SchoolClassSyncJob on create' do
+        expect { create(:school_class, teacher_ids: [teacher.id], school:) }
+          .not_to have_enqueued_job(Salesforce::SchoolClassSyncJob)
+      end
     end
   end
 end

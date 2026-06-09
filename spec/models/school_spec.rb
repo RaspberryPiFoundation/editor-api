@@ -683,6 +683,29 @@ RSpec.describe School do
     end
   end
 
+  describe '#auto_join_enabled?' do
+    it 'returns true when the school has at least one registered email domain' do
+      SchoolEmailDomain.create!(school:, domain: 'valid.edu')
+      expect(school.auto_join_enabled?).to be(true)
+    end
+
+    it 'returns true when the school has multiple registered email domains' do
+      SchoolEmailDomain.create!(school:, domain: 'valid.edu')
+      SchoolEmailDomain.create!(school:, domain: 'other.edu')
+      expect(school.auto_join_enabled?).to be(true)
+    end
+
+    it 'returns false when the school has no registered email domains' do
+      expect(school.auto_join_enabled?).to be(false)
+    end
+
+    it 'returns false after all registered email domains are removed' do
+      domain = SchoolEmailDomain.create!(school:, domain: 'valid.edu')
+      domain.destroy!
+      expect(school.reload.auto_join_enabled?).to be(false)
+    end
+  end
+
   describe '#valid_domain?' do
     let(:valid_domain) { 'valid.edu' }
     let(:unregistered_domain) { 'invalid.edu' }
@@ -698,6 +721,38 @@ RSpec.describe School do
 
     it 'returns false when school has not registered the email domain' do
       expect(school.valid_domain?(unregistered_domain)).to be(false)
+    end
+  end
+
+  describe '#email_domain_in_school_domains?' do
+    before do
+      SchoolEmailDomain.create!(school:, domain: 'valid.edu')
+    end
+
+    it 'returns true when the email domain is registered for the school' do
+      expect(school.email_domain_in_school_domains?('user@valid.edu')).to be(true)
+    end
+
+    it 'returns false when the email domain is not registered for the school' do
+      expect(school.email_domain_in_school_domains?('user@other.edu')).to be(false)
+    end
+
+    it 'normalizes case and surrounding whitespace on the domain' do
+      expect(school.email_domain_in_school_domains?('User@VALID.EDU  ')).to be(true)
+    end
+
+    it 'returns false when the email is blank' do
+      expect(school.email_domain_in_school_domains?('')).to be(false)
+      expect(school.email_domain_in_school_domains?(nil)).to be(false)
+    end
+
+    it 'returns false when the email has no @ separator' do
+      expect(school.email_domain_in_school_domains?('not-an-email')).to be(false)
+    end
+
+    it 'returns false when the local part or domain is missing' do
+      expect(school.email_domain_in_school_domains?('@valid.edu')).to be(false)
+      expect(school.email_domain_in_school_domains?('user@')).to be(false)
     end
   end
 end

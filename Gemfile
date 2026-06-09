@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-source 'https://rubygems.org'
+source 'https://rubygems.org', cooldown: 7
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.tool-versions'
@@ -16,7 +16,7 @@ gem 'csv', '~> 3.3'
 gem 'email_validator'
 gem 'faker'
 gem 'faraday'
-gem 'flipper', '~> 1.3'
+gem 'flipper', '~> 1.4'
 gem 'flipper-active_record', '~> 1.4'
 gem 'flipper-ui', '~> 1.4'
 gem 'github_webhook', '~> 1.4'
@@ -44,6 +44,7 @@ gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
 gem 'rails', '~> 8.1.3'
 gem 'ruby-progressbar', '~> 1.13', require: false
+gem 'ruby-vips'
 gem 'sentry-rails'
 gem 'statesman'
 

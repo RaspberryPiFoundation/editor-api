@@ -7,8 +7,6 @@ class ProfileApiClient
   }.freeze
 
   # rubocop:disable Naming/MethodName
-  School = Data.define(:id, :schoolCode, :updatedAt, :createdAt, :discardedAt)
-  SafeguardingFlag = Data.define(:id, :userId, :schoolId, :flag, :email, :createdAt, :updatedAt, :discardedAt)
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
   # rubocop:enable Naming/MethodName
 
@@ -51,20 +49,21 @@ class ProfileApiClient
       false
     end
 
-    def create_school(token:, id:, code:)
-      return { 'id' => id, 'schoolCode' => code } if ENV['BYPASS_OAUTH'].present?
+    def create_school(token:, id:, code:, school_email_domains: [])
+      return { 'id' => id, 'schoolCode' => code, 'studentEmailDomains' => school_email_domains } if ENV['BYPASS_OAUTH'].present?
 
       response = connection(token).post('/api/v1/schools') do |request|
         request.body = {
           id:,
-          schoolCode: code
+          schoolCode: code,
+          studentEmailDomains: school_email_domains
         }
       end
 
       unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 201
 
-      School.new(**response.body)
+      true
     end
 
     def school_student(token:, school_id:, student_id:)
@@ -189,15 +188,6 @@ class ProfileApiClient
       raise UnexpectedResponse, response unless response.status == 204
     end
 
-    def safeguarding_flags(token:)
-      response = connection(token).get('/api/v1/safeguarding-flags')
-
-      unauthorized!(response)
-      raise UnexpectedResponse, response unless response.status == 200
-
-      response.body.map { |flag| SafeguardingFlag.new(**flag.symbolize_keys) }
-    end
-
     def create_safeguarding_flag(token:, flag:, email:, school_id:)
       response = connection(token).post('/api/v1/safeguarding-flags') do |request|
         request.body = { flag:, email:, schoolId: school_id }
@@ -212,6 +202,21 @@ class ProfileApiClient
 
       unauthorized!(response)
       raise UnexpectedResponse, response unless response.status == 204
+    end
+
+    def update_school_email_domains(token:, school_id:, school_email_domains: [])
+      return { 'id' => school_id, 'studentEmailDomains' => school_email_domains } if ENV['BYPASS_OAUTH'].present?
+
+      response = connection(token).patch("/api/v1/schools/#{school_id}") do |request|
+        request.body = {
+          studentEmailDomains: school_email_domains
+        }
+      end
+
+      unauthorized!(response)
+      raise UnexpectedResponse, response unless response.status == 200
+
+      true
     end
 
     private
@@ -250,7 +255,9 @@ class ProfileApiClient
       symbolized_attrs[:email] ||= nil
       symbolized_attrs[:ssoProviders] ||= []
 
-      Student.new(**symbolized_attrs)
+      allowed_keys = ProfileApiClient::Student.members
+
+      Student.new(**symbolized_attrs.slice(*allowed_keys))
     end
 
     def unauthorized!(response)

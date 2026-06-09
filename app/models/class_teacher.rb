@@ -18,11 +18,25 @@ class ClassTeacher < ApplicationRecord
     }
   )
 
+  # Re-sync the parent SchoolClass on add/remove so its synced teacher/member counts
+  # stay current. Only :create syncs the ClassTeacher itself — a destroyed record has
+  # nothing to publish.
+  after_commit :enqueue_school_class_sync, on: %i[create destroy], if: -> { FeatureFlags.salesforce_sync? }
+  after_commit :enqueue_class_teacher_sync, on: :create, if: -> { FeatureFlags.salesforce_sync? }
+
   def user_id
     teacher_id
   end
 
   private
+
+  def enqueue_school_class_sync
+    Salesforce::SchoolClassSyncJob.perform_later(school_class_id: school_class_id)
+  end
+
+  def enqueue_class_teacher_sync
+    Salesforce::ClassTeacherSyncJob.perform_later(class_teacher_id: id)
+  end
 
   def teacher_has_the_school_teacher_role_for_the_school
     return unless teacher_id_changed? && errors.blank? && teacher.present?

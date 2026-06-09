@@ -16,7 +16,7 @@ module Api
     end
 
     def create
-      result = School::Create.call(school_params:, creator_id: current_user.id, token: current_user.token)
+      result = School::Create.call(school_params: create_params, creator_id: current_user.id, token: current_user.token)
 
       if result.success?
         @school = result[:school]
@@ -31,7 +31,7 @@ module Api
 
     def update
       school = School.find(params[:id])
-      result = School::Update.call(school:, school_params:)
+      result = School::Update.call(school:, school_params: update_params)
 
       if result.success?
         @school = result[:school]
@@ -76,7 +76,7 @@ module Api
 
     private
 
-    def school_params
+    def create_params
       params.expect(
         school: %i[name
                    website
@@ -97,6 +97,12 @@ module Api
                    creator_agree_to_ux_contact
                    creator_agree_responsible_safeguarding
                    user_origin]
+      )
+    end
+
+    def update_params
+      params.expect(
+        school: %i[scratch_enabled]
       )
     end
   end

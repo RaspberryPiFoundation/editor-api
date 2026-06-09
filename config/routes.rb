@@ -70,6 +70,7 @@ Rails.application.routes.draw do
       resources :members, only: %i[index], controller: 'school_members'
       resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do
         post :import, on: :collection
+        post :regenerate_join_code, on: :member
         resources :members, only: %i[index create destroy], controller: 'class_members' do
           post :batch, on: :collection, to: 'class_members#create_batch'
         end
@@ -100,6 +101,9 @@ Rails.application.routes.draw do
 
     resources :profile_auth_check, only: %i[index]
     resources :subscriptions, only: %i[create]
+
+    get  '/join/:join_code', to: 'join#show'
+    post '/join/:join_code', to: 'join#create'
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

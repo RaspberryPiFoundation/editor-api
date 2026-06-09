@@ -13,10 +13,6 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
   let(:auth_headers) { { 'Authorization' => UserProfileMock::TOKEN } }
   let(:project_headers) { auth_headers.merge('X-Project-ID' => project.identifier) }
 
-  before do
-    Flipper.enable_actor :cat_mode, school
-  end
-
   describe 'GET #show' do
     it 'responds 400 Bad Request when X-Project-ID is not provided' do
       get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/', headers: auth_headers
@@ -206,7 +202,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       post '/api/scratch/assets/test_image_1.png', headers: request_headers, params: upload
     end
 
-    context 'when user is logged in and cat_mode is enabled' do
+    context 'when a teacher is logged in' do
       before do
         authenticated_in_hydra_as(teacher)
       end
@@ -384,18 +380,19 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
-    context 'when user is logged in and cat_mode is disabled' do
-      before do
-        authenticated_in_hydra_as(teacher)
-        Flipper.disable :cat_mode
-        Flipper.disable_actor :cat_mode, school
-      end
+    it 'responds 401 unauthorized when user is not signed in' do
+      post '/api/scratch/assets/example.svg', headers: { 'X-Project-ID' => project.identifier }
 
-      it 'responds 404 Not Found when cat_mode is not enabled' do
-        post '/api/scratch/assets/example.svg', headers: request_headers
+      expect(response).to have_http_status(:unauthorized)
+    end
 
-        expect(response).to have_http_status(:not_found)
-      end
+    it 'responds 404 Not Found when user is not part of a school' do
+      user = create(:user)
+      authenticated_in_hydra_as(user)
+
+      post '/api/scratch/assets/example.svg', headers: project_headers
+
+      expect(response).to have_http_status(:not_found)
     end
   end
 

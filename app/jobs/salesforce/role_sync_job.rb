@@ -18,6 +18,9 @@ module Salesforce
 
       return if role.student?
 
+      ensure_parent_synced!(Salesforce::School, :editoruuid__c, role.school_id, 'Editor__c')
+      ensure_parent_synced!(Salesforce::Contact, :pi_accounts_unique_id__c, role.user_id, 'Contact')
+
       sf_role = Salesforce::Role.find_or_initialize_by(affiliation_id__c: role_id)
       sf_role.attributes = sf_role_attributes(role:)
 

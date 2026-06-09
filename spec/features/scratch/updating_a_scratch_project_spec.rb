@@ -6,11 +6,8 @@ RSpec.describe 'Updating a Scratch project', type: :request do
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
   let(:auth_headers) { { 'Authorization' => UserProfileMock::TOKEN } }
-
-  before do
-    Flipper.disable :cat_mode
-    Flipper.disable_actor :cat_mode, school
-  end
+  let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+  let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
 
   it 'responds 401 Unauthorized when no Authorization header is provided' do
     put '/api/scratch/projects/any-identifier', params: { project: { targets: [] } }
@@ -18,21 +15,15 @@ RSpec.describe 'Updating a Scratch project', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 404 Not Found when cat_mode is not enabled' do
+  it 'updates a project when an Authorization header is provided' do
     authenticated_in_hydra_as(teacher)
-
-    put '/api/scratch/projects/any-identifier', params: { content: { targets: [] } }, headers: auth_headers
-
-    expect(response).to have_http_status(:not_found)
-  end
-
-  it 'updates a project when cat_mode is enabled and an Authorization header is provided' do
-    authenticated_in_hydra_as(teacher)
-    Flipper.enable_actor :cat_mode, school
     project = create(
       :project,
       project_type: Project::Types::CODE_EDITOR_SCRATCH,
-      locale: 'en'
+      locale: 'en',
+      school: school,
+      lesson: lesson,
+      user_id: teacher.id
     )
     create(:scratch_component, project: project)
 
@@ -44,5 +35,19 @@ RSpec.describe 'Updating a Scratch project', type: :request do
     expect(data[:status]).to eq('ok')
 
     expect(project.reload.scratch_component.content.to_h['targets']).to eq(['some update'])
+  end
+
+  it 'returns 403 Forbidden when trying to update a project user does not have access to' do
+    authenticated_in_hydra_as(teacher)
+    project = create(
+      :project,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      locale: 'en'
+    )
+    create(:scratch_component, project: project)
+
+    put "/api/scratch/projects/#{project.identifier}", params: { targets: ['some update'] }, headers: auth_headers
+
+    expect(response).to have_http_status(:forbidden)
   end
 end

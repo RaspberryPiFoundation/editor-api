@@ -18,11 +18,23 @@ class ClassStudent < ApplicationRecord
     }
   )
 
+  after_commit :do_salesforce_sync, on: %i[create destroy], if: -> { FeatureFlags.salesforce_sync? }
+
   def user_id
     student_id
   end
 
   private
+
+  # Re-sync the parent SchoolClass when students join or leave so its synced member
+  # count stays current, and fan out to every lesson in the class that's visible to
+  # students.
+  def do_salesforce_sync
+    Salesforce::SchoolClassSyncJob.perform_later(school_class_id: school_class_id)
+    Lesson.where(school_class_id: school_class_id, visibility: 'students').find_each do |lesson|
+      Salesforce::LessonSyncJob.perform_later(lesson_id: lesson.id)
+    end
+  end
 
   def student_has_the_school_student_role_for_the_school
     return unless student_id_changed? && errors.blank? && student.present?

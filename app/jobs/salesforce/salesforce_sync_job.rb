@@ -39,6 +39,19 @@ module Salesforce
       raise NotImplementedError, "#{self.class.name} must implement concurrency_key_id"
     end
 
+    # Guard a write that resolves a Salesforce parent via an external-ID lookup
+    # (`__r__<external_id_field>`). Heroku Connect rejects the INSERT permanently with
+    # "Foreign key external ID ... not found" if the parent isn't yet in Salesforce, and
+    # the mirror row stays FAILED forever (no auto-retry). Raising SalesforceRecordNotFound
+    # here defers the write via the retry_on declared on this base class, so the job
+    # self-heals once the parent lands.
+    def ensure_parent_synced!(model, external_id_field, external_id, label)
+      return if model.where(external_id_field => external_id).where.not(sfid: nil).exists?
+
+      raise SalesforceRecordNotFound,
+            "#{label} not yet synced for #{external_id_field}: #{external_id}"
+    end
+
     def truncate_value(sf_field:, value:)
       column = self.class::MODEL_CLASS.column_for_attribute(sf_field)
       return value if column.limit.nil?

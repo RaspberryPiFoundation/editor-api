@@ -10,9 +10,11 @@ class SchoolClass < ApplicationRecord
   scope :with_teachers, ->(user_id) { joins(:teachers).where(teachers: { id: user_id }) }
 
   before_validation :assign_class_code, on: %i[create import]
+  before_validation :assign_join_code, on: %i[create import]
 
   validates :name, presence: true
   validates :code, uniqueness: { scope: :school_id }, presence: true, format: { with: /\d\d-\d\d-\d\d/, allow_nil: false }
+  validates :join_code, uniqueness: true, presence: true, format: { with: JoinCodeGenerator::FORMAT_REGEX, allow_nil: false }
   validate :code_cannot_be_changed
   validate :school_class_has_at_least_one_teacher
 
@@ -28,6 +30,8 @@ class SchoolClass < ApplicationRecord
       meta_school_id: ->(cm) { cm.school&.id }
     }
   )
+
+  after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? }
 
   def self.teachers
     teacher_ids = all.map(&:teacher_ids).flatten.uniq
@@ -58,11 +62,36 @@ class SchoolClass < ApplicationRecord
     errors.add(:code, 'could not be generated')
   end
 
+  def assign_join_code
+    return if join_code.present?
+
+    5.times do
+      self.join_code = JoinCodeGenerator.generate
+      return if join_code_is_unique?
+    end
+
+    errors.add(:join_code, 'could not be generated')
+  end
+
+  def regenerate_join_code!
+    self.join_code = nil
+    assign_join_code
+    save!
+  rescue ActiveRecord::RecordNotUnique
+    self.join_code = nil
+    assign_join_code
+    save!
+  end
+
   def submitted_projects_count
     lessons.to_a.sum(&:submitted_projects_count)
   end
 
   private
+
+  def do_salesforce_sync
+    Salesforce::SchoolClassSyncJob.perform_later(school_class_id: id)
+  end
 
   def school_class_has_at_least_one_teacher
     return if teachers.present?
@@ -76,5 +105,9 @@ class SchoolClass < ApplicationRecord
 
   def code_is_unique_within_school?
     code.present? && SchoolClass.where(code:, school:).none?
+  end
+
+  def join_code_is_unique?
+    join_code.present? && SchoolClass.where(join_code:).where.not(id:).none?
   end
 end
