@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Lesson
-  class CreateBulk
+  class CreateBatch
     class << self
       def call(lessons_params:)
         lessons_params.map { |lesson| create_one(lesson) }

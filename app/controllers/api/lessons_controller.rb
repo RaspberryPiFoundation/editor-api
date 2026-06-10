@@ -3,23 +3,7 @@
 module Api
   class LessonsController < ApiController
     include RemixSelection
-
-    LESSON_ATTRIBUTES = %i[
-      school_id
-      school_class_id
-      name
-      description
-      visibility
-      due_date
-    ].freeze
-
-    PROJECT_ATTRIBUTES = [
-      :name,
-      :project_type,
-      :locale,
-      { components: %i[id name extension content index default] },
-      { scratch_component: {} }
-    ].freeze
+    include LessonCreation
 
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
@@ -47,20 +31,12 @@ module Api
     end
 
     def create
-      if params[:lesson_projects].present?
-        @results = Lesson::CreateBulk.call(
-          lessons_params: params[:lesson_projects].map { |entry| bulk_create_params(entry) }
-        )
-        @user = current_user
-        render :create_bulk, formats: [:json], status: :created
+      result = Lesson::Create.call(lesson_params: create_params)
+      if result.success?
+        @lesson_with_user = result[:lesson].with_user
+        render :show, formats: [:json], status: :created
       else
-        result = Lesson::Create.call(lesson_params: create_params)
-        if result.success?
-          @lesson_with_user = result[:lesson].with_user
-          render :show, formats: [:json], status: :created
-        else
-          render json: { error: result[:error] }, status: :unprocessable_content
-        end
+        render json: { error: result[:error] }, status: :unprocessable_content
       end
     end
 
@@ -102,41 +78,11 @@ module Api
     end
 
     def verify_school_class_belongs_to_school
-      if params[:lesson_projects].present?
-        params[:lesson_projects].each { |lesson_params| verify_lesson_school_class!(lesson_params) }
-      else
-        verify_lesson_school_class!(create_params)
-      end
-    end
-
-    def verify_lesson_school_class!(lesson_params)
-      school_class_id = lesson_params[:school_class_id]
-      return if school_class_id.blank?
-
-      school = School.find_by(id: lesson_params[:school_id])
-      return if school&.classes&.exists?(id: school_class_id)
-
-      raise ParameterError, 'school_class_id does not correspond to school_id'
+      verify_lesson_school_class!(create_params)
     end
 
     def verify_can_create_scratch_projects
-      if params[:lesson_projects].present?
-        scratch_project_params = params[:lesson_projects].find { |lesson_params| scratch_project?(lesson_params) }
-        return unless scratch_project_params
-
-        verify_lesson_scratch!(scratch_project_params)
-      else
-        verify_lesson_scratch!(create_params)
-      end
-    end
-
-    def verify_lesson_scratch!(lesson_params)
-      return unless scratch_project?(lesson_params)
-
-      school = School.find_by(id: lesson_params[:school_id])
-      return if school&.scratch_enabled?
-
-      render json: { error: 'Forbidden' }, status: :forbidden
+      verify_lesson_scratch!(create_params)
     end
 
     def user_remixes(lessons)
@@ -153,10 +99,6 @@ module Api
       )
     end
 
-    def scratch_project?(lesson_params)
-      lesson_params.dig(:project_attributes, :project_type) == Project::Types::CODE_EDITOR_SCRATCH
-    end
-
     def update_params
       params.fetch(:lesson, {}).permit(
         :name,
@@ -167,16 +109,9 @@ module Api
       )
     end
 
-    def bulk_create_params(lesson_project)
-      permit_lesson_params(lesson_project, :origin_identifier).merge(user_id: current_user.id)
-    end
-
     def create_params
-      permit_lesson_params(params.fetch(:lesson, {})).merge(user_id: current_user.id)
-    end
-
-    def permit_lesson_params(source, *extra)
-      source.permit(*LESSON_ATTRIBUTES, *extra, project_attributes: PROJECT_ATTRIBUTES)
+      source = params.fetch(:lesson, {})
+      source.permit(*LESSON_ATTRIBUTES, project_attributes: PROJECT_ATTRIBUTES).merge(user_id: current_user.id)
     end
 
     def school_owner?

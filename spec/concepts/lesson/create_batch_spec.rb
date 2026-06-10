@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe Lesson::CreateBulk, type: :unit do
+RSpec.describe Lesson::CreateBatch, type: :unit do
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
 

@@ -2,7 +2,7 @@
 
 json.array!(@results) do |result|
   if result.success?
-    json.partial! 'lesson', lesson: result[:lesson], user: @user
+    json.partial! 'api/lessons/lesson', lesson: result[:lesson], user: @user
   else
     json.error result[:error]
   end
