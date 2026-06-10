@@ -25,6 +25,8 @@ module Api
       end
 
       def create
+        authorize! :show, project
+
         # Ensure we have a fallback value to prevent bad requests
         remix_origin = request.origin || request.referer
         result = Project::CreateRemix.call(params: remix_params,
