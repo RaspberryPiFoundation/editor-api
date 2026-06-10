@@ -157,6 +157,32 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
     end
   end
 
+  context 'when the user does not belong to the school' do
+    let(:other_school) { create(:school, scratch_enabled: true) }
+    let(:lesson_project_params) do
+      [
+        {
+          name: 'Lesson 1',
+          school_id: other_school.id,
+          project_attributes: { name: 'Project 1', project_type: Project::Types::CODE_EDITOR_SCRATCH }
+        },
+        {
+          name: 'Lesson 2',
+          school_id: other_school.id,
+          project_attributes: { name: 'Project 2', project_type: Project::Types::CODE_EDITOR_SCRATCH }
+        }
+      ]
+    end
+
+    it 'responds 403 Forbidden' do
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    it 'does not create any lessons' do
+      expect(Lesson.count).to eq(0)
+    end
+  end
+
   context 'when the school does not have Scratch enabled' do
     let(:scratch_enabled) { false }
 
