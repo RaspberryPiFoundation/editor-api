@@ -86,6 +86,7 @@ Rails.application.routes.draw do
 
     resources :lessons, only: %i[index create show update destroy] do
       post :copy, on: :member, to: 'lessons#create_copy'
+      post :batch, on: :collection, to: 'lessons/batch#create_batch'
     end
 
     resources :teacher_invitations, param: :token, only: :show do

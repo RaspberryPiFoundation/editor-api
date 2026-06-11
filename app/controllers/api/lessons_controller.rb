@@ -3,6 +3,7 @@
 module Api
   class LessonsController < ApiController
     include RemixSelection
+    include LessonCreation
 
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
@@ -31,7 +32,6 @@ module Api
 
     def create
       result = Lesson::Create.call(lesson_params: create_params)
-
       if result.success?
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :created
@@ -78,16 +78,11 @@ module Api
     end
 
     def verify_school_class_belongs_to_school
-      return if create_params[:school_class_id].blank?
-      return if school&.classes&.pluck(:id)&.include?(create_params[:school_class_id])
-
-      raise ParameterError, 'school_class_id does not correspond to school_id'
+      verify_lesson_school_class!(create_params)
     end
 
     def verify_can_create_scratch_projects
-      return unless scratch_project? && !school.scratch_enabled?
-
-      render json: { error: 'Forbidden' }, status: :forbidden
+      verify_lesson_scratch!(create_params)
     end
 
     def user_remixes(lessons)
@@ -104,10 +99,6 @@ module Api
       )
     end
 
-    def scratch_project?
-      create_params.dig(:project_attributes, :project_type) == Project::Types::CODE_EDITOR_SCRATCH
-    end
-
     def update_params
       params.fetch(:lesson, {}).permit(
         :name,
@@ -119,23 +110,8 @@ module Api
     end
 
     def create_params
-      params.fetch(:lesson, {}).permit(
-        :school_id,
-        :school_class_id,
-        :name,
-        :description,
-        :visibility,
-        :due_date,
-        {
-          project_attributes: [
-            :name,
-            :project_type,
-            :locale,
-            { components: %i[id name extension content index default] },
-            { scratch_component: {} }
-          ]
-        }
-      ).merge(user_id: current_user.id)
+      source = params.fetch(:lesson, {})
+      source.permit(*LESSON_ATTRIBUTES, project_attributes: PROJECT_ATTRIBUTES).merge(user_id: current_user.id)
     end
 
     def school_owner?
