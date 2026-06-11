@@ -34,6 +34,7 @@ module Api
       result = Lesson::Create.call(lesson_params: create_params)
       if result.success?
         @lesson_with_user = result[:lesson].with_user
+        ahoy.track 'Project Created', project_id: 123
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_content
