@@ -14,9 +14,8 @@ class ScratchAssetImporter
         new(asset_name, asset_base_url).import
       end
     end
-    
+
     def import_from_sb3(assets)
-      
       assets.each do |asset|
         new(nil, nil).import_from_sb3(asset)
       end
@@ -58,7 +57,7 @@ class ScratchAssetImporter
 
   private
 
-  def create_scratch_asset(asset_names)
+  def create_scratch_asset
     return if ScratchAsset.global_assets.exists?(filename: asset_name)
 
     io = StringIO.new(asset.body)
@@ -122,7 +121,6 @@ class ScratchAssetImporter
       region: 'auto'
     )
   end
-
 
   def connection
     @connection ||= Faraday.new(url: asset_base_url) do |faraday|
