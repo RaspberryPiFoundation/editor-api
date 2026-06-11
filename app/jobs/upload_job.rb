@@ -132,7 +132,7 @@ class UploadJob < ApplicationJob
 
     files.each do |file|
       if file.extension == '.sb3'
-        categories[:components] << component(file, project_dir, locale, repository, owner)
+        categories[:components] << scratch_file_component(file, project_dir, locale, repository, owner)
         next
       end
 
@@ -155,14 +155,18 @@ class UploadJob < ApplicationJob
     categories
   end
 
-  def component(file, project_dir = nil, locale = nil, repository = nil, owner = nil)
+  def component(file)
     name = file.name.chomp(file.extension)
     extension = file.extension[1..]
-    return { name:, extension:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open } if extension == 'sb3'
-
     content = file.object.text
     default = file.name == 'main.py'
     { name:, extension:, content:, default: }
+  end
+
+  def scratch_file_component(file, project_dir, locale, repository, owner)
+    name = file.name.chomp(file.extension)
+    extension = file.extension[1..]
+    { name:, extension:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
   end
 
   def media(file, project_dir, locale, repository, owner)
