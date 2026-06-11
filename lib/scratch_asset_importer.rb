@@ -14,6 +14,13 @@ class ScratchAssetImporter
         new(asset_name, asset_base_url).import
       end
     end
+    
+    def import_from_sb3(assets)
+      
+      assets.each do |asset|
+        new(nil, nil).import_from_sb3(asset)
+      end
+    end
 
     private
 
@@ -22,11 +29,7 @@ class ScratchAssetImporter
     end
   end
 
-  def self.import_from_sb3_assets(assets, asset_base_url)
-    new(nil, asset_base_url).import_from_sb3_assets(assets)
-  end
-
-  attr_reader :asset_base_url, :asset_names
+  attr_reader :asset_base_url, :asset_name
 
   ASSET_FETCHING_DELAY = 0.2
 
@@ -49,13 +52,8 @@ class ScratchAssetImporter
     end
   end
 
-  def import_from_sb3_assets(assets)
-    bar = ProgressBar.create(format: '%t: |%B| %c of %C %E', total: assets.count) if show_progress?
-
-    assets.each do |asset|
-      bar.increment if show_progress?
-      import_sb3_asset(asset.fetch(:filename), asset.fetch(:io).read)
-    end
+  def import_from_sb3(asset)
+    create_sb3_asset(asset.fetch(:filename), asset.fetch(:io).read)
   end
 
   private
@@ -68,6 +66,17 @@ class ScratchAssetImporter
     ScratchAsset.create!(filename: asset_name, project_id: nil, uploaded_user_id: nil)
                 .file
                 .attach(io:, filename: asset_name)
+  end
+
+  def create_sb3_asset(asset_name, content)
+    return if ScratchAsset.global_assets.exists?(filename: asset_name)
+
+    sleep(ASSET_FETCHING_DELAY)
+    ScratchAsset.create!(filename: asset_name, project_id: nil, uploaded_user_id: nil)
+                .file
+                .attach(io: StringIO.new(content), filename: asset_name)
+  rescue StandardError => e
+    Rails.logger.error("Failed to import SB3 asset #{asset_name}: #{e.message}")
   end
 
   def save_to_editor_asset_bucket
@@ -114,16 +123,6 @@ class ScratchAssetImporter
     )
   end
 
-  def import_sb3_asset(asset_name, content)
-    return if ScratchAsset.global_assets.exists?(filename: asset_name)
-
-    sleep(ASSET_FETCHING_DELAY)
-    ScratchAsset.create!(filename: asset_name, project_id: nil, uploaded_user_id: nil)
-                .file
-                .attach(io: StringIO.new(content), filename: asset_name)
-  rescue StandardError => e
-    Rails.logger.error("Failed to import SB3 asset #{asset_name}: #{e.message}")
-  end
 
   def connection
     @connection ||= Faraday.new(url: asset_base_url) do |faraday|
