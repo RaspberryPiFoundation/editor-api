@@ -168,6 +168,49 @@ RSpec.describe 'Remix requests' do
         expect(response).to have_http_status(:not_found)
       end
 
+      context 'when the original project belongs to another user' do
+        let!(:original_project) { create(:project, user_id: create(:user).id) }
+
+        it 'returns forbidden without creating a remix' do
+          allow(Project::CreateRemix).to receive(:call).and_call_original
+
+          expect do
+            post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+          end.not_to change(Project, :count)
+
+          expect(response).to have_http_status(:forbidden)
+          expect(Project::CreateRemix).not_to have_received(:call)
+        end
+      end
+
+      context 'when a student cannot view the teacher-only original project' do
+        let(:student) { create(:student, school:) }
+        let(:teacher) { create(:teacher, school:) }
+        let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+        let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'teachers') }
+        let!(:original_project) do
+          lesson.project.tap do |project|
+            project.update!(school:, user_id: teacher.id, instructions: 'Teacher-only instructions')
+          end
+        end
+
+        before do
+          create(:class_student, school_class:, student_id: student.id)
+          authenticated_in_hydra_as(student)
+        end
+
+        it 'returns forbidden without creating a remix' do
+          allow(Project::CreateRemix).to receive(:call).and_call_original
+
+          expect do
+            post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+          end.not_to change(Project, :count)
+
+          expect(response).to have_http_status(:forbidden)
+          expect(Project::CreateRemix).not_to have_received(:call)
+        end
+      end
+
       context 'when project cannot be saved' do
         before do
           authenticated_in_hydra_as(owner)
