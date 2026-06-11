@@ -47,6 +47,7 @@ gem 'ruby-progressbar', '~> 1.13', require: false
 gem 'ruby-vips'
 gem 'sentry-rails'
 gem 'statesman'
+gem "ahoy_matey"
 
 group :development, :test do
   gem 'awesome_print'
