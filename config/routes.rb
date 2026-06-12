@@ -105,6 +105,8 @@ Rails.application.routes.draw do
 
     get  '/join/:join_code', to: 'join#show'
     post '/join/:join_code', to: 'join#create'
+
+    resources :events, only: %i[create]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
