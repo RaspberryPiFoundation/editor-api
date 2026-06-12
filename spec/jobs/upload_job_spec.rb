@@ -269,6 +269,116 @@ RSpec.describe UploadJob do
     end
   end
 
+  context 'when a scratch project is uploaded' do
+    let(:scratch_payload) do
+      {
+        repository: { name: 'my-amazing-repo', owner: { name: 'me' } },
+        commits: [{ added: ['ja-JP/code/scratch-integration-test-starter/main.sb3'], modified: [], removed: [] }]
+      }
+    end
+    let(:scratch_project_json) do
+      {
+        targets: [
+          {
+            costumes: [{ md5ext: 'test_image_1.png' }],
+            sounds: [{ md5ext: 'test_audio_1.mp3' }]
+          }
+        ]
+      }
+    end
+    let(:scratch_sb3_body) do
+      sb3_archive_string(
+        'project.json' => scratch_project_json.to_json,
+        'test_image_1.png' => sb3_fixture_content('test_image_1.png'),
+        'test_audio_1.mp3' => sb3_fixture_content('test_audio_1.mp3')
+      )
+    end
+    let(:raw_response) do
+      {
+        data: {
+          repository: {
+            object: {
+              __typename: 'Tree',
+              entries: [
+                {
+                  name: 'scratch-integration-test-starter',
+                  object: {
+                    __typename: 'Tree',
+                    entries: [
+                      {
+                        name: 'main.sb3',
+                        extension: '.sb3',
+                        object: {
+                          __typename: 'Blob',
+                          text: nil,
+                          isBinary: true
+                        }
+                      },
+                      {
+                        name: 'project_config.yml',
+                        extension: '.yml',
+                        object: {
+                          __typename: 'Blob',
+                          text: "name: \"Scratch Integration Test\"\nidentifier: \"scratch-integration-test-starter\"\ntype: \"code_editor_scratch\"\n",
+                          isBinary: false
+                        }
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }.deep_stringify_keys
+    end
+
+    before do
+      allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
+      allow(ProjectImporter).to receive(:new).and_call_original
+
+      stub_request(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/scratch-integration-test-starter/main.sb3')
+        .to_return(status: 200, body: scratch_sb3_body, headers: {})
+    end
+
+    it 'imports the Scratch project with the sb3 component as io' do
+      described_class.perform_now(scratch_payload)
+
+      expect(ProjectImporter).to have_received(:new).with(
+        hash_including(
+          name: 'Scratch Integration Test',
+          identifier: 'scratch-integration-test-starter',
+          type: Project::Types::CODE_EDITOR_SCRATCH,
+          locale: 'ja-JP',
+          images: [],
+          videos: [],
+          audio: [],
+          components: [
+            hash_including(
+              name: 'main',
+              extension: 'sb3',
+              io: an_object_responding_to(:read)
+            )
+          ]
+        )
+      )
+    end
+
+    it 'requests the sb3 file from the correct URL' do
+      described_class.perform_now(scratch_payload)
+
+      expect(WebMock).to have_requested(:get, 'https://github.com/me/my-amazing-repo/raw/branches/whatever/ja-JP/code/scratch-integration-test-starter/main.sb3').once
+    end
+
+    it 'saves the Scratch project to the database' do
+      expect { described_class.perform_now(scratch_payload) }.to change(Project, :count).by(1)
+
+      project = Project.find_by(identifier: 'scratch-integration-test-starter', locale: 'ja-JP')
+      expect(project.project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
+      expect(project.scratch_component.content).to eq(JSON.parse(scratch_project_json.to_json))
+    end
+  end
+
   context 'when locale is unsupported' do
     let(:raw_response) { { data: { repository: nil } } }
     let(:bad_payload) do
