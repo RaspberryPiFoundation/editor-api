@@ -20,6 +20,7 @@ module Api
 
       if result.success?
         @school = result[:school]
+        track_event('School - Created', school_id: @school.id)
         render :show, formats: [:json], status: :created
       else
         render json: {
