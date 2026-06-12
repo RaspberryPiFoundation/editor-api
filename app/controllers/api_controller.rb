@@ -47,4 +47,8 @@ class ApiController < ActionController::API
   def render_error_as_json(exception, status)
     render json: { error: "#{exception.class}: #{exception.message}" }, status:
   end
+
+  def track_event(name, properties = {})
+    Event.create!(user_id: current_user.id, name:, properties:, time: Time.current)
+  end
 end
