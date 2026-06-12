@@ -135,6 +135,13 @@ RSpec.describe School do
       expect(another_school.errors[:creator_id]).to include('has already been taken')
     end
 
+    it 'schools can re-use creator_ids if the original school is rejected' do
+      rejected_school = create(:school, creator_id: SecureRandom.uuid, rejected_at: Time.zone.now)
+      other_school = build(:school, creator_id: rejected_school.creator_id)
+      expect(rejected_school).to be_valid
+      expect(other_school).to be_valid
+    end
+
     it 'rejects a badly formed url for website' do
       school.website = 'http://.example.com'
       expect(school).not_to be_valid
@@ -184,20 +191,20 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'rejects a reference with non-digit characters' do
-      school.reference = 'URN-123'
+    it 'rejects new schools with a reference containing non-digit characters' do
+      school = build(:school, reference: 'URN-123')
       expect(school).not_to be_valid
       expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
     end
 
-    it 'rejects a reference with too few digits' do
-      school.reference = '1234'
+    it 'rejects new schools with a reference that has too few digits' do
+      school = build(:school, reference: '1234')
       expect(school).not_to be_valid
       expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
     end
 
-    it 'rejects a reference with too many digits' do
-      school.reference = '1234567'
+    it 'rejects new schools with a reference that has too many digits' do
+      school = build(:school, reference: '1234567')
       expect(school).not_to be_valid
       expect(school.errors[:reference]).to include('must be 5-6 digits (e.g., 100000)')
     end
@@ -255,14 +262,14 @@ RSpec.describe School do
       expect(us_school).to be_valid
     end
 
-    it 'rejects a district_nces_id with non-digit characters' do
-      us_school.district_nces_id = '010000A'
+    it 'rejects new schools with a district_nces_id containing non-digit characters' do
+      us_school = build(:school, country_code: 'US', district_nces_id: '010000A')
       expect(us_school).not_to be_valid
       expect(us_school.errors[:district_nces_id]).to include('must be 7 digits (e.g., 0100000)')
     end
 
-    it 'rejects a district_nces_id with wrong length' do
-      us_school.district_nces_id = '123456'
+    it 'rejects new schools with a district_nces_id with wrong length' do
+      us_school = build(:school, country_code: 'US', district_nces_id: '123456')
       expect(us_school).not_to be_valid
       expect(us_school.errors[:district_nces_id]).to include('must be 7 digits (e.g., 0100000)')
     end
@@ -281,8 +288,8 @@ RSpec.describe School do
       expect(school).to be_valid
     end
 
-    it 'requires school_roll_number for Ireland schools' do
-      ireland_school.school_roll_number = nil
+    it 'requires school_roll_number for Ireland for new schools' do
+      ireland_school = build(:school, country_code: 'IE', school_roll_number: nil)
       expect(ireland_school).not_to be_valid
       expect(ireland_school.errors[:school_roll_number]).to include("can't be blank")
     end
@@ -308,20 +315,20 @@ RSpec.describe School do
       expect(ireland_school).to be_valid
     end
 
-    it 'rejects a school_roll_number with only numbers' do
-      ireland_school.school_roll_number = '01572'
+    it 'rejects new schools with a school_roll_number that contains only numbers' do
+      ireland_school = build(:school, country_code: 'IE', school_roll_number: '01572')
       expect(ireland_school).not_to be_valid
       expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
-    it 'rejects a school_roll_number with only letters' do
-      ireland_school.school_roll_number = 'ABCDE'
+    it 'rejects new schools with a school_roll_number containing only letters' do
+      ireland_school = build(:school, country_code: 'IE', school_roll_number: 'ABCDE')
       expect(ireland_school).not_to be_valid
       expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
 
-    it 'rejects a school_roll_number with special characters' do
-      ireland_school.school_roll_number = '01572-D'
+    it 'rejects new schools with a school_roll_number containing special characters' do
+      ireland_school = build(:school, country_code: 'IE', school_roll_number: '01572-D')
       expect(ireland_school).not_to be_valid
       expect(ireland_school.errors[:school_roll_number]).to include('must be numbers followed by letters (e.g., 01572D)')
     end
@@ -356,8 +363,8 @@ RSpec.describe School do
       expect(school).not_to be_valid
     end
 
-    it 'requires an administrative_area' do
-      school.administrative_area = ' '
+    it 'requires an administrative_area for new schools' do
+      school = build(:school, administrative_area: ' ')
       expect(school).not_to be_valid
     end
 
