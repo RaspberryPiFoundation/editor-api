@@ -15,7 +15,7 @@ class ScratchAssetImporter
       end
     end
 
-    def import_from_sb3(assets)
+    def import_all_from_sb3(assets)
       assets.each do |asset|
         new(nil, nil).import_from_sb3(asset)
       end
