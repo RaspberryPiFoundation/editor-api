@@ -9,7 +9,7 @@ module Admin
     end
 
     def destroy_image
-      image = requested_resource.images.find(params[:image_id])
+      image = requested_resource.images.find(params.expect(:image_id))
       image.purge
       redirect_back_or_to(requested_resource)
     end

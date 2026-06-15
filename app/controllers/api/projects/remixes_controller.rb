@@ -45,7 +45,7 @@ module Api
       private
 
       def project
-        @project ||= Project.find_by!(identifier: params[:project_id])
+        @project ||= Project.find_by!(identifier: params.expect(:project_id))
       end
 
       def load_and_authorize_remix
