@@ -72,6 +72,7 @@ class Ability
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
     can(%i[read destroy], Feedback, school_project: { school_id: school.id })
     can(%i[exchange_code], :google_auth)
+    can(%i[read create], :school_email_domain)
   end
 
   def define_school_teacher_abilities(user:, school:)
@@ -102,6 +103,7 @@ class Ability
     can(%i[show_status unsubmit return complete], SchoolProject, project: { remixed_from_id: teacher_project_ids })
     can(%i[read create destroy], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
     can(%i[exchange_code], :google_auth)
+    can(%i[read create], :school_email_domain)
   end
 
   def define_school_student_abilities(user:, school:)

@@ -82,6 +82,7 @@ Rails.application.routes.draw do
         post :batch, on: :collection, to: 'school_students#create_batch'
         delete :batch, on: :collection, to: 'school_students#destroy_batch'
       end
+      resources :school_email_domains, only: %i[index], controller: 'school_email_domains'
     end
 
     resources :lessons, only: %i[index create show update destroy] do
