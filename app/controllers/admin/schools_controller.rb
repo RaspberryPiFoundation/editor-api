@@ -2,6 +2,8 @@
 
 module Admin
   class SchoolsController < Admin::ApplicationController
+    helper_method :school_role_users_by_id
+
     def verify
       service = SchoolVerificationService.new(requested_resource)
 
@@ -32,6 +34,20 @@ module Admin
 
     def default_sorting_direction
       :desc
+    end
+
+    private
+
+    def school_role_users_by_id
+      @school_role_users_by_id ||= fetch_users_batch(school_role_user_ids)
+    end
+
+    def school_role_user_ids
+      requested_resource.roles.where(role: SchoolRolesField::DISPLAYED_ROLES).filter_map(&:user_id).uniq
+    end
+
+    def fetch_users_batch(user_ids)
+      User.from_userinfo(ids: user_ids).index_by(&:id)
     end
   end
 end
