@@ -77,6 +77,44 @@ RSpec.describe 'Schools', type: :request do
     end
   end
 
+  describe 'GET #show with roles' do
+    let(:creator) { create(:user) }
+    let(:school) { create(:school, creator_id: creator.id) }
+    let(:owner) { create(:user, name: 'Olivia Owner', email: 'owner@example.com') }
+    let(:teacher) { create(:user, name: 'Tariq Teacher', email: 'teacher@example.com') }
+    let(:student) { create(:user, name: 'Sam Student', email: 'student@example.com') }
+    let(:role_users) do
+      [
+        owner,
+        teacher
+      ]
+    end
+
+    before do
+      create(:owner_role, school:, user_id: owner.id)
+      create(:teacher_role, school:, user_id: teacher.id)
+      create(:student_role, school:, user_id: student.id)
+
+      allow(User).to receive(:from_userinfo).with(ids: creator.id).and_return([creator])
+      allow(User).to receive(:from_userinfo).with(ids: contain_exactly(owner.id, teacher.id)).and_return(role_users)
+
+      get admin_school_path(school)
+    end
+
+    it 'lists owner and teacher roles with names and emails' do
+      expect(User).to have_received(:from_userinfo).with(ids: contain_exactly(owner.id, teacher.id)).once
+      expect(response.body).to include('Owner')
+      expect(response.body).to include('Olivia Owner (owner@example.com)')
+      expect(response.body).to include('Teacher')
+      expect(response.body).to include('Tariq Teacher (teacher@example.com)')
+    end
+
+    it 'does not list student roles' do
+      expect(response.body).not_to include('Sam Student')
+      expect(response.body).not_to include('student@example.com')
+    end
+  end
+
   describe 'POST #verify' do
     let(:creator) { create(:user) }
     let(:verified_at) { nil }

@@ -25,6 +25,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     classes: Field::HasMany,
     lessons: Field::HasMany,
     projects: Field::HasMany,
+    roles: SchoolRolesField,
     reference: Field::String,
     district_name: Field::String,
     district_nces_id: Field::String,
@@ -59,6 +60,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     name
     user_origin
     creator
+    roles
     creator_role
     creator_department
     reference

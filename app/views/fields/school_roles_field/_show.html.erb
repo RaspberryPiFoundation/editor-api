@@ -1,0 +1,26 @@
+<%#
+Administrate field partial for SchoolRolesField in show view
+%>
+
+<% if field.roles.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Role</th>
+        <th>User</th>
+        <th>Created</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% field.roles.each do |role| %>
+        <tr>
+          <td><%= role.role.humanize %></td>
+          <td><%= field.user_display(role, school_role_users_by_id) %></td>
+          <td><%= l(role.created_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <%= t("administrate.fields.has_many.none", default: "–") %>
+<% end %>
