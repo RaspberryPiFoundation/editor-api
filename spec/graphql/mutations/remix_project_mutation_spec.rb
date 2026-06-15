@@ -37,7 +37,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
     end
 
     it 'returns "not permitted to create" error' do
-      expect(result.dig('errors', 0, 'message')).to match(/not permitted to create/)
+      expect(result.dig('errors', 0, 'message')).to include('not permitted to create')
     end
   end
 
@@ -45,7 +45,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
     let(:project_id) { SecureRandom.uuid }
 
     it 'returns "not found" error' do
-      expect(result.dig('errors', 0, 'message')).to match(/not found/)
+      expect(result.dig('errors', 0, 'message')).to include('not found')
     end
 
     it 'does not create a project' do
@@ -60,7 +60,7 @@ RSpec.describe 'mutation RemixProject() { ... }' do
     end
 
     it 'returns "not permitted to read" error' do
-      expect(result.dig('errors', 0, 'message')).to match(/not permitted to read/)
+      expect(result.dig('errors', 0, 'message')).to include('not permitted to read')
     end
 
     it 'does not create a project' do

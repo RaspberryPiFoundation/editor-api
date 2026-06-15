@@ -93,7 +93,7 @@ RSpec.describe Project::Update, type: :unit do
       end
 
       it 'returns an error message' do
-        expect(update[:error]).to match(/Projects with instructions must belong to a school/)
+        expect(update[:error]).to include('Projects with instructions must belong to a school')
       end
     end
 

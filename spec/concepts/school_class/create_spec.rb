@@ -57,7 +57,7 @@ RSpec.describe SchoolClass::Create, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_class_params:, current_user: teacher)
-      expect(response[:error]).to match(/Error creating school class/)
+      expect(response[:error]).to include('Error creating school class')
     end
 
     it 'sent the exception to Sentry' do

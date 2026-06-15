@@ -58,7 +58,7 @@ RSpec.describe SchoolStudent::Update, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, student_id:, school_student_params:, token:)
-      expect(response[:error]).to match(/username ' ' is invalid/)
+      expect(response[:error]).to include("username ' ' is invalid")
     end
 
     it 'sent the exception to Sentry' do

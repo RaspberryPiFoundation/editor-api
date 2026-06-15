@@ -69,7 +69,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
         let(:project_id) { 'dummy' }
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not found/)
+          expect(result.dig('errors', 0, 'message')).to include('not found')
         end
       end
 
@@ -80,7 +80,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
         end
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not permitted/)
+          expect(result.dig('errors', 0, 'message')).to include('not permitted')
         end
       end
 
@@ -92,7 +92,7 @@ RSpec.describe 'mutation UpdateProject() { ... }' do
         end
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/An error message/)
+          expect(result.dig('errors', 0, 'message')).to include('An error message')
         end
       end
     end

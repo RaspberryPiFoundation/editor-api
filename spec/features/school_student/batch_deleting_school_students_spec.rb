@@ -208,7 +208,7 @@ RSpec.describe 'Batch deleting school students', type: :request do
 
         # First student should have error
         failed_result = json['results'].find { |r| r['user_id'] == student_1.id }
-        expect(failed_result['error']).to match(/StandardError: Profile API error/)
+        expect(failed_result['error']).to include('StandardError: Profile API error')
 
         # Second student should succeed
         success_result = json['results'].find { |r| r['user_id'] == student_2.id }

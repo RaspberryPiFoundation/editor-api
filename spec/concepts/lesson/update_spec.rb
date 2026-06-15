@@ -57,7 +57,7 @@ RSpec.describe Lesson::Update, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(lesson:, lesson_params:)
-      expect(response[:error]).to match(/Error updating lesson/)
+      expect(response[:error]).to include('Error updating lesson')
     end
 
     it 'sent the exception to Sentry' do

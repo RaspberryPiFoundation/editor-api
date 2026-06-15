@@ -199,7 +199,7 @@ RSpec.describe Lesson::CreateCopy, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(lesson:, lesson_params:)
-      expect(response[:error]).to match(/Error creating copy of lesson/)
+      expect(response[:error]).to include('Error creating copy of lesson')
     end
 
     it 'sent the exception to Sentry' do
