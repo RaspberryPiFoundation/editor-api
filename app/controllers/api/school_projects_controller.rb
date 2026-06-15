@@ -74,7 +74,7 @@ module Api
     private
 
     def project
-      @project ||= Project.find_by!(identifier: params[:id])
+      @project ||= Project.find_by!(identifier: params.expect(:id))
     end
 
     def school_project

@@ -101,7 +101,7 @@ module Api
       end
 
       def load_project
-        @project = Project.find_by!(identifier: params[:id], project_type: Project::Types::CODE_EDITOR_SCRATCH)
+        @project = Project.find_by!(identifier: params.expect(:id), project_type: Project::Types::CODE_EDITOR_SCRATCH)
       end
     end
   end

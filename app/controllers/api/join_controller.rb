@@ -30,7 +30,7 @@ module Api
     private
 
     def find_school_and_class
-      @school_class = SchoolClass.find_by!(join_code: JoinCodeGenerator.normalize(params[:join_code]))
+      @school_class = SchoolClass.find_by!(join_code: JoinCodeGenerator.normalize(params.expect(:join_code)))
       @school = @school_class.school
     end
 

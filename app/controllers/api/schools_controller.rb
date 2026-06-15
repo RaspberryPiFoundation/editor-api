@@ -31,7 +31,7 @@ module Api
     end
 
     def update
-      school = School.find(params[:id])
+      school = School.find(params.expect(:id))
       result = School::Update.call(school:, school_params: update_params)
 
       if result.success?

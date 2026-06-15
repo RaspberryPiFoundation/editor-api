@@ -60,7 +60,7 @@ module Api
     end
 
     def update
-      school_class = @school.classes.find(params[:id])
+      school_class = @school.classes.find(params.expect(:id))
       result = SchoolClass::Update.call(school_class:, school_class_params:)
 
       if result.success?
@@ -176,25 +176,25 @@ module Api
     end
 
     def load_and_authorize_school
-      @school = if params[:school_id].match?(/\d\d-\d\d-\d\d/)
+      @school = if params.expect(:school_id).match?(/\d\d-\d\d-\d\d/)
                   School.find_by(code: params[:school_id])
                 else
-                  School.find(params[:school_id])
+                  School.find(params.expect(:school_id))
                 end
       authorize! :read, @school
     end
 
     def load_and_authorize_school_class
       if %w[index create import].include?(params[:action])
-        authorize! params[:action].to_sym, SchoolClass
+        authorize! params.expect(:action).to_sym, SchoolClass
       else
-        @school_class = if params[:id].match?(/\d\d-\d\d-\d\d/)
+        @school_class = if params.expect(:id).match?(/\d\d-\d\d-\d\d/)
                           @school.classes.find_by(code: params[:id])
                         else
-                          @school.classes.find(params[:id])
+                          @school.classes.find(params.expect(:id))
                         end
 
-        authorize! params[:action].to_sym, @school_class
+        authorize! params.expect(:action).to_sym, @school_class
       end
     end
 

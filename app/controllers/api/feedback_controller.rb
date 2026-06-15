@@ -31,7 +31,7 @@ module Api
     end
 
     def set_read
-      feedback = Feedback.find(params[:id])
+      feedback = Feedback.find(params.expect(:id))
       result = Feedback::SetRead.call(feedback: feedback)
 
       if result.success?
