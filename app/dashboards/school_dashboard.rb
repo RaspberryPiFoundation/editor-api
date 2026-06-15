@@ -11,6 +11,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     id: Field::String,
+    code: Field::String,
     creator: Field::BelongsTo.with_options(class_name: 'User'),
     postal_code: Field::String,
     creator_role: Field::String,
@@ -44,6 +45,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # Feel free to add, remove, or rearrange items.
   COLLECTION_ATTRIBUTES = %i[
     name
+    code
     user_origin
     reference
     country_code
@@ -58,6 +60,7 @@ class SchoolDashboard < Administrate::BaseDashboard
   # an array of attributes that will be displayed on the model's show page.
   SHOW_PAGE_ATTRIBUTES = %i[
     name
+    code
     user_origin
     creator
     roles
