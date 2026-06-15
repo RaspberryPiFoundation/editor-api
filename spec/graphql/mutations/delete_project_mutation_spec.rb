@@ -56,7 +56,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
         let(:project_id) { 'dummy' }
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not found/)
+          expect(result.dig('errors', 0, 'message')).to include('not found')
         end
       end
 
@@ -67,7 +67,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
         end
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/not permitted/)
+          expect(result.dig('errors', 0, 'message')).to include('not permitted')
         end
       end
 
@@ -79,7 +79,7 @@ RSpec.describe 'mutation DeleteProject() { ... }' do
         end
 
         it 'returns an error' do
-          expect(result.dig('errors', 0, 'message')).to match(/Deletion failed/)
+          expect(result.dig('errors', 0, 'message')).to include('Deletion failed')
         end
       end
     end

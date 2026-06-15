@@ -137,7 +137,7 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
       data = JSON.parse(response.body, symbolize_names: true)
       member_not_added = data.find { |result| result[:user_id] == existing_class_member_id && result[:success] == false }
-      expect(member_not_added[:error]).to match(/Student has already been taken/)
+      expect(member_not_added[:error]).to include('Student has already been taken')
     end
 
     it 'returns success result for members that could be added' do
@@ -187,7 +187,7 @@ RSpec.describe 'Creating a class member', type: :request do
     it 'returns the error message in the operation response' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
       data = JSON.parse(response.body, symbolize_names: true)
-      expect(data[:error]).to match(/No valid school members provided/)
+      expect(data[:error]).to include('No valid school members provided')
     end
   end
 
