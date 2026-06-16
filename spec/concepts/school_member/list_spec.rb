@@ -11,6 +11,10 @@ RSpec.describe SchoolMember::List, type: :unit do
   let(:student_ids) { students.map(&:id) }
   let(:teacher_ids) { [teacher.id] }
 
+  before do
+    allow(SafeguardingFlagService).to receive(:create_for_token)
+  end
+
   context 'with a mixture of students' do
     let(:sso_student) { create(:student, :sso, school:) }
     let(:standard_student) { create(:student, school:) }
@@ -110,8 +114,20 @@ RSpec.describe SchoolMember::List, type: :unit do
       expect(Sentry).to have_received(:capture_exception).with(instance_of(StandardError))
     end
 
+    it 'propagates student listing operation errors' do
+      allow(SchoolStudent::List).to receive(:call).and_return(
+        OperationResponse[error: 'Error listing school students: Some API error']
+      )
+
+      response = described_class.call(school:, token:)
+
+      expect(response.failure?).to be(true)
+      expect(response[:error]).to eq('Error listing school students: Some API error')
+      expect(response[:school_members]).to eq([])
+    end
+
     it 'returns an empty array when no ids match' do
-      allow(SchoolStudent::List).to receive(:call).and_return({ school_students: [] })
+      allow(SchoolStudent::List).to receive(:call).and_return(OperationResponse[school_students: []])
       allow(SchoolTeacher::List).to receive(:call).and_return({ school_teachers: [] })
 
       response = described_class.call(school:, token:)

@@ -9,6 +9,10 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:students) { create_list(:student, 3, school:) }
   let(:teacher) { create(:teacher, school:) }
 
+  before do
+    stub_profile_api_create_safeguarding_flag
+  end
+
   context 'with valid params' do
     let(:student_attributes) do
       students.map do |student|

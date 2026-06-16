@@ -15,7 +15,7 @@ module SchoolStudent
       def call(school:, school_students_params:, current_user:)
         response = OperationResponse.new
         response[:school_students] = []
-        response[:school_students] = create_batch_sso(school, school_students_params, current_user.token)
+        response[:school_students] = create_batch_sso(school, school_students_params, current_user)
         response
       rescue ValidationError => e
         response[:error] = "Error creating one or more students - see 'errors' key for details"
@@ -31,8 +31,10 @@ module SchoolStudent
 
       private
 
-      def create_batch_sso(school, students, token)
+      def create_batch_sso(school, students, current_user)
         students = normalize_student_params(students)
+        token = current_user.token
+        SafeguardingFlagService.create_for_school_roles(user: current_user, school:)
         responses = ProfileApiClient.create_school_students_sso(token:, students:, school_id: school.id)
 
         create_student_roles(school, responses)

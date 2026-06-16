@@ -27,6 +27,7 @@ RSpec.describe CreateStudentsJob do
 
   before do
     stub_profile_api_create_school_students(user_ids: [user_id])
+    allow(SafeguardingFlagService).to receive(:create_for_token)
   end
 
   after do

@@ -6,6 +6,10 @@ RSpec.describe SchoolStudent::ValidateBatch do
   let(:school) { create(:verified_school) }
   let(:token) { UserProfileMock::TOKEN }
 
+  before do
+    allow(SafeguardingFlagService).to receive(:create_for_token)
+  end
+
   context 'when all students are valid' do
     let(:valid_students) do
       [

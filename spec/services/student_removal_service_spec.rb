@@ -13,6 +13,7 @@ describe StudentRemovalService do
 
   before do
     allow(ProfileApiClient).to receive(:delete_school_student)
+    allow(SafeguardingFlagService).to receive(:create_for_token)
     create(:class_student, student_id: student.id, school_class: school_class)
   end
 
@@ -143,6 +144,30 @@ describe StudentRemovalService do
         service = described_class.new(students: [student.id], school: school, remove_from_profile: true, token: token)
         service.remove_students
         expect(ProfileApiClient).to have_received(:delete_school_student).with(token: token, school_id: school.id, student_id: student.id)
+      end
+
+      it 'creates the safeguarding flag once when removing multiple students from Profile' do
+        token = 'abc123'
+        second_student = create(:student, school: school)
+        service = described_class.new(students: [student.id, second_student.id], school: school, remove_from_profile: true, token: token)
+
+        service.remove_students
+
+        expect(SafeguardingFlagService).to have_received(:create_for_token).with(token: token, school: school).once
+      end
+
+      it 'does not delete local records if safeguarding flag creation fails' do
+        token = 'abc123'
+        project = create(:project, user_id: student.id, school: school)
+        allow(SafeguardingFlagService).to receive(:create_for_token).and_raise(StandardError, 'flag failure')
+
+        service = described_class.new(students: [student.id], school: school, remove_from_profile: true, token: token)
+
+        expect { service.remove_students }.to raise_error(StandardError, 'flag failure')
+        expect(ProfileApiClient).not_to have_received(:delete_school_student)
+        expect(Project.exists?(project.id)).to be true
+        expect(ClassStudent.where(student_id: student.id)).to exist
+        expect(Role.where(user_id: student.id, school_id: school.id, role: :student)).to exist
       end
 
       it 'does not call ProfileApiClient if remove_from_profile is false' do

@@ -6,6 +6,7 @@ RSpec.describe 'Importing a school class', type: :request do
   before do
     authenticated_in_hydra_as(teacher)
     stub_user_info_api_for(teacher)
+    stub_profile_api_create_safeguarding_flag
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

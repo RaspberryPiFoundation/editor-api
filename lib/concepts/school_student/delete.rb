@@ -16,6 +16,7 @@ module SchoolStudent
       private
 
       def delete_student(school, student_id, token)
+        SafeguardingFlagService.create_for_token(token:, school:)
         ProfileApiClient.delete_school_student(token:, student_id:, school_id: school.id)
       end
     end

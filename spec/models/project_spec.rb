@@ -193,6 +193,7 @@ RSpec.describe Project, :versioning do
 
     before do
       stub_profile_api_list_school_students(school:, student_attributes:)
+      allow(SafeguardingFlagService).to receive(:create_for_token)
     end
 
     it 'returns User instances for the current scope' do
@@ -227,6 +228,7 @@ RSpec.describe Project, :versioning do
 
     before do
       stub_profile_api_list_school_students(school:, student_attributes:)
+      allow(SafeguardingFlagService).to receive(:create_for_token)
     end
 
     it 'returns an array of class members paired with their User instance' do
@@ -264,6 +266,7 @@ RSpec.describe Project, :versioning do
 
     before do
       stub_profile_api_list_school_students(school:, student_attributes:)
+      allow(SafeguardingFlagService).to receive(:create_for_token)
     end
 
     it 'returns the class member paired with their User instance' do
