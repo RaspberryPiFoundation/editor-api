@@ -42,9 +42,9 @@ module SchoolMember
       private
 
       def fetch_students(school:, token:)
-        student_roles = Role.student.where(school:)
+        return OperationResponse[school_students: []] unless Role.student.exists?(school:)
 
-        student_roles.any? ? SchoolStudent::List.call(school:, token:) : OperationResponse[school_students: []]
+        SchoolStudent::List.call(school:, token:)
       end
 
       def build_student_members(students)

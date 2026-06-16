@@ -5,11 +5,7 @@ class SafeguardingFlagService
     def create_for_school_roles(user:, school:)
       return if user.blank? || school.blank?
 
-      roles = []
-      roles << :teacher if user.school_teacher?(school)
-      roles << :owner if user.school_owner?(school)
-
-      create_for_roles(token: user.token, email: user.email, school:, roles:)
+      create_for_roles(token: user.token, email: user.email, school:, roles: user.school_roles(school))
     end
 
     def create_for_token(token:, school:)
