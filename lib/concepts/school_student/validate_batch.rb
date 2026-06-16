@@ -33,6 +33,7 @@ module SchoolStudent
 
       def validate_batch(school:, students:, token:)
         decrypted_students = StudentHelpers.decrypt_students(students)
+        SafeguardingFlagService.create_for_token(token:, school:)
         ProfileApiClient.validate_school_students(token:, students: decrypted_students, school_id: school.id)
       rescue ProfileApiClient::Student422Error => e
         handle_student422_error(e.errors)

@@ -17,6 +17,7 @@ RSpec.describe SchoolStudent::Create, type: :unit do
 
   before do
     stub_profile_api_create_school_student(user_id:)
+    allow(SafeguardingFlagService).to receive(:create_for_token)
   end
 
   it 'returns a successful operation response' do

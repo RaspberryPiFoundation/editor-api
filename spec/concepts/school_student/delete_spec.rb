@@ -9,6 +9,7 @@ RSpec.describe SchoolStudent::Delete, type: :unit do
 
   before do
     stub_profile_api_delete_school_student
+    allow(SafeguardingFlagService).to receive(:create_for_token)
   end
 
   it 'returns a successful operation response' do

@@ -34,7 +34,10 @@ class StudentRemovalService
           student_roles.destroy_all
 
           # Remove from profile if requested - inside transaction so it can be rolled back
-          ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id) if @remove_from_profile && @token.present?
+          if @remove_from_profile && @token.present?
+            SafeguardingFlagService.create_for_token(token: @token, school: @school)
+            ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id)
+          end
         end
       rescue StandardError => e
         result[:error] = "#{e.class}: #{e.message}"

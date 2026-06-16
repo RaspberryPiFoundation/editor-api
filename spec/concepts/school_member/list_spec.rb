@@ -11,6 +11,10 @@ RSpec.describe SchoolMember::List, type: :unit do
   let(:student_ids) { students.map(&:id) }
   let(:teacher_ids) { [teacher.id] }
 
+  before do
+    allow(SafeguardingFlagService).to receive(:create_for_token)
+  end
+
   context 'with a mixture of students' do
     let(:sso_student) { create(:student, :sso, school:) }
     let(:standard_student) { create(:student, school:) }

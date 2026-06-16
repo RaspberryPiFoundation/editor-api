@@ -13,6 +13,10 @@ RSpec.describe ClassMember::List, type: :unit do
   let(:student_ids) { students.map(&:id) }
   let(:teacher_ids) { [teacher.id] }
 
+  before do
+    allow(SafeguardingFlagService).to receive(:create_for_token)
+  end
+
   context 'with students and a teacher' do
     before do
       student_ids.each do |student_id|

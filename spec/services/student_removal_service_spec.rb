@@ -13,6 +13,7 @@ describe StudentRemovalService do
 
   before do
     allow(ProfileApiClient).to receive(:delete_school_student)
+    allow(SafeguardingFlagService).to receive(:create_for_token)
     create(:class_student, student_id: student.id, school_class: school_class)
   end
 

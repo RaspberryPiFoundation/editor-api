@@ -17,6 +17,7 @@ RSpec.describe 'Listing class members', type: :request do
       { id: student.id, name: student.name, username: student.username, email: nil }
     end
     stub_profile_api_list_school_students(school:, student_attributes:)
+    stub_profile_api_create_safeguarding_flag
 
     students.each do |student|
       create(:class_student, student_id: student.id, school_class:)

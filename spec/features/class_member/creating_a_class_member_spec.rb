@@ -8,11 +8,12 @@ RSpec.describe 'Creating a class member', type: :request do
   let(:school) { create(:school) }
   let(:student) { create(:student, school:, name: 'School Student', username: 'school-student') }
   let(:teacher) { create(:teacher, school:) }
+  let(:owner) { create(:owner, school:) }
 
   before do
-    owner = create(:owner, school:)
     authenticated_in_hydra_as(owner)
     stub_user_info_api_for(student)
+    stub_profile_api_create_safeguarding_flag
   end
 
   context 'with valid params' do

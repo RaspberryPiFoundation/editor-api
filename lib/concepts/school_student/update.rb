@@ -39,6 +39,7 @@ module SchoolStudent
         validate(username:, password:, name:)
 
         # Prevent updating SSO students (students with ssoProviders present)
+        SafeguardingFlagService.create_for_token(token:, school:)
         student = ProfileApiClient.school_student(
           token: token,
           school_id: school.id,
