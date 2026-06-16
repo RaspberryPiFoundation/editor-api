@@ -57,4 +57,14 @@ RSpec.describe 'Creating a school', type: :request do
     post '/api/schools'
     expect(response).to have_http_status(:unauthorized)
   end
+
+  it 'records a school created event' do
+    post('/api/schools', headers:, params:)
+    expect(Event.last).to have_attributes(
+      name: 'School - Created',
+      user_id: user.id,
+      properties: { 'school_id' => School.last.id },
+      time: be_within(1.second).of(Time.current)
+    )
+  end
 end

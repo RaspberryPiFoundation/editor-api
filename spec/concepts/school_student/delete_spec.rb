@@ -37,7 +37,7 @@ RSpec.describe SchoolStudent::Delete, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, student_id:, token:)
-      expect(response[:error]).to match(/Some API error/)
+      expect(response[:error]).to include('Some API error')
     end
 
     it 'sent the exception to Sentry' do

@@ -107,7 +107,7 @@ RSpec.describe SchoolStudent::List, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, token:, student_ids:)
-      expect(response[:error]).to match(/Some API error/)
+      expect(response[:error]).to include('Some API error')
     end
 
     it 'sent the exception to Sentry' do

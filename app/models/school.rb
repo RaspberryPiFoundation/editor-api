@@ -16,27 +16,26 @@ class School < ApplicationRecord
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
   validates :address_line_1, presence: true
   validates :municipality, presence: true
-  validates :administrative_area, presence: true
+  validates :administrative_area, presence: true, on: :create
   validates :postal_code, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :reference,
             uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.reference_urn_exists') },
             format: { with: /\A\d{5,6}\z/, allow_nil: true, message: I18n.t('validations.school.reference') },
-            if: :united_kingdom?
+            if: :united_kingdom?, on: :create, unless: :rejected?
   validates :district_nces_id,
             format: { with: /\A\d{7}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') },
-            if: :united_states?
+            if: :united_states?, on: :create
   validates :district_name, presence: true, if: :united_states?
   validates :school_roll_number,
             uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.school_roll_number_exists') },
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
-            presence: true,
-            if: :ireland?
+            presence: true, on: :create, if: :ireland?, unless: :rejected?
   validates :creator_id,
             presence: true,
             uniqueness: {
               conditions: -> { where(rejected_at: nil) }
-            }
+            }, unless: :rejected?
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
   validates :creator_agree_responsible_safeguarding, presence: true, acceptance: true

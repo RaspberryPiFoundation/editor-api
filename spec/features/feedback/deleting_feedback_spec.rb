@@ -45,7 +45,7 @@ RSpec.describe 'Delete feedback requests', type: :request do
 
       it 'returns an error message' do
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:error]).to match(/Couldn't find Feedback with 'id'="invalid-id"/)
+        expect(data[:error]).to include("Couldn't find Feedback with 'id'=\"invalid-id\"")
       end
     end
   end

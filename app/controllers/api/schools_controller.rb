@@ -20,6 +20,7 @@ module Api
 
       if result.success?
         @school = result[:school]
+        track_event('School - Created', school_id: @school.id)
         render :show, formats: [:json], status: :created
       else
         render json: {
@@ -30,7 +31,7 @@ module Api
     end
 
     def update
-      school = School.find(params[:id])
+      school = School.find(params.expect(:id))
       result = School::Update.call(school:, school_params: update_params)
 
       if result.success?

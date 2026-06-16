@@ -86,6 +86,7 @@ Rails.application.routes.draw do
 
     resources :lessons, only: %i[index create show update destroy] do
       post :copy, on: :member, to: 'lessons#create_copy'
+      post :batch, on: :collection, to: 'lessons/batch#create_batch'
     end
 
     resources :teacher_invitations, param: :token, only: :show do
@@ -104,6 +105,8 @@ Rails.application.routes.draw do
 
     get  '/join/:join_code', to: 'join#show'
     post '/join/:join_code', to: 'join#create'
+
+    resources :events, only: %i[create]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

@@ -114,7 +114,7 @@ class Project < ApplicationRecord
   end
 
   def identifier_cannot_be_taken_by_another_user
-    return if Project.where(identifier: self.identifier).where.not(user_id:).empty?
+    return if Project.where(identifier:).where.not(user_id:).empty?
 
     errors.add(:identifier, "can't be taken by another user")
   end

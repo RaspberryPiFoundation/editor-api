@@ -80,12 +80,12 @@ RSpec.describe Feedback::Create, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(feedback_params:)
-      expect(response[:error]).to match(/Error creating feedback/)
+      expect(response[:error]).to include('Error creating feedback')
     end
 
     it 'raises school project not found error when no school project' do
       response = described_class.call(feedback_params:)
-      expect(response[:error]).to match(/School project must exist/)
+      expect(response[:error]).to include('School project must exist')
     end
 
     it 'sent the exception to Sentry' do

@@ -216,7 +216,7 @@ RSpec.describe 'Creating a class member', type: :request do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: invalid_params)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:error]).to match(/No valid school members provided/)
+      expect(data[:error]).to include('No valid school members provided')
     end
   end
 

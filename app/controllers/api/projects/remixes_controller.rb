@@ -25,6 +25,8 @@ module Api
       end
 
       def create
+        authorize! :show, project
+
         # Ensure we have a fallback value to prevent bad requests
         remix_origin = request.origin || request.referer
         result = Project::CreateRemix.call(params: remix_params,
@@ -43,7 +45,7 @@ module Api
       private
 
       def project
-        @project ||= Project.find_by!(identifier: params[:project_id])
+        @project ||= Project.find_by!(identifier: params.expect(:project_id))
       end
 
       def load_and_authorize_remix

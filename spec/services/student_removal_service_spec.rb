@@ -168,7 +168,7 @@ describe StudentRemovalService do
         results = service.remove_students
 
         # Should have error in result
-        expect(results.first[:error]).to match(/Profile API failure/)
+        expect(results.first[:error]).to include('Profile API failure')
 
         # Database changes should have been rolled back
         expect(Project.exists?(project.id)).to be true
@@ -181,7 +181,7 @@ describe StudentRemovalService do
       it 'handles errors gracefully' do
         allow(ClassStudent).to receive(:joins).and_raise(StandardError, 'fail')
         results = service.remove_students
-        expect(results.first[:error]).to match(/StandardError: fail/)
+        expect(results.first[:error]).to include('StandardError: fail')
       end
 
       it 'continues processing other students after an error' do
@@ -197,7 +197,7 @@ describe StudentRemovalService do
         results = service.remove_students
 
         expect(results.length).to eq(2)
-        expect(results.first[:error]).to match(/StandardError/)
+        expect(results.first[:error]).to include('StandardError')
         # Second student should succeed
         expect(Role.where(user_id: second_student.id, school: school, role: :student)).not_to exist
       end

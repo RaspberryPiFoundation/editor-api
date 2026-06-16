@@ -44,7 +44,7 @@ RSpec.describe SchoolClass::Delete, type: :unit do
 
     it 'returns the error message in the operation response' do
       response = described_class.call(school:, school_class_id:)
-      expect(response[:error]).to match(/does-not-exist/)
+      expect(response[:error]).to include('does-not-exist')
     end
 
     it 'sent the exception to Sentry' do
