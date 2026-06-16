@@ -44,6 +44,7 @@ RSpec.describe 'School project complete requests', type: :request do
 
     context('when transition is valid') do
       before do
+        class_student
         student_project.school_project.transition_status_to!(:submitted, student.id)
         post("/api/projects/#{student_project.identifier}/complete", headers:)
       end
@@ -58,6 +59,22 @@ RSpec.describe 'School project complete requests', type: :request do
 
       it 'sets the status to complete' do
         expect(student_project.school_project).to be_complete
+      end
+
+      it 'records a project marked as completed event' do
+        expect(Event.last).to have_attributes(
+          name: 'Project - Marked as completed',
+          user_id: teacher.id,
+          properties: {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'lesson_id' => lesson.id,
+            'project_type' => Project::Types::PYTHON,
+            'user_role' => 'educator',
+            'student_id' => student.id
+          },
+          time: be_within(1.second).of(Time.current)
+        )
       end
     end
   end

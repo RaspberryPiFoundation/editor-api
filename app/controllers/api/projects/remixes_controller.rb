@@ -36,6 +36,7 @@ module Api
 
         if result.success?
           @project = result[:project]
+          track_project_event('Project - Saved', @project)
           render '/api/projects/show', formats: [:json]
         else
           render json: { error: result[:error] }, status: :bad_request

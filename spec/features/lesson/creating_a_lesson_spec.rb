@@ -148,6 +148,25 @@ RSpec.describe 'Creating a lesson', type: :request do
       expect(response).to have_http_status(:created)
     end
 
+    it 'records a project created event' do
+      authenticated_in_hydra_as(teacher)
+
+      post('/api/lessons', headers:, params:)
+
+      expect(Event.last).to have_attributes(
+        name: 'Project - Created',
+        user_id: teacher.id,
+        properties: {
+          'school_id' => school.id,
+          'class_id' => school_class.id,
+          'lesson_id' => Lesson.last.id,
+          'project_type' => Project::Types::PYTHON,
+          'user_role' => 'educator'
+        },
+        time: be_within(1.second).of(Time.current)
+      )
+    end
+
     it 'responds 422 Unprocessable if school_id is missing' do
       new_params = { lesson: params[:lesson].without(:school_id) }
 
