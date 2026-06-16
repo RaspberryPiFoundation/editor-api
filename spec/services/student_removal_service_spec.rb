@@ -156,6 +156,21 @@ describe StudentRemovalService do
         expect(SafeguardingFlagService).to have_received(:create_for_token).with(token: token, school: school).once
       end
 
+      it 'does not delete local records if safeguarding flag creation fails' do
+        token = 'abc123'
+        project = create(:project, user_id: student.id, school: school)
+        allow(SafeguardingFlagService).to receive(:create_for_token).and_raise(StandardError, 'flag failure')
+
+        service = described_class.new(students: [student.id], school: school, remove_from_profile: true, token: token)
+        results = service.remove_students
+
+        expect(results.first[:error]).to include('flag failure')
+        expect(ProfileApiClient).not_to have_received(:delete_school_student)
+        expect(Project.exists?(project.id)).to be true
+        expect(ClassStudent.where(student_id: student.id)).to exist
+        expect(Role.where(user_id: student.id, school_id: school.id, role: :student)).to exist
+      end
+
       it 'does not call ProfileApiClient if remove_from_profile is false' do
         service = described_class.new(students: [student.id], school: school, remove_from_profile: false, token: 'token')
         service.remove_students

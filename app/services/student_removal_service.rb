@@ -21,6 +21,8 @@ class StudentRemovalService
 
       result = { user_id: }
       begin
+        ensure_safeguarding_flag if remove_from_profile?
+
         ActiveRecord::Base.transaction do
           # Delete all projects for this user
           projects = Project.where(user_id: user_id)
@@ -47,7 +49,6 @@ class StudentRemovalService
   private
 
   def delete_from_profile(user_id)
-    ensure_safeguarding_flag
     ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id)
   end
 

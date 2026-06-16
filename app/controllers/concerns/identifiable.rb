@@ -10,9 +10,10 @@ module Identifiable
 
   def load_current_user
     token = request.headers['Authorization']
-    return unless token
+    return if token.blank?
 
     @current_user = User.from_token(token:)
+    return if @current_user.blank?
     return unless RequestStore.respond_to?(:active?) && RequestStore.active?
 
     RequestStore.store[:safeguarding_flag_users_by_token] ||= {}
