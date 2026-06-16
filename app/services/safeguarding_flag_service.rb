@@ -37,10 +37,16 @@ class SafeguardingFlagService
     private
 
     def user_for_token(token)
+      return User.from_token(token:) unless request_store_active?
+
       cache = RequestStore.store[:safeguarding_flag_users_by_token] ||= {}
       return cache[token] if cache.key?(token)
 
       cache[token] = User.from_token(token:)
+    end
+
+    def request_store_active?
+      RequestStore.respond_to?(:active?) && RequestStore.active?
     end
   end
 end

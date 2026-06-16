@@ -58,6 +58,7 @@ RSpec.describe SafeguardingFlagService do
 
     before do
       allow(User).to receive(:from_token).with(token:).and_return(user)
+      allow(described_class).to receive(:request_store_active?).and_return(false)
     end
 
     it 'creates flags for the user identified by the token' do
@@ -72,6 +73,7 @@ RSpec.describe SafeguardingFlagService do
     end
 
     it 'uses a user cached for the token' do
+      allow(described_class).to receive(:request_store_active?).and_return(true)
       RequestStore.store[:safeguarding_flag_users_by_token][token] = user
 
       described_class.create_for_token(token:, school:)
@@ -86,9 +88,17 @@ RSpec.describe SafeguardingFlagService do
     end
 
     it 'caches the user after looking it up' do
+      allow(described_class).to receive(:request_store_active?).and_return(true)
+
       2.times { described_class.create_for_token(token:, school:) }
 
       expect(User).to have_received(:from_token).once
+    end
+
+    it 'does not cache token lookups outside an active request store' do
+      2.times { described_class.create_for_token(token:, school:) }
+
+      expect(User).to have_received(:from_token).twice
     end
 
     it 'does not look up a user without a token' do
