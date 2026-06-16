@@ -15,7 +15,13 @@ module SchoolMember
         response[:school_members] = []
 
         begin
-          students = fetch_students(school:, token:)
+          students_response = fetch_students(school:, token:)
+          if students_response.failure?
+            response[:error] = students_response[:error]
+            return response
+          end
+
+          students = build_student_members(students_response.fetch(:school_students, []))
           teachers = fetch_teachers(school:)
           owners = fetch_owners(school:)
 
@@ -38,9 +44,11 @@ module SchoolMember
       def fetch_students(school:, token:)
         student_roles = Role.student.where(school:)
 
-        students_response = student_roles.any? ? SchoolStudent::List.call(school:, token:).fetch(:school_students, []) : []
+        student_roles.any? ? SchoolStudent::List.call(school:, token:) : OperationResponse[school_students: []]
+      end
 
-        students_response.map do |student|
+      def build_student_members(students)
+        students.map do |student|
           SchoolMember.new(student.id, student.name, student.username, student.email, :student, student.sso_providers)
         end
       end
