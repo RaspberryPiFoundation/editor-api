@@ -12,6 +12,8 @@ class StudentRemovalService
   def remove_students
     results = []
 
+    ensure_safeguarding_flag if remove_from_profile?
+
     @students.each do |user_id|
       student_roles = Role.student.where(user_id:, school_id: @school.id)
       if student_roles.empty?
@@ -21,8 +23,6 @@ class StudentRemovalService
 
       result = { user_id: }
       begin
-        ensure_safeguarding_flag if remove_from_profile?
-
         ActiveRecord::Base.transaction do
           # Delete all projects for this user
           projects = Project.where(user_id: user_id)
@@ -53,10 +53,7 @@ class StudentRemovalService
   end
 
   def ensure_safeguarding_flag
-    return if @safeguarding_flag_created
-
     SafeguardingFlagService.create_for_token(token: @token, school: @school)
-    @safeguarding_flag_created = true
   end
 
   def remove_from_profile?

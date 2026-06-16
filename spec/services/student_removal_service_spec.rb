@@ -162,9 +162,8 @@ describe StudentRemovalService do
         allow(SafeguardingFlagService).to receive(:create_for_token).and_raise(StandardError, 'flag failure')
 
         service = described_class.new(students: [student.id], school: school, remove_from_profile: true, token: token)
-        results = service.remove_students
 
-        expect(results.first[:error]).to include('flag failure')
+        expect { service.remove_students }.to raise_error(StandardError, 'flag failure')
         expect(ProfileApiClient).not_to have_received(:delete_school_student)
         expect(Project.exists?(project.id)).to be true
         expect(ClassStudent.where(student_id: student.id)).to exist
