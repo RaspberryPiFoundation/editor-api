@@ -15,7 +15,7 @@ class SafeguardingFlagService
     def create_for_token(token:, school:)
       return if token.blank? || school.blank?
 
-      create_for_school_roles(user: User.from_token(token:), school:)
+      create_for_school_roles(user: user_for_token(token), school:)
     end
 
     def create_for_roles(token:, email:, school:, roles:)
@@ -32,6 +32,15 @@ class SafeguardingFlagService
           school_id: school.id
         )
       end
+    end
+
+    private
+
+    def user_for_token(token)
+      cache = RequestStore.store[:safeguarding_flag_users_by_token] ||= {}
+      return cache[token] if cache.key?(token)
+
+      cache[token] = User.from_token(token:)
     end
   end
 end

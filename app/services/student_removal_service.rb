@@ -33,11 +33,8 @@ class StudentRemovalService
           # Remove roles
           student_roles.destroy_all
 
-          # Remove from profile if requested - inside transaction so it can be rolled back
-          if @remove_from_profile && @token.present?
-            SafeguardingFlagService.create_for_token(token: @token, school: @school)
-            ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id)
-          end
+          # Keep local DB changes uncommitted until Profile confirms deletion.
+          delete_from_profile(user_id) if remove_from_profile?
         end
       rescue StandardError => e
         result[:error] = "#{e.class}: #{e.message}"
@@ -45,5 +42,23 @@ class StudentRemovalService
       results << result
     end
     results
+  end
+
+  private
+
+  def delete_from_profile(user_id)
+    ensure_safeguarding_flag
+    ProfileApiClient.delete_school_student(token: @token, school_id: @school.id, student_id: user_id)
+  end
+
+  def ensure_safeguarding_flag
+    return if @safeguarding_flag_created
+
+    SafeguardingFlagService.create_for_token(token: @token, school: @school)
+    @safeguarding_flag_created = true
+  end
+
+  def remove_from_profile?
+    @remove_from_profile && @token.present?
   end
 end

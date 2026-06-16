@@ -7,6 +7,7 @@ RSpec.describe SafeguardingFlagService do
   let(:token) { UserProfileMock::TOKEN }
 
   before do
+    RequestStore.store[:safeguarding_flag_users_by_token] = {}
     allow(ProfileApiClient).to receive(:create_safeguarding_flag)
   end
 
@@ -68,6 +69,26 @@ RSpec.describe SafeguardingFlagService do
         email: user.email,
         school_id: school.id
       )
+    end
+
+    it 'uses a user cached for the token' do
+      RequestStore.store[:safeguarding_flag_users_by_token][token] = user
+
+      described_class.create_for_token(token:, school:)
+
+      expect(User).not_to have_received(:from_token)
+      expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(
+        token:,
+        flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher],
+        email: user.email,
+        school_id: school.id
+      )
+    end
+
+    it 'caches the user after looking it up' do
+      2.times { described_class.create_for_token(token:, school:) }
+
+      expect(User).to have_received(:from_token).once
     end
 
     it 'does not look up a user without a token' do

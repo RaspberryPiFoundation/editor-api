@@ -146,6 +146,16 @@ describe StudentRemovalService do
         expect(ProfileApiClient).to have_received(:delete_school_student).with(token: token, school_id: school.id, student_id: student.id)
       end
 
+      it 'creates the safeguarding flag once when removing multiple students from Profile' do
+        token = 'abc123'
+        second_student = create(:student, school: school)
+        service = described_class.new(students: [student.id, second_student.id], school: school, remove_from_profile: true, token: token)
+
+        service.remove_students
+
+        expect(SafeguardingFlagService).to have_received(:create_for_token).with(token: token, school: school).once
+      end
+
       it 'does not call ProfileApiClient if remove_from_profile is false' do
         service = described_class.new(students: [student.id], school: school, remove_from_profile: false, token: 'token')
         service.remove_students
