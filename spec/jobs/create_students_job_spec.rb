@@ -8,6 +8,7 @@ RSpec.describe CreateStudentsJob do
   let(:token) { UserProfileMock::TOKEN }
   let(:school) { create(:verified_school) }
   let(:user_id) { create(:user).id }
+  let(:actor_user_id) { create(:owner, school:).id }
 
   let(:students) do
     [{
@@ -45,5 +46,19 @@ RSpec.describe CreateStudentsJob do
     described_class.perform_now(school_id: school.id, students:, token:)
 
     expect(Role.student.where(school:, user_id:)).to exist
+  end
+
+  it 'records a student created event when the actor is provided' do
+    described_class.perform_now(school_id: school.id, students:, token:, actor_user_id:)
+
+    expect(Event.last).to have_attributes(
+      name: 'Student - Created',
+      user_id: actor_user_id,
+      properties: {
+        'school_id' => school.id,
+        'student_id' => user_id
+      },
+      time: be_within(1.second).of(Time.current)
+    )
   end
 end
