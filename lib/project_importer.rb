@@ -73,7 +73,7 @@ class ProjectImporter
       next unless component[:extension] == 'sb3'
 
       parsed_assets = Sb3Parser.new(component: component).parse.fetch(:assets)
-      ScratchAssetImporter.import_all_from_sb3(parsed_assets)
+      ScratchSb3AssetImporter.import_all(parsed_assets)
     end
   end
 

@@ -15,12 +15,6 @@ class ScratchAssetImporter
       end
     end
 
-    def import_all_from_sb3(assets)
-      assets.each do |asset|
-        new(nil, nil).import_from_sb3(asset)
-      end
-    end
-
     private
 
     def show_progress?
@@ -51,10 +45,6 @@ class ScratchAssetImporter
     end
   end
 
-  def import_from_sb3(asset)
-    create_sb3_asset(asset.fetch(:filename), asset.fetch(:io).read)
-  end
-
   private
 
   def create_scratch_asset
@@ -65,17 +55,6 @@ class ScratchAssetImporter
     ScratchAsset.create!(filename: asset_name, project_id: nil, uploaded_user_id: nil)
                 .file
                 .attach(io:, filename: asset_name)
-  end
-
-  def create_sb3_asset(asset_name, content)
-    return if ScratchAsset.global_assets.exists?(filename: asset_name)
-
-    sleep(ASSET_FETCHING_DELAY)
-    ScratchAsset.create!(filename: asset_name, project_id: nil, uploaded_user_id: nil)
-                .file
-                .attach(io: StringIO.new(content), filename: asset_name)
-  rescue StandardError => e
-    Rails.logger.error("Failed to import SB3 asset #{asset_name}: #{e.message}")
   end
 
   def save_to_editor_asset_bucket
