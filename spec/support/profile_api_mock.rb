@@ -129,4 +129,8 @@ module ProfileApiMock
       )
     )
   end
+
+  def stub_profile_api_update_school_email_domains
+    allow(ProfileApiClient).to receive(:update_school_email_domains).and_return(true)
+  end
 end
