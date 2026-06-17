@@ -73,5 +73,7 @@ module App
 
     config.x.cloudflare_turnstile.secret_key = ENV.fetch('CLOUDFLARE_TURNSTILE_SECRET_KEY', nil)
     config.x.cloudflare_turnstile.enabled = ENV['CLOUDFLARE_TURNSTILE_SECRET_KEY'].present?
+
+    config.rails_semantic_logger.format = :json
   end
 end
