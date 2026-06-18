@@ -121,7 +121,11 @@ RSpec.describe ProjectImporter do
     let(:parser_result) do
       {
         scratch_component: { content: JSON.parse(scratch_project_content.to_json) },
-        assets: []
+        assets: [
+          { filename: 'test_image_1.png', io: StringIO.new(sb3_fixture_content('test_image_1.png')), content_type: 'image/png' },
+          { filename: 'test_video_1.mp4', io: StringIO.new(sb3_fixture_content('test_video_1.mp4')), content_type: 'video/mp4' },
+          { filename: 'test_audio_1.mp3', io: StringIO.new(sb3_fixture_content('test_audio_1.mp3')), content_type: 'audio/mpeg' }
+        ]
       }
     end
     let(:importer) do
