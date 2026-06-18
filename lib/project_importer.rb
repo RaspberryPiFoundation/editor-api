@@ -43,13 +43,13 @@ class ProjectImporter
   end
 
   def delete_components
-    return unless project.project_type != 'code_editor_scratch'
+    return if project.scratch_project?
 
     project.components.each(&:destroy)
   end
 
   def create_components
-    return unless project.project_type != 'code_editor_scratch'
+    return if project.scratch_project?
 
     components.each do |component|
       project_component = Component.new(**component)
@@ -58,7 +58,7 @@ class ProjectImporter
   end
 
   def create_scratch_component
-    return unless project.project_type == 'code_editor_scratch'
+    return unless project.scratch_project?
 
     component = components[0]
     return unless component&.fetch(:extension, nil) == 'sb3'
@@ -70,7 +70,7 @@ class ProjectImporter
   end
 
   def create_scratch_assets
-    return unless project.project_type == 'code_editor_scratch'
+    return unless project.scratch_project?
 
     component = components[0]
     return unless component&.fetch(:extension, nil) == 'sb3'

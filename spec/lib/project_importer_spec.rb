@@ -214,6 +214,12 @@ RSpec.describe ProjectImporter do
         create(:scratch_component, project:, content: original_scratch_content)
       end
 
+      it 'does not delete existing standard components' do
+        create(:component, project:, name: 'legacy', extension: 'txt', content: 'keep me')
+
+        expect { importer.import! }.not_to change { project.reload.components.count }
+      end
+
       it 'does not create a new project' do
         expect { importer.import! }.not_to change(Project, :count)
       end
