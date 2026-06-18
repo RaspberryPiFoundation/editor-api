@@ -58,23 +58,21 @@ class ProjectImporter
   def create_scratch_component
     return unless project.project_type == 'code_editor_scratch'
 
-    components.each do |component|
-      next unless component[:extension] == 'sb3'
+    component = components[0]
+    return unless component[:extension] == 'sb3'
 
-      parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
-      project.scratch_component = ScratchComponent.new(content: parsed_content) if parsed_content
-    end
+    parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
+    project.scratch_component = ScratchComponent.new(content: parsed_content) if parsed_content
   end
 
   def create_scratch_assets
     return unless project.project_type == 'code_editor_scratch'
 
-    components.each do |component|
-      next unless component[:extension] == 'sb3'
+    component = components[0]
+    return unless component[:extension] == 'sb3'
 
-      parsed_assets = Sb3Parser.new(component: component).parse.fetch(:assets)
-      ScratchSb3AssetImporter.import_all(parsed_assets)
-    end
+    parsed_assets = Sb3Parser.new(component: component).parse.fetch(:assets)
+    ScratchSb3AssetImporter.import_all(parsed_assets)
   end
 
   def delete_removed_media
