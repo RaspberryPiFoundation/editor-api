@@ -61,7 +61,7 @@ class ProjectImporter
     return unless project.project_type == 'code_editor_scratch'
 
     component = components[0]
-    return unless component[:extension] == 'sb3'
+    return unless component&.fetch(:extension, nil) == 'sb3'
 
     parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
     raise ImportError, 'Scratch project content could not be parsed' if parsed_content.blank?
@@ -73,7 +73,7 @@ class ProjectImporter
     return unless project.project_type == 'code_editor_scratch'
 
     component = components[0]
-    return unless component[:extension] == 'sb3'
+    return unless component&.fetch(:extension, nil) == 'sb3'
 
     parsed_assets = Sb3Parser.new(component: component).parse.fetch(:assets)
     ScratchSb3AssetImporter.import_all(parsed_assets)
