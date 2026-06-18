@@ -52,6 +52,11 @@ class ProjectImporter
     return if project.scratch_project?
 
     components.each do |component|
+      # .sb3 files are only ever imported as a ScratchComponent (see
+      # create_scratch_component); they carry an :io/:file_path key that is not a
+      # Component attribute, so skip them here to avoid building invalid rows.
+      next if component[:extension] == 'sb3'
+
       project_component = Component.new(**component)
       project.components << project_component
     end

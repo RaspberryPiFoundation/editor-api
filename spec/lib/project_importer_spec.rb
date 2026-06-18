@@ -115,6 +115,31 @@ RSpec.describe ProjectImporter do
     end
   end
 
+  context 'when a non-scratch project contains an sb3 file' do
+    let(:project) { Project.find_by(identifier: importer.identifier, user_id: nil, locale: importer.locale) }
+    let(:importer) do
+      described_class.new(
+        name: 'My amazing project',
+        identifier: 'my-amazing-project',
+        type: Project::Types::PYTHON,
+        locale: 'en',
+        components: [
+          { name: 'main', extension: 'py', content: 'print(\'hello\')', default: true },
+          { name: 'stray', extension: 'sb3', io: StringIO.new('ignored') }
+        ]
+      )
+    end
+
+    it 'does not raise when importing' do
+      expect { importer.import! }.not_to raise_error
+    end
+
+    it 'skips the sb3 file and only creates the standard components' do
+      importer.import!
+      expect(project.components.pluck(:extension)).to eq(['py'])
+    end
+  end
+
   context 'when the project has type code_editor_scratch' do
     let(:scratch_project_file) { Tempfile.new(['test_scratch_project', '.sb3']) }
     let(:parser) { instance_double(Sb3Parser, parse: parser_result) }
