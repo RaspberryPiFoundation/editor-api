@@ -45,13 +45,10 @@ Rails.application.configure do
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   # config.force_ssl = true
 
-  # Log to STDOUT on Heroku in JSON format, where this variable is set automatically.
-  if ENV['RAILS_LOG_TO_STDOUT'].present?
-    $stdout.sync = true
-    config.rails_semantic_logger.add_file_appender = false
-    config.semantic_logger.add_appender(io: $stdout, formatter: :json)
-    config.semantic_logger.application = "editor-api@#{ENV['HEROKU_SLUG_COMMIT'] || 'unknown'}"
-  end
+  # Log to STDOUT by default
+  config.logger = ActiveSupport::Logger.new($stdout)
+                                       .tap  { |logger| logger.formatter = Logger::Formatter.new }
+                                       .then { |logger| ActiveSupport::TaggedLogging.new(logger) }
 
   # Prepend all log lines with the following tags.
   config.log_tags = [:request_id]

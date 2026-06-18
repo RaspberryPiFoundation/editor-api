@@ -18,7 +18,7 @@ Rails.application.configure do
   # config.flipper.strict = Rails.env.development? && :warn
 
   ## Show Flipper checks in logs
-  config.flipper.log = false
+  # config.flipper.log = true
 
   ## Reconfigure Flipper to use the Memory adapter and disable Cloud in tests
   # config.flipper.test_help = true
