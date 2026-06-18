@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'zip'
 module Sb3ArchiveHelper
   def sb3_archive(entries)
     Zip::OutputStream.write_buffer do |zip|
