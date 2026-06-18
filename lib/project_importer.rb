@@ -64,7 +64,7 @@ class ProjectImporter
     return unless component[:extension] == 'sb3'
 
     parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
-    raise ImportError, 'Scratch project content could not be parsed' unless parsed_content.present?
+    raise ImportError, 'Scratch project content could not be parsed' if parsed_content.blank?
 
     project.scratch_component = ScratchComponent.new(content: parsed_content)
   end

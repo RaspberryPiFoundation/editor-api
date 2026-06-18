@@ -117,6 +117,13 @@ RSpec.describe ProjectImporter do
 
   context 'when the project has type code_editor_scratch' do
     let(:scratch_project_file) { Tempfile.new(['test_scratch_project', '.sb3']) }
+    let(:parser) { instance_double(Sb3Parser, parse: parser_result) }
+    let(:parser_result) do
+      {
+        scratch_component: { content: JSON.parse(scratch_project_content.to_json) },
+        assets: []
+      }
+    end
     let(:importer) do
       described_class.new(
         name: 'My amazing Scratch project',
@@ -143,6 +150,8 @@ RSpec.describe ProjectImporter do
     let(:project) { Project.find_by(identifier: importer.identifier, user_id: nil, locale: importer.locale) }
 
     before do
+      allow(Sb3Parser).to receive(:new).and_return(parser)
+
       scratch_project_file.binmode
       scratch_project_file.write(
         sb3_archive(
@@ -174,16 +183,12 @@ RSpec.describe ProjectImporter do
       end
 
       it 'raises and rolls back the import when the scratch content cannot be parsed' do
-        allow_any_instance_of(Sb3Parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
+        allow(parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
 
         expect { importer.import! }
           .to raise_error(ProjectImporter::ImportError, 'Scratch project content could not be parsed')
 
-        expect do
-          importer.import!
-        rescue StandardError
-          ProjectImporter::ImportError
-        end.not_to change(Project, :count)
+        expect(Project.where(identifier: importer.identifier, locale: importer.locale).count).to eq(0)
       end
     end
 
@@ -228,7 +233,7 @@ RSpec.describe ProjectImporter do
       end
 
       it 'rolls back project changes when the scratch content cannot be parsed' do
-        allow_any_instance_of(Sb3Parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
+        allow(parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
 
         expect { importer.import! }
           .to raise_error(ProjectImporter::ImportError, 'Scratch project content could not be parsed')
