@@ -31,7 +31,9 @@ class CreateStudentsJob < ApplicationJob
   end
 
   def perform(school_id:, students:, token:)
+    school = School.find(school_id)
     decrypted_students = StudentHelpers.decrypt_students(students)
+    SafeguardingFlagService.create_for_token(token:, school:)
     responses = ProfileApiClient.create_school_students(token:, students: decrypted_students, school_id:)
     return if responses[:created].blank?
 

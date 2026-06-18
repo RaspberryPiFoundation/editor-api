@@ -18,6 +18,7 @@ RSpec.describe SchoolStudent::Update, type: :unit do
   before do
     stub_profile_api_school_student # This is the call made to determine if it's an SSO student
     stub_profile_api_update_school_student
+    allow(SafeguardingFlagService).to receive(:create_for_token)
   end
 
   it 'returns a successful operation response' do

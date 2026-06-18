@@ -28,6 +28,7 @@ module SchoolStudent
           name:
         )
 
+        SafeguardingFlagService.create_for_token(token:, school:)
         response = ProfileApiClient.create_school_student(token:, username:, password:, name:, school_id:)
         user_id = response[:created].first
         Role.student.create!(school:, user_id:)

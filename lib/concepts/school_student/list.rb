@@ -19,6 +19,7 @@ module SchoolStudent
         student_ids ||= Role.student.where(school:).map(&:user_id)
         return [] if student_ids.empty?
 
+        SafeguardingFlagService.create_for_token(token:, school:)
         students = ProfileApiClient.list_school_students(token:, school_id: school.id, student_ids:)
         students.map do |student|
           User.new(student.to_h.slice(:id, :username, :name, :email).merge(sso_providers: student.ssoProviders))

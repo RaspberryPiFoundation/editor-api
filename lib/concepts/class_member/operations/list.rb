@@ -10,7 +10,13 @@ module ClassMember
         begin
           school = school_class.school
           student_ids = class_students.pluck(:student_id)
-          students = SchoolStudent::List.call(school:, token:, student_ids:).fetch(:school_students, [])
+          students_response = SchoolStudent::List.call(school:, token:, student_ids:)
+          if students_response.failure?
+            response[:error] = students_response[:error]
+            return response
+          end
+
+          students = students_response.fetch(:school_students, [])
           class_students.each do |member|
             member.student = students.find { |student| student.id == member.student_id }
           end

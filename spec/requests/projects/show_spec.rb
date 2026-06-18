@@ -13,6 +13,7 @@ RSpec.describe 'Project show requests' do
     before do
       authenticated_in_hydra_as(teacher)
       stub_profile_api_list_school_students(school:, student_attributes: [{ name: 'Joe Bloggs' }])
+      stub_profile_api_create_safeguarding_flag
     end
 
     context 'when loading own project' do

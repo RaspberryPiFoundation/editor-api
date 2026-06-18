@@ -7,6 +7,10 @@ RSpec.describe SchoolStudent::List, type: :unit do
   let(:school) { create(:school) }
   let(:students) { create_list(:student, 3, school:) }
 
+  before do
+    allow(SafeguardingFlagService).to receive(:create_for_token)
+  end
+
   context 'without student_ids' do
     before do
       student_attributes = students.map do |student|
@@ -29,6 +33,12 @@ RSpec.describe SchoolStudent::List, type: :unit do
         school_id: school.id,
         student_ids: match_array(students.map(&:id))
       )
+    end
+
+    it 'ensures the current user has a safeguarding flag before listing students' do
+      described_class.call(school:, token:)
+
+      expect(SafeguardingFlagService).to have_received(:create_for_token).with(token:, school:)
     end
 
     it 'returns a school students JSON array' do

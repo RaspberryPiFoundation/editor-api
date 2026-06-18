@@ -28,6 +28,7 @@ RSpec.describe 'Remix requests' do
 
     before do
       authenticated_in_hydra_as(owner)
+      stub_profile_api_create_safeguarding_flag
     end
 
     describe '#index' do

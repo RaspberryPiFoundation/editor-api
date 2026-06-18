@@ -19,6 +19,10 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
     ]
   end
 
+  before do
+    allow(SafeguardingFlagService).to receive(:create_for_school_roles)
+  end
+
   context 'when SSO creation succeeds' do
     let(:user_ids) { [SecureRandom.uuid, SecureRandom.uuid] }
 
@@ -37,6 +41,12 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
 
       expect(ProfileApiClient).to have_received(:create_school_students_sso)
         .with(token: current_user.token, students: school_students_params, school_id: school.id)
+    end
+
+    it 'ensures the current user has a safeguarding flag before creating students' do
+      described_class.call(school:, school_students_params:, current_user:)
+
+      expect(SafeguardingFlagService).to have_received(:create_for_school_roles).with(user: current_user, school:)
     end
 
     it 'transforms nil values to empty strings before API call' do
