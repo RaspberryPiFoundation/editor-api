@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectImporter
+  class ImportError < StandardError; end
+
   attr_reader :name, :identifier, :images, :videos, :audio, :media, :components, :type, :locale
 
   def initialize(**kwargs)
@@ -62,7 +64,9 @@ class ProjectImporter
     return unless component[:extension] == 'sb3'
 
     parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
-    project.scratch_component = ScratchComponent.new(content: parsed_content) if parsed_content
+    raise ImportError, 'Scratch project content could not be parsed' unless parsed_content.present?
+
+    project.scratch_component = ScratchComponent.new(content: parsed_content)
   end
 
   def create_scratch_assets

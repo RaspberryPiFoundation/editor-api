@@ -172,6 +172,19 @@ RSpec.describe ProjectImporter do
         importer.import!
         expect(ScratchAsset.global_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
       end
+
+      it 'raises and rolls back the import when the scratch content cannot be parsed' do
+        allow_any_instance_of(Sb3Parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
+
+        expect { importer.import! }
+          .to raise_error(ProjectImporter::ImportError, 'Scratch project content could not be parsed')
+
+        expect do
+          importer.import!
+        rescue StandardError
+          ProjectImporter::ImportError
+        end.not_to change(Project, :count)
+      end
     end
 
     context 'when the scratch project already exists in the database' do
@@ -212,6 +225,16 @@ RSpec.describe ProjectImporter do
         importer.import!
 
         expect(ScratchAsset.global_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
+      end
+
+      it 'rolls back project changes when the scratch content cannot be parsed' do
+        allow_any_instance_of(Sb3Parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
+
+        expect { importer.import! }
+          .to raise_error(ProjectImporter::ImportError, 'Scratch project content could not be parsed')
+
+        expect(project.reload.name).to eq('Old Scratch project name')
+        expect(project.scratch_component.content).to eq(original_scratch_content.deep_stringify_keys)
       end
     end
   end
