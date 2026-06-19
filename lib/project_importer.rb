@@ -55,7 +55,7 @@ class ProjectImporter
       # .sb3 files are only ever imported as a ScratchComponent (see
       # create_scratch_component); they carry an :io/:file_path key that is not a
       # Component attribute, so skip them here to avoid building invalid rows.
-      next if component[:extension] == 'sb3'
+      next if component[:extension]&.casecmp?('sb3')
 
       project_component = Component.new(**component)
       project.components << project_component
@@ -66,7 +66,7 @@ class ProjectImporter
     return unless project.scratch_project?
 
     component = components[0]
-    return unless component&.fetch(:extension, nil) == 'sb3'
+    return unless component&.fetch(:extension, nil)&.casecmp?('sb3')
 
     parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
     raise ImportError, 'Scratch project content could not be parsed' if parsed_content.blank?
@@ -78,7 +78,7 @@ class ProjectImporter
     return unless project.scratch_project?
 
     component = components[0]
-    return unless component&.fetch(:extension, nil) == 'sb3'
+    return unless component&.fetch(:extension, nil)&.casecmp?('sb3')
 
     parsed_assets = Sb3Parser.new(component: component).parse.fetch(:assets)
     ScratchSb3AssetImporter.import_all(parsed_assets)

@@ -56,7 +56,7 @@ class FilesystemProject
   def self.component(file, dir)
     name = File.basename(file, '.*')
     extension = File.extname(file).delete('.')
-    return { name:, extension:, file_path: dir.join(File.basename(file)).to_s } if extension == 'sb3'
+    return { name:, extension:, file_path: dir.join(File.basename(file)).to_s } if extension.casecmp?('sb3')
 
     code = File.read(dir.join(File.basename(file)).to_s)
     default = (File.basename(file) == 'main.py')
