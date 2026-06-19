@@ -12,7 +12,6 @@ class FilesystemProject
       proj_config = YAML.safe_load_file(dir.join(PROJECT_CONFIG).to_s)
 
       files = dir.children.reject { |file| file.basename.to_s == PROJECT_CONFIG }
-      files = configured_scratch_files(files, proj_config) if proj_config['TYPE'] == Project::Types::CODE_EDITOR_SCRATCH
       categorized_files = categorize_files(files, dir)
 
       project_importer = ProjectImporter.new(name: proj_config['NAME'], identifier: proj_config['IDENTIFIER'],
@@ -52,13 +51,6 @@ class FilesystemProject
     end
 
     categories
-  end
-
-  def self.configured_scratch_files(files, proj_config)
-    configured_locations = Array(proj_config['COMPONENTS']).pluck('location')
-    return files if configured_locations.empty?
-
-    files.reject { |file| File.extname(file) == '.sb3' && configured_locations.exclude?(file.basename.to_s) }
   end
 
   def self.component(file, dir)

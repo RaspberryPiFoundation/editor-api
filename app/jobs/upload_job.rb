@@ -170,13 +170,11 @@ class UploadJob < ApplicationJob
   end
 
   def media(file, project_dir, locale, repository, owner)
-    filename = file.name
-    { filename:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
+    { filename: file.name, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
   end
 
   def file_url(file, project_dir, locale, repository, owner)
-    directory = project_dir.name
-    "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{file.name}"
+    "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{project_dir.name}/#{file.name}"
   end
 
   def repository(payload)

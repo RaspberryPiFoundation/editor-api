@@ -36,9 +36,9 @@ class Sb3Parser
     return Zip::File.open(file_path, &) if file_path
 
     io.rewind if io.respond_to?(:rewind)
-    result = nil
-    Zip::File.open_buffer(io.read) { |zip_file| result = yield zip_file }
-    result
+    Zip::File.open_buffer(io.read) do |zip_file|
+      return yield zip_file
+    end
   end
 
   def project_json_entry(zip_file)
