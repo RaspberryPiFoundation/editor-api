@@ -26,11 +26,14 @@ class CreateStudentsJob < ApplicationJob
 
   queue_as :create_students_job
 
-  def self.attempt_perform_later(school_id:, students:, token:)
-    perform_later(school_id:, students:, token:)
+  def self.attempt_perform_later(school_id:, students:, token:, actor_user_id: nil)
+    args = { school_id:, students:, token: }
+    args[:actor_user_id] = actor_user_id if actor_user_id.present?
+
+    perform_later(**args)
   end
 
-  def perform(school_id:, students:, token:)
+  def perform(school_id:, students:, token:, actor_user_id: nil)
     school = School.find(school_id)
     decrypted_students = StudentHelpers.decrypt_students(students)
     SafeguardingFlagService.create_for_token(token:, school:)
@@ -39,6 +42,22 @@ class CreateStudentsJob < ApplicationJob
 
     responses[:created].each do |user_id|
       Role.student.create!(school_id:, user_id:)
+      track_student_created(school_id:, student_id: user_id, actor_user_id:)
     end
+  end
+
+  private
+
+  def track_student_created(school_id:, student_id:, actor_user_id:)
+    return if actor_user_id.blank?
+
+    EventTracker.track!(
+      name: 'Student - Created',
+      user_id: actor_user_id,
+      properties: {
+        school_id:,
+        student_id:
+      }
+    )
   end
 end

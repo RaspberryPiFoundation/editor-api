@@ -60,6 +60,21 @@ RSpec.describe 'Creating a class member', type: :request do
         expect(response_student).to eq(student_attributes)
       end
 
+      it 'records a class student added event' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: student_params)
+
+        expect(Event.last).to have_attributes(
+          name: 'Class - Student added',
+          user_id: owner.id,
+          properties: {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'student_id' => student.id
+          },
+          time: be_within(1.second).of(Time.current)
+        )
+      end
+
       context 'when the student is already in the class' do
         before do
           school_class.students.create!({ student_id: student.id })
@@ -124,6 +139,12 @@ RSpec.describe 'Creating a class member', type: :request do
         response_teacher = data[:class_member][:teacher]
         teacher_attributes = { id: another_teacher.id, name: another_teacher.name, email: another_teacher.email, type: 'teacher' }
         expect(response_teacher).to eq(teacher_attributes)
+      end
+
+      it 'does not record a class student added event' do
+        expect do
+          post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: teacher_params)
+        end.not_to change(Event, :count)
       end
 
       context 'when the teacher is already in the class' do

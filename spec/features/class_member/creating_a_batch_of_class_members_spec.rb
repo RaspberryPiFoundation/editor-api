@@ -61,6 +61,23 @@ RSpec.describe 'Creating a class member', type: :request do
           expect(data).to include({ success: true, user_id: class_member[:user_id] })
         end
       end
+
+      it 'records class student added events for the student members only' do
+        post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params:)
+
+        events = Event.where(name: 'Class - Student added').order(:time)
+        expect(events.count).to eq(3)
+        expect(events.map(&:user_id)).to all(eq(teacher.id))
+        expect(events.map(&:properties)).to match_array(
+          students.map do |student|
+            {
+              'school_id' => school.id,
+              'class_id' => school_class.id,
+              'student_id' => student.id
+            }
+          end
+        )
+      end
     end
 
     context 'when adding an owner as another teacher' do

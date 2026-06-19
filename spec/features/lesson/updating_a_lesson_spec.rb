@@ -129,5 +129,27 @@ RSpec.describe 'Updating a lesson', type: :request do
       lesson.reload
       expect(lesson.school_class_id).not_to eq(school_class.id)
     end
+
+    context "when changing visibility to 'students'" do
+      let!(:lesson) { create(:lesson, school_class:, name: 'Test Lesson', visibility: 'teachers', user_id: teacher.id) }
+      let(:params) { { lesson: { visibility: 'students' } } }
+
+      it 'records a project made visible event' do
+        put("/api/lessons/#{lesson.id}", headers:, params:)
+
+        expect(Event.last).to have_attributes(
+          name: 'Project - Made visible',
+          user_id: teacher.id,
+          properties: {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'lesson_id' => lesson.id,
+            'project_type' => Project::Types::PYTHON,
+            'user_role' => 'educator'
+          },
+          time: be_within(1.second).of(Time.current)
+        )
+      end
+    end
   end
 end

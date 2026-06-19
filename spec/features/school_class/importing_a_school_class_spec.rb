@@ -301,6 +301,20 @@ RSpec.describe 'Importing a school class', type: :request do
       # Class members should be assigned successfully
       expect(response_data[:class_members]).to be_an(Array)
       expect(response_data[:class_members].length).to eq(2)
+
+      student_events = Event.where(name: 'Student - Created')
+      expect(student_events.map(&:properties)).to contain_exactly(
+        { 'school_id' => school.id, 'class_id' => response_data[:school_class][:id], 'student_id' => 'student-1-id' },
+        { 'school_id' => school.id, 'class_id' => response_data[:school_class][:id], 'student_id' => 'student-2-id' }
+      )
+      expect(student_events).to all(have_attributes(user_id: teacher.id, time: be_within(1.second).of(Time.current)))
+
+      class_member_events = Event.where(name: 'Class - Student added')
+      expect(class_member_events.map(&:properties)).to contain_exactly(
+        { 'school_id' => school.id, 'class_id' => response_data[:school_class][:id], 'student_id' => 'student-1-id' },
+        { 'school_id' => school.id, 'class_id' => response_data[:school_class][:id], 'student_id' => 'student-2-id' }
+      )
+      expect(class_member_events).to all(have_attributes(user_id: teacher.id, time: be_within(1.second).of(Time.current)))
     end
 
     it 'allows re-importing the same class (finds existing class)' do

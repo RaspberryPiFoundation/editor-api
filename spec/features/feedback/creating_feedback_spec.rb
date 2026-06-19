@@ -46,6 +46,24 @@ RSpec.describe 'Create feedback requests', type: :request do
       it 'adds the feedback to the school project' do
         expect(student_project.school_project.feedback.count).to eq(1)
       end
+
+      it 'records a project feedback given event' do
+        event = Event.last
+
+        expect(event).to have_attributes(
+          name: 'Project - Feedback given',
+          user_id: teacher.id,
+          properties: {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'lesson_id' => lesson.id,
+            'project_type' => Project::Types::PYTHON,
+            'user_role' => 'educator',
+            'student_id' => student.id
+          },
+          time: be_within(1.second).of(Time.current)
+        )
+      end
     end
 
     context 'when leaving feedback on a project that is not student work' do

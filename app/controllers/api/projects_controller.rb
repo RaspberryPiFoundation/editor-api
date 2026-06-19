@@ -17,6 +17,8 @@ module Api
     end
 
     def show
+      track_project_event('Project - Opened', @project) if current_user.present?
+
       if !@project.school_id.nil? && @project.lesson_id.nil?
         project_with_user = @project.with_student(current_user)
         @user = project_with_user[1]
@@ -31,6 +33,7 @@ module Api
 
       if result.success?
         @project = result[:project]
+        track_project_event('Project - Created', @project)
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_content
@@ -41,6 +44,7 @@ module Api
       result = Project::Update.call(project: @project, update_hash: project_params, current_user:)
 
       if result.success?
+        track_project_event('Project - Saved', @project)
         render :show, formats: [:json]
       else
         render json: { error: result[:error] }, status: :unprocessable_content

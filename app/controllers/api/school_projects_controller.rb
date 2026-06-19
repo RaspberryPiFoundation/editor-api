@@ -23,9 +23,11 @@ module Api
 
     def submit
       authorize! :submit, school_project
+      previous_status = school_project.status
       result = SchoolProject::SetStatus.call(school_project:, status: :submitted, user_id: current_user.id)
       if result.success?
         @school_project = result[:school_project]
+        track_project_event('Project - Submitted for review', @school_project.project) if previous_status != 'submitted'
         render :show_status, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_content
@@ -45,9 +47,11 @@ module Api
 
     def complete
       authorize! :complete, school_project
+      previous_status = school_project.status
       result = SchoolProject::SetStatus.call(school_project:, status: :complete, user_id: current_user.id)
       if result.success?
         @school_project = result[:school_project]
+        track_project_event('Project - Marked as completed', @school_project.project) if previous_status != 'complete'
         render :show_status, formats: [:json], status: :ok
       else
         render json: { error: result[:error] }, status: :unprocessable_content

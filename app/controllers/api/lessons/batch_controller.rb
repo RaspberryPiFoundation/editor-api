@@ -18,6 +18,7 @@ module Api
           lessons_params: batch_lessons_params
         )
         @user = current_user
+        @results.select(&:success?).each { |result| track_project_event('Project - Created', result[:lesson].project) }
         render :create_batch, formats: [:json], status: :created
       end
 
