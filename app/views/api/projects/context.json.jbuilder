@@ -6,8 +6,7 @@ json.call(
   @project,
   :identifier,
   :project_type,
-  :school_id,
-  :lesson_id
+  :school_id
 )
 
 json.lesson_id source_lesson&.id
