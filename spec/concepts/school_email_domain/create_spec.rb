@@ -78,9 +78,9 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
       expect(Sentry).not_to have_received(:capture_exception).with(kind_of(StandardError))
     end
 
-    it 'returns the error message in the operation response' do
+    it 'returns the error code in the operation response' do
       response = described_class.call(school:, domain:, token:)
-      expect(response[:error]).to include('')
+      expect(response[:error_code]).to eq(expected_error_code)
     end
 
     it 'does not attempt to update Profile' do
@@ -91,28 +91,28 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
 
   context 'when domain is blank' do
     let(:domain) { '' }
-    let(:expected_error_message) { "Domain can't be blank" }
+    let(:expected_error_code) { 'blank' }
 
     it_behaves_like 'an invalid record'
   end
 
   context 'when domain is not an FQDN' do
     let(:domain) { 'edu' }
-    let(:expected_error_message) { 'Domain must be a fully qualified domain name' }
+    let(:expected_error_code) { 'invalid_host' }
 
     it_behaves_like 'an invalid record'
   end
 
   context 'when domain has an invalid URI' do
     let(:domain) { 'exa mple.com' }
-    let(:expected_error_message) { 'Domain must be a valid domain format' }
+    let(:expected_error_code) { 'invalid_uri' }
 
     it_behaves_like 'an invalid record'
   end
 
   context 'when domain has an invalid public suffix' do
     let(:domain) { 'co.uk' }
-    let(:expected_error_message) { 'Domain must be a registrable domain name' }
+    let(:expected_error_code) { 'invalid_public_suffix' }
 
     it_behaves_like 'an invalid record'
   end
@@ -120,13 +120,13 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
   context 'when domain is a duplicate' do
     before { create(:school_email_domain, school:, domain:) }
 
-    let(:expected_error_message) { 'Domain has already been taken' }
+    let(:expected_error_code) { 'taken' }
 
     it_behaves_like 'an invalid record'
   end
 
   context 'when a concurrent request creates the same domain' do
-    let(:expected_error_message) { 'Domain has already been taken' }
+    let(:expected_error_code) { 'taken' }
     let(:school_email_domain) { SchoolEmailDomain.new(school:, domain:) }
 
     before do
@@ -171,9 +171,9 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
       expect(described_class.call(school:, domain:, token:)).to be_failure
     end
 
-    it 'returns the error message in the operation response' do
+    it 'returns the error code in the operation response' do
       response = described_class.call(school:, domain:, token:)
-      expect(response[:error]).to eq('Unexpected response from Profile API (status code 500)')
+      expect(response[:error_code]).to eq('profile_sync_failed')
     end
   end
 end

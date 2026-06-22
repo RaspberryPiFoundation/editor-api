@@ -43,9 +43,9 @@ RSpec.describe 'Creating school email domains', type: :request do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
-      it 'returns the error in the response body' do
+      it 'returns the error code in the response body' do
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:error]).to match(expected_error)
+        expect(data[:error_code]).to eq(expected_error_code)
       end
     end
 
@@ -117,7 +117,7 @@ RSpec.describe 'Creating school email domains', type: :request do
     context 'when the domain cannot be processed' do
       context 'when the domain is blank' do
         let(:domain) { '' }
-        let(:expected_error) { /Domain can't be blank/ }
+        let(:expected_error_code) { 'blank' }
 
         it_behaves_like 'an unprocessable school email domain creation response'
 
@@ -130,7 +130,7 @@ RSpec.describe 'Creating school email domains', type: :request do
 
       context 'when the domain is not an FQDN' do
         let(:domain) { 'edu' }
-        let(:expected_error) { /Domain must be a fully qualified domain name/ }
+        let(:expected_error_code) { 'invalid_host' }
 
         it_behaves_like 'an unprocessable school email domain creation response'
 
@@ -143,7 +143,7 @@ RSpec.describe 'Creating school email domains', type: :request do
 
       context 'when the uri is invalid' do
         let(:domain) { 'exa mple.com' }
-        let(:expected_error) { /Domain must be a valid domain format/ }
+        let(:expected_error_code) { 'invalid_uri' }
 
         it_behaves_like 'an unprocessable school email domain creation response'
 
@@ -156,7 +156,7 @@ RSpec.describe 'Creating school email domains', type: :request do
 
       context 'when the public suffix is invalid' do
         let(:domain) { 'co.uk' }
-        let(:expected_error) { /Domain must be a registrable domain name/ }
+        let(:expected_error_code) { 'invalid_public_suffix' }
 
         it_behaves_like 'an unprocessable school email domain creation response'
 
@@ -168,7 +168,7 @@ RSpec.describe 'Creating school email domains', type: :request do
       end
 
       context 'when the domain is a duplicate' do
-        let(:expected_error) { /Domain has already been taken/ }
+        let(:expected_error_code) { 'taken' }
 
         before do
           create(:school_email_domain, school:, domain:)
@@ -190,7 +190,7 @@ RSpec.describe 'Creating school email domains', type: :request do
           instance_double(Faraday::Response, status: 500, headers: {}, body: '')
         )
       end
-      let(:expected_error) { /Unexpected response from Profile API \(status code 500\)/ }
+      let(:expected_error_code) { 'profile_sync_failed' }
 
       before do
         allow(ProfileApiClient).to receive(:update_school_email_domains).and_raise(profile_error)

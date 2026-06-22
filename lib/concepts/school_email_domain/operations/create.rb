@@ -14,15 +14,18 @@ class SchoolEmailDomain
       rescue ActiveRecord::RecordInvalid => e
         record = response[:school_email_domain] || e.record
         response[:error] = record.errors.full_messages.join(', ')
+        response[:error_code] = domain_error_code(record)
         response
       rescue ActiveRecord::RecordNotUnique
         record = response[:school_email_domain]
         record.errors.add(:domain, :taken)
         response[:error] = record.errors.full_messages.join(', ')
+        response[:error_code] = 'taken'
         response
       rescue StandardError => e
         Sentry.capture_exception(e) # Send unexpected/Profile errors to Sentry
         response[:error] = e.message
+        response[:error_code] = 'profile_sync_failed'
         response
       end
 
@@ -35,6 +38,10 @@ class SchoolEmailDomain
       def update_profile(school, token)
         school_email_domains = school.school_email_domains.order(:created_at).pluck(:domain)
         ProfileApiClient.update_school_email_domains(token:, school_id: school.id, school_email_domains:)
+      end
+
+      def domain_error_code(record)
+        record.errors.details[:domain].first.fetch(:error).to_s
       end
     end
   end

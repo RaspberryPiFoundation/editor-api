@@ -15,7 +15,7 @@ module Api
       if result.success?
         render json: { domain: result[:school_email_domain].domain }, status: :created
       else
-        render json: { error: result[:error] }, status: :unprocessable_content
+        render json: { error: result[:error], error_code: result[:error_code] }, status: :unprocessable_content
       end
     end
 
