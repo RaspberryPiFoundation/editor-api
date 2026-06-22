@@ -69,7 +69,7 @@ class ProjectImporter
 
     parsed_content = Sb3Parser.new(component: component).parse
     project_content = parsed_content.dig(:scratch_component, :content)
-    assets = parsed_content.dig(:assets) || []
+    assets = parsed_content[:assets] || []
 
     raise ImportError, 'Scratch project content could not be parsed' if project_content.blank?
 
@@ -78,8 +78,8 @@ class ProjectImporter
   end
 
   def create_scratch_asset(asset)
-    filename = asset.dig(:filename)
-    io = asset.dig(:io)
+    filename = asset[:filename]
+    io = asset[:io]
 
     asset = ScratchAsset.new(filename:, uploaded_user_id: nil)
     asset.file.attach(io:, filename:)
