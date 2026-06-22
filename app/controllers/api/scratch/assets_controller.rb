@@ -5,6 +5,7 @@ module Api
     class AssetsController < ScratchController
       include ActiveStorage::SetCurrent
 
+      before_action :authorize_user, except: %i[show]
       prepend_before_action :load_project_from_header, only: %i[show create]
       authorize_resource :project_from_header
 

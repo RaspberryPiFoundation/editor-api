@@ -5,6 +5,7 @@ module Api
     class ProjectsController < ScratchController
       include RemixSelection
 
+      before_action :authorize_user, except: %i[show]
       before_action :load_project, except: %i[create]
       authorize_resource :project, except: %i[create]
 
