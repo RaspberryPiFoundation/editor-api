@@ -23,7 +23,6 @@ class ProjectImporter
       delete_components
       create_components
       create_scratch_component
-      create_scratch_assets
       delete_removed_media
       attach_media_if_needed
 
@@ -68,20 +67,23 @@ class ProjectImporter
     component = components[0]
     return unless component&.fetch(:extension, nil)&.casecmp?('sb3')
 
-    parsed_content = Sb3Parser.new(component: component).parse.fetch(:scratch_component).fetch(:content)
-    raise ImportError, 'Scratch project content could not be parsed' if parsed_content.blank?
+    parsed_content = Sb3Parser.new(component: component).parse
+    project_content = parsed_content.dig(:scratch_component, :content)
+    assets = parsed_content.dig(:assets) || []
 
-    project.scratch_component = ScratchComponent.new(content: parsed_content)
+    raise ImportError, 'Scratch project content could not be parsed' if project_content.blank?
+
+    project.scratch_component = ScratchComponent.new(content: project_content)
+    project.scratch_assets = assets.map { create_scratch_asset(it) }
   end
 
-  def create_scratch_assets
-    return unless project.scratch_project?
+  def create_scratch_asset(asset)
+    filename = asset.dig(:filename)
+    io = asset.dig(:io)
 
-    component = components[0]
-    return unless component&.fetch(:extension, nil)&.casecmp?('sb3')
-
-    parsed_assets = Sb3Parser.new(component: component).parse.fetch(:assets)
-    ScratchSb3AssetImporter.import_all(parsed_assets)
+    asset = ScratchAsset.new(filename:, uploaded_user_id: nil)
+    asset.file.attach(io:, filename:)
+    asset
   end
 
   def delete_removed_media
