@@ -5,8 +5,6 @@ class ScratchAsset < ApplicationRecord
   has_one_attached :file
 
   validates :filename, presence: true, uniqueness: { scope: %i[project_id uploaded_user_id] }
-  validates :uploaded_user_id, absence: true, if: :global?
-  validates :uploaded_user_id, presence: true, unless: :global?
   validate :belongs_to_scratch_project
 
   scope :global_assets, -> { where(project_id: nil, uploaded_user_id: nil) }
