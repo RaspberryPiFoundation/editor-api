@@ -17,7 +17,9 @@ RSpec.describe 'Project index requests' do
   context 'when user is logged in' do
     before do
       # create non user projects
-      create_list(:project, 2)
+      create(:project)
+      create(:project, user_id: nil)
+
       authenticated_in_hydra_as(owner)
     end
 
