@@ -23,7 +23,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
     context 'when the user is not logged in' do
       let(:project_headers) { { 'X-Project-ID' => project.identifier } }
 
-      it 'responds with unathorized' do
+      it 'responds with unauthorized' do
         create_uploaded_scratch_asset(filename: 'test_image_1.png', project:, body: 'global-body')
         get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/', headers: project_headers
 
