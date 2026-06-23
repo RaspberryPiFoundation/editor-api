@@ -98,7 +98,7 @@ class Ability
         school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id)
       )
     ).pluck(:id)
-    can(%i[read], Project, remixed_from_id: teacher_project_ids)
+    can(%i[read show_context], Project, remixed_from_id: teacher_project_ids)
     can(%i[show_status unsubmit return complete], SchoolProject, project: { remixed_from_id: teacher_project_ids })
     can(%i[read create destroy], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
     can(%i[exchange_code], :google_auth)

@@ -338,6 +338,7 @@ RSpec.describe Ability do
         let(:user) { create(:teacher, school:) }
 
         it { is_expected.not_to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:show_context, remixed_project) }
         it { is_expected.not_to be_able_to(:create, feedback) }
         it { is_expected.not_to be_able_to(:read, feedback) }
         it { is_expected.not_to be_able_to(:set_read, feedback) }
@@ -356,6 +357,7 @@ RSpec.describe Ability do
         let(:user) { teacher }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.to be_able_to(:show_context, remixed_project) }
         it { is_expected.to be_able_to(:create, feedback) }
         it { is_expected.to be_able_to(:read, feedback) }
         it { is_expected.not_to be_able_to(:set_read, feedback) }
@@ -382,6 +384,7 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:update, original_project) }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.to be_able_to(:show_context, remixed_project) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }
