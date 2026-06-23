@@ -54,13 +54,35 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 404 Not Found when user is not part of a school' do
-    user = create(:user)
-    authenticated_in_hydra_as(user)
+  context 'when authenticated but not part of a school' do
+    let(:user) { create(:user) }
 
-    make_request
+    before do
+      authenticated_in_hydra_as(user)
+    end
 
-    expect(response).to have_http_status(:not_found)
+    it 'responds 403 forbidden when the user cannot access the original project' do
+      make_request
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    context 'when the original project is anonymous scratch project' do
+      let(:original_project) do
+        create(
+          :project,
+          user_id: nil,
+          project_type: Project::Types::CODE_EDITOR_SCRATCH,
+          locale: 'en'
+        )
+      end
+
+      it 'responds 200 ok' do
+        make_request
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
   end
 
   context 'when authenticated and part of a school' do

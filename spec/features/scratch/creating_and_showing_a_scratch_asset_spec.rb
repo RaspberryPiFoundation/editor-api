@@ -20,7 +20,29 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       expect(response).to have_http_status(:bad_request)
     end
 
-    context 'when the user can view the project' do
+    context 'when the user is not logged in' do
+      let(:project_headers) { { 'X-Project-ID' => project.identifier } }
+
+      it 'responds with unathorized' do
+        create_uploaded_scratch_asset(filename: 'test_image_1.png', project:, body: 'global-body')
+        get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/', headers: project_headers
+
+        expect(response).to have_http_status(:unauthorized)
+      end
+
+      context 'when the project is anonymous' do
+        let(:project) { create_scratch_project(locale: 'en', user_id: nil) }
+
+        it 'responds with 200 ok' do
+          create_uploaded_scratch_asset(filename: 'test_image_1.png', project: nil, body: 'global-body')
+          get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/', headers: project_headers
+
+          expect(response).to have_http_status(:found)
+        end
+      end
+    end
+
+    context 'when the project owner is logged in' do
       before do
         authenticated_in_hydra_as(teacher)
       end
@@ -384,15 +406,6 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       post '/api/scratch/assets/example.svg', headers: { 'X-Project-ID' => project.identifier }
 
       expect(response).to have_http_status(:unauthorized)
-    end
-
-    it 'responds 404 Not Found when user is not part of a school' do
-      user = create(:user)
-      authenticated_in_hydra_as(user)
-
-      post '/api/scratch/assets/example.svg', headers: project_headers
-
-      expect(response).to have_http_status(:not_found)
     end
   end
 
