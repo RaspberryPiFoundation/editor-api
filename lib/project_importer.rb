@@ -74,16 +74,16 @@ class ProjectImporter
     raise ImportError, 'Scratch project content could not be parsed' if project_content.blank?
 
     project.scratch_component = ScratchComponent.new(content: project_content)
-    project.scratch_assets = assets.map { create_scratch_asset(it) }
+    assets.each { create_scratch_asset(it) }
   end
 
   def create_scratch_asset(asset)
     filename = asset[:filename]
     io = asset[:io]
 
-    asset = ScratchAsset.new(filename:, uploaded_user_id: nil)
+    asset = ScratchAsset.new(filename:, uploaded_user_id: nil, project_id: nil)
     asset.file.attach(io:, filename:)
-    asset
+    asset.save!
   end
 
   def delete_removed_media
