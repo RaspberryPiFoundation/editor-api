@@ -33,7 +33,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       context 'when the project is anonymous' do
         let(:project) { create_scratch_project(locale: 'en', user_id: nil) }
 
-        it 'responds with 200 ok' do
+        it 'redirects (302 Found)' do
           create_uploaded_scratch_asset(filename: 'test_image_1.png', project: nil, body: 'global-body')
           get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/', headers: project_headers
 
