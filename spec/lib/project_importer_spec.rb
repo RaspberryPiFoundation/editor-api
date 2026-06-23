@@ -208,13 +208,13 @@ RSpec.describe ProjectImporter do
 
       it 'imports the project assets' do
         importer.import!
-        expect(project.scratch_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
+        expect(ScratchAsset.global_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
       end
 
       it 'attaches the imported asset file content' do
         importer.import!
 
-        scratch_asset = project.scratch_assets.find_by(filename: 'test_image_1.png')
+        scratch_asset = ScratchAsset.global_assets.find_by(filename: 'test_image_1.png')
         expect(scratch_asset.file.download).to eq(sb3_fixture_content('test_image_1.png'))
       end
 
@@ -271,7 +271,7 @@ RSpec.describe ProjectImporter do
 
         importer.import!
 
-        expect(project.scratch_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
+        expect(ScratchAsset.global_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
       end
 
       it 'rolls back project changes when the scratch content cannot be parsed' do
