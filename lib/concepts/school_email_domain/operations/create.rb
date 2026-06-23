@@ -5,6 +5,7 @@ class SchoolEmailDomain
     class << self
       def call(school:, domain:, token:)
         response = OperationResponse.new
+        response[:school_email_domain] = nil
         response[:school_email_domain] = build_domain(school, domain)
         SchoolEmailDomain.transaction do
           response[:school_email_domain].save!
