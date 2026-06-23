@@ -80,6 +80,7 @@ class ProjectImporter
   def create_scratch_asset(asset)
     filename = asset[:filename]
     io = asset[:io]
+    return if ScratchAsset.global_assets.exists?(filename:)
 
     asset = ScratchAsset.new(filename:, uploaded_user_id: nil, project_id: nil)
     asset.file.attach(io:, filename:)
