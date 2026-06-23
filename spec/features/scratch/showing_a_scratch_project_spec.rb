@@ -84,7 +84,7 @@ RSpec.describe 'Showing a Scratch project', type: :request do
   it 'returns a 200 ok if logged in for an anonymous scratch project' do
     authenticated_in_hydra_as(student)
     project = create(:scratch_project, locale: 'en', user_id: nil)
-    get "/api/scratch/projects/#{project.identifier}"
+    get "/api/scratch/projects/#{project.identifier}", headers: headers
 
     expect(response).to have_http_status(:ok)
   end

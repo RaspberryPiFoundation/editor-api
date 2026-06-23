@@ -22,6 +22,7 @@ class Ability
   private
 
   def define_common_non_student_abilities(user)
+    can :show, Project, user_id: nil, school_id: nil, project_type: Project::Types::CODE_EDITOR_SCRATCH
     return if user&.student?
 
     # Anyone can view projects not owned by a user or a school.
