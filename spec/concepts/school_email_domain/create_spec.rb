@@ -43,6 +43,14 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
       )
     end
 
+    it 'locks the school while creating and syncing to Profile' do
+      allow(school).to receive(:with_lock).and_call_original
+
+      described_class.call(school:, domain:, token:)
+
+      expect(school).to have_received(:with_lock)
+    end
+
     context 'when multiple domains already exist' do
       before do
         create(:school_email_domain, school:, domain: 'first.edu')

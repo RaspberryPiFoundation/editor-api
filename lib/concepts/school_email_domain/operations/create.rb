@@ -7,7 +7,7 @@ class SchoolEmailDomain
         response = OperationResponse.new
         response[:school_email_domain] = nil
         response[:school_email_domain] = build_domain(school, domain)
-        SchoolEmailDomain.transaction do
+        school.with_lock do
           response[:school_email_domain].save!
           update_profile(school, token)
         end
