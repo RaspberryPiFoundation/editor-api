@@ -37,12 +37,6 @@ class SchoolEmailDomain
       private
 
       def acquire_advisory_lock_for_school(school)
-        # Advisory lock: queue school email domain creation for the same school so Profile
-        # always gets a complete domain list. Released automatically on commit or rollback.
-        #
-        # lock_key is a CRC32 hash, so two different schools could theoretically share the same
-        # key (~1 in 4 billion per pair). That wouldn't corrupt data — it would only queue
-        # unrelated schools' updates briefly.
         lock_key = Zlib.crc32("#{LOCK_NAMESPACE}:#{school.id}")
         SchoolEmailDomain.connection.execute("SELECT pg_advisory_xact_lock(#{lock_key})")
       end
