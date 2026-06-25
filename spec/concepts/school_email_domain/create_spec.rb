@@ -43,12 +43,11 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
       )
     end
 
-    it 'locks the school while creating and syncing to Profile' do
-      allow(school).to receive(:with_lock).and_call_original
-
+    it 'acquires an advisory lock while creating and syncing to Profile' do
+      allow(SchoolEmailDomain.connection).to receive(:execute).and_call_original
       described_class.call(school:, domain:, token:)
-
-      expect(school).to have_received(:with_lock)
+      lock_key = Zlib.crc32("#{SchoolEmailDomain::Create::LOCK_NAMESPACE}:#{school.id}")
+      expect(SchoolEmailDomain.connection).to have_received(:execute).with("SELECT pg_advisory_xact_lock(#{lock_key})")
     end
 
     context 'when multiple domains already exist' do

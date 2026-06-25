@@ -2,13 +2,17 @@
 
 class SchoolEmailDomain
   class Create
+    LOCK_NAMESPACE = Zlib.crc32(name) # convert the class name into a 32-bit int to derive the namespace for our advisory lock
+
     class << self
       def call(school:, domain:, token:)
         response = OperationResponse.new
         response[:school_email_domain] = nil
         response[:school_email_domain] = build_domain(school, domain)
-        school.with_lock do
+
+        SchoolEmailDomain.transaction do
           response[:school_email_domain].save!
+          acquire_advisory_lock_for_school(school)
           update_profile(school, token)
         end
         response
@@ -31,6 +35,17 @@ class SchoolEmailDomain
       end
 
       private
+
+      def acquire_advisory_lock_for_school(school)
+        # Advisory lock: queue school email domain creation for the same school so Profile
+        # always gets a complete domain list. Released automatically on commit or rollback.
+        #
+        # lock_key is a CRC32 hash, so two different schools could theoretically share the same
+        # key (~1 in 4 billion per pair). That wouldn't corrupt data — it would only queue
+        # unrelated schools' updates briefly.
+        lock_key = Zlib.crc32("#{LOCK_NAMESPACE}:#{school.id}")
+        SchoolEmailDomain.connection.execute("SELECT pg_advisory_xact_lock(#{lock_key})")
+      end
 
       def build_domain(school, domain)
         school.school_email_domains.build(domain:)
