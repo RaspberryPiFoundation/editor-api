@@ -5,7 +5,6 @@ require 'rails_helper'
 RSpec.describe 'Showing a Scratch project', type: :request do
   let(:school) { create(:school) }
   let(:teacher) { create(:teacher, school:) }
-  let(:student) { create(:student, school:) }
   let(:headers) { { 'Authorization' => UserProfileMock::TOKEN } }
   let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
   let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
@@ -82,7 +81,7 @@ RSpec.describe 'Showing a Scratch project', type: :request do
   end
 
   it 'returns a 200 ok if logged in for an anonymous scratch project' do
-    authenticated_in_hydra_as(student)
+    authenticated_in_hydra_as(teacher)
     project = create(:scratch_project, locale: 'en', user_id: nil)
     get "/api/scratch/projects/#{project.identifier}", headers: headers
 

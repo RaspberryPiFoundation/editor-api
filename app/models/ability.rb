@@ -4,7 +4,7 @@ class Ability
   include CanCan::Ability
 
   def initialize(user)
-    define_common_abilities
+    define_common_non_student_abilities(user)
 
     return unless user
 
@@ -21,7 +21,9 @@ class Ability
 
   private
 
-  def define_common_abilities
+  def define_common_non_student_abilities(user)
+    return if user&.student?
+
     # Anyone can view projects not owned by a user or a school.
     can :show, Project, user_id: nil, school_id: nil
     can :show, Component, project: { user_id: nil, school_id: nil }
