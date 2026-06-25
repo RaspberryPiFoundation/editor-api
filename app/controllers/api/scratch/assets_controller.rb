@@ -2,7 +2,7 @@
 
 module Api
   module Scratch
-    class AssetsController < ScratchController
+    class AssetsController < ApiController
       include ActiveStorage::SetCurrent
 
       before_action :authorize_user, except: %i[show]

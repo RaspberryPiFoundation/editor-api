@@ -2,7 +2,7 @@
 
 module Api
   module Scratch
-    class ProjectsController < ScratchController
+    class ProjectsController < ApiController
       include RemixSelection
 
       before_action :authorize_user, except: %i[show]
