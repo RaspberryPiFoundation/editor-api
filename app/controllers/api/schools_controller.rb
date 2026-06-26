@@ -20,7 +20,12 @@ module Api
 
       if result.success?
         @school = result[:school]
-        track_event('School - Created', school_id: @school.id)
+        track_event(
+          'School - Created',
+          school_id: @school.id,
+          first_landing_page: params[:first_landing_page],
+          marketing_parameters: marketing_parameters
+        )
         render :show, formats: [:json], status: :created
       else
         render json: {
@@ -76,6 +81,10 @@ module Api
     end
 
     private
+
+    def marketing_parameters
+      params[:marketing_parameters]&.permit!&.to_h
+    end
 
     def create_params
       params.expect(
