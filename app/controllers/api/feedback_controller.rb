@@ -24,6 +24,7 @@ module Api
 
       if result.success?
         @feedback = result[:feedback]
+        track_project_event('Project - Feedback given', project)
         render :show, formats: [:json], status: :created
       else
         render json: { error: result[:error] }, status: :unprocessable_content

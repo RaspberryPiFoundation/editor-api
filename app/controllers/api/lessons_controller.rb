@@ -33,6 +33,7 @@ module Api
     def create
       result = Lesson::Create.call(lesson_params: create_params)
       if result.success?
+        track_project_event('Project - Created', result[:lesson].project)
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :created
       else
@@ -54,9 +55,11 @@ module Api
     def update
       # TODO: Consider removing user_id from the lesson_params for update so users can update other users' lessons without changing ownership
       # OR consider dropping user_id on lessons and using teacher id/ids on the class instead
+      previous_visibility = @lesson.visibility
       result = Lesson::Update.call(lesson: @lesson, lesson_params: update_params)
 
       if result.success?
+        track_project_event('Project - Made visible', result[:lesson].project) if previous_visibility != 'students' && result[:lesson].visibility == 'students'
         @lesson_with_user = result[:lesson].with_user
         render :show, formats: [:json], status: :ok
       else

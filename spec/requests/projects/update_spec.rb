@@ -126,9 +126,41 @@ RSpec.describe 'Project update requests' do
     end
   end
 
+  context 'when authed user is a teacher updating a class project' do
+    let(:school) { create(:school) }
+    let(:teacher) { create(:teacher, school:) }
+    let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+    let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
+    let(:project) { create(:project, school:, lesson:, locale: nil, user_id: teacher.id) }
+    let(:params) { { project: { name: 'updated project name' } } }
+
+    before do
+      authenticated_in_hydra_as(teacher)
+    end
+
+    it 'records a project saved event' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+
+      expect(Event.last).to have_attributes(
+        name: 'Project - Saved',
+        user_id: teacher.id,
+        properties: {
+          'school_id' => school.id,
+          'class_id' => school_class.id,
+          'lesson_id' => lesson.id,
+          'project_type' => Project::Types::PYTHON,
+          'user_role' => 'educator'
+        },
+        time: be_within(1.second).of(Time.current)
+      )
+    end
+  end
+
   context 'when authed user is a student and the project is remixed from a lesson project' do
     let(:teacher) { create(:teacher, school:) }
-    let(:lesson_project) { create(:project, school:, locale: nil, user_id: teacher.id, lesson: create(:lesson, visibility: 'students')) }
+    let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+    let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
+    let(:lesson_project) { create(:project, school:, locale: nil, user_id: teacher.id, lesson:) }
     let(:project) { create(:project, school:, locale: nil, user_id: student.id, remixed_from_id: lesson_project.id) }
     let(:params) { { project: { components: [] } } }
     let(:school) { create(:school) }
@@ -136,6 +168,7 @@ RSpec.describe 'Project update requests' do
 
     before do
       authenticated_in_hydra_as(student)
+      create(:class_student, school_class:, student_id: student.id)
     end
 
     it 'returns success if instructions not updated' do
@@ -147,6 +180,23 @@ RSpec.describe 'Project update requests' do
       params[:project][:instructions] = 'updated instructions'
       put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'records a project saved event' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+
+      expect(Event.last).to have_attributes(
+        name: 'Project - Saved',
+        user_id: student.id,
+        properties: {
+          'school_id' => school.id,
+          'class_id' => school_class.id,
+          'lesson_id' => lesson.id,
+          'project_type' => Project::Types::PYTHON,
+          'user_role' => 'student'
+        },
+        time: be_within(1.second).of(Time.current)
+      )
     end
   end
 

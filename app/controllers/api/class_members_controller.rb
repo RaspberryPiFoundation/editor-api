@@ -37,6 +37,7 @@ module Api
 
       if result.success?
         @class_member = result[:class_members].first
+        track_class_students_added([@class_member])
         render :show, formats: [:json], status: :created
       else
         render json: result.slice(:error, :errors), status: :unprocessable_content
@@ -55,6 +56,7 @@ module Api
       if result.failure? && result[:error].include?('No valid school members provided')
         render json: result, status: :unprocessable_content
       else
+        track_class_students_added(result[:class_members])
         successful = result[:class_members].map { |m| { success: true, user_id: m.user_id } }
         errors = result[:errors].map { |user_id, error| { success: false, user_id:, error: } }
         render json: successful + errors
@@ -113,6 +115,20 @@ module Api
         SchoolTeacher::List.call(school:, teacher_ids:)
       else
         { school_teachers: [] }
+      end
+    end
+
+    def track_class_students_added(class_members)
+      Array(class_members).grep(ClassStudent).each do |class_student|
+        student_id = class_student.student_id || class_student.student&.id
+        next if student_id.blank?
+
+        track_event(
+          'Class - Student added',
+          school_id: @school.id,
+          class_id: @school_class.id,
+          student_id:
+        )
       end
     end
   end

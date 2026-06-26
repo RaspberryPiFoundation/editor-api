@@ -127,6 +127,24 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
       expect(response).to have_http_status(:created)
     end
 
+    it 'records project created events for each created lesson project' do
+      events = Event.where(name: 'Project - Created')
+
+      expect(events.count).to eq(2)
+      expect(events.map(&:user_id)).to all(eq(teacher.id))
+      expect(events.map(&:properties)).to match_array(
+        Lesson.order(:created_at).map do |lesson|
+          {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'lesson_id' => lesson.id,
+            'project_type' => Project::Types::CODE_EDITOR_SCRATCH,
+            'user_role' => 'educator'
+          }
+        end
+      )
+    end
+
     context 'when school_class_id does not correspond to school_id' do
       let(:lesson_projects) { lesson_project_params.map { |entry| entry.merge(school_id: SecureRandom.uuid) } }
 

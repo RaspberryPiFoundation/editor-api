@@ -157,7 +157,7 @@ module Api
       {
         school_students: school_students_result[:school_students],
         errors: school_students_result[:errors]
-      }
+      }.tap { track_created_school_students(school_students_result[:school_students], class_id: school_class.id) }
     end
 
     def assign_students_to_class(school_class, school_students)
@@ -172,6 +172,7 @@ module Api
         { success: false, student_id: user_id, school_class_id: school_class.id, error: error }
       end
 
+      track_imported_class_students_added(school_class, class_members_result[:class_members])
       class_members_result[:class_members] + class_members_errors
     end
 
@@ -220,6 +221,33 @@ module Api
 
     def school_owner?
       current_user.school_owner?(@school)
+    end
+
+    def track_created_school_students(school_students, class_id: nil)
+      Array(school_students).each do |school_student|
+        next unless school_student[:success] && school_student[:created]
+
+        track_event(
+          'Student - Created',
+          school_id: @school.id,
+          class_id:,
+          student_id: school_student[:student].id
+        )
+      end
+    end
+
+    def track_imported_class_students_added(school_class, class_members)
+      Array(class_members).grep(ClassStudent).each do |class_student|
+        student_id = class_student.student_id || class_student.student&.id
+        next if student_id.blank?
+
+        track_event(
+          'Class - Student added',
+          school_id: @school.id,
+          class_id: school_class.id,
+          student_id:
+        )
+      end
     end
   end
 end

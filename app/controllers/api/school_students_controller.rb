@@ -27,6 +27,7 @@ module Api
       )
 
       if result.success?
+        track_event('Student - Created', school_id: @school.id, student_id: result[:student_id]) if result[:student_id].present?
         head :no_content
       else
         render json: { error: result[:error] }, status: :unprocessable_content
@@ -86,7 +87,10 @@ module Api
       @batch.enqueue do
         students.each_slice(MAX_BATCH_CREATION_SIZE) do |student_batch|
           SchoolStudent::CreateBatch.call(
-            school: @school, school_students_params: student_batch, token: current_user.token
+            school: @school,
+            school_students_params: student_batch,
+            token: current_user.token,
+            actor_user_id: current_user.id
           )
         end
       end
