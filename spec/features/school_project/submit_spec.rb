@@ -29,6 +29,7 @@ RSpec.describe 'School project submit requests', type: :request do
 
     context('when transition is valid') do
       before do
+        class_student
         post("/api/projects/#{student_project.identifier}/submit", headers:)
       end
 
@@ -43,10 +44,26 @@ RSpec.describe 'School project submit requests', type: :request do
       it 'sets the status to submitted' do
         expect(student_project.school_project).to be_submitted
       end
+
+      it 'records a project submitted for review event' do
+        expect(Event.last).to have_attributes(
+          name: 'Project - Submitted for review',
+          user_id: student.id,
+          properties: {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'lesson_id' => lesson.id,
+            'project_type' => Project::Types::PYTHON,
+            'user_role' => 'student'
+          },
+          time: be_within(1.second).of(Time.current)
+        )
+      end
     end
 
     context 'when attempting an invalid status transition' do
       before do
+        class_student
         student_project.school_project.transition_status_to!(:complete, student.id)
         post("/api/projects/#{student_project.identifier}/submit", headers:)
       end
@@ -61,6 +78,10 @@ RSpec.describe 'School project submit requests', type: :request do
 
       it 'does not change the status' do
         expect(student_project.school_project).to be_complete
+      end
+
+      it 'does not record an event' do
+        expect(Event.where(name: 'Project - Submitted for review')).to be_empty
       end
     end
   end

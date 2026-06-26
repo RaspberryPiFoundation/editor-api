@@ -125,7 +125,8 @@ RSpec.describe 'Creating a project', type: :request do
 
   context 'when the project is associated with a lesson' do
     let(:school) { create(:school) }
-    let(:lesson) { create(:lesson, school:, user_id: teacher.id) }
+    let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+    let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id) }
     let(:lesson_created_by_owner) { create(:lesson, school:, user_id: owner.id) }
     let(:teacher) { create(:teacher, school:) }
 
@@ -144,6 +145,23 @@ RSpec.describe 'Creating a project', type: :request do
     it 'responds 201 Created' do
       post('/api/projects', headers:, params:)
       expect(response).to have_http_status(:created)
+    end
+
+    it 'records a project created event' do
+      post('/api/projects', headers:, params:)
+
+      expect(Event.last).to have_attributes(
+        name: 'Project - Created',
+        user_id: teacher.id,
+        properties: {
+          'school_id' => school.id,
+          'class_id' => school_class.id,
+          'lesson_id' => lesson.id,
+          'project_type' => Project::Types::PYTHON,
+          'user_role' => 'educator'
+        },
+        time: be_within(1.second).of(Time.current)
+      )
     end
 
     it 'responds 201 Created when the current user is the owner of the lesson' do

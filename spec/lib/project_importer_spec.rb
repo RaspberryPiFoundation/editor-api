@@ -114,4 +114,175 @@ RSpec.describe ProjectImporter do
       expect { importer.import! }.to change { project.reload.audio[0].filename.to_s }.to('my-amazing-audio.mp3')
     end
   end
+
+  context 'when a non-scratch project contains an sb3 file' do
+    let(:project) { Project.find_by(identifier: importer.identifier, user_id: nil, locale: importer.locale) }
+    let(:importer) do
+      described_class.new(
+        name: 'My amazing project',
+        identifier: 'my-amazing-project',
+        type: Project::Types::PYTHON,
+        locale: 'en',
+        components: [
+          { name: 'main', extension: 'py', content: 'print(\'hello\')', default: true },
+          { name: 'stray', extension: 'sb3', io: StringIO.new('ignored') }
+        ]
+      )
+    end
+
+    it 'does not raise when importing' do
+      expect { importer.import! }.not_to raise_error
+    end
+
+    it 'skips the sb3 file and only creates the standard components' do
+      importer.import!
+      expect(project.components.pluck(:extension)).to eq(['py'])
+    end
+  end
+
+  context 'when the project has type code_editor_scratch' do
+    let(:scratch_project_file) { Tempfile.new(['test_scratch_project', '.sb3']) }
+    let(:parser) { instance_double(Sb3Parser, parse: parser_result) }
+    let(:parser_result) do
+      {
+        scratch_component: { content: JSON.parse(scratch_project_content.to_json) },
+        assets: [
+          { filename: 'test_image_1.png', io: StringIO.new(sb3_fixture_content('test_image_1.png')), content_type: 'image/png' },
+          { filename: 'test_video_1.mp4', io: StringIO.new(sb3_fixture_content('test_video_1.mp4')), content_type: 'video/mp4' },
+          { filename: 'test_audio_1.mp3', io: StringIO.new(sb3_fixture_content('test_audio_1.mp3')), content_type: 'audio/mpeg' }
+        ]
+      }
+    end
+    let(:importer) do
+      described_class.new(
+        name: 'My amazing Scratch project',
+        identifier: 'my-amazing-scratch-project',
+        type: Project::Types::CODE_EDITOR_SCRATCH,
+        locale: 'en',
+        components: [
+          { name: 'main', extension: 'sb3', file_path: scratch_project_file.path }
+        ]
+      )
+    end
+    let(:scratch_project_content) do
+      {
+        targets: [
+          {
+            costumes: [{ md5ext: 'test_image_1.png' }],
+            sounds: [{ md5ext: 'test_audio_1.mp3' }],
+            videos: [{ md5ext: 'test_video_1.mp4' }]
+          }
+        ]
+      }
+    end
+
+    let(:project) { Project.find_by(identifier: importer.identifier, user_id: nil, locale: importer.locale) }
+
+    before do
+      allow(Sb3Parser).to receive(:new).and_return(parser)
+
+      scratch_project_file.binmode
+      scratch_project_file.write(
+        sb3_archive(
+          'project.json' => scratch_project_content.to_json,
+          'test_image_1.png' => sb3_fixture_content('test_image_1.png'),
+          'test_video_1.mp4' => sb3_fixture_content('test_video_1.mp4'),
+          'test_audio_1.mp3' => sb3_fixture_content('test_audio_1.mp3')
+        ).read
+      )
+      scratch_project_file.flush
+    end
+
+    after do
+      scratch_project_file.close
+      scratch_project_file.unlink
+    end
+
+    context 'when importing a new scratch project' do
+      it 'imports the Scratch component content' do
+        importer.import!
+
+        expect(project.components.count).to eq(0)
+        expect(project.scratch_component.content).to eq(JSON.parse(scratch_project_content.to_json))
+      end
+
+      it 'imports the project assets' do
+        importer.import!
+        expect(ScratchAsset.global_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
+      end
+
+      it 'attaches the imported asset file content' do
+        importer.import!
+
+        scratch_asset = ScratchAsset.global_assets.find_by(filename: 'test_image_1.png')
+        expect(scratch_asset.file.download).to eq(sb3_fixture_content('test_image_1.png'))
+      end
+
+      it 'raises and rolls back the import when the scratch content cannot be parsed' do
+        allow(parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
+
+        expect { importer.import! }
+          .to raise_error(ProjectImporter::ImportError, 'Scratch project content could not be parsed')
+
+        expect(Project.where(identifier: importer.identifier, locale: importer.locale).count).to eq(0)
+      end
+    end
+
+    context 'when the scratch project already exists in the database' do
+      let(:original_scratch_content) do
+        { targets: ['old target'], monitors: [], extensions: [], meta: {} }
+      end
+      let!(:project) do
+        create(
+          :project,
+          identifier: 'my-amazing-scratch-project',
+          locale: 'en',
+          project_type: Project::Types::CODE_EDITOR_SCRATCH,
+          name: 'Old Scratch project name'
+        )
+      end
+
+      before do
+        create(:scratch_component, project:, content: original_scratch_content)
+      end
+
+      it 'does not delete existing standard components' do
+        create(:component, project:, name: 'legacy', extension: 'txt', content: 'keep me')
+
+        expect { importer.import! }.not_to change { project.reload.components.count }
+      end
+
+      it 'does not create a new project' do
+        expect { importer.import! }.not_to change(Project, :count)
+      end
+
+      it 'updates the project name' do
+        expect { importer.import! }.to change { project.reload.name }.to(importer.name)
+      end
+
+      it 'updates the scratch component content' do
+        importer.import!
+
+        expect(project.reload.scratch_component.content).to eq(JSON.parse(scratch_project_content.to_json))
+      end
+
+      it 'imports any new assets without duplicating existing ones' do
+        create(:scratch_asset, :with_file, filename: 'test_image_1.png')
+
+        importer.import!
+
+        expect(ScratchAsset.global_assets.where(filename: ['test_image_1.png', 'test_video_1.mp4', 'test_audio_1.mp3']).count).to eq(3)
+      end
+
+      it 'rolls back project changes when the scratch content cannot be parsed' do
+        allow(parser).to receive(:parse).and_return({ scratch_component: { content: nil }, assets: [] })
+
+        expect { importer.import! }
+          .to raise_error(ProjectImporter::ImportError, 'Scratch project content could not be parsed')
+
+        expect(project.reload.name).to eq('Old Scratch project name')
+        expect(project.scratch_component.content).to eq(original_scratch_content.deep_stringify_keys)
+      end
+    end
+  end
 end

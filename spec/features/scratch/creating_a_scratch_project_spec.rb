@@ -22,11 +22,12 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
     }
   end
   let(:lesson) { create(:lesson, school:, user_id: teacher.id) }
+  let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
   let(:original_project) do
     create(
       :project,
       school:,
-      lesson:,
+      lesson: lesson,
       user_id: teacher.id,
       project_type: Project::Types::CODE_EDITOR_SCRATCH,
       locale: nil
@@ -53,13 +54,35 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
     expect(response).to have_http_status(:unauthorized)
   end
 
-  it 'responds 404 Not Found when user is not part of a school' do
-    user = create(:user)
-    authenticated_in_hydra_as(user)
+  context 'when authenticated but not part of a school' do
+    let(:user) { create(:user) }
 
-    make_request
+    before do
+      authenticated_in_hydra_as(user)
+    end
 
-    expect(response).to have_http_status(:not_found)
+    it 'responds 403 forbidden when the user cannot access the original project' do
+      make_request
+
+      expect(response).to have_http_status(:forbidden)
+    end
+
+    context 'when the original project is anonymous scratch project' do
+      let(:original_project) do
+        create(
+          :project,
+          user_id: nil,
+          project_type: Project::Types::CODE_EDITOR_SCRATCH,
+          locale: 'en'
+        )
+      end
+
+      it 'responds 200 ok' do
+        make_request
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
   end
 
   context 'when authenticated and part of a school' do
@@ -122,6 +145,25 @@ RSpec.describe 'Creating a Scratch project (remixing)', type: :request do
       expect(remixed_project.remixed_from_id).to eq(original_project.id)
       expect(remixed_project.lesson_id).to be_nil
       expect(remixed_project.scratch_component.content.to_h).to eq(scratch_project.deep_stringify_keys)
+    end
+
+    it 'records a project saved event when creating a remix' do
+      original_project.update!(lesson: create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students'))
+
+      make_request
+
+      expect(Event.last).to have_attributes(
+        name: 'Project - Saved',
+        user_id: teacher.id,
+        properties: {
+          'school_id' => school.id,
+          'class_id' => school_class.id,
+          'lesson_id' => original_project.lesson.id,
+          'project_type' => Project::Types::CODE_EDITOR_SCRATCH,
+          'user_role' => 'educator'
+        },
+        time: be_within(1.second).of(Time.current)
+      )
     end
 
     it 'moves the current user pending original-project assets onto the new remix' do

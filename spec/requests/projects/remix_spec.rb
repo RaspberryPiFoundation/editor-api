@@ -212,6 +212,36 @@ RSpec.describe 'Remix requests' do
         end
       end
 
+      context 'when a student saves a remix of a visible lesson project' do
+        let(:student) { create(:student, school:) }
+        let(:teacher) { create(:teacher, school:) }
+        let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+        let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
+        let!(:original_project) { create(:project, school:, lesson:, user_id: teacher.id, locale: nil) }
+
+        before do
+          create(:class_student, school_class:, student_id: student.id)
+          authenticated_in_hydra_as(student)
+        end
+
+        it 'records a project saved event' do
+          post("/api/projects/#{original_project.identifier}/remix", params: { project: project_params }, headers:)
+
+          expect(Event.last).to have_attributes(
+            name: 'Project - Saved',
+            user_id: student.id,
+            properties: {
+              'school_id' => school.id,
+              'class_id' => school_class.id,
+              'lesson_id' => lesson.id,
+              'project_type' => Project::Types::PYTHON,
+              'user_role' => 'student'
+            },
+            time: be_within(1.second).of(Time.current)
+          )
+        end
+      end
+
       context 'when project cannot be saved' do
         before do
           authenticated_in_hydra_as(owner)

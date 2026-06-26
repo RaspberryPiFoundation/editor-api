@@ -131,6 +131,11 @@ class UploadJob < ApplicationJob
     }
 
     files.each do |file|
+      if file.extension == '.sb3'
+        categories[:components] << scratch_file_component(file, project_dir, locale, repository, owner)
+        next
+      end
+
       mime_type = file_mime_type(file)
 
       case mime_type
@@ -158,11 +163,18 @@ class UploadJob < ApplicationJob
     { name:, extension:, content:, default: }
   end
 
+  def scratch_file_component(file, project_dir, locale, repository, owner)
+    name = file.name.chomp(file.extension)
+    extension = file.extension[1..]
+    { name:, extension:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
+  end
+
   def media(file, project_dir, locale, repository, owner)
-    filename = file.name
-    directory = project_dir.name
-    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
-    { filename:, io: URI.parse(url).open }
+    { filename: file.name, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
+  end
+
+  def file_url(file, project_dir, locale, repository, owner)
+    "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{project_dir.name}/#{file.name}"
   end
 
   def repository(payload)

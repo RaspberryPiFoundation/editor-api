@@ -49,6 +49,16 @@ class ApiController < ActionController::API
   end
 
   def track_event(name, properties = {})
-    Event.create!(user_id: current_user.id, name:, properties:, time: Time.current)
+    EventTracker.track!(user_id: current_user.id, name:, properties:)
+  end
+
+  def track_project_event(name, project, user_role: nil, student_id: nil)
+    EventTracker.track_project_event!(
+      name:,
+      user_id: current_user.id,
+      project:,
+      user_role:,
+      student_id:
+    )
   end
 end

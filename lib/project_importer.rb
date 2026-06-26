@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectImporter
+  class ImportError < StandardError; end
+
   attr_reader :name, :identifier, :images, :videos, :audio, :media, :components, :type, :locale
 
   def initialize(**kwargs)
@@ -20,6 +22,7 @@ class ProjectImporter
       setup_project
       delete_components
       create_components
+      create_scratch_component
       delete_removed_media
       attach_media_if_needed
 
@@ -39,14 +42,49 @@ class ProjectImporter
   end
 
   def delete_components
+    return if project.scratch_project?
+
     project.components.each(&:destroy)
   end
 
   def create_components
+    return if project.scratch_project?
+
     components.each do |component|
+      # .sb3 files are only ever imported as a ScratchComponent (see
+      # create_scratch_component); they carry an :io/:file_path key that is not a
+      # Component attribute, so skip them here to avoid building invalid rows.
+      next if component[:extension]&.casecmp?('sb3')
+
       project_component = Component.new(**component)
       project.components << project_component
     end
+  end
+
+  def create_scratch_component
+    return unless project.scratch_project?
+
+    component = components[0]
+    return unless component&.fetch(:extension, nil)&.casecmp?('sb3')
+
+    parsed_content = Sb3Parser.new(component: component).parse
+    project_content = parsed_content.dig(:scratch_component, :content)
+    assets = parsed_content[:assets] || []
+
+    raise ImportError, 'Scratch project content could not be parsed' if project_content.blank?
+
+    project.scratch_component = ScratchComponent.new(content: project_content)
+    assets.each { create_scratch_asset(it) }
+  end
+
+  def create_scratch_asset(asset)
+    filename = asset[:filename]
+    io = asset[:io]
+    return if ScratchAsset.global_assets.exists?(filename:)
+
+    asset = ScratchAsset.new(filename:, uploaded_user_id: nil, project_id: nil)
+    asset.file.attach(io:, filename:)
+    asset.save!
   end
 
   def delete_removed_media

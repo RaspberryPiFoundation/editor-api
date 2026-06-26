@@ -59,7 +59,12 @@ RSpec.describe 'Project show requests' do
       let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
       let(:teacher_project) { create(:project, :with_instructions, school_id: school.id, lesson_id: lesson.id, user_id: teacher.id, locale: nil) }
-      let(:student_project) { create(:project, school_id: school.id, lesson_id: nil, user_id: create(:student, school:).id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions) }
+      let(:student) { create(:student, school:) }
+      let(:class_student) { create(:class_student, school_class:, student_id: student.id) }
+      let(:student_project) do
+        class_student
+        create(:project, school_id: school.id, lesson_id: nil, user_id: student.id, remixed_from_id: teacher_project.id, locale: nil, instructions: teacher_project.instructions)
+      end
       let(:student_project_json) do
         {
           identifier: student_project.identifier,
@@ -88,6 +93,24 @@ RSpec.describe 'Project show requests' do
       it 'includes the expected parameters in the project json' do
         get("/api/projects/#{student_project.identifier}", headers:)
         expect(response.body).to eq(student_project_json)
+      end
+
+      it 'records a project opened event' do
+        get("/api/projects/#{student_project.identifier}", headers:)
+
+        expect(Event.last).to have_attributes(
+          name: 'Project - Opened',
+          user_id: teacher.id,
+          properties: {
+            'school_id' => school.id,
+            'class_id' => school_class.id,
+            'lesson_id' => lesson.id,
+            'project_type' => Project::Types::PYTHON,
+            'user_role' => 'educator',
+            'student_id' => student.id
+          },
+          time: be_within(1.second).of(Time.current)
+        )
       end
     end
 

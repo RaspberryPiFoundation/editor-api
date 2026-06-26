@@ -2,9 +2,10 @@
 
 module Api
   module Scratch
-    class ProjectsController < ScratchController
+    class ProjectsController < ApiController
       include RemixSelection
 
+      before_action :authorize_user, except: %i[show]
       before_action :load_project, except: %i[create]
       authorize_resource :project, except: %i[create]
 
@@ -27,6 +28,7 @@ module Api
           scratch_component.content = scratch_content_params
           existing_remix.save!
           move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project: existing_remix)
+          track_project_event('Project - Saved', existing_remix)
 
           return render json: { status: 'ok', 'content-name': existing_remix.identifier }, status: :ok
         end
@@ -42,6 +44,7 @@ module Api
 
         if result.success?
           move_assets_uploaded_by_current_user_before_remix(original_project:, remix_project: result[:project])
+          track_project_event('Project - Saved', result[:project])
           render json: { status: 'ok', 'content-name': result[:project].identifier }, status: :ok
         else
           render json: { error: result[:error] }, status: :bad_request
@@ -51,6 +54,7 @@ module Api
       def update
         @project.scratch_component&.content = scratch_content_params
         @project.save!
+        track_project_event('Project - Saved', @project)
         render json: { status: 'ok' }, status: :ok
       end
 

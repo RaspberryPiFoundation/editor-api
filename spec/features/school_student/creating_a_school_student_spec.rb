@@ -38,6 +38,23 @@ RSpec.describe 'Creating a school student', type: :request do
     expect(response).to have_http_status(:no_content)
   end
 
+  it 'records a student created event' do
+    student_id = SecureRandom.uuid
+    stub_profile_api_create_school_student(user_id: student_id)
+
+    post("/api/schools/#{school.id}/students", headers:, params:)
+
+    expect(Event.last).to have_attributes(
+      name: 'Student - Created',
+      user_id: owner.id,
+      properties: {
+        'school_id' => school.id,
+        'student_id' => student_id
+      },
+      time: be_within(1.second).of(Time.current)
+    )
+  end
+
   it 'responds 204 No Content when the user is a school-teacher' do
     teacher = create(:teacher, school:)
     authenticated_in_hydra_as(teacher)
