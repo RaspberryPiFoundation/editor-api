@@ -53,6 +53,8 @@ namespace :test_seeds do
 
         school = create_school(creator_id, TEST_SCHOOL)
         Flipper.enable_actor :cat_mode, school
+        Flipper.enable_actor :student_sso, school
+
         verify_school(school)
         assign_a_teacher(teacher_id, school)
 
