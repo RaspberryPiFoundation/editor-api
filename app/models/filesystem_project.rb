@@ -3,7 +3,7 @@
 require 'yaml'
 
 class FilesystemProject
-  CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css'].freeze
+  CODE_FORMATS = ['.py', '.csv', '.txt', '.html', '.css', '.sb3'].freeze
   PROJECTS_ROOT = Rails.root.join('lib/tasks/project_components')
   PROJECT_CONFIG = 'project_config.yml'
 
@@ -11,7 +11,7 @@ class FilesystemProject
     PROJECTS_ROOT.each_child do |dir|
       proj_config = YAML.safe_load_file(dir.join(PROJECT_CONFIG).to_s)
 
-      files = dir.children.reject { |file| file.basename.to_s == 'project_config.yml' }
+      files = dir.children.reject { |file| file.basename.to_s == PROJECT_CONFIG }
       categorized_files = categorize_files(files, dir)
 
       project_importer = ProjectImporter.new(name: proj_config['NAME'], identifier: proj_config['IDENTIFIER'],
@@ -56,6 +56,8 @@ class FilesystemProject
   def self.component(file, dir)
     name = File.basename(file, '.*')
     extension = File.extname(file).delete('.')
+    return { name:, extension:, file_path: dir.join(File.basename(file)).to_s } if extension.casecmp?('sb3')
+
     code = File.read(dir.join(File.basename(file)).to_s)
     default = (File.basename(file) == 'main.py')
     { name:, extension:, content: code, default: }
