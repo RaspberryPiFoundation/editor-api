@@ -633,6 +633,7 @@ DEPENDENCIES
   ruby-lsp-rspec (~> 0.1.29)
   ruby-progressbar (~> 1.13)
   ruby-vips
+  rubyzip
   selenium-webdriver
   sentry-rails
   shoulda-matchers (~> 7.0)
