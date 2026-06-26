@@ -67,5 +67,10 @@ FactoryBot.define do
       instructions { Faker::Lorem.paragraph }
       school factory: %i[school]
     end
+
+    factory :scratch_project do
+      project_type { Project::Types::CODE_EDITOR_SCRATCH }
+      scratch_component
+    end
   end
 end

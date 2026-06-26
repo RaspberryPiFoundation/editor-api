@@ -73,11 +73,19 @@ RSpec.describe 'Showing a Scratch project', type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
-  it 'returns a 401 unauthorized if not logged in' do
-    project = create(:project, project_type: Project::Types::PYTHON, locale: 'en')
+  it 'returns a 200 ok if not logged in for an anonymous scratch project' do
+    project = create(:scratch_project, locale: 'en', user_id: nil)
     get "/api/scratch/projects/#{project.identifier}"
 
-    expect(response).to have_http_status(:unauthorized)
+    expect(response).to have_http_status(:ok)
+  end
+
+  it 'returns a 200 ok if logged in for an anonymous scratch project' do
+    authenticated_in_hydra_as(teacher)
+    project = create(:scratch_project, locale: 'en', user_id: nil)
+    get "/api/scratch/projects/#{project.identifier}", headers: headers
+
+    expect(response).to have_http_status(:ok)
   end
 
   it 'returns a 403 forbidden if user does not have access to the project' do
