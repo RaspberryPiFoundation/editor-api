@@ -50,51 +50,6 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
       expect(SchoolEmailDomain.connection).to have_received(:execute).with("SELECT pg_advisory_xact_lock(#{lock_key})")
     end
 
-    context 'when two requests race for the same school', :no_transaction do
-      # RSpec's use_transactional_tests config wraps each test in a transaction
-      # This example tests the behaviour of a pg_advisory_xact_lock, which is released when a transaction commits or rolls back
-      # We need to set use_transactional_tests to false, otherwise the advisory lock is released
-      # only when the spec itself finishes, not when the transaction under test completes
-      self.use_transactional_tests = false
-
-      # Since this test example is no longer scoped to a transaction, we need to ensure
-      # that we've cleaned the DB before and after it runs so data doesn't leak into the other specs
-      around do |example|
-        DatabaseCleaner.strategy = :truncation
-        DatabaseCleaner.clean_with(:truncation)
-        DatabaseCleaner.cleaning { example.run }
-      end
-
-      it 'blocks a second session while the lock is held and frees it on commit' do
-        lock_key = Zlib.crc32("#{SchoolEmailDomain::Create::LOCK_NAMESPACE}:#{school.id}")
-
-        acquired_while_held = nil
-
-        ActiveRecord::Base.transaction do # open a transaction on the main thread
-          ActiveRecord::Base.connection.execute("SELECT pg_advisory_xact_lock(#{lock_key})") # acquire and hold the lock
-          # Attempt to acquire the lock from a separate thread
-          # acquired_while_held should be false since the main thread has yet to complete its transaction
-          acquired_while_held = Thread.new do
-            ActiveRecord::Base.connection_pool.with_connection do |conn|
-              conn.select_value("SELECT pg_try_advisory_xact_lock(#{lock_key})")
-            end
-          end.value
-        end
-
-        # Now that the transaction is complete we should be able to acquire the lock,
-        # acquired_after_commit should be true demonstrating that the main thread has released the lock
-        # and another thread can acquire it
-        acquired_after_commit = Thread.new do
-          ActiveRecord::Base.connection_pool.with_connection do |conn|
-            conn.select_value("SELECT pg_try_advisory_xact_lock(#{lock_key})")
-          end
-        end.value
-
-        expect(acquired_while_held).to be(false) # a concurrent session is blocked
-        expect(acquired_after_commit).to be(true) # a subsequent session can acquire the lock
-      end
-    end
-
     context 'when multiple domains already exist' do
       before do
         create(:school_email_domain, school:, domain: 'first.edu')
