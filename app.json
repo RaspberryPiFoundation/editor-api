@@ -5,7 +5,7 @@
   },
   "env": {
     "BYPASS_OAUTH": {
-      "value": "yes"
+      "value": "true"
     },
     "HEROKU_APP_NAME": {
       "required": true
