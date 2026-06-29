@@ -28,3 +28,12 @@ en:
     attributes:
       school_class:
         import_id: "Import id"
+    errors:
+      models:
+        school_email_domain:
+          attributes:
+            domain:
+              invalid: "is invalid"
+              invalid_host: "must be a fully qualified domain name"
+              invalid_public_suffix: "must be a registrable domain name"
+              invalid_uri: "must be a valid domain format"
