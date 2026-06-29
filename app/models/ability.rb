@@ -91,7 +91,7 @@ class Ability
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
-    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students], school_class: { teachers: { teacher_id: user.id } } })
     teacher_project_ids = Project.where(
       school_id: school.id,
       remixed_from_id: nil,
