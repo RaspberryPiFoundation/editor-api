@@ -373,12 +373,12 @@ RSpec.describe Ability do
       end
 
       context 'when remix school_id does not match the parent lesson project school' do
-        let(:other_school) { create(:school) }
-        let(:other_student) { create(:student, school: other_school) }
+        let(:user) { teacher }
         let!(:cross_school_remix) do
+          other_school = create(:school)
+          other_student = create(:student, school: other_school)
           create(:project, school: other_school, user_id: other_student.id, remixed_from_id: original_project.id)
         end
-        let(:user) { teacher }
 
         it { is_expected.not_to be_able_to(:read, cross_school_remix) }
         it { is_expected.not_to be_able_to(:show_context, cross_school_remix) }
