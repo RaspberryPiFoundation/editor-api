@@ -255,6 +255,60 @@ RSpec.describe UploadJob do
     end
   end
 
+  context 'with multiple projects where an earlier one has build set to false' do
+    let(:raw_response) { modifiable_response.deep_dup }
+
+    before do
+      entries = raw_response['data']['repository']['object']['entries']
+
+      # Turn the existing project into a build: false project
+      build_false_dir = entries.find { |entry| entry['name'] == 'dont-collide-starter' }
+      build_false_config = build_false_dir['object']['entries'].find { |entry| entry['name'] == 'project_config.yml' }
+      build_false_config['object']['text'] += "build: false\n"
+
+      # add second project with build set to true
+      entries << {
+        'name' => 'build-me-starter',
+        'object' => {
+          '__typename' => 'Tree',
+          'entries' => [
+            {
+              'name' => 'main.py',
+              'extension' => '.py',
+              'object' => {
+                '__typename' => 'Blob',
+                'text' => "print('hello')\n",
+                'isBinary' => false
+              }
+            },
+            {
+              'name' => 'project_config.yml',
+              'extension' => '.yml',
+              'object' => {
+                '__typename' => 'Blob',
+                'text' => "name: \"Build Me\"\nidentifier: \"build-me-starter\"\ntype: \"python\"\nbuild: true\n",
+                'isBinary' => true
+              }
+            }
+          ]
+        }
+      }
+
+      allow(GithubApi::Client).to receive(:query).and_return(graphql_response)
+      allow(ProjectImporter).to receive(:new).and_call_original
+    end
+
+    it 'still imports the later buildable project' do
+      expect { described_class.perform_now(payload) }.to change(Project, :count).by(1)
+      expect(Project.find_by(identifier: 'build-me-starter', locale: 'ja-JP')).to be_present
+    end
+
+    it 'does not import the build: false project' do
+      described_class.perform_now(payload)
+      expect(Project.find_by(identifier: 'dont-collide-starter', locale: 'ja-JP')).to be_nil
+    end
+  end
+
   context 'when GitHub returns nothing for the locale' do
     let(:raw_response) { { data: { repository: nil } } }
 
