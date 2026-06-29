@@ -372,6 +372,19 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:complete, remixed_project.school_project) }
       end
 
+      context 'when remix school_id does not match the parent lesson project school' do
+        let(:other_school) { create(:school) }
+        let(:other_student) { create(:student, school: other_school) }
+        let!(:cross_school_remix) do
+          create(:project, school: other_school, user_id: other_student.id, remixed_from_id: original_project.id)
+        end
+        let(:user) { teacher }
+
+        it { is_expected.not_to be_able_to(:read, cross_school_remix) }
+        it { is_expected.not_to be_able_to(:show_context, cross_school_remix) }
+        it { is_expected.not_to be_able_to(:return, cross_school_remix.school_project) }
+      end
+
       context 'when user is another teacher of the class' do
         let(:user) { another_teacher }
 
