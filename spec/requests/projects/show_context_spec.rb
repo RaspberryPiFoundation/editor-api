@@ -75,6 +75,37 @@ RSpec.describe 'Project context requests' do
       end
     end
 
+    context 'when loading a student remix context for a lesson the teacher teaches' do
+      let(:student) { create(:student, school:) }
+      let!(:project) { create(:project, :with_instructions, school:, lesson:, user_id: teacher.id, locale: nil) }
+      let!(:student_remix) { create(:project, school:, user_id: student.id, remixed_from_id: project.id, locale: nil) }
+      let(:expected_context_json) do
+        {
+          identifier: student_remix.identifier,
+          project_type: project.project_type,
+          school_id: school.id,
+          lesson_id: lesson.id,
+          class_id: school_class.id
+        }.to_json
+      end
+
+      before do
+        create(:class_student, school_class:, student_id: student.id)
+      end
+
+      it 'returns success response' do
+        get("/api/projects/#{student_remix.identifier}/context", headers:)
+
+        expect(response).to have_http_status(:ok)
+      end
+
+      it 'returns the remix project context json' do
+        get("/api/projects/#{student_remix.identifier}/context", headers:)
+
+        expect(response.body).to eq(expected_context_json)
+      end
+    end
+
     context 'when loading another user\'s project context' do
       let!(:another_project) { create(:project, user_id: SecureRandom.uuid, locale: nil) }
       let(:another_project_json) do
