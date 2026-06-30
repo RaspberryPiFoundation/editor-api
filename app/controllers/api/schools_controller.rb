@@ -2,6 +2,16 @@
 
 module Api
   class SchoolsController < ApiController
+    MARKETING_PARAMETER_KEYS = %i[
+      utm_source
+      utm_medium
+      utm_campaign
+      utm_term
+      utm_content
+      gclid
+      fbclid
+    ].freeze
+
     before_action :authorize_user
     load_and_authorize_resource
     skip_load_and_authorize_resource only: :import
@@ -20,7 +30,13 @@ module Api
 
       if result.success?
         @school = result[:school]
-        track_event('School - Created', school_id: @school.id)
+        track_event(
+          'School - Created',
+          marketing_parameters.merge(
+            school_id: @school.id,
+            first_landing_page: params[:first_landing_page]
+          )
+        )
         render :show, formats: [:json], status: :created
       else
         render json: {
@@ -76,6 +92,13 @@ module Api
     end
 
     private
+
+    def marketing_parameters
+      marketing_params = params[:marketing_parameters]
+      return {} unless marketing_params.is_a?(ActionController::Parameters)
+
+      marketing_params.permit(*MARKETING_PARAMETER_KEYS).to_h
+    end
 
     def create_params
       params.expect(
