@@ -67,4 +67,27 @@ RSpec.describe 'Creating a school', type: :request do
       time: be_within(1.second).of(Time.current)
     )
   end
+
+  it 'records marketing parameters as top-level event properties' do
+    post(
+      '/api/schools',
+      headers:,
+      params: params.merge(
+        first_landing_page: '/signup',
+        marketing_parameters: {
+          utm_source: 'newsletter',
+          utm_campaign: 'back-to-school'
+        }
+      )
+    )
+
+    properties = Event.last.properties
+    expect(properties).to include(
+      'school_id' => School.last.id,
+      'first_landing_page' => '/signup',
+      'utm_source' => 'newsletter',
+      'utm_campaign' => 'back-to-school'
+    )
+    expect(properties).not_to have_key('marketing_parameters')
+  end
 end
