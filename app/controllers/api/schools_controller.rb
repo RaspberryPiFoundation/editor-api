@@ -2,6 +2,16 @@
 
 module Api
   class SchoolsController < ApiController
+    MARKETING_PARAMETER_KEYS = %i[
+      utm_source
+      utm_medium
+      utm_campaign
+      utm_term
+      utm_content
+      gclid
+      fbclid
+    ].freeze
+
     before_action :authorize_user
     load_and_authorize_resource
     skip_load_and_authorize_resource only: :import
@@ -83,7 +93,10 @@ module Api
     private
 
     def marketing_parameters
-      params[:marketing_parameters]&.permit!.to_h
+      marketing_params = params[:marketing_parameters]
+      return {} unless marketing_params.is_a?(ActionController::Parameters)
+
+      marketing_params.permit(*MARKETING_PARAMETER_KEYS).to_h
     end
 
     def create_params

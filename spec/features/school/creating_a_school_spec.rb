@@ -76,7 +76,8 @@ RSpec.describe 'Creating a school', type: :request do
         first_landing_page: '/signup',
         marketing_parameters: {
           utm_source: 'newsletter',
-          utm_campaign: 'back-to-school'
+          utm_campaign: 'back-to-school',
+          unexpected_email: 'person@example.com'
         }
       )
     )
@@ -89,5 +90,17 @@ RSpec.describe 'Creating a school', type: :request do
       'utm_campaign' => 'back-to-school'
     )
     expect(properties).not_to have_key('marketing_parameters')
+    expect(properties).not_to have_key('unexpected_email')
+  end
+
+  it 'ignores malformed marketing parameters' do
+    post(
+      '/api/schools',
+      headers:,
+      params: params.merge(marketing_parameters: 'newsletter')
+    )
+
+    expect(response).to have_http_status(:created)
+    expect(Event.last.properties).to eq('school_id' => School.last.id)
   end
 end
