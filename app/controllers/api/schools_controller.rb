@@ -32,9 +32,10 @@ module Api
         @school = result[:school]
         track_event(
           'School - Created',
-          **marketing_parameters,
-          school_id: @school.id,
-          first_landing_page: params[:first_landing_page]
+          marketing_parameters.merge(
+            school_id: @school.id,
+            first_landing_page: params[:first_landing_page]
+          )
         )
         render :show, formats: [:json], status: :created
       else
