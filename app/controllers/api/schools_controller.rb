@@ -83,7 +83,7 @@ module Api
     private
 
     def marketing_parameters
-      params[:marketing_parameters]&.permit!&.to_h || {}
+      params[:marketing_parameters]&.permit!.to_h
     end
 
     def create_params
