@@ -43,8 +43,10 @@ gem 'puma', '~> 8.0'
 gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
 gem 'rails', '~> 8.1.3'
+gem 'rails_semantic_logger', '~> 4.20'
 gem 'ruby-progressbar', '~> 1.13', require: false
 gem 'ruby-vips'
+gem 'rubyzip'
 gem 'sentry-rails'
 gem 'statesman'
 
@@ -81,7 +83,7 @@ group :test do
   gem 'climate_control'
   gem 'database_cleaner-active_record'
   gem 'selenium-webdriver'
-  gem 'shoulda-matchers', '~> 7.0'
+  gem 'shoulda-matchers', '~> 8.0'
   gem 'webdrivers'
   gem 'webmock'
 end

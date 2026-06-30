@@ -186,15 +186,15 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
 
-      context 'when user is a school teacher' do
+      context 'when user is another teacher in the same school' do
         before do
           create(:teacher_role, user_id: user.id, school:)
         end
 
-        it { is_expected.to be_able_to(:read, project) }
-        it { is_expected.to be_able_to(:show_context, project) }
+        it { is_expected.not_to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
-        it { is_expected.to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
@@ -248,15 +248,15 @@ RSpec.describe Ability do
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
 
-      context 'when user is a school teacher' do
+      context 'when user is another teacher in the same school' do
         before do
           create(:teacher_role, user_id: user.id, school:)
         end
 
-        it { is_expected.to be_able_to(:read, project) }
-        it { is_expected.to be_able_to(:show_context, project) }
+        it { is_expected.not_to be_able_to(:read, project) }
+        it { is_expected.not_to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
-        it { is_expected.to be_able_to(:update, project) }
+        it { is_expected.not_to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
@@ -338,6 +338,7 @@ RSpec.describe Ability do
         let(:user) { create(:teacher, school:) }
 
         it { is_expected.not_to be_able_to(:read, remixed_project) }
+        it { is_expected.not_to be_able_to(:show_context, remixed_project) }
         it { is_expected.not_to be_able_to(:create, feedback) }
         it { is_expected.not_to be_able_to(:read, feedback) }
         it { is_expected.not_to be_able_to(:set_read, feedback) }
@@ -356,6 +357,7 @@ RSpec.describe Ability do
         let(:user) { teacher }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.to be_able_to(:show_context, remixed_project) }
         it { is_expected.to be_able_to(:create, feedback) }
         it { is_expected.to be_able_to(:read, feedback) }
         it { is_expected.not_to be_able_to(:set_read, feedback) }
@@ -370,6 +372,19 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:complete, remixed_project.school_project) }
       end
 
+      context 'when remix school_id does not match the parent lesson project school' do
+        let(:user) { teacher }
+        let!(:cross_school_remix) do
+          other_school = create(:school)
+          other_student = create(:student, school: other_school)
+          create(:project, school: other_school, user_id: other_student.id, remixed_from_id: original_project.id)
+        end
+
+        it { is_expected.not_to be_able_to(:read, cross_school_remix) }
+        it { is_expected.not_to be_able_to(:show_context, cross_school_remix) }
+        it { is_expected.not_to be_able_to(:return, cross_school_remix.school_project) }
+      end
+
       context 'when user is another teacher of the class' do
         let(:user) { another_teacher }
 
@@ -382,6 +397,7 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:update, original_project) }
 
         it { is_expected.to be_able_to(:read, remixed_project) }
+        it { is_expected.to be_able_to(:show_context, remixed_project) }
         it { is_expected.not_to be_able_to(:create, remixed_project) }
         it { is_expected.not_to be_able_to(:update, remixed_project) }
         it { is_expected.not_to be_able_to(:destroy, remixed_project) }

@@ -72,6 +72,7 @@ class Ability
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
     can(%i[read destroy], Feedback, school_project: { school_id: school.id })
     can(%i[exchange_code], :google_auth)
+    can(%i[read create], :school_email_domain)
   end
 
   def define_school_teacher_abilities(user:, school:)
@@ -90,7 +91,7 @@ class Ability
     can(%i[create], Project) do |project|
       school_teacher_can_manage_project?(user:, school:, project:)
     end
-    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students], school_class: { teachers: { teacher_id: user.id } } })
     teacher_project_ids = Project.where(
       school_id: school.id,
       remixed_from_id: nil,
@@ -98,10 +99,11 @@ class Ability
         school_class_id: ClassTeacher.where(teacher_id: user.id).select(:school_class_id)
       )
     ).pluck(:id)
-    can(%i[read], Project, remixed_from_id: teacher_project_ids)
-    can(%i[show_status unsubmit return complete], SchoolProject, project: { remixed_from_id: teacher_project_ids })
-    can(%i[read create destroy], Feedback, school_project: { project: { remixed_from_id: teacher_project_ids } })
+    can(%i[read show_context], Project, school_id: school.id, remixed_from_id: teacher_project_ids)
+    can(%i[show_status unsubmit return complete], SchoolProject, project: { school_id: school.id, remixed_from_id: teacher_project_ids })
+    can(%i[read create destroy], Feedback, school_project: { project: { school_id: school.id, remixed_from_id: teacher_project_ids } })
     can(%i[exchange_code], :google_auth)
+    can(%i[read create], :school_email_domain)
   end
 
   def define_school_student_abilities(user:, school:)
@@ -115,7 +117,7 @@ class Ability
     can(%i[read], SchoolClass, school: { id: school.id }, students: { student_id: user.id })
     # Ensure no access to ClassMember resources, relationships otherwise allow access in some circumstances.
     can(%i[read], Lesson, school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } })
-    can(%i[read create update], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids)
+    can(%i[read create update show_context], Project, school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids)
     can(%i[read show_context], Project, lesson: { school_id: school.id, visibility: 'students', school_class: { students: { student_id: user.id } } })
     can(%i[read set_read], Feedback, school_project: { project: { school_id: school.id, user_id: user.id, lesson_id: nil, remixed_from_id: visible_lesson_project_ids } })
     can(%i[show_finished set_finished show_status unsubmit submit], SchoolProject, project: { user_id: user.id, lesson_id: nil }, school_id: school.id)

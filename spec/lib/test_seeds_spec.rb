@@ -59,6 +59,11 @@ RSpec.describe 'test_seeds', type: :task do
       expect(Flipper.enabled?(:cat_mode, school)).to be(true)
     end
 
+    it 'enables student sso for the school' do
+      school = School.find_by(creator_id:)
+      expect(Flipper.enabled?(:student_sso, school)).to be(true)
+    end
+
     it 'creates lessons with projects' do
       school = School.find_by(creator_id:)
       expect(SchoolClass.where(school_id: school.id)).to exist

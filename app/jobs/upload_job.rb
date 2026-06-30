@@ -21,8 +21,6 @@ class UploadJob < ApplicationJob
 
   VALID_LOCALES = Locales.load_locales.freeze
 
-  @skip_job = false
-
   ProjectContentQuery = GithubApi::Client.parse <<-GRAPHQL
     query($owner: String!, $repository: String!, $expression: String!) {
       repository(owner: $owner, name: $repository) {
@@ -63,7 +61,7 @@ class UploadJob < ApplicationJob
 
       projects_data.data.repository.object.entries.each do |project_dir|
         project = format_project(project_dir, locale, repository(payload), owner(payload))
-        if @skip_job
+        if project[:build] == false
           Rails.logger.warn "Build skipped for #{project[:name]}"
           next
         end
@@ -107,10 +105,8 @@ class UploadJob < ApplicationJob
     proj_config_file = data.entries.find { |file| file.name == PROJECT_CONFIG }
     proj_config = YAML.safe_load(proj_config_file.object.text, symbolize_names: true)
 
-    if proj_config[:build] == false
-      @skip_job = true
-      return proj_config
-    end
+    # if the build is false, no need to check files, just return the config
+    return proj_config if proj_config[:build] == false
 
     files = data.entries.reject { |file| file.name == PROJECT_CONFIG }
     categorized_files = categorize_files(files, project_dir, locale, repository, owner)
@@ -131,6 +127,11 @@ class UploadJob < ApplicationJob
     }
 
     files.each do |file|
+      if file.extension == '.sb3'
+        categories[:components] << scratch_file_component(file, project_dir, locale, repository, owner)
+        next
+      end
+
       mime_type = file_mime_type(file)
 
       case mime_type
@@ -158,11 +159,18 @@ class UploadJob < ApplicationJob
     { name:, extension:, content:, default: }
   end
 
+  def scratch_file_component(file, project_dir, locale, repository, owner)
+    name = file.name.chomp(file.extension)
+    extension = file.extension[1..]
+    { name:, extension:, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
+  end
+
   def media(file, project_dir, locale, repository, owner)
-    filename = file.name
-    directory = project_dir.name
-    url = "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{directory}/#{filename}"
-    { filename:, io: URI.parse(url).open }
+    { filename: file.name, io: URI.parse(file_url(file, project_dir, locale, repository, owner)).open }
+  end
+
+  def file_url(file, project_dir, locale, repository, owner)
+    "https://github.com/#{owner}/#{repository}/raw/#{ENV.fetch('GITHUB_WEBHOOK_REF')}/#{locale}/code/#{project_dir.name}/#{file.name}"
   end
 
   def repository(payload)

@@ -45,6 +45,8 @@ class ScratchAssetImporter
     end
   end
 
+  private
+
   def create_scratch_asset
     return if ScratchAsset.global_assets.exists?(filename: asset_name)
 
