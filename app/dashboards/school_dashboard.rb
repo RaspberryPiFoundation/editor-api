@@ -33,6 +33,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     school_roll_number: Field::String,
     verified_at: Field::DateTime,
     rejected_at: Field::DateTime,
+    archived_at: Field::DateTime,
     created_at: Field::DateTime,
     updated_at: Field::DateTime,
     user_origin: EnumField
@@ -84,6 +85,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     updated_at
     verified_at
     rejected_at
+archived_at
   ].freeze
 
   # FORM_ATTRIBUTES

@@ -28,6 +28,12 @@ module Admin
       redirect_to admin_school_path(requested_resource)
     end
 
+    def archive
+      requested_resource.archive!
+
+      redirect_to admin_school_path(requested_resource)
+    end
+
     def default_sorting_attribute
       :created_at
     end

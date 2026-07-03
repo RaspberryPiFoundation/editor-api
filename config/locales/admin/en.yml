@@ -8,6 +8,8 @@ en:
       confirm_verify_school: Are you sure you want to verify this school?
       reopen_school: Reopen School
       confirm_reopen_school: Are you sure you want to reopen this school?
+      archive_school: Archive School
+      confirm_archive_school: Are you sure you want to archive this school?
     controller:
       verify_school:
         success: "Successfully verified."
@@ -15,6 +17,9 @@ en:
       reopen_school:
         success: "Successfully reopened."
         error: "There was an error reopening the school"
+      archive_school:
+        success: "Successfully archived."
+        error: "There was an error archiving the school"
   activerecord:
     attributes:
       school:

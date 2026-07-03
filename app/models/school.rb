@@ -103,6 +103,14 @@ class School < ApplicationRecord
     update(rejected_at: nil)
   end
 
+  def archive!
+    update!(archived_at: Time.zone.now, verified_at: nil)
+  end
+
+  def archived?
+    archived_at.present?
+  end
+
   def postal_code=(str)
     super(str.to_s.upcase)
   end

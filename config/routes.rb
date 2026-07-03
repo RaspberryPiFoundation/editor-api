@@ -16,6 +16,7 @@ Rails.application.routes.draw do
       member do
         post :verify
         patch :reopen
+        patch :archive
       end
     end
 

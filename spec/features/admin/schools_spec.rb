@@ -36,6 +36,10 @@ RSpec.describe 'Schools', type: :request do
       expect(response.body).to include(I18n.t('administrate.actions.verify_school'))
     end
 
+    it 'includes link to archive school' do
+      expect(response.body).to include(I18n.t('administrate.actions.archive_school'))
+    end
+
     it 'does not include a link to search for this school by its ZIP code in the NCES public schools database' do
       expect(response.body).not_to include('Search for this school in the NCES database')
     end
@@ -198,6 +202,25 @@ RSpec.describe 'Schools', type: :request do
       it 'displays failure message' do
         expect(response.body).to include(I18n.t('administrate.controller.reopen_school.error'))
       end
+    end
+  end
+
+  describe 'PUT #archive' do
+    let(:creator) { create(:user) }
+    let(:school) { create(:school, creator_id: creator.id) }
+
+    before do
+      stub_user_info_api_for(creator)
+    end
+
+    it 'marks the school as archived' do
+      patch archive_admin_school_path(school)
+      expect(school.reload).to be_archived
+    end
+
+    it 'redirects to school path' do
+      patch archive_admin_school_path(school)
+      expect(response).to redirect_to(admin_school_path(school))
     end
   end
 
