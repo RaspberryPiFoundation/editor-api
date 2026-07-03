@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_150521) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_151018) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -253,6 +253,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_150521) do
   end
 
   create_table "roles", force: :cascade do |t|
+    t.datetime "archived_at"
     t.datetime "created_at", null: false
     t.integer "role"
     t.uuid "school_id"

@@ -218,6 +218,15 @@ RSpec.describe 'Schools', type: :request do
       expect(school.reload).to be_archived
     end
 
+    it 'displays the validation error when the school has students' do
+      create(:student_role, school:)
+
+      patch archive_admin_school_path(school)
+      follow_redirect!
+
+      expect(response.body).to include('Cannot archive a school with students')
+    end
+
     it 'redirects to school path' do
       patch archive_admin_school_path(school)
       expect(response).to redirect_to(admin_school_path(school))

@@ -29,7 +29,11 @@ module Admin
     end
 
     def archive
-      requested_resource.archive!
+      if requested_resource.archive
+        flash[:notice] = t('administrate.controller.archive_school.success')
+      else
+        flash[:error] = requested_resource.errors.full_messages.to_sentence.presence || t('administrate.controller.archive_school.error')
+      end
 
       redirect_to admin_school_path(requested_resource)
     end
