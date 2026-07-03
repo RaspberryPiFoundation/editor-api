@@ -128,6 +128,10 @@ class School < ApplicationRecord
     archived_at.present?
   end
 
+  def student_count
+    roles.student.count
+  end
+
   def postal_code=(str)
     super(str.to_s.upcase)
   end
