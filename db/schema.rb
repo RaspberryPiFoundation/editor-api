@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_07_03_145125) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_150521) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -349,9 +349,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_07_03_145125) do
     t.datetime "verified_at"
     t.string "website", null: false
     t.index ["code"], name: "index_schools_on_code", unique: true
-    t.index ["creator_id"], name: "index_schools_on_creator_id_active_only", unique: true, where: "(rejected_at IS NULL)"
-    t.index ["reference"], name: "index_schools_on_reference", unique: true, where: "(rejected_at IS NULL)"
-    t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true, where: "(rejected_at IS NULL)"
+    t.index ["creator_id"], name: "index_schools_on_creator_id", unique: true, where: "((rejected_at IS NULL) AND (archived_at IS NULL))"
+    t.index ["reference"], name: "index_schools_on_reference", unique: true, where: "((rejected_at IS NULL) AND (archived_at IS NULL))"
+    t.index ["school_roll_number"], name: "index_schools_on_school_roll_number", unique: true, where: "((rejected_at IS NULL) AND (archived_at IS NULL))"
   end
 
   create_table "scratch_assets", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|

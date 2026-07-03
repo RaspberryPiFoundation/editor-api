@@ -12,6 +12,8 @@ class School < ApplicationRecord
 
   enum :user_origin, { for_education: 0, experience_cs: 1 }, default: :for_education, validate: true
 
+  scope :active, -> { where(rejected_at: nil, archived_at: nil) }
+
   validates :name, presence: true
   validates :website, presence: true, format: { with: VALID_URL_REGEX, message: I18n.t('validations.school.website') }
   validates :address_line_1, presence: true
@@ -20,22 +22,22 @@ class School < ApplicationRecord
   validates :postal_code, presence: true
   validates :country_code, presence: true, inclusion: { in: ISO3166::Country.codes }
   validates :reference,
-            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.reference_urn_exists') },
+            uniqueness: { conditions: -> { active }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.reference_urn_exists') },
             format: { with: /\A\d{5,6}\z/, allow_nil: true, message: I18n.t('validations.school.reference') },
-            if: :united_kingdom?, on: :create, unless: :rejected?
+            if: :united_kingdom?, on: :create, unless: :hidden?
   validates :district_nces_id,
             format: { with: /\A\d{7}\z/, allow_nil: true, message: I18n.t('validations.school.district_nces_id') },
             if: :united_states?, on: :create
   validates :district_name, presence: true, if: :united_states?
   validates :school_roll_number,
-            uniqueness: { conditions: -> { where(rejected_at: nil) }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.school_roll_number_exists') },
+            uniqueness: { conditions: -> { active }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.school_roll_number_exists') },
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
-            presence: true, on: :create, if: :ireland?, unless: :rejected?
+            presence: true, on: :create, if: :ireland?, unless: :hidden?
   validates :creator_id,
             presence: true,
             uniqueness: {
-              conditions: -> { where(rejected_at: nil) }
-            }, unless: :rejected?
+              conditions: -> { active }
+            }, unless: :hidden?
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
   validates :creator_agree_responsible_safeguarding, presence: true, acceptance: true
@@ -59,7 +61,7 @@ class School < ApplicationRecord
   after_commit -> { do_salesforce_sync(is_create: false) }, on: :update, if: -> { FeatureFlags.salesforce_sync? }
 
   def self.find_for_user!(user)
-    school = Role.find_by(user_id: user.id)&.school || find_by(creator_id: user.id, rejected_at: nil)
+    school = Role.find_by(user_id: user.id)&.school || active.find_by(creator_id: user.id)
     raise ActiveRecord::RecordNotFound unless school
 
     school
@@ -80,6 +82,10 @@ class School < ApplicationRecord
   def verify!
     generate_code!
     update!(verified_at: Time.zone.now)
+  end
+
+  def hidden?
+    rejected? || archived?
   end
 
   def generate_code!
