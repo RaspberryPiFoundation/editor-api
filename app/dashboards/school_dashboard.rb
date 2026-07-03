@@ -27,6 +27,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     lessons: Field::HasMany,
     projects: Field::HasMany,
     roles: SchoolRolesField,
+    student_count: Field::Number,
     reference: Field::String,
     district_name: Field::String,
     district_nces_id: Field::String,
@@ -65,6 +66,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     user_origin
     creator
     roles
+    student_count
     creator_role
     creator_department
     reference
@@ -85,7 +87,7 @@ class SchoolDashboard < Administrate::BaseDashboard
     updated_at
     verified_at
     rejected_at
-archived_at
+    archived_at
   ].freeze
 
   # FORM_ATTRIBUTES
