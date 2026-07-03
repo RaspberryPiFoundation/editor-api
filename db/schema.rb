@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_06_12_144637) do
+ActiveRecord::Schema[8.1].define(version: 2026_07_03_145125) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -324,6 +324,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_12_144637) do
     t.string "address_line_1", null: false
     t.string "address_line_2"
     t.string "administrative_area"
+    t.datetime "archived_at"
     t.string "code"
     t.string "country_code", null: false
     t.datetime "created_at", null: false

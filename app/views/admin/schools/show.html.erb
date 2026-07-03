@@ -45,6 +45,15 @@ as well as a link to its edit page.
       style: "background-color: darkorange; margin: 5px;",
       data: { turbo_confirm: t("administrate.actions.confirm_reopen_school") }
     ) unless page.resource.verified? || !page.resource.rejected? %>
+
+    <%= button_to(
+      t("administrate.actions.archive_school"),
+      archive_admin_school_path(page.resource),
+      class: "button button--archive",
+      method: :patch,
+      style: "background-color: firebrick; margin: 5px;",
+      data: { turbo_confirm: t("administrate.actions.confirm_archive_school") }
+    ) unless page.resource.archived? %>
   </div>
 </header>
 
