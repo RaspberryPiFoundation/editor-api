@@ -10,6 +10,8 @@ class Role < ApplicationRecord
   validate :students_cannot_have_additional_roles
   validate :users_can_only_have_roles_in_one_school
 
+  default_scope { where(archived_at: nil) }
+
   has_paper_trail(
     meta: {
       meta_school_id: ->(cm) { cm.school&.id }
@@ -17,6 +19,10 @@ class Role < ApplicationRecord
   )
 
   after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? && !student? }
+
+  def archive!
+    update!(archived_at: Time.zone.now)
+  end
 
   private
 

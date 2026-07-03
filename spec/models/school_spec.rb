@@ -706,6 +706,35 @@ RSpec.describe School do
     end
   end
 
+  describe '#archive' do
+    it 'sets archived_at and returns true' do
+      result = nil
+
+      expect do
+        result = school.archive
+      end.to change { school.reload.archived? }.from(false).to(true)
+
+      expect(result).to be(true)
+    end
+
+    it 'archives owner and teacher roles' do
+      owner_role = create(:owner_role, school:)
+      teacher_role = create(:teacher_role, school:)
+
+      school.archive
+
+      expect(Role.unscoped.find(owner_role.id).archived_at).to be_present
+      expect(Role.unscoped.find(teacher_role.id).archived_at).to be_present
+    end
+
+    it 'does not archive school if students exist and returns false' do
+      create(:student_role, school:)
+
+      expect(school.archive).to be(false)
+      expect(school.reload).not_to be_archived
+    end
+  end
+
   describe '#auto_join_enabled?' do
     it 'returns true when the school has at least one registered email domain' do
       SchoolEmailDomain.create!(school:, domain: 'valid.edu')

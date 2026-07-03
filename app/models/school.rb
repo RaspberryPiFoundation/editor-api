@@ -46,6 +46,7 @@ class School < ApplicationRecord
   validates :code,
             uniqueness: { allow_nil: true },
             format: { with: /\d\d-\d\d-\d\d/, allow_nil: true }
+  validate :cannot_archive_with_students, on: :archive
   validate :verified_at_cannot_be_changed
   validate :code_cannot_be_changed
 
@@ -109,8 +110,18 @@ class School < ApplicationRecord
     update(rejected_at: nil)
   end
 
-  def archive!
-    update!(archived_at: Time.zone.now, verified_at: nil)
+  def archive
+    return true if archived?
+
+    transaction do
+      self.archived_at = Time.zone.now
+      save!(context: :archive)
+      roles.where(role: %i[owner teacher]).find_each(&:archive!)
+    end
+
+    true
+  rescue ActiveRecord::RecordInvalid
+    false
   end
 
   def archived?
@@ -167,6 +178,10 @@ class School < ApplicationRecord
   # Also normalize to uppercase for consistent validation
   def normalize_school_roll_number
     self.school_roll_number = (school_roll_number.presence&.upcase)
+  end
+
+  def cannot_archive_with_students
+    errors.add(:base, 'Cannot archive a school with students') if roles.student.exists?
   end
 
   def verified_at_cannot_be_changed
