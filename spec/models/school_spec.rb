@@ -217,6 +217,14 @@ RSpec.describe School do
       expect { new_school.save! }.not_to raise_error
     end
 
+    it 'allows reference reuse when original school is archived' do
+      school.update!(reference: '100000', archived_at: Time.zone.now)
+
+      new_school = build(:school, reference: '100000')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
+    end
+
     it 'does not require a district_nces_id for UK schools' do
       school.country_code = 'GB'
       school.district_nces_id = nil
@@ -347,6 +355,14 @@ RSpec.describe School do
 
     it 'allows school_roll_number reuse when original school is rejected' do
       ireland_school.update!(rejected_at: Time.zone.now)
+
+      new_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
+      expect(new_school).to be_valid
+      expect { new_school.save! }.not_to raise_error
+    end
+
+    it 'allows school_roll_number reuse when original school is archived' do
+      ireland_school.update!(archived_at: Time.zone.now)
 
       new_school = build(:school, school_roll_number: '01572D', country_code: 'IE')
       expect(new_school).to be_valid
