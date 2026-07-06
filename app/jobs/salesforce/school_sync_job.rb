@@ -22,7 +22,8 @@ module Salesforce
       website__c: :website,
       districtnamesupplied__c: :district_name,
       ncesid__c: :district_nces_id,
-      schoolrollnumber__c: :school_roll_number
+      schoolrollnumber__c: :school_roll_number,
+      discardedat__c: :archived_at
     }.freeze
 
     def perform(school_id:, is_create: false)
