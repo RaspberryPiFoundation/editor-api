@@ -17,22 +17,20 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
     ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
   end
 
-  context 'when the job has run' do
-    before { perform_job }
-
-    it 'syncs all FIELD_MAPPINGS to the correct role values' do
-      sf_role = Salesforce::Role.find_by(affiliation_id__c: role.id)
-      described_class::FIELD_MAPPINGS.each do |sf_field, role_field|
-        expected = Salesforce::Role.type_for_attribute(sf_field).cast(role.send(role_field))
-        expect(sf_role.send(sf_field)).to eq(expected),
-                                          "Expected #{sf_field} to equal role.#{role_field}"
-      end
+  it 'syncs all FIELD_MAPPINGS to the correct role values' do
+    perform_job
+    sf_role = Salesforce::Role.find_by(affiliation_id__c: role.id)
+    described_class::FIELD_MAPPINGS.each do |sf_field, role_field|
+      expected = Salesforce::Role.type_for_attribute(sf_field).cast(role.send(role_field))
+      expect(sf_role.send(sf_field)).to eq(expected),
+                                        "Expected #{sf_field} to equal role.#{role_field}"
     end
+  end
 
-    it 'sets editor_type__c from the school user_origin' do
-      sf_role = Salesforce::Role.find_by(affiliation_id__c: role.id)
-      expect(sf_role.editor_type__c).to eq(role.school.user_origin)
-    end
+  it 'sets editor_type__c from the school user_origin' do
+    perform_job
+    sf_role = Salesforce::Role.find_by(affiliation_id__c: role.id)
+    expect(sf_role.editor_type__c).to eq(role.school.user_origin)
   end
 
   context 'when the Salesforce role fails to save' do
