@@ -33,6 +33,13 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
     expect(sf_role.editor_type__c).to eq(role.school.user_origin)
   end
 
+  it 'syncs archived roles' do
+    role.update!(archived_at: Time.zone.now)
+    perform_job
+    sf_role = Salesforce::Role.find_by(affiliation_id__c: role.id)
+    expect(sf_role.offboardedat__c.to_date).to eq(role.archived_at.to_date)
+  end
+
   context 'when the Salesforce role fails to save' do
     let(:sf_role) { instance_double(Salesforce::Role) }
 

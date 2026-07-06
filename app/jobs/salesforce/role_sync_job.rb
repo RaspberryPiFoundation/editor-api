@@ -9,12 +9,13 @@ module Salesforce
       contact__r__pi_accounts_unique_id__c: :user_id,
       editor__r__editoruuid__c: :school_id,
       roletype__c: :role,
+      offboardedat__c: :archived_at,
       createdat__c: :created_at,
       updatedat__c: :updated_at
     }.freeze
 
     def perform(role_id:)
-      role = ::Role.find(role_id)
+      role = ::Role.unscoped.find(role_id)
 
       return if role.student?
 
