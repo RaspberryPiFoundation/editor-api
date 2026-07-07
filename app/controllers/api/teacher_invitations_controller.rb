@@ -13,7 +13,8 @@ module Api
     end
 
     def accept
-      role = Role.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school)
+      role = Role.unscoped.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school)
+      role.archived_at = nil
       if role.save
         @invitation.update!(accepted_at: Time.current) if @invitation.accepted_at.blank?
         head :ok
