@@ -9,7 +9,7 @@ class Ability
     return unless user
 
     define_authenticated_non_student_abilities(user)
-    user.schools.each do |school|
+    user.schools.active.each do |school|
       define_school_student_abilities(user:, school:) if user.school_student?(school)
       define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
       define_school_owner_abilities(school:) if user.school_owner?(school)

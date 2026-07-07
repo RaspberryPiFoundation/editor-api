@@ -4,7 +4,7 @@ require 'cancan/matchers'
 require 'rails_helper'
 
 RSpec.describe Ability do
-  subject { described_class.new(user) }
+  subject(:ability) { described_class.new(user) }
 
   let(:user_id) { SecureRandom.uuid }
   let(:project) { build(:project, user_id:) }
@@ -485,6 +485,11 @@ RSpec.describe Ability do
       it { is_expected.to be_able_to(:read, school) }
       it { is_expected.to be_able_to(:update, school) }
       it { is_expected.to be_able_to(:destroy, school) }
+
+      it 'cannot interact with an inactive school' do
+        school.update!(archived_at: Time.current)
+        expect(ability).not_to be_able_to(:read, school)
+      end
     end
 
     context 'when user is a school teacher' do
@@ -495,6 +500,11 @@ RSpec.describe Ability do
       it { is_expected.to be_able_to(:read, school) }
       it { is_expected.not_to be_able_to(:update, school) }
       it { is_expected.not_to be_able_to(:destroy, school) }
+
+      it 'cannot interact with an inactive school' do
+        school.update!(archived_at: Time.current)
+        expect(ability).not_to be_able_to(:read, school)
+      end
     end
 
     context 'when user is a school student' do
@@ -505,6 +515,11 @@ RSpec.describe Ability do
       it { is_expected.to be_able_to(:read, school) }
       it { is_expected.not_to be_able_to(:update, school) }
       it { is_expected.not_to be_able_to(:destroy, school) }
+
+      it 'cannot interact with an inactive school' do
+        school.update(archived_at: Time.current)
+        expect(ability).not_to be_able_to(:read, school)
+      end
 
       context 'with a starter project' do
         it { is_expected.not_to be_able_to(:index, starter_project) }
