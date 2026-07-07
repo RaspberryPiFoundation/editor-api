@@ -197,9 +197,7 @@ RSpec.describe 'Accepting an invitations', type: :request do
       end
 
       context 'when user already has teacher role for the same school' do
-        before do
-          Role.teacher.create!(user_id: user.id, school:)
-        end
+        let(:role) { Role.teacher.create!(user_id: user.id, school:) }
 
         it 'responds 200 OK' do
           put("/api/teacher_invitations/#{token}/accept", headers:)
@@ -211,6 +209,15 @@ RSpec.describe 'Accepting an invitations', type: :request do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
           expect(user).to be_school_teacher(school)
+        end
+
+        it 'makes the user active if they were previously archived' do
+          role.update!(archived_at: Time.current)
+
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(user).to be_school_teacher(school)
+          expect(role.reload.archived_at).to be_nil
         end
 
         it 'sets the accepted_at timestamp on the invitation' do
