@@ -3,6 +3,8 @@
 module Api
   class DefaultProjectsController < ApiController
     before_action :authorize_user, only: %i[create]
+    # Public template payloads; no user-owned resource is accessed.
+    skip_authorization_check only: %i[show python html]
 
     def show
       data = if params[:type] == Project::Types::HTML

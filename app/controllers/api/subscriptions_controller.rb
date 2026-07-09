@@ -3,6 +3,8 @@
 module Api
   class SubscriptionsController < ApiController
     before_action :check_cloudflare_turnstile, only: :create
+    # Public subscription form endpoint; bot checks and validation are not CanCan resources.
+    skip_authorization_check only: :create
 
     def create
       # turnstile token is only used for bot check so strip it out before validation and submission

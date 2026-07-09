@@ -4,6 +4,8 @@ module Api
   class JoinController < ApiController
     before_action :authorize_user, only: :create
     before_action :find_school_and_class
+    # Join-code flow is governed by JoinStatusService rather than CanCan.
+    skip_authorization_check only: %i[show create]
 
     def show
       @status = show_status
