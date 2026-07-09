@@ -6,6 +6,7 @@ module Api
 
     def show
       @school = School.find_for_user!(current_user)
+      authorize! :read, @school
       @user = current_user
       render :show, formats: [:json], status: :ok
     end

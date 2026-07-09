@@ -5,6 +5,7 @@ module Api
     before_action :authorize_user
 
     def index
+      authorize! :read, UserJob.new(user_id: current_user.id)
       user_jobs = UserJob.where(user_id: current_user.id)
 
       batches = user_jobs.filter_map do |user_job|
@@ -19,10 +20,7 @@ module Api
     end
 
     def show
-      user_job = UserJob.find_by(
-        good_job_batch_id: params[:id],
-        user_id: current_user.id
-      )
+      user_job = authorized_user_job
 
       batch = batch_attributes_for(user_job) if user_job
       if batch.present?
@@ -33,6 +31,20 @@ module Api
     end
 
     private
+
+    def authorized_user_job
+      user_job = UserJob.find_by(good_job_batch_id: params[:id])
+
+      if user_job
+        authorize! :read, user_job
+        return user_job
+      end
+
+      authorize! :read, UserJob.new(user_id: current_user.id)
+      nil
+    rescue CanCan::AccessDenied
+      nil
+    end
 
     def batch_attributes_for(user_job)
       return nil unless user_job
