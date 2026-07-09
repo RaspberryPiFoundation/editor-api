@@ -6,6 +6,7 @@ RSpec.describe 'Showing user jobs', type: :request do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:school) { create(:school) }
   let(:owner) { create(:owner, school:) }
+  let(:other_user) { create(:user) }
 
   let!(:batch) { GoodJob::BatchRecord.create!(description: school.id) }
   let!(:user_job) { create(:user_job, good_job_batch_id: batch.id, user_id: owner.id) }
@@ -38,5 +39,14 @@ RSpec.describe 'Showing user jobs', type: :request do
     data = JSON.parse(response.body, symbolize_names: true)
 
     expect(data[:job][:id]).to eq(job_id)
+  end
+
+  it 'responds 404 Not Found when the job belongs to another user' do
+    other_batch = GoodJob::BatchRecord.create!(description: 'other-user-job')
+    other_user_job = create(:user_job, good_job_batch_id: other_batch.id, user_id: other_user.id)
+
+    get("/api/user_jobs/#{other_user_job.good_job_batch_id}", headers:)
+
+    expect(response).to have_http_status(:not_found)
   end
 end

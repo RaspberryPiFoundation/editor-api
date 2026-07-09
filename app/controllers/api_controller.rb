@@ -49,7 +49,8 @@ class ApiController < ActionController::API
   def authorization_not_performed(exception)
     raise exception if performed?
 
-    internal_server_error(exception)
+    Sentry.capture_exception(exception)
+    render json: { error: 'Internal server error' }, status: :internal_server_error
   end
 
   def render_error_as_json(exception, status)

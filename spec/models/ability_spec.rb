@@ -10,6 +10,14 @@ RSpec.describe Ability do
   let(:project) { build(:project, user_id:) }
   let(:starter_project) { build(:project, user_id: nil) }
 
+  describe 'TeacherInvitation' do
+    let(:user) { build(:user, email: 'teacher@example.com') }
+
+    it { is_expected.to be_able_to(:read, build(:teacher_invitation, email_address: user.email)) }
+    it { is_expected.to be_able_to(:accept, build(:teacher_invitation, email_address: user.email)) }
+    it { is_expected.not_to be_able_to(:read, build(:teacher_invitation, email_address: nil)) }
+  end
+
   describe 'Project' do
     context 'with no user' do
       let(:user) { nil }

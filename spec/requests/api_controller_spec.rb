@@ -173,6 +173,33 @@ RSpec.describe ApiController do
     end
   end
 
+  context 'when CanCan::AuthorizationNotPerformed is raised before rendering' do
+    let(:error) { CanCan::AuthorizationNotPerformed.new('foo') }
+
+    before do
+      test_controller.error = error
+      allow(Sentry).to receive(:capture_exception)
+    end
+
+    it 'reports exception to Sentry' do
+      get '/test'
+
+      expect(Sentry).to have_received(:capture_exception).with(error)
+    end
+
+    it 'responds with 500 Internal server error status code' do
+      get '/test'
+
+      expect(response).to have_http_status(:internal_server_error)
+    end
+
+    it 'responds with a generic error message' do
+      get '/test'
+
+      expect(response.parsed_body).to eq('error' => 'Internal server error')
+    end
+  end
+
   context 'when an action completes without CanCan authorization' do
     it 'fails closed with an authorization-not-performed error' do
       expect { get '/unguarded_test' }.to raise_error(CanCan::AuthorizationNotPerformed)

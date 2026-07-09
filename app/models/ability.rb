@@ -36,7 +36,9 @@ class Ability
   def define_authenticated_abilities(user)
     can :read, UserJob, user_id: user.id
     can %i[read accept], TeacherInvitation do |invitation|
-      user.email.present? && invitation.email_address.casecmp?(user.email)
+      user.email.present? &&
+        invitation.email_address.present? &&
+        invitation.email_address.casecmp?(user.email)
     end
   end
 

@@ -33,7 +33,10 @@ module Api
     private
 
     def authorized_user_job
-      user_job = UserJob.find_by(good_job_batch_id: params[:id])
+      user_job = UserJob.find_by(
+        good_job_batch_id: params[:id],
+        user_id: current_user.id
+      )
 
       if user_job
         authorize! :read, user_job
@@ -41,8 +44,6 @@ module Api
       end
 
       authorize! :read, UserJob.new(user_id: current_user.id)
-      nil
-    rescue CanCan::AccessDenied
       nil
     end
 
