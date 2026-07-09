@@ -8,6 +8,8 @@ RSpec.describe ApiController do
       cattr_accessor :authorize_user_required
       cattr_accessor :error
 
+      skip_authorization_check only: :index
+
       def index
         authorize_user if self.class.authorize_user_required
         raise self.class.error if self.class.error.present?
@@ -16,14 +18,23 @@ RSpec.describe ApiController do
       end
     end
   end
+  let(:unguarded_test_controller) do
+    Class.new(ApiController) do
+      def index
+        render json: {}
+      end
+    end
+  end
 
   before do
     stub_const('TestController', test_controller)
+    stub_const('UnguardedTestController', unguarded_test_controller)
 
     Rails.application.routes.disable_clear_and_finalize = true
 
     Rails.application.routes.draw do
       get '/test', to: 'test#index'
+      get '/unguarded_test', to: 'unguarded_test#index'
     end
   end
 
@@ -159,6 +170,12 @@ RSpec.describe ApiController do
       expect(response.parsed_body).to include(
         'error' => 'RuntimeError: foo'
       )
+    end
+  end
+
+  context 'when an action completes without CanCan authorization' do
+    it 'fails closed with an authorization-not-performed error' do
+      expect { get '/unguarded_test' }.to raise_error(CanCan::AuthorizationNotPerformed)
     end
   end
 
