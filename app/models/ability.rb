@@ -8,6 +8,7 @@ class Ability
 
     return unless user
 
+    define_authenticated_abilities(user)
     define_authenticated_non_student_abilities(user)
     user.schools.active.each do |school|
       define_school_student_abilities(user:, school:) if user.school_student?(school)
@@ -30,6 +31,15 @@ class Ability
 
     # Anyone can read publicly shared lessons.
     can :read, Lesson, visibility: 'public'
+  end
+
+  def define_authenticated_abilities(user)
+    can :read, UserJob, user_id: user.id
+    can %i[read accept], TeacherInvitation do |invitation|
+      user.email.present? &&
+        invitation.email_address.present? &&
+        invitation.email_address.casecmp?(user.email)
+    end
   end
 
   def define_authenticated_non_student_abilities(user)

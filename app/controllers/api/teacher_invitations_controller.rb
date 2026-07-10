@@ -7,6 +7,7 @@ module Api
     before_action :authorize_user
     before_action :load_invitation
     before_action :ensure_invitation_email_matches_user_email
+    before_action :authorize_invitation
 
     def show
       render :show, formats: [:json], status: :ok
@@ -30,9 +31,23 @@ module Api
     end
 
     def ensure_invitation_email_matches_user_email
-      return if @invitation.email_address.casecmp?(current_user.email)
+      return if invitation_email_matches_user?
 
       render json: { error: 'Invitation email does not match user email' }, status: :forbidden
+    end
+
+    def authorize_invitation
+      authorize! invitation_authorization_action, @invitation
+    end
+
+    def invitation_authorization_action
+      action_name == 'accept' ? :accept : :read
+    end
+
+    def invitation_email_matches_user?
+      current_user.email.present? &&
+        @invitation.email_address.present? &&
+        @invitation.email_address.casecmp?(current_user.email)
     end
   end
 end

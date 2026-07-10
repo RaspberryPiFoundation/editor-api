@@ -2,6 +2,9 @@
 
 module Api
   class FeaturesController < ApiController
+    # Public feature discovery endpoint; feature visibility is resolved by Flipper.
+    skip_authorization_check only: :index
+
     def index
       school = current_user&.schools&.first
 

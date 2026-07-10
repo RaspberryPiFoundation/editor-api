@@ -5,6 +5,8 @@ class GraphqlController < ApiController
   # This allows for outside API access while preventing CSRF attacks,
   # but you'll have to authenticate your user separately
   # protect_from_forgery with: :null_session
+  # Authorization is handled by GraphQL fields and mutations via current_ability.
+  skip_authorization_check only: :execute
 
   def execute
     result = EditorApiSchema.execute(query, variables:, context:, operation_name:)

@@ -2,6 +2,9 @@
 
 module Api
   class ProjectErrorsController < ApiController
+    # Public client error intake; project identifiers are used only for attribution.
+    skip_authorization_check only: :create
+
     def create
       project_error = ProjectError.new(project_error_params)
       project_error.save!

@@ -54,6 +54,28 @@ RSpec.describe 'Remix requests' do
 
         expect(response).to have_http_status(:not_found)
       end
+
+      context 'when the original project is a private project belonging to another user' do
+        let!(:original_project) { create(:project, user_id: create(:user).id) }
+
+        it 'returns forbidden' do
+          get("/api/projects/#{original_project.identifier}/remixes", headers:)
+
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+
+      context 'when the original project belongs to another user but is visible to the school owner' do
+        let(:teacher) { create(:teacher, school:) }
+        let(:lesson) { create(:lesson, school:, user_id: teacher.id, visibility: 'students') }
+        let!(:original_project) { create(:project, school:, lesson:, user_id: teacher.id) }
+
+        it 'returns success' do
+          get("/api/projects/#{original_project.identifier}/remixes", headers:)
+
+          expect(response).to have_http_status(:ok)
+        end
+      end
     end
 
     describe '#show' do
@@ -169,7 +191,7 @@ RSpec.describe 'Remix requests' do
         expect(response).to have_http_status(:not_found)
       end
 
-      context 'when the original project belongs to another user' do
+      context 'when the original project is a private project belonging to another user' do
         let!(:original_project) { create(:project, user_id: create(:user).id) }
 
         it 'returns forbidden without creating a remix' do

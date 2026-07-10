@@ -3,6 +3,8 @@
 module Api
   class EventsController < ApiController
     before_action :authorize_user
+    # Authenticated telemetry endpoint; authorize_user is the access boundary.
+    skip_authorization_check only: :create
 
     def create
       event = Event.new(event_params.merge(user_id: current_user.id, time: Time.current))

@@ -2,6 +2,9 @@
 
 module Api
   class ProfileAuthCheckController < ApiController
+    # This endpoint reports whether the supplied token works against Profile.
+    skip_authorization_check only: :index
+
     def index
       authorised = ProfileApiClient.check_auth(token: current_user&.token)
 

@@ -12,6 +12,7 @@ module Api
       before_action :authorize_lesson_projects!
 
       def create_batch
+        authorize_blank_lesson_batch! unless lesson_projects?
         raise ParameterError, 'lesson_projects cannot be blank' unless lesson_projects?
 
         @results = Lesson::CreateBatch.call(
@@ -60,6 +61,10 @@ module Api
         batch_lessons_params.each do |lesson_params|
           authorize! :create, Lesson.new(lesson_params.slice(:school_id, :school_class_id, :user_id))
         end
+      end
+
+      def authorize_blank_lesson_batch!
+        authorize! :create, Lesson.new(user_id: current_user.id)
       end
     end
   end

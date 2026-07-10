@@ -11,6 +11,7 @@ module Api
       before_action :load_and_authorize_remix_identifier, only: :show_identifier
 
       def index
+        authorize! :show, project
         projects = Project.where(remixed_from_id: project.id).accessible_by(current_ability)
         @projects_with_students = projects.includes(:school_project).with_students(project.school, current_user)
         render index: @projects_with_students, formats: [:json]
