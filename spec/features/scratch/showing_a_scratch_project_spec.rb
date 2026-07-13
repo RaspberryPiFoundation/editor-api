@@ -73,6 +73,22 @@ RSpec.describe 'Showing a Scratch project', type: :request do
     expect(response).to have_http_status(:not_found)
   end
 
+  it 'returns a 404 if project does not have a scratch component' do
+    authenticated_in_hydra_as(teacher)
+    project = create(
+      :project,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      locale: 'en',
+      school: school,
+      user_id: teacher.id,
+      lesson: lesson
+    )
+
+    get "/api/scratch/projects/#{project.identifier}", headers: headers
+
+    expect(response).to have_http_status(:not_found)
+  end
+
   it 'returns a 200 ok if not logged in for an anonymous scratch project' do
     project = create(:scratch_project, locale: 'en', user_id: nil)
     get "/api/scratch/projects/#{project.identifier}"
