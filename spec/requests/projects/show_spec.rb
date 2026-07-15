@@ -165,6 +165,31 @@ RSpec.describe 'Project show requests' do
       end
     end
 
+    context "when a school owner loads a student's project from a class they teach" do
+      let(:teacher) { create(:owner, school:) }
+      let(:student) { create(:student, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+      let(:class_student) { create(:class_student, school_class:, student_id: student.id) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
+      let(:lesson_project) { create(:project, school:, lesson:, user_id: teacher.id, locale: nil) }
+      let(:student_project) do
+        class_student
+        create(:project, school:, user_id: student.id, remixed_from_id: lesson_project.id, locale: nil)
+      end
+
+      before do
+        create(:teacher_role, school:, user_id: teacher.id)
+      end
+
+      it 'returns the student as the project owner because the school owner cannot update it' do
+        get("/api/projects/#{student_project.identifier}", headers:)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body['user_id']).to eq(student.id)
+        expect(Ability.new(teacher).can?(:update, student_project)).to be(false)
+      end
+    end
+
     context 'when loading another user\'s project' do
       let!(:another_project) { create(:project, user_id: SecureRandom.uuid, locale: nil) }
       let(:another_project_json) do
