@@ -5,13 +5,14 @@ require 'rails_helper'
 RSpec.describe 'Project show requests' do
   let(:headers) { {} }
   let(:teacher) { create(:teacher, school:) }
+  let(:authenticated_user) { teacher }
   let(:school) { create(:school) }
 
   context 'when user is logged in' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
     before do
-      authenticated_in_hydra_as(teacher)
+      authenticated_in_hydra_as(authenticated_user)
       stub_profile_api_list_school_students(school:, student_attributes: [{ name: 'Joe Bloggs' }])
       stub_profile_api_create_safeguarding_flag
     end
@@ -150,35 +151,36 @@ RSpec.describe 'Project show requests' do
     end
 
     context "when a school owner loads another teacher's project outside their class" do
-      let(:teacher) { create(:owner, school:) }
-      let(:project_teacher) { create(:teacher, school:) }
-      let(:school_class) { create(:school_class, school:, teacher_ids: [project_teacher.id]) }
-      let(:lesson) { create(:lesson, school:, school_class:, user_id: project_teacher.id, visibility: 'teachers') }
-      let(:project) { create(:project, school:, lesson:, user_id: project_teacher.id, locale: nil) }
+      let(:authenticated_user) { owner }
+      let(:owner) { create(:owner, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'teachers') }
+      let(:project) { create(:project, school:, lesson:, user_id: teacher.id, locale: nil) }
 
       it 'returns the owner as the effective project owner without changing the stored owner' do
         get("/api/projects/#{project.identifier}", headers:)
 
         expect(response).to have_http_status(:ok)
-        expect(response.parsed_body['user_id']).to eq(teacher.id)
-        expect(project.reload.user_id).to eq(project_teacher.id)
+        expect(response.parsed_body['user_id']).to eq(owner.id)
+        expect(project.reload.user_id).to eq(teacher.id)
       end
     end
 
     context "when a school owner loads a student's project from a class they teach" do
-      let(:teacher) { create(:owner, school:) }
+      let(:authenticated_user) { owner }
+      let(:owner) { create(:owner, school:) }
       let(:student) { create(:student, school:) }
-      let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [owner.id]) }
       let(:class_student) { create(:class_student, school_class:, student_id: student.id) }
-      let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
-      let(:lesson_project) { create(:project, school:, lesson:, user_id: teacher.id, locale: nil) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: owner.id, visibility: 'students') }
+      let(:lesson_project) { create(:project, school:, lesson:, user_id: owner.id, locale: nil) }
       let(:student_project) do
         class_student
         create(:project, school:, user_id: student.id, remixed_from_id: lesson_project.id, locale: nil)
       end
 
       before do
-        create(:teacher_role, school:, user_id: teacher.id)
+        create(:teacher_role, school:, user_id: owner.id)
       end
 
       it 'returns the student as the project owner because the school owner cannot update it' do
@@ -186,7 +188,7 @@ RSpec.describe 'Project show requests' do
 
         expect(response).to have_http_status(:ok)
         expect(response.parsed_body['user_id']).to eq(student.id)
-        expect(Ability.new(teacher).can?(:update, student_project)).to be(false)
+        expect(Ability.new(owner).can?(:update, student_project)).to be(false)
       end
     end
 

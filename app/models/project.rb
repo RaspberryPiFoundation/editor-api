@@ -136,7 +136,7 @@ class Project < ApplicationRecord
 
     return if no_lesson || no_school_class || user_is_school_owner? || user_is_class_student? || user_is_class_teacher?
 
-    errors.add(:user, "'#{user_id}' is not a class member or school owner for lesson '#{lesson_id}'")
+    errors.add(:user, "'#{user_id}' is not a class member and is not a school owner for school '#{school_id}' (lesson '#{lesson_id}')")
   end
 
   def user_is_class_student?
