@@ -24,7 +24,7 @@ module Api
         @user = project_with_user[1]
       end
 
-      @project.user_id = current_user.id if class_teacher?(@project)
+      @project.user_id = current_user.id if class_teacher?(@project) || school_owner?
       render :show, formats: [:json]
     end
 

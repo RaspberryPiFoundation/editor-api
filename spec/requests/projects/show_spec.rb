@@ -149,6 +149,22 @@ RSpec.describe 'Project show requests' do
       end
     end
 
+    context "when a school owner loads another teacher's project outside their class" do
+      let(:teacher) { create(:owner, school:) }
+      let(:project_teacher) { create(:teacher, school:) }
+      let(:school_class) { create(:school_class, school:, teacher_ids: [project_teacher.id]) }
+      let(:lesson) { create(:lesson, school:, school_class:, user_id: project_teacher.id, visibility: 'teachers') }
+      let(:project) { create(:project, school:, lesson:, user_id: project_teacher.id, locale: nil) }
+
+      it 'returns the owner as the effective project owner without changing the stored owner' do
+        get("/api/projects/#{project.identifier}", headers:)
+
+        expect(response).to have_http_status(:ok)
+        expect(response.parsed_body['user_id']).to eq(teacher.id)
+        expect(project.reload.user_id).to eq(project_teacher.id)
+      end
+    end
+
     context 'when loading another user\'s project' do
       let!(:another_project) { create(:project, user_id: SecureRandom.uuid, locale: nil) }
       let(:another_project_json) do

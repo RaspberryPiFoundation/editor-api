@@ -49,6 +49,25 @@ RSpec.describe 'Updating a Scratch project', type: :request do
     )
   end
 
+  it "allows a school owner to update another teacher's project outside their class" do
+    owner = create(:owner, school:)
+    authenticated_in_hydra_as(owner)
+    project = create(
+      :project,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      locale: 'en',
+      school:,
+      lesson:,
+      user_id: teacher.id
+    )
+    create(:scratch_component, project:)
+
+    put "/api/scratch/projects/#{project.identifier}", params: { targets: ['owner update'] }, headers: auth_headers
+
+    expect(response).to have_http_status(:ok)
+    expect(project.reload.scratch_component.content.to_h['targets']).to eq(['owner update'])
+  end
+
   it 'returns 403 Forbidden when trying to update a project user does not have access to' do
     authenticated_in_hydra_as(teacher)
     project = create(
