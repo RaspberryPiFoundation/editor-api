@@ -156,6 +156,27 @@ RSpec.describe 'Project update requests' do
     end
   end
 
+  context "when a school owner updates another teacher's class project" do
+    let(:school) { create(:school) }
+    let(:owner) { create(:owner, school:) }
+    let(:teacher) { create(:teacher, school:) }
+    let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
+    let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'teachers') }
+    let(:project) { create(:project, school:, lesson:, locale: nil, user_id: teacher.id) }
+    let(:params) { { project: { name: 'updated by school owner' } } }
+
+    before do
+      authenticated_in_hydra_as(owner)
+    end
+
+    it 'updates the original project' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+
+      expect(response).to have_http_status(:ok)
+      expect(project.reload.name).to eq('updated by school owner')
+    end
+  end
+
   context 'when authed user is a student and the project is remixed from a lesson project' do
     let(:teacher) { create(:teacher, school:) }
     let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }

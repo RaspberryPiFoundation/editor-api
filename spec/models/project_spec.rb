@@ -135,6 +135,14 @@ RSpec.describe Project, :versioning do
         expect(project).to be_valid
       end
 
+      it 'is valid if the user is a school owner outside the class' do
+        owner = create(:owner, school:)
+        project.user_id = owner.id
+        project.identifier = 'unique-owner-identifier'
+
+        expect(project).to be_valid
+      end
+
       it 'is invalid if the user is neither the owner nor a class member' do
         project.user_id = SecureRandom.uuid
         expect(project).not_to be_valid

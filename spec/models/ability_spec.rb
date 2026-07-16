@@ -189,7 +189,7 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:read, project) }
         it { is_expected.to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
-        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
@@ -251,7 +251,7 @@ RSpec.describe Ability do
         it { is_expected.to be_able_to(:read, project) }
         it { is_expected.to be_able_to(:show_context, project) }
         it { is_expected.not_to be_able_to(:create, project) }
-        it { is_expected.not_to be_able_to(:update, project) }
+        it { is_expected.to be_able_to(:update, project) }
         it { is_expected.not_to be_able_to(:set_finished, project.school_project) }
         it { is_expected.not_to be_able_to(:destroy, project) }
       end
