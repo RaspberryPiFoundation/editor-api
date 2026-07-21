@@ -66,7 +66,7 @@ Rails.application.routes.draw do
     resource :project_errors, only: %i[create]
 
     resource :school, only: [:show], controller: 'my_school'
-    resources :schools, only: %i[index show create update destroy] do
+    resources :schools, only: %i[index show create update] do
       post :import, on: :collection
       resources :members, only: %i[index], controller: 'school_members'
       resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do

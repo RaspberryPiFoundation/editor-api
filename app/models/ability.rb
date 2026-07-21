@@ -70,7 +70,7 @@ class Ability
   end
 
   def define_school_owner_abilities(school:)
-    can(%i[read update destroy], School, id: school.id)
+    can(%i[read update], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[read create import update destroy regenerate_join_code], SchoolClass, school: { id: school.id })
     can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })

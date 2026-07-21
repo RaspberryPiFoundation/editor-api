@@ -492,7 +492,6 @@ RSpec.describe Ability do
 
       it { is_expected.to be_able_to(:read, school) }
       it { is_expected.to be_able_to(:update, school) }
-      it { is_expected.to be_able_to(:destroy, school) }
 
       it 'cannot interact with an inactive school' do
         school.update!(archived_at: Time.current)
