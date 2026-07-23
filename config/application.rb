@@ -79,7 +79,6 @@ module App
         # Log to STDOUT on Heroku in JSON format, where this variable is set automatically.
         appenders.add(io: $stdout, formatter: :json, application: "editor-api@#{ENV['HEROKU_SLUG_COMMIT'] || 'unknown'}")
       else
-        appenders.add(file_name: "log/#{Rails.env}.log", formatter: :json)
         appenders.add_server(formatter: :color)  # $stdout while serving
         appenders.add_console(formatter: :color) # $stderr inside `rails console`
       end
