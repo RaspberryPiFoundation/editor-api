@@ -13,8 +13,6 @@
 
 ## Sources of Truth
 - `.rubocop.yml` is authoritative for machine-checkable Ruby style; do not restate individual cop rules here.
-- Specs are authoritative for behavior; add or update specs when behavior changes.
-- `AGENTS.md` governs project-specific architectural and workflow decisions.
 
 ## Key Conventions
 - GraphQL context: `current_user`, `current_ability`, `remix_origin`. Object IDs use GlobalID. Locale fallback via `ProjectLoader`: `[requested, 'en', nil]`.
@@ -38,7 +36,7 @@ docker compose up
 - After changing behavior, run the closest relevant spec: `docker compose run --rm api rspec spec/path/to/spec.rb`
 - After changing Ruby, run RuboCop: `docker compose run --rm api bundle exec rubocop`
 - After changing shared infrastructure, the database or schema, authorization, or other cross-cutting behavior, run the full suite: `docker compose run --rm api rspec`
-- CI: GitHub Actions with Ruby 4, Postgres 12, Redis.
+- CI runs in GitHub Actions; treat `.github/workflows/ci.yml` and `.tool-versions` as authoritative for jobs and runtime versions.
 - Salesforce sync specs need `SALESFORCE_CONNECT_DB` set and matching Heroku Connect tables (schema comes from the published `heroku-connect` image after Salesforce mapping is exported).
 
 ## Salesforce / Heroku Connect
