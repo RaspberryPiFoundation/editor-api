@@ -38,11 +38,6 @@ if worker_count > 1
 
   workers worker_count
 
-  before_worker_boot do
-    # Re-open appenders after forking the process
-    SemanticLogger.reopen
-  end
-
   # Use the `preload_app!` method when specifying a `workers` number.
   # This directive tells Puma to first boot the application and load code
   # before forking the application. This takes advantage of Copy On Write

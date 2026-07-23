@@ -74,7 +74,15 @@ module App
     config.x.cloudflare_turnstile.secret_key = ENV.fetch('CLOUDFLARE_TURNSTILE_SECRET_KEY', nil)
     config.x.cloudflare_turnstile.enabled = ENV['CLOUDFLARE_TURNSTILE_SECRET_KEY'].present?
 
-    config.rails_semantic_logger.format = :json
-    config.semantic_logger.application = 'editor-api'
+    config.rails_semantic_logger.appenders do |appenders|
+      if ENV['RAILS_LOG_TO_STDOUT'].present?
+        # Log to STDOUT on Heroku in JSON format, where this variable is set automatically.
+        appenders.add(io: $stdout, formatter: :json, application: "editor-api@#{ENV['HEROKU_SLUG_COMMIT'] || 'unknown'}")
+      else
+        appenders.add(file_name: "log/#{Rails.env}.log", formatter: :json)
+        appenders.add_server(formatter: :color)  # $stdout while serving
+        appenders.add_console(formatter: :color) # $stderr inside `rails console`
+      end
+    end
   end
 end
