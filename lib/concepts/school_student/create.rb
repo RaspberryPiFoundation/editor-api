@@ -7,6 +7,9 @@ module SchoolStudent
         response = OperationResponse.new
         response[:student_id] = create_student(school, school_student_params, token)
         response
+      rescue ProfileApiClient::Student422Error => e
+        response[:error] = e.to_s
+        response
       rescue StandardError => e
         Sentry.capture_exception(e)
         response[:error] = e.to_s
