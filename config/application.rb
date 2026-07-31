@@ -80,5 +80,10 @@ module App
         appenders.add(io: $stdout, formatter: :json, application: "editor-api@#{ENV['HEROKU_SLUG_COMMIT'] || 'unknown'}")
       end
     end
+
+    config.before_initialize do |app|
+      previous_secret_key_base = ENV.fetch('PREVIOUS_SECRET_KEY_BASE', nil)
+      app.message_verifiers.rotate(secret_key_base: previous_secret_key_base) if previous_secret_key_base.present?
+    end
   end
 end
