@@ -65,7 +65,10 @@ module App
 
     config.generators.system_tests = nil
 
-    config.active_record.encryption.primary_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')
+    config.active_record.encryption.primary_key = [
+      ENV.fetch('PREVIOUS_ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY', nil),
+      ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')
+    ].compact
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT')
 
     config.x.subscriptions.pardot_form_handler_url = ENV.fetch('PARDOT_SUBSCRIPTION_URL', '')
