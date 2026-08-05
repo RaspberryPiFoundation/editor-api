@@ -23,6 +23,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
 
       - name: Set up Ruby and bundle cache
@@ -97,6 +99,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
 
       - name: Install test dependencies
         run: >
