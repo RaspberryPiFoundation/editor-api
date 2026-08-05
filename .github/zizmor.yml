@@ -1,4 +1,0 @@
-rules:
-  unpinned-images:
-    ignore:
-      - ci.yml
