@@ -1,0 +1,11 @@
+rules:
+  artipacked:
+    ignore:
+      - ci.yml
+  unpinned-uses:
+    ignore:
+      - ci.yml
+      - close_stale_issues_and_prs.yml
+  unpinned-images:
+    ignore:
+      - ci.yml
