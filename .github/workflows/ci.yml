@@ -100,7 +100,7 @@ jobs:
         ports:
           - 6379:6379
       salesforce_connect:
-        image: 'ghcr.io/raspberrypifoundation/heroku-connect'
+        image: 'ghcr.io/raspberrypifoundation/heroku-connect' # zizmor: ignore[unpinned-images]
         credentials:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
