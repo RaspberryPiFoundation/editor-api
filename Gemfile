@@ -43,7 +43,7 @@ gem 'puma', '~> 8.0'
 gem 'rack_content_type_default', '~> 1.1'
 gem 'rack-cors'
 gem 'rails', '~> 8.1.3.1'
-gem 'rails_semantic_logger', '~> 5.0'
+gem 'rails_semantic_logger', '~> 5.1'
 gem 'ruby-progressbar', '~> 1.13', require: false
 gem 'ruby-vips'
 gem 'rubyzip'
