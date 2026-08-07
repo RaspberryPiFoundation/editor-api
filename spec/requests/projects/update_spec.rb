@@ -124,6 +124,14 @@ RSpec.describe 'Project update requests' do
       put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response.body).to include('updated instructions')
     end
+
+    it 'saves and returns instructions in the instruction steps format' do
+      params[:project][:instructions] = [{ markdown_content: 'step 1' }, { markdown_content: 'step 2' }]
+      put("/api/projects/#{project.identifier}", params:, headers:)
+
+      expect(project.reload.instructions).to eq([{ 'markdown_content' => 'step 1' }, { 'markdown_content' => 'step 2' }])
+      expect(response.parsed_body['instructions']).to eq([{ 'markdown_content' => 'step 1' }, { 'markdown_content' => 'step 2' }])
+    end
   end
 
   context 'when authed user is a teacher updating a class project' do
