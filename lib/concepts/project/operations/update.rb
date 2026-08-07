@@ -3,11 +3,11 @@
 class Project
   class Update
     class << self
-      def call(project:, update_hash:, current_user:)
+      def call(project:, update_hash:)
         response = setup_response(project)
 
         setup_deletions(response, update_hash)
-        update_project_attributes(response, update_hash, current_user)
+        update_project_attributes(response, update_hash)
         update_component_attributes(response, update_hash)
         persist_changes(response)
         response
@@ -42,28 +42,7 @@ class Project
         response[:error] = I18n.t 'errors.project.editing.delete_default_component'
       end
 
-      def student_project_instructions_updated?(response, update_hash, current_user)
-        is_school_project = response[:project].school.present?
-        user_is_student = current_user.student?
-        instructions_updated = normalize_instructions(response[:project].instructions) != normalize_instructions(update_hash[:instructions])
-        is_school_project && user_is_student && instructions_updated
-      end
-
-      # update_hash[:instructions] may be plain Ruby data or an ActionController::Parameters
-      # array/hash (for the instruction steps format); round-trip through JSON so both sides
-      # of the comparison are in the same plain, comparable shape.
-      def normalize_instructions(value)
-        ActiveSupport::JSON.decode(ActiveSupport::JSON.encode(value))
-      end
-
-      def validate_update(response, update_hash, current_user)
-        return unless student_project_instructions_updated?(response, update_hash, current_user)
-
-        response[:error] = I18n.t 'errors.project.editing.student_update_instructions'
-      end
-
-      def update_project_attributes(response, update_hash, current_user)
-        validate_update(response, update_hash, current_user)
+      def update_project_attributes(response, update_hash)
         return if response.failure?
 
         response[:project].assign_attributes(update_hash.slice(:name, :instructions))
