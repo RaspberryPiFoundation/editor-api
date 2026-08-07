@@ -74,6 +74,18 @@ class Project < ApplicationRecord
     super(value.is_a?(Hash) ? ScratchComponent.new(value) : value)
   end
 
+  def instructions
+    self[:instruction_steps].nil? ? self[:instructions] : self[:instruction_steps]
+  end
+
+  def instructions=(value)
+    if value.is_a?(Array)
+      self[:instruction_steps] = value
+    else
+      self[:instructions] = value
+    end
+  end
+
   def last_edited_at
     # datetime that the project or one of its components was last updated
     [updated_at, components.maximum(:updated_at)].compact.max

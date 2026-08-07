@@ -45,8 +45,15 @@ class Project
       def student_project_instructions_updated?(response, update_hash, current_user)
         is_school_project = response[:project].school.present?
         user_is_student = current_user.student?
-        instructions_updated = response[:project].instructions != update_hash[:instructions]
+        instructions_updated = normalize_instructions(response[:project].instructions) != normalize_instructions(update_hash[:instructions])
         is_school_project && user_is_student && instructions_updated
+      end
+
+      # update_hash[:instructions] may be plain Ruby data or an ActionController::Parameters
+      # array/hash (for the instruction steps format); round-trip through JSON so both sides
+      # of the comparison are in the same plain, comparable shape.
+      def normalize_instructions(value)
+        ActiveSupport::JSON.decode(ActiveSupport::JSON.encode(value))
       end
 
       def validate_update(response, update_hash, current_user)

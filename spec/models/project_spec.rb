@@ -344,6 +344,24 @@ RSpec.describe Project, :versioning do
     end
   end
 
+  describe '#instructions' do
+    let(:project) { create(:project, :with_instructions, school:, user_id: create(:teacher, school:).id) }
+
+    it 'falls back to the legacy text column when instruction_steps has never been set' do
+      expect(project.instructions).to eq(project[:instructions])
+    end
+
+    it 'returns instruction_steps once set, without touching the legacy column' do
+      project.update!(instructions: [{ markdown_content: 'step 1' }])
+      expect(project.instructions).to eq([{ 'markdown_content' => 'step 1' }])
+    end
+
+    it 'does not fall back to stale legacy text once instruction_steps is set to an empty array' do
+      project.update!(instructions: [])
+      expect(project.instructions).to eq([])
+    end
+  end
+
   describe 'auditing' do
     let(:school) { create(:school) }
     let(:teacher) { create(:teacher, school:) }

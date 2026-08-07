@@ -82,7 +82,8 @@ module Api
                             :instructions,
                             {
                               image_list: [],
-                              components: [%i[id name extension content index]]
+                              components: [%i[id name extension content index]],
+                              instructions: [[:markdown_content]]
                             }])
       end
     end
