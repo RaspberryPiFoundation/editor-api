@@ -41,7 +41,7 @@ module Api
     end
 
     def update
-      result = Project::Update.call(project: @project, update_hash: project_params, current_user:)
+      result = Project::Update.call(project: @project, update_hash: project_params)
 
       if result.success?
         track_project_event('Project - Saved', @project)
@@ -94,7 +94,11 @@ module Api
     end
 
     def base_params
-      params.fetch(:project, {}).permit(
+      params.fetch(:project, {}).permit(*permitted_project_attributes)
+    end
+
+    def permitted_project_attributes
+      attributes = [
         :school_id,
         :lesson_id,
         :user_id,
@@ -102,14 +106,16 @@ module Api
         :name,
         :project_type,
         :locale,
-        :instructions,
         {
           components: %i[id name extension content index default]
         },
         scratch_component: {},
         parent: {},
         image_list: []
-      )
+      ]
+      return attributes if current_user&.student?
+
+      attributes + [:instructions, { instructions: [:markdown_content] }]
     end
 
     def school_owner?

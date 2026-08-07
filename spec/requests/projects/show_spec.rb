@@ -54,6 +54,16 @@ RSpec.describe 'Project show requests' do
         get("/api/projects/#{project.identifier}", headers:)
         expect(response.parsed_body).not_to have_key('finished')
       end
+
+      it 'returns instructions in the instruction steps format when saved that way' do
+        project.update!(instructions: [{ markdown_content: 'step 1' }, { markdown_content: 'step 2' }])
+
+        get("/api/projects/#{project.identifier}", headers:)
+
+        expect(response.parsed_body['instructions']).to eq(
+          [{ 'markdown_content' => 'step 1' }, { 'markdown_content' => 'step 2' }]
+        )
+      end
     end
 
     context 'when loading a student\'s project' do
