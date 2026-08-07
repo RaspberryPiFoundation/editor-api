@@ -9,10 +9,9 @@ RSpec.describe Project::Update, type: :unit do
       components: component_hash,
       instructions:
     }
-    described_class.call(project:, update_hash:, current_user:)
+    described_class.call(project:, update_hash:)
   end
 
-  let(:current_user) { create(:user) }
   let!(:project) { create(:project, :with_default_component, :with_components) }
   let(:editable_component) { project.components.last }
   let(:default_component) { project.components.first }
@@ -97,10 +96,9 @@ RSpec.describe Project::Update, type: :unit do
       end
     end
 
-    context 'when the instructions have changed and the current user is a teacher' do
+    context 'when the instructions have changed' do
       let(:school) { create(:school) }
-      let!(:current_user) { create(:teacher, school:) }
-      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
+      let!(:project) { create(:project, :with_instructions, school:, user_id: create(:teacher, school:).id) }
       let(:instructions) { 'new instructions' }
 
       it 'returns success? true' do
@@ -109,29 +107,6 @@ RSpec.describe Project::Update, type: :unit do
 
       it 'updates project instructions' do
         expect { update }.to change { project.reload.instructions }.to('new instructions')
-      end
-    end
-
-    context 'when the instructions have changed and the current user is a student' do
-      let(:school) { create(:school) }
-      let!(:current_user) { create(:student, school:) }
-      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
-      let(:instructions) { 'new instructions' }
-
-      it 'returns success? false' do
-        expect(update.success?).to be(false)
-      end
-
-      it 'does not update project name' do
-        expect { update }.not_to change { project.reload.name }
-      end
-
-      it 'does not update project instructions' do
-        expect { update }.not_to change { project.reload.instructions }
-      end
-
-      it 'returns an error message' do
-        expect(update[:error]).to eq('Student cannot update project instructions')
       end
     end
   end
