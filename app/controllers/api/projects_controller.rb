@@ -104,7 +104,8 @@ module Api
         :locale,
         :instructions,
         {
-          components: %i[id name extension content index default]
+          components: %i[id name extension content index default],
+          instructions: [:markdown_content]
         },
         scratch_component: {},
         parent: {},
