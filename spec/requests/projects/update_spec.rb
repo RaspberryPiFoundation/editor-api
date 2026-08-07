@@ -205,10 +205,12 @@ RSpec.describe 'Project update requests' do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'returns unprocessable entity if instructions updated' do
+    it 'ignores an attempt to update instructions' do
       params[:project][:instructions] = 'updated instructions'
       put("/api/projects/#{project.identifier}", params:, headers:)
-      expect(response).to have_http_status(:unprocessable_content)
+
+      expect(response).to have_http_status(:ok)
+      expect(project.reload.instructions).to be_nil
     end
 
     it 'records a project saved event' do
