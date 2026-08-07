@@ -6,10 +6,13 @@
 - **REST** under `app/controllers/api/**` with Jbuilder views in `app/views/api/**`; **GraphQL** at `/graphql` (schema in `app/graphql/**`).
 - **Auth**: Browser/session via OmniAuth (OIDC to Hydra); API token via `Authorization: Bearer` with `Identifiable#identify_user` → `User.from_token` → `HydraPublicApiClient`.
 - **Authorization**: cancancan in `app/models/ability.rb`. Use `load_and_authorize_resource` in controllers; GraphQL uses `Types::ProjectType.authorized?` and `current_ability` in context.
-- **Domain**: `Project` (+ `Component`) with Active Storage attachments. Domain operations in `lib/concepts/**` (e.g. `Project::Create`, `Project::CreateRemix`). Prefer calling these from controllers/mutations.
+- **Domain**: `Project` (+ `Component`) with Active Storage attachments. Controllers and mutations must use an existing domain operation from `lib/concepts/**` (e.g. `Project::Create`, `Project::CreateRemix`). Add a new operation when no suitable one exists; keep logic in the transport layer only when it is transport-specific.
 - **Jobs**: GoodJob (`bundle exec good_job start --max-threads=8`). Admin UI at `/admin/good_job`.
 - **Integrations**: Profile API (`lib/profile_api_client.rb`), UserInfo API, GitHub GraphQL (`lib/github_api.rb`), GitHub webhooks via `GithubWebhooksController`.
 - **Storage/CORS**: Active Storage uses S3 in non-dev. CORS via `config/initializers/cors.rb` and `lib/origin_parser.rb`. `CorpMiddleware` sets CORP for Active Storage routes.
+
+## Sources of Truth
+- `.rubocop.yml` is authoritative for machine-checkable Ruby style; do not restate individual cop rules here.
 
 ## Key Conventions
 - GraphQL context: `current_user`, `current_ability`, `remix_origin`. Object IDs use GlobalID. Locale fallback via `ProjectLoader`: `[requested, 'en', nil]`.
@@ -17,7 +20,6 @@
 - Project rules: identifiers unique per locale; default component name/extension immutable on update; students cannot update `instructions` on school projects; creating a project in a school auto-builds `SchoolProject`.
 - Remix: `Project::CreateRemix` clones media/components, sets `remix_origin`, clears `lesson_id`.
 - Errors: domain ops return `OperationResponse` with `:error`; controllers return 4xx heads; GraphQL raises `GraphQL::ExecutionError`. Exceptions reported to Sentry.
-- snake_case for variable numbers (exceptions: `sha256`, `X-Hub-Signature-256`).
 
 ## Quickstart
 ```bash
@@ -31,10 +33,10 @@ docker compose up
 - Use `docker compose` for all commands; project mounts into `editor-api:builder` with tmpfs for `tmp/`.
 
 ## Testing
-- Full suite: `docker compose run --rm api rspec`
-- Single spec: `docker compose run --rm api rspec spec/path/to/spec.rb`
-- Lint: `docker compose run --rm api bundle exec rubocop`
-- CI: GitHub Actions with Ruby 4, Postgres 12, Redis.
+- After changing behavior, run the closest relevant spec: `docker compose run --rm api rspec spec/path/to/spec.rb`
+- After changing Ruby, run RuboCop: `docker compose run --rm api bundle exec rubocop`
+- After changing shared infrastructure, the database or schema, authorization, or other cross-cutting behavior, run the full suite: `docker compose run --rm api rspec`
+- CI runs in GitHub Actions; treat `.github/workflows/ci.yml` and `.tool-versions` as authoritative for jobs and runtime versions.
 - Salesforce sync specs need `SALESFORCE_CONNECT_DB` set and matching Heroku Connect tables (schema comes from the published `heroku-connect` image after Salesforce mapping is exported).
 
 ## Salesforce / Heroku Connect
