@@ -104,18 +104,25 @@ module Api
         :user_id,
         :identifier,
         :name,
-        :project_type,
         :locale,
         {
           components: %i[id name extension content index default]
         },
-        scratch_component: {},
         parent: {},
         image_list: []
       ]
-      return attributes if current_user&.student?
+      attributes.push(:instructions, { instructions: [:markdown_content] }) if can_set_instructions?
+      attributes.push(:project_type, { scratch_component: { content: {} } }) if can_set_project_type_and_scratch_data?
 
-      attributes + [:instructions, { instructions: [:markdown_content] }]
+      attributes
+    end
+
+    def can_set_instructions?
+      !current_user&.student?
+    end
+
+    def can_set_project_type_and_scratch_data?
+      action_name == 'create' || current_user&.experience_cs_admin?
     end
 
     def school_owner?
