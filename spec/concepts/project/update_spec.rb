@@ -80,6 +80,29 @@ RSpec.describe Project::Update, type: :unit do
       end
     end
 
+    context 'when Scratch component attributes are provided' do
+      subject(:update_scratch_component) do
+        described_class.call(
+          project:,
+          update_hash: { scratch_component: { content: new_content, project_id: other_project.id } }
+        )
+      end
+
+      let!(:scratch_component) { create(:scratch_component, project:) }
+      let(:other_project) { create(:project) }
+      let(:new_content) { { targets: [{ isStage: true }], monitors: [], extensions: [], meta: {} } }
+
+      it 'updates the content' do
+        expect { update_scratch_component }
+          .to change { scratch_component.reload.content.to_h }
+          .to(new_content.deep_stringify_keys)
+      end
+
+      it 'ignores other attributes' do
+        expect { update_scratch_component }.not_to change { scratch_component.reload.project_id }
+      end
+    end
+
     context 'when updating the instructions if project does not belong to a school' do
       let(:instructions) { 'new instructions' }
 

@@ -227,15 +227,25 @@ RSpec.describe 'Creating a project', type: :request do
     end
   end
 
-  context 'when an Experience CS admin creates a starter Scratch project' do
+  context 'when an Experience CS admin creates a Code Classroom Blocks project' do
     let(:experience_cs_admin) { create(:experience_cs_admin_user) }
+    let(:scratch_data) do
+      {
+        targets: [{ isStage: true, name: 'Stage' }],
+        monitors: [],
+        extensions: [],
+        meta: { semver: '3.0.0' }
+      }
+    end
     let(:params) do
       {
         project: {
           identifier: 'test-project',
+          instructions: '<p>Project instructions</p>',
           name: 'Test Project',
           locale: 'fr',
-          project_type: Project::Types::SCRATCH,
+          project_type: Project::Types::CODE_EDITOR_SCRATCH,
+          scratch_component: { content: scratch_data },
           user_id: nil,
           components: []
         }
@@ -247,43 +257,56 @@ RSpec.describe 'Creating a project', type: :request do
     end
 
     it 'responds 201 Created' do
-      post('/api/projects', headers:, params:)
+      post('/api/projects', headers:, params:, as: :json)
       expect(response).to have_http_status(:created)
     end
 
     it 'sets the project identifier to the specified (not the generated) value' do
-      post('/api/projects', headers:, params:)
+      post('/api/projects', headers:, params:, as: :json)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:identifier]).to eq('test-project')
     end
 
     it 'sets the project name to the specified value' do
-      post('/api/projects', headers:, params:)
+      post('/api/projects', headers:, params:, as: :json)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:name]).to eq('Test Project')
     end
 
     it 'sets the project locale to the specified value' do
-      post('/api/projects', headers:, params:)
+      post('/api/projects', headers:, params:, as: :json)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:locale]).to eq('fr')
     end
 
     it 'sets the project type to the specified value' do
-      post('/api/projects', headers:, params:)
+      post('/api/projects', headers:, params:, as: :json)
       data = JSON.parse(response.body, symbolize_names: true)
 
-      expect(data[:project_type]).to eq(Project::Types::SCRATCH)
+      expect(data[:project_type]).to eq(Project::Types::CODE_EDITOR_SCRATCH)
     end
 
     it 'sets the project user_id to the specified value (i.e. nil to represent a public project)' do
-      post('/api/projects', headers:, params:)
+      post('/api/projects', headers:, params:, as: :json)
       data = JSON.parse(response.body, symbolize_names: true)
 
       expect(data[:user_id]).to be_nil
+    end
+
+    it 'stores the project instructions' do
+      post('/api/projects', headers:, params:, as: :json)
+
+      expect(Project.find_by!(identifier: 'test-project', locale: 'fr').instructions).to eq('<p>Project instructions</p>')
+    end
+
+    it 'stores the Scratch data in a Scratch component' do
+      post('/api/projects', headers:, params:, as: :json)
+
+      project = Project.find_by!(identifier: 'test-project', locale: 'fr')
+      expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
     end
   end
 end
