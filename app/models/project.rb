@@ -161,9 +161,14 @@ class Project < ApplicationRecord
   end
 
   def project_with_instructions_must_belong_to_school
+    return if public_code_editor_scratch_project?
     return unless instructions && !school_id
 
     errors.add(:instructions, 'Projects with instructions must belong to a school')
+  end
+
+  def public_code_editor_scratch_project?
+    user_id.nil? && locale.present? && project_type == Types::CODE_EDITOR_SCRATCH
   end
 
   def project_with_school_id_has_school_project

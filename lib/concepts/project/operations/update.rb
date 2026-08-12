@@ -9,6 +9,7 @@ class Project
         setup_deletions(response, update_hash)
         update_project_attributes(response, update_hash)
         update_component_attributes(response, update_hash)
+        update_scratch_component_attributes(response, update_hash)
         persist_changes(response)
         response
       rescue StandardError => e
@@ -45,7 +46,7 @@ class Project
       def update_project_attributes(response, update_hash)
         return if response.failure?
 
-        response[:project].assign_attributes(update_hash.slice(:name, :instructions))
+        response[:project].assign_attributes(update_hash.slice(:name, :instructions, :project_type))
       end
 
       def update_component_attributes(response, update_hash)
@@ -65,11 +66,20 @@ class Project
         component.assign_attributes(component_params)
       end
 
+      def update_scratch_component_attributes(response, update_hash)
+        return if response.failure? || update_hash[:scratch_component].nil?
+
+        scratch_component = response[:project].scratch_component || response[:project].build_scratch_component
+        scratch_component.assign_attributes(update_hash[:scratch_component].slice(:content))
+        response[:scratch_component] = scratch_component
+      end
+
       def persist_changes(response)
         return if response.failure?
 
         ActiveRecord::Base.transaction do
           response[:project].save!
+          response[:scratch_component]&.save!
           response[:project].components.where(id: response[:component_ids_to_delete]).destroy_all
         end
       end

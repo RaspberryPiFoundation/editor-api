@@ -53,6 +53,30 @@ RSpec.describe Project, :versioning do
       expect(valid_project).to be_valid
     end
 
+    it 'allows a public Code Classroom Blocks project to have instructions' do
+      project = build(
+        :project,
+        instructions: '<p>Project instructions</p>',
+        locale: 'en',
+        project_type: Project::Types::CODE_EDITOR_SCRATCH,
+        user_id: nil
+      )
+
+      expect(project).to be_valid
+    end
+
+    it 'does not allow another type of public project to have instructions' do
+      project = build(
+        :project,
+        instructions: '<p>Project instructions</p>',
+        locale: 'en',
+        project_type: Project::Types::SCRATCH,
+        user_id: nil
+      )
+
+      expect(project).not_to be_valid
+    end
+
     it 'is invalid if school_id but no school project' do
       invalid_project = build(:project, school_id: SecureRandom.uuid)
       expect(invalid_project).not_to be_valid
