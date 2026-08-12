@@ -14,8 +14,5 @@ class SchoolOnboardingService
 
       ProfileApiClient.create_school(token:, id: school.id, code: school.code)
     end
-  rescue StandardError => e
-    Rails.logger.error { "Failed to onboard school #{school.id}: #{e.message}" }
-    raise
   end
 end
