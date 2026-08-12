@@ -41,7 +41,7 @@ docker compose up
 - Sync writes to the `salesforce_connect` DB (not a Salesforce API). Pattern from editor-api PR #677.
 - Feature flag: `SALESFORCE_ENABLED=true`.
 - After deploy, backfill: `rails salesforce_sync:school`, `salesforce_sync:role`, `salesforce_sync:contact`, `salesforce_sync:school_class`, `salesforce_sync:class_teacher`, `salesforce_sync:lesson`.
-- **Parent-sync race guard (required for any job using `__r__` external-ID lookups).** Heroku Connect rejects an INSERT permanently with `Foreign key external ID … not found` if the parent record isn't yet in Salesforce — the mirror row stays `FAILED` forever (no auto-retry). Call `ensure_parent_synced!(model, external_id_field, external_id, label)` on `Salesforce::SalesforceSyncJob` (the base class) before saving a child record; it checks the parent has a non-nil `sfid` in its Heroku Connect mirror and raises `SalesforceRecordNotFound` if not. The base job declares `retry_on SalesforceRecordNotFound, wait: :polynomially_longer, attempts: 10` so the job self-heals once parents land. See `Salesforce::RoleSyncJob` and `Salesforce::ClassTeacherSyncJob` for call-site examples.
+- Jobs under `app/jobs/salesforce/**` have additional instructions in `app/jobs/salesforce/AGENTS.md`.
 
 ## Where to Look First
 - Routes: `config/routes.rb`. Auth: `config/initializers/omniauth.rb`, `app/helpers/authentication_helper.rb`, `app/controllers/concerns/identifiable.rb`.
