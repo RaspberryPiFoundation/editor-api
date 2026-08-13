@@ -62,6 +62,19 @@ RSpec.describe 'test_seeds', type: :task do
       ).not_to exist
     end
 
+    it 'does not destroy owned projects that share the preview identifier' do
+      owned = create(
+        :scratch_project,
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE,
+        user_id: SecureRandom.uuid
+      )
+
+      task.invoke
+
+      expect(Project.find_by(id: owned.id)).to be_present
+    end
+
     it 'removes all feature flags' do
       Flipper.enable(:some_feature)
       task.invoke
@@ -132,6 +145,22 @@ RSpec.describe 'test_seeds', type: :task do
 
       expect(project.reload.instructions).to eq(
         JSON.parse(File.read(SeedsHelper::PROJECT_PREVIEW_INSTRUCTIONS_PATH))
+      )
+    end
+
+    it 'refuses to overwrite a non-public project with the preview identifier' do
+      Project.where(identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER).destroy_all
+      create(
+        :scratch_project,
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE,
+        user_id: SecureRandom.uuid
+      )
+
+      task.reenable
+      expect { task.invoke }.to raise_error(
+        RuntimeError,
+        /Refusing to overwrite non-public project/
       )
     end
 

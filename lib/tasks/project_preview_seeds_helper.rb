@@ -31,23 +31,27 @@ module ProjectPreviewSeedsHelper
       identifier: PROJECT_PREVIEW_IDENTIFIER,
       locale:
     )
+    raise "Refusing to overwrite non-public project '#{PROJECT_PREVIEW_IDENTIFIER}' (#{locale})" if project.persisted? && (project.user_id.present? || project.school_id.present?)
+
     Rails.logger.info "Seeding public Scratch preview project '#{PROJECT_PREVIEW_IDENTIFIER}' (#{locale})..."
     project.name = name
     project.user_id = nil
-    project.school = nil
+    project.school_id = nil
     project.project_type = Project::Types::CODE_EDITOR_SCRATCH
     project.instructions = instructions
-    if project.scratch_component
-      project.scratch_component.content = public_scratch_preview_content
-    else
-      project.scratch_component = ScratchComponent.new(content: public_scratch_preview_content)
-    end
+    project.scratch_component ||= ScratchComponent.new
+    project.scratch_component.content = public_scratch_preview_content
     project.save!
     project
   end
 
   def destroy_public_scratch_preview_project
-    Project.where(identifier: PROJECT_PREVIEW_IDENTIFIER).destroy_all
+    Project.where(
+      identifier: PROJECT_PREVIEW_IDENTIFIER,
+      user_id: nil,
+      school_id: nil,
+      project_type: Project::Types::CODE_EDITOR_SCRATCH
+    ).destroy_all
   end
 
   def public_scratch_preview_content
