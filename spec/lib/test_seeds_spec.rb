@@ -38,6 +38,12 @@ RSpec.describe 'test_seeds', type: :task do
       expect(Project.where(school_id: school.id)).not_to exist
       expect(ScratchAsset.where(project_id: scratch_project_id)).not_to exist
     end
+
+    it 'removes all feature flags' do
+      Flipper.enable(:some_feature)
+      task.invoke
+      expect(Flipper.features).to be_empty
+    end
   end
 
   describe ':seed_a_school_with_lessons_and_students' do
@@ -52,16 +58,6 @@ RSpec.describe 'test_seeds', type: :task do
 
     it 'creates a verified school' do
       expect(School.find_by(creator_id:).verified_at).to be_truthy
-    end
-
-    it 'enables scratch for the school' do
-      school = School.find_by(creator_id:)
-      expect(Flipper.enabled?(:cat_mode, school)).to be(true)
-    end
-
-    it 'enables student sso for the school' do
-      school = School.find_by(creator_id:)
-      expect(Flipper.enabled?(:student_sso, school)).to be(true)
     end
 
     it 'creates lessons with projects' do

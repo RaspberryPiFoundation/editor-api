@@ -37,6 +37,9 @@ namespace :test_seeds do
       school_ids = [school_id, teacher_signup_school_id].compact
       School.where(id: school_ids).destroy_all
 
+      # Clear any feature flags that may have been set
+      Flipper.features.each(&:remove)
+
       Rails.logger.info 'Done...'
     end
   end
@@ -52,8 +55,6 @@ namespace :test_seeds do
         teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
         school = create_school(creator_id, TEST_SCHOOL)
-        Flipper.enable_actor :cat_mode, school
-        Flipper.enable_actor :student_sso, school
 
         verify_school(school)
         assign_a_teacher(teacher_id, school)
