@@ -47,14 +47,18 @@ RSpec.describe 'test_seeds', type: :task do
         user_id: nil,
         name: SeedsHelper::PROJECT_PREVIEW_NAME
       )
+      create(
+        :scratch_project,
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE_FR,
+        user_id: nil,
+        name: SeedsHelper::PROJECT_PREVIEW_NAME_FR
+      )
 
       task.invoke
 
       expect(
-        Project.where(
-          identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
-          locale: SeedsHelper::PROJECT_PREVIEW_LOCALE
-        )
+        Project.where(identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER)
       ).not_to exist
     end
 
@@ -95,6 +99,24 @@ RSpec.describe 'test_seeds', type: :task do
       expect(project.scratch_component.content.to_h).to include('targets')
       expect(project.instructions).to eq(
         JSON.parse(File.read(SeedsHelper::PROJECT_PREVIEW_INSTRUCTIONS_PATH))
+      )
+    end
+
+    it 'creates a French locale public Scratch preview project' do
+      project = Project.find_by!(
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE_FR
+      )
+
+      expect(project).to have_attributes(
+        name: SeedsHelper::PROJECT_PREVIEW_NAME_FR,
+        user_id: nil,
+        school_id: nil,
+        project_type: Project::Types::CODE_EDITOR_SCRATCH
+      )
+      expect(project.scratch_component).to be_present
+      expect(project.instructions).to eq(
+        JSON.parse(File.read(SeedsHelper::PROJECT_PREVIEW_INSTRUCTIONS_FR_PATH))
       )
     end
 
