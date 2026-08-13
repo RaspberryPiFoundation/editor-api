@@ -39,6 +39,25 @@ RSpec.describe 'test_seeds', type: :task do
       expect(ScratchAsset.where(project_id: scratch_project_id)).not_to exist
     end
 
+    it 'destroys the public Scratch preview project' do
+      create(
+        :scratch_project,
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE,
+        user_id: nil,
+        name: SeedsHelper::PROJECT_PREVIEW_NAME
+      )
+
+      task.invoke
+
+      expect(
+        Project.where(
+          identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+          locale: SeedsHelper::PROJECT_PREVIEW_LOCALE
+        )
+      ).not_to exist
+    end
+
     it 'removes all feature flags' do
       Flipper.enable(:some_feature)
       task.invoke
@@ -58,6 +77,40 @@ RSpec.describe 'test_seeds', type: :task do
 
     it 'creates a verified school' do
       expect(School.find_by(creator_id:).verified_at).to be_truthy
+    end
+
+    it 'creates a public Scratch preview project' do
+      project = Project.find_by!(
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE
+      )
+
+      expect(project).to have_attributes(
+        name: SeedsHelper::PROJECT_PREVIEW_NAME,
+        user_id: nil,
+        school_id: nil,
+        project_type: Project::Types::CODE_EDITOR_SCRATCH
+      )
+      expect(project.scratch_component).to be_present
+      expect(project.scratch_component.content.to_h).to include('targets')
+      expect(project.instructions).to eq(
+        JSON.parse(File.read(SeedsHelper::PROJECT_PREVIEW_INSTRUCTIONS_PATH))
+      )
+    end
+
+    it 'updates instructions on an existing public Scratch preview project' do
+      project = Project.find_by!(
+        identifier: SeedsHelper::PROJECT_PREVIEW_IDENTIFIER,
+        locale: SeedsHelper::PROJECT_PREVIEW_LOCALE
+      )
+      project.update!(instructions: [{ markdown_content: 'stale step' }])
+
+      task.reenable
+      task.invoke
+
+      expect(project.reload.instructions).to eq(
+        JSON.parse(File.read(SeedsHelper::PROJECT_PREVIEW_INSTRUCTIONS_PATH))
+      )
     end
 
     it 'creates lessons with projects' do

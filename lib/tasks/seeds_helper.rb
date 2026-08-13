@@ -14,6 +14,13 @@ module SeedsHelper
   TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9' # e52de409-9210-4e94-b08c-dd11439e07d9
   SCHOOL_CODE = '12-34-56'
 
+  # Public Blocks template for Experience CS project preview (unowned, loadable without auth).
+  PROJECT_PREVIEW_IDENTIFIER = 'excs-preview-starter'
+  PROJECT_PREVIEW_LOCALE = 'en'
+  PROJECT_PREVIEW_NAME = 'Experience CS Preview Starter'
+  PROJECT_PREVIEW_CONTENT_PATH = Rails.root.join('lib/tasks/seed_data/excs_preview_starter.json')
+  PROJECT_PREVIEW_INSTRUCTIONS_PATH = Rails.root.join('lib/tasks/seed_data/excs_preview_starter_instructions.json')
+
   def create_school(creator_id, school_id = nil)
     School.find_or_create_by!(creator_id:, id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
@@ -114,5 +121,37 @@ module SeedsHelper
       project.components << Component.new({ extension: 'py', name: 'main',
                                             content: code })
     end
+  end
+
+  def create_public_scratch_preview_project
+    project = Project.find_or_initialize_by(
+      identifier: PROJECT_PREVIEW_IDENTIFIER,
+      locale: PROJECT_PREVIEW_LOCALE
+    )
+    Rails.logger.info "Seeding public Scratch preview project '#{PROJECT_PREVIEW_IDENTIFIER}'..."
+    project.name = PROJECT_PREVIEW_NAME
+    project.user_id = nil
+    project.school = nil
+    project.project_type = Project::Types::CODE_EDITOR_SCRATCH
+    project.instructions = public_scratch_preview_instructions
+    if project.scratch_component
+      project.scratch_component.content = public_scratch_preview_content
+    else
+      project.scratch_component = ScratchComponent.new(content: public_scratch_preview_content)
+    end
+    project.save!
+    project
+  end
+
+  def destroy_public_scratch_preview_project
+    Project.where(identifier: PROJECT_PREVIEW_IDENTIFIER, locale: PROJECT_PREVIEW_LOCALE).destroy_all
+  end
+
+  def public_scratch_preview_content
+    JSON.parse(File.read(PROJECT_PREVIEW_CONTENT_PATH))
+  end
+
+  def public_scratch_preview_instructions
+    JSON.parse(File.read(PROJECT_PREVIEW_INSTRUCTIONS_PATH))
   end
 end
