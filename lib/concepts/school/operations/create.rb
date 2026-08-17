@@ -10,20 +10,27 @@ class School
         School.transaction do
           response[:school].save!
 
-          onboarded = SchoolOnboardingService.new(response[:school]).onboard(token:)
-          raise 'School onboarding failed' unless onboarded
+          SchoolOnboardingService.new(response[:school]).onboard(token:)
         end
 
         response
+      rescue ProfileApiClient::UnauthorizedError => e
+        # Do not log noise to sentry.
+        # TODO: consider returning a separate error here to distinguish from other errors and return 401 from the API, not 422
+        Rails.logger.warn { "Failed to onboard school #{response[:school].id}: user is unauthorized" }
+        failure(response, e)
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = response[:school].errors.presence || [e.message]
-        response[:error_types] = response[:school].errors.details
-
-        response
+        failure(response, e)
       end
 
       private
+
+      def failure(response, error)
+        response[:error] = response[:school].errors.presence || [error.message]
+        response[:error_types] = response[:school].errors.details
+        response
+      end
 
       def build_school(school_params)
         School.new(school_params)
