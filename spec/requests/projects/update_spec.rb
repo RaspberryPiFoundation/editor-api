@@ -180,6 +180,21 @@ RSpec.describe 'Project update requests' do
         .not_to change(ScratchComponent, :count)
       expect(project.scratch_component.reload.content.to_h).to eq(scratch_data.deep_stringify_keys)
     end
+
+    context 'when authenticated with the Experience CS service API key' do
+      let(:headers) { { ExperienceCsServiceAuthenticator::HEADER => 'service-api-key' } }
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'updates the public project' do
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:ok)
+        expect(project.reload.project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
+      end
+    end
   end
 
   context 'when authed user is a teacher' do

@@ -4,6 +4,7 @@ require 'project_loader'
 
 module Api
   class ProjectsController < ApiController
+    prepend_before_action :load_experience_cs_service_user, only: %i[create update]
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]

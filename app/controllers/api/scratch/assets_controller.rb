@@ -6,8 +6,8 @@ module Api
       include ActiveStorage::SetCurrent
 
       before_action :authorize_user, except: %i[show]
-      prepend_before_action :load_project_from_header, only: %i[show create]
-      authorize_resource :project_from_header
+      prepend_before_action :load_project_from_header, only: %i[show create create_global]
+      authorize_resource :project_from_header, except: %i[create_global]
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
@@ -24,30 +24,42 @@ module Api
 
       def create
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
-        scratch_asset = ScratchAsset.find_or_initialize_by(
+        create_asset(
           project: @project_from_header,
           uploaded_user_id: current_user.id,
           filename: filename_with_extension
         )
+      end
+
+      def create_global
+        authorize! :create, @project_from_header
+        raise CanCan::AccessDenied unless experience_cs_public_project?
+
+        create_asset(project: nil, uploaded_user_id: nil, filename: "#{params[:id]}.#{params[:format]}")
+      end
+
+      private
+
+      def create_asset(attributes)
+        scratch_asset = ScratchAsset.find_or_initialize_by(attributes)
 
         if scratch_asset.new_record?
           begin
             scratch_asset.save!
-            scratch_asset.file.attach(io: request.body, filename: filename_with_extension)
           rescue ActiveRecord::RecordNotUnique
-            logger.info("Scratch asset already created during concurrent upload: #{filename_with_extension}")
-            ScratchAsset.find_by!(
-              project: @project_from_header,
-              uploaded_user_id: current_user.id,
-              filename: filename_with_extension
-            )
+            logger.info("Scratch asset already created during concurrent upload: #{attributes.fetch(:filename)}")
+            scratch_asset = ScratchAsset.find_by!(attributes)
           end
         end
+
+        scratch_asset.file.attach(io: request.body, filename: attributes.fetch(:filename)) unless scratch_asset.file.attached?
 
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
       end
 
-      private
+      def experience_cs_public_project?
+        current_user.experience_cs_admin? && @project_from_header.user_id.nil? && @project_from_header.school_id.nil?
+      end
 
       def load_project_from_header
         identifier = request.headers['X-Project-ID']

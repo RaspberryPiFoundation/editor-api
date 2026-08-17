@@ -402,10 +402,112 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
+    context 'when an Experience CS admin uses the regular upload endpoint' do
+      let(:experience_cs_admin) { create(:experience_cs_admin_user) }
+      let(:project) { create_scratch_project(locale: 'en', user_id: nil) }
+
+      before do
+        authenticated_in_hydra_as(experience_cs_admin)
+      end
+
+      it 'keeps the asset scoped to the project and uploading user' do
+        make_request
+
+        asset = ScratchAsset.find_by!(filename:)
+        expect(asset.project).to eq(project)
+        expect(asset.uploaded_user_id).to eq(experience_cs_admin.id)
+        expect(asset.file.download).to eq(upload)
+      end
+    end
+
     it 'responds 401 unauthorized when user is not signed in' do
       post '/api/scratch/assets/example.svg', headers: { 'X-Project-ID' => project.identifier }
 
       expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  describe 'POST #create_global' do
+    let(:upload) { File.binread(file_fixture(filename)) }
+    let(:project) { create_scratch_project(locale: 'en', user_id: nil) }
+    let(:request_headers) do
+      {
+        'Authorization' => UserProfileMock::TOKEN,
+        'Content-Type' => 'application/octet-stream',
+        'X-Project-ID' => project.identifier
+      }
+    end
+    let(:make_request) do
+      post '/api/scratch/assets/global/test_image_1.png', headers: request_headers, params: upload
+    end
+
+    context 'when an Experience CS admin syncs a public project' do
+      before do
+        authenticated_in_hydra_as(create(:experience_cs_admin_user))
+      end
+
+      it 'creates a global asset' do
+        make_request
+
+        asset = ScratchAsset.find_by!(filename:)
+        expect(asset.project).to be_nil
+        expect(asset.uploaded_user_id).to be_nil
+        expect(asset.file.download).to eq(upload)
+      end
+
+      it 'does not replace an existing global asset' do
+        existing_asset = create_uploaded_scratch_asset(filename:, project: nil, body: 'existing-body')
+
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:created)
+        expect(existing_asset.reload.file.download).to eq('existing-body')
+      end
+
+      it 'repairs an existing global asset whose file was not attached' do
+        existing_asset = create(:scratch_asset, filename:, project: nil)
+
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(existing_asset.reload.file.download).to eq(upload)
+      end
+
+      it 'makes the uploaded asset available without signing in' do
+        make_request
+
+        get '/api/scratch/assets/internalapi/asset/test_image_1.png/get/',
+            headers: { 'X-Project-ID' => project.identifier }
+        follow_redirect! while response.redirect?
+
+        expect(response.body).to eq(upload)
+        expect(response.media_type).to eq('image/png')
+      end
+    end
+
+    context 'when an Experience CS admin syncs a school project' do
+      let(:project) { create_scratch_project(locale: 'en', user_id: nil, school:) }
+
+      before do
+        authenticated_in_hydra_as(create(:experience_cs_admin_user))
+      end
+
+      it 'does not make its asset global' do
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
+    context 'when a teacher is logged in' do
+      before do
+        authenticated_in_hydra_as(teacher)
+      end
+
+      it 'does not allow a user-project asset to be made global' do
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:forbidden)
+      end
     end
   end
 
