@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
+require_relative 'project_preview_seeds_helper'
+
 module SeedsHelper
+  include ProjectPreviewSeedsHelper
+
   TEST_USERS = {
     jane_doe: '583ba872-b16e-46e1-9f7d-df89d267550d', # jane.doe@example.com
     john_doe: 'bbb9b8fd-f357-4238-983d-6f87b99bdbb2', # john.doe@example.com

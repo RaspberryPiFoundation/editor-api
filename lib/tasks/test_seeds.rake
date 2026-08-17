@@ -37,6 +37,8 @@ namespace :test_seeds do
       school_ids = [school_id, teacher_signup_school_id].compact
       School.where(id: school_ids).destroy_all
 
+      destroy_public_scratch_preview_project
+
       # Clear any feature flags that may have been set
       Flipper.features.each(&:remove)
 
@@ -47,10 +49,13 @@ namespace :test_seeds do
   desc 'Create a school with lessons and students'
   task create: :environment do
     if School.exists?(id: TEST_SCHOOL)
-      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over)."
+      create_public_scratch_preview_project
+      puts "Test school (#{TEST_SCHOOL}) already exists, run the destroy_seed_data task to start over."
     else
       ActiveRecord::Base.transaction do
         Rails.logger.info 'Attempting to seed data...'
+        create_public_scratch_preview_project
+
         creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
         teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
