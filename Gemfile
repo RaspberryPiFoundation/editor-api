@@ -81,6 +81,7 @@ group :test do
   gem 'capybara'
   gem 'climate_control'
   gem 'database_cleaner-active_record'
+  gem 'rspec-openapi'
   gem 'selenium-webdriver'
   gem 'shoulda-matchers', '~> 8.0'
   gem 'webdrivers'

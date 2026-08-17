@@ -438,6 +438,10 @@ GEM
     rspec-mocks (3.13.8)
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.13.0)
+    rspec-openapi (0.32.0)
+      actionpack (>= 5.2.0)
+      rails-dom-testing
+      rspec-core
     rspec-rails (8.0.4)
       actionpack (>= 7.2)
       activesupport (>= 7.2)
@@ -612,6 +616,7 @@ DEPENDENCIES
   rails (~> 8.1.3.1)
   rails_semantic_logger (~> 5.1)
   rspec
+  rspec-openapi
   rspec-rails
   rspec_junit_formatter
   rubocop
