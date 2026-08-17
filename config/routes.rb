@@ -28,6 +28,8 @@ Rails.application.routes.draw do
   end
 
   post '/test/reseed', to: 'test_utilities#reseed'
+  post '/test/enable_feature', to: 'test_utilities#enable_feature'
+  post '/test/disable_feature', to: 'test_utilities#disable_feature'
 
   post '/graphql', to: 'graphql#execute'
   mount GraphiQL::Rails::Engine, at: '/graphql', graphql_path: '/graphql#execute' unless Rails.env.production?
