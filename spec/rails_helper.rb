@@ -116,7 +116,7 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
-    Rails.application.load_tasks
+    Rails.application.load_tasks if Rake::Task.tasks.empty?
 
     db_config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
     Rails.logger.debug { "Running tests in environment: #{Rails.env}" }
