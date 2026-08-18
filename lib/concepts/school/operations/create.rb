@@ -26,6 +26,11 @@ class School
         # TODO: consider returning a separate error here to distinguish from other errors and return 401 from the API, not 422
         Rails.logger.warn { "Failed to onboard school #{response[:school].id}: user is unauthorized" }
         failure(response, e)
+      rescue ActiveRecord::RecordInvalid => e
+        # A double submit loses the advisory lock race and fails the creator_id
+        # uniqueness validation as expected, so keep it out of Sentry.
+        Sentry.capture_exception(e) unless response[:school].errors.of_kind?(:creator_id, :taken)
+        failure(response, e)
       rescue StandardError => e
         Sentry.capture_exception(e)
         failure(response, e)

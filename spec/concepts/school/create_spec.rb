@@ -85,6 +85,12 @@ RSpec.describe School::Create, type: :unit do
       described_class.call(school_params:, creator_id:, token:)
       expect(SchoolOnboardingService).not_to have_received(:new)
     end
+
+    it 'does not capture the error in Sentry' do
+      allow(Sentry).to receive(:capture_exception)
+      described_class.call(school_params:, creator_id:, token:)
+      expect(Sentry).not_to have_received(:capture_exception)
+    end
   end
 
   context 'when creation fails' do
