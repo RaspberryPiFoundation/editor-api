@@ -455,12 +455,24 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         expect(asset.file.download).to eq(upload)
       end
 
-      it 'does not replace an existing global asset' do
-        existing_asset = create_uploaded_scratch_asset(filename:, project: nil, body: 'existing-body')
+      it 'accepts an existing global asset with the same content' do
+        existing_asset = create_uploaded_scratch_asset(filename:, project: nil, body: upload)
 
         expect { make_request }.not_to change(ScratchAsset, :count)
 
         expect(response).to have_http_status(:created)
+        expect(existing_asset.reload.file.download).to eq(upload)
+      end
+
+      it 'rejects an existing global asset with conflicting content' do
+        existing_asset = create_uploaded_scratch_asset(filename:, project: nil, body: 'existing-body')
+
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:conflict)
+        expect(response.parsed_body).to eq(
+          'error' => 'Asset content conflicts with the existing global asset'
+        )
         expect(existing_asset.reload.file.download).to eq('existing-body')
       end
 
@@ -481,6 +493,49 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
 
         expect(response.body).to eq(upload)
         expect(response.media_type).to eq('image/png')
+      end
+    end
+
+    context 'when the Experience CS service syncs a public project' do
+      let(:request_headers) do
+        super().except('Authorization').merge(ExperienceCsServiceAuthenticator::HEADER => 'service-api-key')
+      end
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'creates the global asset' do
+        expect { make_request }.to change(ScratchAsset, :count).by(1)
+
+        expect(response).to have_http_status(:created)
+        expect(ScratchAsset.find_by!(filename:).file.download).to eq(upload)
+      end
+
+      context 'when the project belongs to a user' do
+        let(:project) { create_scratch_project(locale: 'en', user_id: SecureRandom.uuid) }
+
+        it 'does not create a global asset' do
+          expect { make_request }.not_to change(ScratchAsset, :count)
+
+          expect(response).to have_http_status(:forbidden)
+        end
+      end
+    end
+
+    context 'when the Experience CS service key is invalid' do
+      let(:request_headers) do
+        super().except('Authorization').merge(ExperienceCsServiceAuthenticator::HEADER => 'wrong-api-key')
+      end
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'rejects the upload' do
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:unauthorized)
       end
     end
 

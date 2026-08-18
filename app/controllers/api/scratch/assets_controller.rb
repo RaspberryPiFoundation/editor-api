@@ -1,10 +1,13 @@
 # frozen_string_literal: true
 
+require 'digest/md5'
+
 module Api
   module Scratch
     class AssetsController < ApiController
       include ActiveStorage::SetCurrent
 
+      prepend_before_action :load_experience_cs_service_user, only: %i[create_global]
       before_action :authorize_user, except: %i[show]
       prepend_before_action :load_project_from_header, only: %i[show create create_global]
       authorize_resource :project_from_header, except: %i[create_global]
@@ -35,12 +38,17 @@ module Api
         authorize! :create, @project_from_header
         raise CanCan::AccessDenied unless experience_cs_public_project?
 
-        create_asset(project: nil, uploaded_user_id: nil, filename: "#{params[:id]}.#{params[:format]}")
+        create_asset(
+          project: nil,
+          uploaded_user_id: nil,
+          filename: "#{params[:id]}.#{params[:format]}",
+          reject_conflicting_content: true
+        )
       end
 
       private
 
-      def create_asset(attributes)
+      def create_asset(reject_conflicting_content: false, **attributes)
         scratch_asset = ScratchAsset.find_or_initialize_by(attributes)
 
         if scratch_asset.new_record?
@@ -52,9 +60,45 @@ module Api
           end
         end
 
-        scratch_asset.file.attach(io: request.body, filename: attributes.fetch(:filename)) unless scratch_asset.file.attached?
+        if reject_conflicting_content
+          return if attach_global_file(scratch_asset, attributes.fetch(:filename)) == :conflict
+        else
+          attach_file_unless_present(scratch_asset, attributes.fetch(:filename))
+        end
 
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
+      end
+
+      def attach_global_file(scratch_asset, filename)
+        scratch_asset.with_lock do
+          if scratch_asset.file.attached?
+            next :unchanged if global_file_matches?(scratch_asset)
+
+            next reject_conflicting_global_file
+          end
+
+          scratch_asset.file.attach(io: request.body, filename:)
+          :attached
+        end
+      end
+
+      def attach_file_unless_present(scratch_asset, filename)
+        scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
+      end
+
+      def global_file_matches?(scratch_asset)
+        scratch_asset.file.blob.checksum == request_body_checksum
+      end
+
+      def reject_conflicting_global_file
+        render json: { error: 'Asset content conflicts with the existing global asset' }, status: :conflict
+        :conflict
+      end
+
+      def request_body_checksum
+        @request_body_checksum ||= Digest::MD5.base64digest(request.body.read)
+      ensure
+        request.body.rewind
       end
 
       def experience_cs_public_project?
