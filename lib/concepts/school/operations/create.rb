@@ -2,12 +2,19 @@
 
 class School
   class Create
+    LOCK_NAMESPACE = Zlib.crc32(name)
+
     class << self
       def call(school_params:, creator_id:, token:)
         response = OperationResponse.new
         response[:school] = build_school(school_params.merge!(creator_id:))
 
         School.transaction do
+          # Serialise concurrent creates by the same creator.
+          # The loser blocks here until the winner's transaction commits,
+          # so its uniqueness validation sees the winner's school
+          # rather than hitting the partial unique index on creator_id.
+          acquire_advisory_lock_for_creator(creator_id)
           response[:school].save!
 
           SchoolOnboardingService.new(response[:school]).onboard(token:)
@@ -25,6 +32,11 @@ class School
       end
 
       private
+
+      def acquire_advisory_lock_for_creator(creator_id)
+        lock_key = Zlib.crc32("#{School::Create::LOCK_NAMESPACE}:#{creator_id}")
+        School.connection.execute("SELECT pg_advisory_xact_lock(#{lock_key})")
+      end
 
       def failure(response, error)
         response[:error] = response[:school].errors.presence || [error.message]

@@ -27,6 +27,13 @@ RSpec.describe School::Create, type: :unit do
     allow(ProfileApiClient).to receive(:create_school).and_return(true)
   end
 
+  it 'acquires an advisory lock keyed on the creator' do
+    allow(School.connection).to receive(:execute).and_call_original
+    described_class.call(school_params:, creator_id:, token:)
+    lock_key = Zlib.crc32("#{School::Create::LOCK_NAMESPACE}:#{creator_id}")
+    expect(School.connection).to have_received(:execute).with("SELECT pg_advisory_xact_lock(#{lock_key})")
+  end
+
   it 'returns a successful operation response' do
     response = described_class.call(school_params:, creator_id:, token:)
     expect(response.success?).to be(true)
@@ -49,6 +56,35 @@ RSpec.describe School::Create, type: :unit do
   it 'assigns the creator_id' do
     response = described_class.call(school_params:, creator_id:, token:)
     expect(response[:school].creator_id).to eq(creator_id)
+  end
+
+  context 'when the creator already has an active school' do
+    # The advisory lock serialises concurrent requests: the loser only validates
+    # once the winner has committed, so it sees the winner's school.
+    before do
+      allow(Sentry).to receive(:capture_exception)
+      create(:school, creator_id:, reference: '999999')
+    end
+
+    it 'does not create a second school' do
+      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
+    end
+
+    it 'returns a failed operation response' do
+      response = described_class.call(school_params:, creator_id:, token:)
+      expect(response.failure?).to be(true)
+    end
+
+    it 'returns a validation error rather than a database uniqueness violation' do
+      response = described_class.call(school_params:, creator_id:, token:)
+      expect(response[:error_types][:creator_id]).to eq([{ error: :taken, value: creator_id }])
+    end
+
+    it 'does not onboard the second school' do
+      allow(SchoolOnboardingService).to receive(:new)
+      described_class.call(school_params:, creator_id:, token:)
+      expect(SchoolOnboardingService).not_to have_received(:new)
+    end
   end
 
   context 'when creation fails' do
