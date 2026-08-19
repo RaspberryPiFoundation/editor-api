@@ -23,7 +23,12 @@ class Ability
   private
 
   def define_common_non_student_abilities(user)
-    return if user&.student?
+    if user&.student?
+      # Allow students to view the Experience CS preview starter template.
+      can :show, Project, user_id: nil, school_id: nil, project_type: Project::Types::CODE_EDITOR_SCRATCH
+      can :show, Component, project: { user_id: nil, school_id: nil, project_type: Project::Types::CODE_EDITOR_SCRATCH }
+      return
+    end
 
     # Anyone can view projects not owned by a user or a school.
     can :show, Project, user_id: nil, school_id: nil
