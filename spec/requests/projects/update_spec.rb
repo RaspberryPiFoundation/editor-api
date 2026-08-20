@@ -203,6 +203,14 @@ RSpec.describe 'Project update requests' do
         expect(response).to have_http_status(:forbidden)
       end
 
+      it 'does not authorize updates to a user-owned project' do
+        project.update!(user_id: SecureRandom.uuid)
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
       it 'does not authorize updates to a non-Scratch project' do
         project.update!(project_type: Project::Types::PYTHON)
 
@@ -213,6 +221,22 @@ RSpec.describe 'Project update requests' do
 
       it 'does not authorize changing the project to a non-Scratch type' do
         params[:project][:project_type] = Project::Types::PYTHON
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize assigning the project to a user' do
+        params[:project][:user_id] = SecureRandom.uuid
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize assigning the project to a school' do
+        params[:project][:school_id] = create(:school).id
 
         put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
 

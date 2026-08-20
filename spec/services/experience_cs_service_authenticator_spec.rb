@@ -13,7 +13,7 @@ RSpec.describe ExperienceCsServiceAuthenticator do
     let(:candidate) { 'service-api-key' }
 
     it 'returns an Experience CS service user', :aggregate_failures do
-      expect(authenticate.id).to eq(described_class::USER_ID)
+      expect(authenticate).to be_experience_cs_service_account
       expect(authenticate).to be_experience_cs_admin
     end
   end

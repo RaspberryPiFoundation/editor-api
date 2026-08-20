@@ -4,8 +4,6 @@ require 'project_loader'
 
 module Api
   class ProjectsController < ApiController
-    EXPERIENCE_CS_SERVICE_PROJECT_TYPES = [Project::Types::SCRATCH, Project::Types::CODE_EDITOR_SCRATCH].freeze
-
     prepend_before_action :load_experience_cs_service_user, only: %i[create update]
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy show_context]
@@ -68,34 +66,24 @@ module Api
     private
 
     def authorize_experience_cs_service_project
-      return unless current_user&.id == ExperienceCsServiceAuthenticator::USER_ID
-      return if experience_cs_service_project?
+      return unless current_user&.experience_cs_service_account?
+      return if experience_cs_service_project_change_permitted?
 
       raise CanCan::AccessDenied
     end
 
-    def experience_cs_service_project?
-      return public_scratch_project_attributes?(experience_cs_service_project_attributes) if action_name == 'create'
+    def experience_cs_service_project_change_permitted?
+      return false if action_name == 'update' && !@project.public_experience_cs_project?
 
-      public_scratch_project_attributes?(@project.attributes.symbolize_keys) &&
-        public_scratch_project_attributes?(experience_cs_service_project_attributes)
+      requested_experience_cs_project.public_experience_cs_project?
     end
 
-    def experience_cs_service_project_attributes
-      existing_attributes = if action_name == 'create'
-                              { user_id: nil, school_id: nil, project_type: Project.column_defaults['project_type'] }
-                            else
-                              @project.attributes.symbolize_keys
-                            end
-      requested_attributes = base_params.slice(:user_id, :school_id, :project_type).to_h.symbolize_keys
+    def requested_experience_cs_project
+      project = action_name == 'create' ? Project.new : @project.dup
+      attributes = base_params.slice(:user_id, :school_id, :project_type).to_h
+      project.assign_attributes(attributes)
 
-      existing_attributes.merge(requested_attributes)
-    end
-
-    def public_scratch_project_attributes?(attributes)
-      attributes[:user_id].nil? &&
-        attributes[:school_id].nil? &&
-        EXPERIENCE_CS_SERVICE_PROJECT_TYPES.include?(attributes[:project_type])
+      project
     end
 
     def verify_lesson_belongs_to_school

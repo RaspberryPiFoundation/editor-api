@@ -197,6 +197,41 @@ RSpec.describe Project, :versioning do
     end
   end
 
+  describe '#public_experience_cs_project?' do
+    it 'returns true for public Experience CS project types', :aggregate_failures do
+      project_types = [described_class::Types::SCRATCH, described_class::Types::CODE_EDITOR_SCRATCH]
+
+      project_types.each do |project_type|
+        project = build(:project, project_type:, user_id: nil, school_id: nil)
+
+        expect(project).to be_public_experience_cs_project
+      end
+    end
+
+    it 'returns false for a user-owned project' do
+      project = build(:project, project_type: described_class::Types::SCRATCH)
+
+      expect(project).not_to be_public_experience_cs_project
+    end
+
+    it 'returns false for a school-owned project' do
+      project = build(
+        :project,
+        project_type: described_class::Types::SCRATCH,
+        user_id: nil,
+        school_id: SecureRandom.uuid
+      )
+
+      expect(project).not_to be_public_experience_cs_project
+    end
+
+    it 'returns false for a non-Scratch project' do
+      project = build(:project, project_type: described_class::Types::PYTHON, user_id: nil)
+
+      expect(project).not_to be_public_experience_cs_project
+    end
+  end
+
   describe 'create_school_project_if_needed' do
     let(:teacher) { create(:teacher, school:) }
     let(:teacher_project) { create(:project, school_id: school.id, user_id: teacher.id) }
