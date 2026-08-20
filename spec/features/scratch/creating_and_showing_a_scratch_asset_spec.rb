@@ -433,15 +433,14 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
     let(:request_headers) do
       {
         'Authorization' => UserProfileMock::TOKEN,
-        'Content-Type' => 'application/octet-stream',
-        'X-Project-ID' => project.identifier
+        'Content-Type' => 'application/octet-stream'
       }
     end
     let(:make_request) do
       post '/api/scratch/assets/global/test_image_1.png', headers: request_headers, params: upload
     end
 
-    context 'when an Experience CS admin syncs a public project' do
+    context 'when an Experience CS admin uploads a global asset' do
       before do
         authenticated_in_hydra_as(create(:experience_cs_admin_user))
       end
@@ -496,7 +495,7 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
-    context 'when the Experience CS service syncs a public project' do
+    context 'when the Experience CS service uploads a global asset' do
       let(:request_headers) do
         super().except('Authorization').merge(ExperienceCsServiceAuthenticator::HEADER => 'service-api-key')
       end
@@ -510,16 +509,6 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
 
         expect(response).to have_http_status(:created)
         expect(ScratchAsset.find_by!(filename:).file.download).to eq(upload)
-      end
-
-      context 'when the project belongs to a user' do
-        let(:project) { create_scratch_project(locale: 'en', user_id: SecureRandom.uuid) }
-
-        it 'does not create a global asset' do
-          expect { make_request }.not_to change(ScratchAsset, :count)
-
-          expect(response).to have_http_status(:forbidden)
-        end
       end
     end
 
@@ -539,26 +528,12 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
-    context 'when an Experience CS admin syncs a school project' do
-      let(:project) { create_scratch_project(locale: 'en', user_id: nil, school:) }
-
-      before do
-        authenticated_in_hydra_as(create(:experience_cs_admin_user))
-      end
-
-      it 'does not make its asset global' do
-        expect { make_request }.not_to change(ScratchAsset, :count)
-
-        expect(response).to have_http_status(:forbidden)
-      end
-    end
-
     context 'when a teacher is logged in' do
       before do
         authenticated_in_hydra_as(teacher)
       end
 
-      it 'does not allow a user-project asset to be made global' do
+      it 'does not allow a global asset to be created' do
         expect { make_request }.not_to change(ScratchAsset, :count)
 
         expect(response).to have_http_status(:forbidden)

@@ -9,7 +9,7 @@ module Api
 
       prepend_before_action :load_experience_cs_service_user, only: %i[create_global]
       before_action :authorize_user, except: %i[show]
-      prepend_before_action :load_project_from_header, only: %i[show create create_global]
+      prepend_before_action :load_project_from_header, only: %i[show create]
       authorize_resource :project_from_header, except: %i[create_global]
 
       def show
@@ -36,7 +36,6 @@ module Api
 
       def create_global
         authorize! :create_global, ScratchAsset
-        raise CanCan::AccessDenied unless @project_from_header.public_experience_cs_project?
 
         create_asset(
           project: nil,
