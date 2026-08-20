@@ -18,6 +18,20 @@ RSpec.describe Ability do
     it { is_expected.not_to be_able_to(:read, build(:teacher_invitation, email_address: nil)) }
   end
 
+  describe 'ScratchAsset' do
+    context 'with an Experience CS admin' do
+      let(:user) { build(:experience_cs_admin_user) }
+
+      it { is_expected.to be_able_to(:create_global, ScratchAsset) }
+    end
+
+    context 'with a standard user' do
+      let(:user) { build(:user) }
+
+      it { is_expected.not_to be_able_to(:create_global, ScratchAsset) }
+    end
+  end
+
   describe 'Project' do
     context 'with no user' do
       let(:user) { nil }

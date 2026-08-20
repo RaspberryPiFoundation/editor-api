@@ -35,8 +35,8 @@ module Api
       end
 
       def create_global
-        authorize! :create, @project_from_header
-        raise CanCan::AccessDenied unless experience_cs_public_project?
+        authorize! :create_global, ScratchAsset
+        raise CanCan::AccessDenied unless @project_from_header.public_experience_cs_project?
 
         create_asset(
           project: nil,
@@ -99,10 +99,6 @@ module Api
         @request_body_checksum ||= Digest::MD5.base64digest(request.body.read)
       ensure
         request.body.rewind
-      end
-
-      def experience_cs_public_project?
-        current_user.experience_cs_admin? && @project_from_header.user_id.nil? && @project_from_header.school_id.nil?
       end
 
       def load_project_from_header
