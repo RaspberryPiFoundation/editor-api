@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_20_122510) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -240,6 +240,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.uuid "lesson_id"
     t.string "locale"
     t.string "name"
+    t.string "origin"
     t.string "project_type", default: "python", null: false
     t.string "remix_origin"
     t.uuid "remixed_from_id"
@@ -249,6 +250,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_07_120000) do
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["lesson_id"], name: "index_projects_on_lesson_id"
+    t.index ["origin"], name: "index_projects_on_origin", where: "(origin IS NOT NULL)"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
     t.index ["school_id"], name: "index_projects_on_school_id"
   end

@@ -308,5 +308,11 @@ RSpec.describe 'Creating a project', type: :request do
       project = Project.find_by!(identifier: 'test-project', locale: 'fr')
       expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
     end
+
+    it 'sets the project origin to experience_cs' do
+      post('/api/projects', headers:, params:, as: :json)
+
+      expect(Project.find_by!(identifier: 'test-project', locale: 'fr').origin).to eq(Project::Origins::EXPERIENCE_CS)
+    end
   end
 end
