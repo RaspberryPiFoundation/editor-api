@@ -8,6 +8,10 @@ class Project < ApplicationRecord
     CODE_EDITOR_SCRATCH = 'code_editor_scratch'
   end
 
+  module Origins
+    EXPERIENCE_CS = 'experience_cs'
+  end
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
@@ -35,6 +39,8 @@ class Project < ApplicationRecord
   validate :project_with_instructions_must_belong_to_school
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
+  validates :origin, inclusion: { in: [Origins::EXPERIENCE_CS], allow_nil: true }
+  validate :origin_cannot_change, on: :update
 
   scope :internal_projects, -> { where(user_id: nil) }
 
@@ -181,5 +187,13 @@ class Project < ApplicationRecord
     return unless school_id && school_project && school_id != school_project.school_id
 
     errors.add(:school_project, 'School project school_id must match project school_id')
+  end
+
+  def origin_cannot_change
+    return unless origin_changed?
+    # allow filling in origin when it's nil
+    return if origin_was.nil?
+
+    errors.add(:origin, 'cannot be changed once set')
   end
 end
