@@ -29,7 +29,7 @@ class School
       rescue ActiveRecord::RecordInvalid => e
         # A double submit loses the advisory lock race and fails the creator_id
         # uniqueness validation as expected, so keep it out of Sentry.
-        Sentry.capture_exception(e) unless response[:school].errors.of_kind?(:creator_id, :taken)
+        Sentry.capture_exception(e) unless response[:school]&.errors&.of_kind?(:creator_id, :taken)
         failure(response, e)
       rescue StandardError => e
         Sentry.capture_exception(e)
