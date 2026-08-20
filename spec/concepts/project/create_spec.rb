@@ -40,6 +40,36 @@ RSpec.describe Project::Create, type: :unit do
         new_project = create_project_with_content[:project]
         expect(new_project.components.first.content).to eq('print("hello world")')
       end
+
+      it 'does not set the project origin' do
+        expect(create_project_with_content[:project].origin).to be_nil
+      end
+    end
+
+    context 'when the current user is an Experience CS admin' do
+      subject(:create_project_as_admin) { described_class.call(project_hash:, current_user:) }
+
+      let(:current_user) { create(:experience_cs_admin_user) }
+      let(:project_hash) do
+        {
+          project_type: Project::Types::PYTHON,
+          components: [{
+            name: 'main',
+            extension: 'py',
+            content: 'print("hello world")',
+            default: true
+          }],
+          user_id:
+        }
+      end
+
+      it 'returns success' do
+        expect(create_project_as_admin.success?).to be(true)
+      end
+
+      it 'sets the project origin to experience_cs' do
+        expect(create_project_as_admin[:project].origin).to eq(Project::Origins::EXPERIENCE_CS)
+      end
     end
 
     context 'when creation fails' do
