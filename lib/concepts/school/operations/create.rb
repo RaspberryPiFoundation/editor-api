@@ -24,7 +24,7 @@ class School
       rescue ProfileApiClient::UnauthorizedError => e
         # Do not log noise to sentry.
         # TODO: consider returning a separate error here to distinguish from other errors and return 401 from the API, not 422
-        Rails.logger.warn { "Failed to onboard school #{response[:school].id}: user is unauthorized" }
+        Rails.logger.warn { "Failed to onboard school #{response[:school]&.id}: user is unauthorized" }
         failure(response, e)
       rescue ActiveRecord::RecordInvalid => e
         # A double submit loses the advisory lock race and fails the creator_id
@@ -44,8 +44,9 @@ class School
       end
 
       def failure(response, error)
-        response[:error] = response[:school].errors.presence || [error.message]
-        response[:error_types] = response[:school].errors.details
+        school_errors = response[:school]&.errors
+        response[:error] = school_errors&.presence || [error.message]
+        response[:error_types] = school_errors&.details
         response
       end
 
