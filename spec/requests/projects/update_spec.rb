@@ -180,6 +180,69 @@ RSpec.describe 'Project update requests' do
         .not_to change(ScratchComponent, :count)
       expect(project.scratch_component.reload.content.to_h).to eq(scratch_data.deep_stringify_keys)
     end
+
+    context 'when authenticated with the Experience CS service API key' do
+      let(:headers) { { ExperienceCsServiceAuthenticator::HEADER => 'service-api-key' } }
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'updates the public project' do
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:ok)
+        expect(project.reload.project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
+      end
+
+      it 'does not authorize updates to a school project' do
+        project.update!(school: create(:school))
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize updates to a user-owned project' do
+        project.update!(user_id: SecureRandom.uuid)
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize updates to a non-Scratch project' do
+        project.update!(project_type: Project::Types::PYTHON)
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize changing the project to a non-Scratch type' do
+        params[:project][:project_type] = Project::Types::PYTHON
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize assigning the project to a user' do
+        params[:project][:user_id] = SecureRandom.uuid
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize assigning the project to a school' do
+        params[:project][:school_id] = create(:school).id
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 
   context 'when authed user is a teacher' do

@@ -312,6 +312,18 @@ RSpec.describe User do
     end
   end
 
+  describe '#experience_cs_service_account?' do
+    it 'returns true for the Experience CS service account' do
+      user = build(:user, id: described_class::EXPERIENCE_CS_SERVICE_ACCOUNT_ID)
+
+      expect(user).to be_experience_cs_service_account
+    end
+
+    it 'returns false for another user' do
+      expect(user).not_to be_experience_cs_service_account
+    end
+  end
+
   describe '#school_roles' do
     subject(:user) { build(:user) }
 

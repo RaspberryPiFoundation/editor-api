@@ -75,6 +75,7 @@ module App
 
     config.x.cloudflare_turnstile.secret_key = ENV.fetch('CLOUDFLARE_TURNSTILE_SECRET_KEY', nil)
     config.x.cloudflare_turnstile.enabled = ENV['CLOUDFLARE_TURNSTILE_SECRET_KEY'].present?
+    config.x.experience_cs.service_api_key = ENV.fetch('EXPERIENCE_CS_API_KEY', nil)
 
     if ENV['RAILS_LOG_TO_STDOUT'].present?
       config.rails_semantic_logger.appenders do |appenders|
