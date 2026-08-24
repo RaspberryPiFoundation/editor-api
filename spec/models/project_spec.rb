@@ -53,6 +53,21 @@ RSpec.describe Project, :versioning do
       expect(valid_project).to be_valid
     end
 
+    it 'is valid without an origin' do
+      valid_project = build(:project, origin: nil)
+      expect(valid_project).to be_valid
+    end
+
+    it 'is valid with a known origin' do
+      valid_project = build(:project, origin: Project::Origins::EXPERIENCE_CS)
+      expect(valid_project).to be_valid
+    end
+
+    it 'is invalid with an unrecognised origin' do
+      invalid_project = build(:project, origin: 'invalid_origin')
+      expect(invalid_project).not_to be_valid
+    end
+
     it 'allows a public Code Classroom Blocks project to have instructions' do
       project = build(
         :project,
@@ -194,6 +209,24 @@ RSpec.describe Project, :versioning do
     it 'generates an identifier if nil' do
       unsaved_project = build(:project, identifier: nil)
       expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
+    end
+  end
+
+  describe 'origin_cannot_change' do
+    it 'allows an origin to be set on create' do
+      expect { create(:project, origin: Project::Origins::EXPERIENCE_CS) }.not_to raise_error
+    end
+
+    it 'allows an origin to be set on a project that does not have one' do
+      project = create(:project, origin: nil)
+      expect { project.update!(origin: Project::Origins::EXPERIENCE_CS) }.not_to raise_error
+    end
+
+    it 'does not allow an origin to be updated once set' do
+      project = create(:project, origin: Project::Origins::EXPERIENCE_CS)
+
+      expect(project.update(origin: nil)).to be(false)
+      expect(project.errors[:origin]).to include(/cannot be changed once set/)
     end
   end
 
