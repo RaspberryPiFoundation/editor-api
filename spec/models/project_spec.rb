@@ -53,6 +53,45 @@ RSpec.describe Project, :versioning do
       expect(valid_project).to be_valid
     end
 
+    it 'is valid without an origin' do
+      valid_project = build(:project, origin: nil)
+      expect(valid_project).to be_valid
+    end
+
+    it 'is valid with a known origin' do
+      valid_project = build(:project, origin: Project::Origins::EXPERIENCE_CS)
+      expect(valid_project).to be_valid
+    end
+
+    it 'is invalid with an unrecognised origin' do
+      invalid_project = build(:project, origin: 'invalid_origin')
+      expect(invalid_project).not_to be_valid
+    end
+
+    it 'allows a public Code Classroom Blocks project to have instructions' do
+      project = build(
+        :project,
+        instructions: '<p>Project instructions</p>',
+        locale: 'en',
+        project_type: Project::Types::CODE_EDITOR_SCRATCH,
+        user_id: nil
+      )
+
+      expect(project).to be_valid
+    end
+
+    it 'does not allow another type of public project to have instructions' do
+      project = build(
+        :project,
+        instructions: '<p>Project instructions</p>',
+        locale: 'en',
+        project_type: Project::Types::SCRATCH,
+        user_id: nil
+      )
+
+      expect(project).not_to be_valid
+    end
+
     it 'is invalid if school_id but no school project' do
       invalid_project = build(:project, school_id: SecureRandom.uuid)
       expect(invalid_project).not_to be_valid
@@ -170,6 +209,59 @@ RSpec.describe Project, :versioning do
     it 'generates an identifier if nil' do
       unsaved_project = build(:project, identifier: nil)
       expect { unsaved_project.valid? }.to change { unsaved_project.identifier.nil? }.from(true).to(false)
+    end
+  end
+
+  describe 'origin_cannot_change' do
+    it 'allows an origin to be set on create' do
+      expect { create(:project, origin: Project::Origins::EXPERIENCE_CS) }.not_to raise_error
+    end
+
+    it 'allows an origin to be set on a project that does not have one' do
+      project = create(:project, origin: nil)
+      expect { project.update!(origin: Project::Origins::EXPERIENCE_CS) }.not_to raise_error
+    end
+
+    it 'does not allow an origin to be updated once set' do
+      project = create(:project, origin: Project::Origins::EXPERIENCE_CS)
+
+      expect(project.update(origin: nil)).to be(false)
+      expect(project.errors[:origin]).to include(/cannot be changed once set/)
+    end
+  end
+
+  describe '#public_experience_cs_project?' do
+    it 'returns true for public Experience CS project types', :aggregate_failures do
+      project_types = [described_class::Types::SCRATCH, described_class::Types::CODE_EDITOR_SCRATCH]
+
+      project_types.each do |project_type|
+        project = build(:project, project_type:, user_id: nil, school_id: nil)
+
+        expect(project).to be_public_experience_cs_project
+      end
+    end
+
+    it 'returns false for a user-owned project' do
+      project = build(:project, project_type: described_class::Types::SCRATCH)
+
+      expect(project).not_to be_public_experience_cs_project
+    end
+
+    it 'returns false for a school-owned project' do
+      project = build(
+        :project,
+        project_type: described_class::Types::SCRATCH,
+        user_id: nil,
+        school_id: SecureRandom.uuid
+      )
+
+      expect(project).not_to be_public_experience_cs_project
+    end
+
+    it 'returns false for a non-Scratch project' do
+      project = build(:project, project_type: described_class::Types::PYTHON, user_id: nil)
+
+      expect(project).not_to be_public_experience_cs_project
     end
   end
 
@@ -341,6 +433,35 @@ RSpec.describe Project, :versioning do
 
     it 'returns all media files' do
       expect(project.media).to eq(project.images + project.videos + project.audio)
+    end
+  end
+
+  describe '#instructions' do
+    let(:project) { create(:project, :with_instructions, school:, user_id: create(:teacher, school:).id) }
+
+    it 'falls back to the legacy text column for rows that predate instruction_steps' do
+      project.instruction_steps = nil
+      project.save!
+      expect(project.instructions).to eq(project[:instructions])
+    end
+
+    it 'returns instruction_steps once set, without touching the legacy column for arrays' do
+      legacy_value = project[:instructions]
+      project.update!(instructions: [{ markdown_content: 'step 1' }])
+      expect(project.instructions).to eq([{ 'markdown_content' => 'step 1' }])
+      expect(project[:instructions]).to eq(legacy_value)
+    end
+
+    it 'does not fall back to stale legacy text once instruction_steps is set to an empty array' do
+      project.update!(instructions: [])
+      expect(project.instructions).to eq([])
+    end
+
+    it 'also clears the legacy column when instructions are set to nil' do
+      project.update!(instructions: [{ markdown_content: 'step 1' }])
+      project.update!(instructions: nil)
+      expect(project.instructions).to be_nil
+      expect(project[:instructions]).to be_nil
     end
   end
 

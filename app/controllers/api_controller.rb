@@ -17,6 +17,13 @@ class ApiController < ActionController::API
 
   private
 
+  def append_info_to_payload(payload)
+    super
+
+    origin = request.origin
+    payload[:origin] = origin if origin.present?
+  end
+
   def bad_request(exception)
     render_error_as_json(exception, :bad_request)
   end

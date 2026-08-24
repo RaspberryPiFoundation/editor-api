@@ -17,7 +17,12 @@ class Project
       private
 
       def build_project(project_hash, current_user)
-        project_hash[:identifier] = PhraseIdentifier.generate unless current_user&.experience_cs_admin?
+        if current_user&.experience_cs_admin?
+          project_hash[:origin] = Project::Origins::EXPERIENCE_CS
+        else
+          project_hash[:identifier] = PhraseIdentifier.generate
+        end
+
         new_project = Project.new(project_hash.except(:components, :scratch_component))
         new_project.components.build(project_hash[:components])
         new_project.build_scratch_component(project_hash[:scratch_component]) if project_hash[:scratch_component].present?

@@ -79,6 +79,28 @@ RSpec.describe 'Project update requests' do
       end
     end
 
+    context 'when project type and Scratch data are specified' do
+      let(:params) do
+        {
+          project: {
+            project_type: Project::Types::CODE_EDITOR_SCRATCH,
+            scratch_component: { content: { targets: [] } }
+          }
+        }
+      end
+
+      it 'does not update the project type' do
+        expect { put("/api/projects/#{project.identifier}", params:, headers:) }
+          .not_to(change { project.reload.project_type })
+      end
+
+      it 'does not create a Scratch component' do
+        put("/api/projects/#{project.identifier}", params:, headers:)
+
+        expect(project.reload.scratch_component).to be_nil
+      end
+    end
+
     context 'when updated (non-school) project has instructions' do
       let(:params) { { project: { instructions: 'updated instructions' } } }
 
@@ -105,6 +127,124 @@ RSpec.describe 'Project update requests' do
     end
   end
 
+  context 'when an Experience CS admin updates a Code Classroom Blocks project' do
+    let(:experience_cs_admin) { create(:experience_cs_admin_user) }
+    let!(:project) do
+      create(
+        :project,
+        identifier: 'experience-cs-project',
+        locale: 'fr',
+        project_type: Project::Types::SCRATCH,
+        user_id: nil
+      )
+    end
+    let(:scratch_data) do
+      {
+        targets: [{ isStage: true, name: 'Scène' }],
+        monitors: [],
+        extensions: [],
+        meta: { semver: '3.0.0' }
+      }
+    end
+    let(:params) do
+      {
+        project: {
+          name: 'Projet traduit',
+          instructions: '<p>Instructions traduites</p>',
+          project_type: Project::Types::CODE_EDITOR_SCRATCH,
+          scratch_component: { content: scratch_data }
+        }
+      }
+    end
+
+    before do
+      authenticated_in_hydra_as(experience_cs_admin)
+    end
+
+    it 'updates the locale-specific project and stores its Scratch data' do
+      put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+      expect(response).to have_http_status(:ok)
+      expect(project.reload).to have_attributes(
+        name: 'Projet traduit',
+        instructions: '<p>Instructions traduites</p>',
+        project_type: Project::Types::CODE_EDITOR_SCRATCH
+      )
+      expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
+    end
+
+    it 'updates an existing Scratch component without creating another one' do
+      create(:scratch_component, project:)
+
+      expect { put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json) }
+        .not_to change(ScratchComponent, :count)
+      expect(project.scratch_component.reload.content.to_h).to eq(scratch_data.deep_stringify_keys)
+    end
+
+    context 'when authenticated with the Experience CS service API key' do
+      let(:headers) { { ExperienceCsServiceAuthenticator::HEADER => 'service-api-key' } }
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'updates the public project' do
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:ok)
+        expect(project.reload.project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
+      end
+
+      it 'does not authorize updates to a school project' do
+        project.update!(school: create(:school))
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize updates to a user-owned project' do
+        project.update!(user_id: SecureRandom.uuid)
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize updates to a non-Scratch project' do
+        project.update!(project_type: Project::Types::PYTHON)
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize changing the project to a non-Scratch type' do
+        params[:project][:project_type] = Project::Types::PYTHON
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize assigning the project to a user' do
+        params[:project][:user_id] = SecureRandom.uuid
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize assigning the project to a school' do
+        params[:project][:school_id] = create(:school).id
+
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+  end
+
   context 'when authed user is a teacher' do
     let(:project) { create(:project, :with_instructions, school:, locale: nil, user_id: teacher.id) }
     let(:params) { { project: { components: [], instructions: 'updated instructions' } } }
@@ -123,6 +263,14 @@ RSpec.describe 'Project update requests' do
     it 'includes updated instructions in response' do
       put("/api/projects/#{project.identifier}", params:, headers:)
       expect(response.body).to include('updated instructions')
+    end
+
+    it 'saves and returns instructions in the instruction steps format' do
+      params[:project][:instructions] = [{ markdown_content: 'step 1' }, { markdown_content: 'step 2' }]
+      put("/api/projects/#{project.identifier}", params:, headers:)
+
+      expect(project.reload.instructions).to eq([{ 'markdown_content' => 'step 1' }, { 'markdown_content' => 'step 2' }])
+      expect(response.parsed_body['instructions']).to eq([{ 'markdown_content' => 'step 1' }, { 'markdown_content' => 'step 2' }])
     end
   end
 
@@ -197,10 +345,12 @@ RSpec.describe 'Project update requests' do
       expect(response).to have_http_status(:ok)
     end
 
-    it 'returns unprocessable entity if instructions updated' do
+    it 'ignores an attempt to update instructions' do
       params[:project][:instructions] = 'updated instructions'
       put("/api/projects/#{project.identifier}", params:, headers:)
-      expect(response).to have_http_status(:unprocessable_content)
+
+      expect(response).to have_http_status(:ok)
+      expect(project.reload.instructions).to be_nil
     end
 
     it 'records a project saved event' do

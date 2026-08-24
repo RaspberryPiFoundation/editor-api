@@ -9,10 +9,9 @@ RSpec.describe Project::Update, type: :unit do
       components: component_hash,
       instructions:
     }
-    described_class.call(project:, update_hash:, current_user:)
+    described_class.call(project:, update_hash:)
   end
 
-  let(:current_user) { create(:user) }
   let!(:project) { create(:project, :with_default_component, :with_components) }
   let(:editable_component) { project.components.last }
   let(:default_component) { project.components.first }
@@ -81,6 +80,29 @@ RSpec.describe Project::Update, type: :unit do
       end
     end
 
+    context 'when Scratch component attributes are provided' do
+      subject(:update_scratch_component) do
+        described_class.call(
+          project:,
+          update_hash: { scratch_component: { content: new_content, project_id: other_project.id } }
+        )
+      end
+
+      let!(:scratch_component) { create(:scratch_component, project:) }
+      let(:other_project) { create(:project) }
+      let(:new_content) { { targets: [{ isStage: true }], monitors: [], extensions: [], meta: {} } }
+
+      it 'updates the content' do
+        expect { update_scratch_component }
+          .to change { scratch_component.reload.content.to_h }
+          .to(new_content.deep_stringify_keys)
+      end
+
+      it 'ignores other attributes' do
+        expect { update_scratch_component }.not_to change { scratch_component.reload.project_id }
+      end
+    end
+
     context 'when updating the instructions if project does not belong to a school' do
       let(:instructions) { 'new instructions' }
 
@@ -97,10 +119,9 @@ RSpec.describe Project::Update, type: :unit do
       end
     end
 
-    context 'when the instructions have changed and the current user is a teacher' do
+    context 'when the instructions have changed' do
       let(:school) { create(:school) }
-      let!(:current_user) { create(:teacher, school:) }
-      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
+      let!(:project) { create(:project, :with_instructions, school:, user_id: create(:teacher, school:).id) }
       let(:instructions) { 'new instructions' }
 
       it 'returns success? true' do
@@ -109,29 +130,6 @@ RSpec.describe Project::Update, type: :unit do
 
       it 'updates project instructions' do
         expect { update }.to change { project.reload.instructions }.to('new instructions')
-      end
-    end
-
-    context 'when the instructions have changed and the current user is a student' do
-      let(:school) { create(:school) }
-      let!(:current_user) { create(:student, school:) }
-      let!(:project) { create(:project, :with_instructions, school:, user_id: current_user.id) }
-      let(:instructions) { 'new instructions' }
-
-      it 'returns success? false' do
-        expect(update.success?).to be(false)
-      end
-
-      it 'does not update project name' do
-        expect { update }.not_to change { project.reload.name }
-      end
-
-      it 'does not update project instructions' do
-        expect { update }.not_to change { project.reload.instructions }
-      end
-
-      it 'returns an error message' do
-        expect(update[:error]).to eq('Student cannot update project instructions')
       end
     end
   end

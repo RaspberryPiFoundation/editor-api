@@ -28,6 +28,8 @@ Rails.application.routes.draw do
   end
 
   post '/test/reseed', to: 'test_utilities#reseed'
+  post '/test/enable_feature', to: 'test_utilities#enable_feature'
+  post '/test/disable_feature', to: 'test_utilities#disable_feature'
 
   post '/graphql', to: 'graphql#execute'
   mount GraphiQL::Rails::Engine, at: '/graphql', graphql_path: '/graphql#execute' unless Rails.env.production?
@@ -36,6 +38,7 @@ Rails.application.routes.draw do
     namespace :scratch do
       resources :projects, only: %i[show update create]
       get '/assets/internalapi/asset/:id.:format/get/' => 'assets#show'
+      post '/assets/global/:id.:format' => 'assets#create_global'
       post '/assets/:id.:format' => 'assets#create'
     end
 
@@ -66,7 +69,7 @@ Rails.application.routes.draw do
     resource :project_errors, only: %i[create]
 
     resource :school, only: [:show], controller: 'my_school'
-    resources :schools, only: %i[index show create update destroy] do
+    resources :schools, only: %i[index show create update] do
       post :import, on: :collection
       resources :members, only: %i[index], controller: 'school_members'
       resources :classes, only: %i[index show create update destroy], controller: 'school_classes' do

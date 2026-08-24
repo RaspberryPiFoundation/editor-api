@@ -95,4 +95,53 @@ RSpec.describe School::Create, type: :unit do
       expect(onboarding_service).to have_received(:onboard).with(token:)
     end
   end
+
+  context 'when onboarding fails' do
+    let(:error) { ProfileApiClient::Error.new('Profile API is unavailable') }
+
+    before do
+      allow(Sentry).to receive(:capture_exception)
+      allow(ProfileApiClient).to receive(:create_school).and_raise(error)
+    end
+
+    it 'does not create a school' do
+      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
+    end
+
+    it 'returns a failed operation response' do
+      response = described_class.call(school_params:, creator_id:, token:)
+      expect(response.failure?).to be(true)
+    end
+
+    it 'sends the underlying error to Sentry rather than a generic error' do
+      described_class.call(school_params:, creator_id:, token:)
+      expect(Sentry).to have_received(:capture_exception).with(error)
+    end
+
+    it 'returns the underlying error message in the operation response' do
+      response = described_class.call(school_params:, creator_id:, token:)
+      expect(response[:error]).to eq([error.message])
+    end
+  end
+
+  context 'when onboarding fails because the user is unauthorized in Profile' do
+    before do
+      allow(Sentry).to receive(:capture_exception)
+      allow(ProfileApiClient).to receive(:create_school).and_raise(ProfileApiClient::UnauthorizedError)
+    end
+
+    it 'does not create a school' do
+      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
+    end
+
+    it 'returns a failed operation response' do
+      response = described_class.call(school_params:, creator_id:, token:)
+      expect(response.failure?).to be(true)
+    end
+
+    it 'does not capture the error in Sentry' do
+      described_class.call(school_params:, creator_id:, token:)
+      expect(Sentry).not_to have_received(:capture_exception)
+    end
+  end
 end

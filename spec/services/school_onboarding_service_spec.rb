@@ -28,10 +28,6 @@ RSpec.describe SchoolOnboardingService do
         service.onboard(token:)
         expect(ProfileApiClient).to have_received(:create_school).with(token:, id: school.id, code: school.code)
       end
-
-      it 'returns true' do
-        expect(service.onboard(token:)).to be(true)
-      end
     end
 
     describe 'when the school cannot be created in Profile API' do
@@ -40,43 +36,37 @@ RSpec.describe SchoolOnboardingService do
       end
 
       it 'does not create owner role' do
-        service.onboard(token:)
+        suppress(RuntimeError) { service.onboard(token:) }
         expect(school_creator).not_to be_school_owner(school)
       end
 
       it 'does not create teacher role' do
-        service.onboard(token:)
+        suppress(RuntimeError) { service.onboard(token:) }
         expect(school_creator).not_to be_school_teacher(school)
       end
 
-      it 'returns false' do
-        expect(service.onboard(token:)).to be(false)
+      it 'raises the underlying error' do
+        expect { service.onboard(token:) }.to raise_error(RuntimeError)
       end
     end
 
     describe 'when Profile API returns unauthorized' do
       before do
         allow(ProfileApiClient).to receive(:create_school).and_raise(ProfileApiClient::UnauthorizedError)
-        allow(Sentry).to receive(:capture_exception)
       end
 
       it 'does not create owner role' do
-        service.onboard(token:)
+        suppress(ProfileApiClient::UnauthorizedError) { service.onboard(token:) }
         expect(school_creator).not_to be_school_owner(school)
       end
 
       it 'does not create teacher role' do
-        service.onboard(token:)
+        suppress(ProfileApiClient::UnauthorizedError) { service.onboard(token:) }
         expect(school_creator).not_to be_school_teacher(school)
       end
 
-      it 'does not capture the error in Sentry' do
-        service.onboard(token:)
-        expect(Sentry).not_to have_received(:capture_exception)
-      end
-
-      it 'returns false' do
-        expect(service.onboard(token:)).to be(false)
+      it 'raises the underlying error' do
+        expect { service.onboard(token:) }.to raise_error(ProfileApiClient::UnauthorizedError)
       end
     end
 
@@ -88,22 +78,22 @@ RSpec.describe SchoolOnboardingService do
       end
 
       it 'does not create owner role' do
-        service.onboard(token:)
+        suppress(ActiveRecord::RecordInvalid) { service.onboard(token:) }
         expect(school_creator).not_to be_school_owner(school)
       end
 
       it 'does not create teacher role' do
-        service.onboard(token:)
+        suppress(ActiveRecord::RecordInvalid) { service.onboard(token:) }
         expect(school_creator).not_to be_school_teacher(school)
       end
 
       it 'does not create school in Profile API' do
-        service.onboard(token:)
+        suppress(ActiveRecord::RecordInvalid) { service.onboard(token:) }
         expect(ProfileApiClient).not_to have_received(:create_school)
       end
 
-      it 'returns false' do
-        expect(service.onboard(token:)).to be(false)
+      it 'raises the underlying error' do
+        expect { service.onboard(token:) }.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
   end
