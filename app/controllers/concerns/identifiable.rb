@@ -22,6 +22,12 @@ module Identifiable
     RequestStore.store[:safeguarding_flag_users_by_token][token] = @current_user
   end
 
+  def load_experience_cs_service_user
+    @current_user = ExperienceCsServiceAuthenticator.authenticate(
+      request.headers[ExperienceCsServiceAuthenticator::HEADER]
+    )
+  end
+
   def extract_token(header)
     header.sub(/^Bearer\s+/i, '')
   end

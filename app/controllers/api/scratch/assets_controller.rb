@@ -1,13 +1,16 @@
 # frozen_string_literal: true
 
+require 'digest/md5'
+
 module Api
   module Scratch
     class AssetsController < ApiController
       include ActiveStorage::SetCurrent
 
+      prepend_before_action :load_experience_cs_service_user, only: %i[create_global]
       before_action :authorize_user, except: %i[show]
       prepend_before_action :load_project_from_header, only: %i[show create]
-      authorize_resource :project_from_header
+      authorize_resource :project_from_header, except: %i[create_global]
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
@@ -24,30 +27,78 @@ module Api
 
       def create
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
-        scratch_asset = ScratchAsset.find_or_initialize_by(
+        create_asset(
           project: @project_from_header,
           uploaded_user_id: current_user.id,
           filename: filename_with_extension
         )
+      end
+
+      def create_global
+        authorize! :create_global, ScratchAsset
+
+        create_asset(
+          project: nil,
+          uploaded_user_id: nil,
+          filename: "#{params[:id]}.#{params[:format]}",
+          reject_conflicting_content: true
+        )
+      end
+
+      private
+
+      def create_asset(reject_conflicting_content: false, **attributes)
+        scratch_asset = ScratchAsset.find_or_initialize_by(attributes)
 
         if scratch_asset.new_record?
           begin
             scratch_asset.save!
-            scratch_asset.file.attach(io: request.body, filename: filename_with_extension)
           rescue ActiveRecord::RecordNotUnique
-            logger.info("Scratch asset already created during concurrent upload: #{filename_with_extension}")
-            ScratchAsset.find_by!(
-              project: @project_from_header,
-              uploaded_user_id: current_user.id,
-              filename: filename_with_extension
-            )
+            logger.info("Scratch asset already created during concurrent upload: #{attributes.fetch(:filename)}")
+            scratch_asset = ScratchAsset.find_by!(attributes)
           end
+        end
+
+        if reject_conflicting_content
+          return if attach_global_file(scratch_asset, attributes.fetch(:filename)) == :conflict
+        else
+          attach_file_unless_present(scratch_asset, attributes.fetch(:filename))
         end
 
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
       end
 
-      private
+      def attach_global_file(scratch_asset, filename)
+        scratch_asset.with_lock do
+          if scratch_asset.file.attached?
+            next :unchanged if global_file_matches?(scratch_asset)
+
+            next reject_conflicting_global_file
+          end
+
+          scratch_asset.file.attach(io: request.body, filename:)
+          :attached
+        end
+      end
+
+      def attach_file_unless_present(scratch_asset, filename)
+        scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
+      end
+
+      def global_file_matches?(scratch_asset)
+        scratch_asset.file.blob.checksum == request_body_checksum
+      end
+
+      def reject_conflicting_global_file
+        render json: { error: 'Asset content conflicts with the existing global asset' }, status: :conflict
+        :conflict
+      end
+
+      def request_body_checksum
+        @request_body_checksum ||= Digest::MD5.base64digest(request.body.read)
+      ensure
+        request.body.rewind
+      end
 
       def load_project_from_header
         identifier = request.headers['X-Project-ID']

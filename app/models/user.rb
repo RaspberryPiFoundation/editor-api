@@ -4,6 +4,8 @@ class User
   include ActiveModel::Serialization
   include ActiveModel::Model
 
+  EXPERIENCE_CS_SERVICE_ACCOUNT_ID = '00000000-0000-0000-0000-000000000000'
+
   ATTRIBUTES = %w[
     country
     country_code
@@ -57,6 +59,10 @@ class User
 
   def experience_cs_admin?
     parsed_roles.include?('experience-cs-admin')
+  end
+
+  def experience_cs_service_account?
+    id == EXPERIENCE_CS_SERVICE_ACCOUNT_ID
   end
 
   def parsed_roles
