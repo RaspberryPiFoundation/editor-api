@@ -35,6 +35,8 @@ Rails.application.routes.draw do
   mount GraphiQL::Rails::Engine, at: '/graphql', graphql_path: '/graphql#execute' unless Rails.env.production?
 
   namespace :api do
+    put '/experience-cs/projects/:id/migrate', to: 'experience_cs_project_migrations#update'
+
     namespace :scratch do
       resources :projects, only: %i[show update create]
       get '/assets/internalapi/asset/:id.:format/get/' => 'assets#show'
