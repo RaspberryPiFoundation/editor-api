@@ -18,6 +18,7 @@ class Ability
 
     define_editor_admin_abilities(user)
     define_experience_cs_admin_abilities(user)
+    define_experience_cs_service_abilities(user)
   end
 
   private
@@ -72,6 +73,12 @@ class Ability
     can(%i[read], :school_member)
     can(%i[read create import update destroy regenerate_join_code], SchoolClass, school: { id: school.id })
     can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
+    lesson_project_ids = Project.where(
+      school_id: school.id,
+      remixed_from_id: nil,
+      lesson_id: Lesson.where(school_id: school.id, visibility: %w[teachers students]).select(:id)
+    ).pluck(:id)
+    can(%i[read show_context], Project, school_id: school.id, remixed_from_id: lesson_project_ids)
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
@@ -150,6 +157,12 @@ class Ability
     can %i[read create update destroy], Project, user_id: nil
     can :create_global, ScratchAsset
     define_school_import_abilities(user)
+  end
+
+  def define_experience_cs_service_abilities(user)
+    return unless user&.experience_cs_service_account?
+
+    can %i[migrate_from_experience_cs upload_migration_asset], Project, &:experience_cs_migration_target?
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)

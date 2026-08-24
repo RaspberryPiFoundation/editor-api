@@ -108,6 +108,12 @@ class Project < ApplicationRecord
     user_id.nil? && school_id.nil? && EXPERIENCE_CS_PROJECT_TYPES.include?(project_type)
   end
 
+  def experience_cs_migration_target?
+    return false unless user_id.present? && school_id.present?
+
+    project_type == Types::SCRATCH || experience_cs_migrated_at.present?
+  end
+
   def self_and_ancestors
     projects = []
     current_project = self

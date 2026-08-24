@@ -265,6 +265,44 @@ RSpec.describe Project, :versioning do
     end
   end
 
+  describe '#experience_cs_migration_target?' do
+    let(:project) do
+      build(
+        :project,
+        school_id: SecureRandom.uuid,
+        user_id: SecureRandom.uuid,
+        locale: nil,
+        project_type: described_class::Types::SCRATCH
+      )
+    end
+
+    it 'allows a user-owned school legacy Scratch stub' do
+      expect(project).to be_experience_cs_migration_target
+    end
+
+    it 'allows a replay after a successful migration' do
+      project.project_type = described_class::Types::CODE_EDITOR_SCRATCH
+      project.experience_cs_migrated_at = Time.current
+
+      expect(project).to be_experience_cs_migration_target
+    end
+
+    it 'rejects an unmarked native Code Classroom Scratch project' do
+      project.project_type = described_class::Types::CODE_EDITOR_SCRATCH
+
+      expect(project).not_to be_experience_cs_migration_target
+    end
+
+    it 'rejects public and non-school projects', :aggregate_failures do
+      project.user_id = nil
+      expect(project).not_to be_experience_cs_migration_target
+
+      project.user_id = SecureRandom.uuid
+      project.school_id = nil
+      expect(project).not_to be_experience_cs_migration_target
+    end
+  end
+
   describe 'create_school_project_if_needed' do
     let(:teacher) { create(:teacher, school:) }
     let(:teacher_project) { create(:project, school_id: school.id, user_id: teacher.id) }
