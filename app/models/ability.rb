@@ -150,6 +150,7 @@ class Ability
     return unless user&.experience_cs_admin?
 
     can %i[read create update destroy], Project, user_id: nil
+    can :create_global, ScratchAsset
     define_school_import_abilities(user)
   end
 

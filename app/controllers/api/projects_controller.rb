@@ -4,10 +4,12 @@ require 'project_loader'
 
 module Api
   class ProjectsController < ApiController
+    prepend_before_action :load_experience_cs_service_user, only: %i[create update]
     before_action :authorize_user, only: %i[create update index destroy]
     before_action :load_project, only: %i[show update destroy show_context]
     before_action :load_projects, only: %i[index]
     load_and_authorize_resource
+    before_action :authorize_experience_cs_service_project, only: %i[create update]
     before_action :verify_lesson_belongs_to_school, only: :create
     after_action :pagination_link_header, only: %i[index]
 
@@ -62,6 +64,27 @@ module Api
     end
 
     private
+
+    def authorize_experience_cs_service_project
+      return unless current_user&.experience_cs_service_account?
+      return if experience_cs_service_project_change_permitted?
+
+      raise CanCan::AccessDenied
+    end
+
+    def experience_cs_service_project_change_permitted?
+      return false if action_name == 'update' && !@project.public_experience_cs_project?
+
+      requested_experience_cs_project.public_experience_cs_project?
+    end
+
+    def requested_experience_cs_project
+      project = action_name == 'create' ? Project.new : @project.dup
+      attributes = base_params.slice(:user_id, :school_id, :project_type).to_h
+      project.assign_attributes(attributes)
+
+      project
+    end
 
     def verify_lesson_belongs_to_school
       return if base_params[:lesson_id].blank?

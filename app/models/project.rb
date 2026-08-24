@@ -12,6 +12,8 @@ class Project < ApplicationRecord
     EXPERIENCE_CS = 'experience_cs'
   end
 
+  EXPERIENCE_CS_PROJECT_TYPES = [Types::SCRATCH, Types::CODE_EDITOR_SCRATCH].freeze
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
@@ -100,6 +102,10 @@ class Project < ApplicationRecord
 
   def scratch_project?
     project_type == Types::CODE_EDITOR_SCRATCH
+  end
+
+  def public_experience_cs_project?
+    user_id.nil? && school_id.nil? && EXPERIENCE_CS_PROJECT_TYPES.include?(project_type)
   end
 
   def self_and_ancestors

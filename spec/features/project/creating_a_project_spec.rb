@@ -314,5 +314,51 @@ RSpec.describe 'Creating a project', type: :request do
 
       expect(Project.find_by!(identifier: 'test-project', locale: 'fr').origin).to eq(Project::Origins::EXPERIENCE_CS)
     end
+
+    context 'when authenticated with the Experience CS service API key' do
+      let(:headers) { { ExperienceCsServiceAuthenticator::HEADER => 'service-api-key' } }
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'creates the public project' do
+        post('/api/projects', headers:, params:, as: :json)
+
+        expect(response).to have_http_status(:created)
+        expect(Project).to exist(identifier: 'test-project', locale: 'fr', user_id: nil)
+      end
+
+      it 'creates a public legacy Scratch project' do
+        params[:project].except!(:instructions, :scratch_component)
+        params[:project][:project_type] = Project::Types::SCRATCH
+
+        post('/api/projects', headers:, params:, as: :json)
+
+        expect(response).to have_http_status(:created)
+        expect(Project).to exist(identifier: 'test-project', locale: 'fr', project_type: Project::Types::SCRATCH)
+      end
+
+      it 'does not authorize user-project creation' do
+        params[:project][:user_id] = SecureRandom.uuid
+
+        expect { post('/api/projects', headers:, params:, as: :json) }.not_to change(Project, :count)
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize school-project creation' do
+        params[:project][:school_id] = create(:school).id
+
+        expect { post('/api/projects', headers:, params:, as: :json) }.not_to change(Project, :count)
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not authorize non-Scratch project creation' do
+        params[:project][:project_type] = Project::Types::PYTHON
+
+        expect { post('/api/projects', headers:, params:, as: :json) }.not_to change(Project, :count)
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
   end
 end
