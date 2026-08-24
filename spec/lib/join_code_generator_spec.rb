@@ -7,6 +7,15 @@ RSpec.describe JoinCodeGenerator do
     it 'matches CDDD-CDDD' do
       expect(described_class.generate).to match(described_class::FORMAT_REGEX)
     end
+
+    it 'uses SecureRandom for each code component' do
+      allow(SecureRandom).to receive(:random_number).with(described_class::CONSONANTS.length).and_return(0, 1)
+      allow(SecureRandom).to receive(:random_number).with(1000).and_return(123, 456)
+
+      expect(described_class.generate).to eq('B123-C456')
+      expect(SecureRandom).to have_received(:random_number).with(described_class::CONSONANTS.length).twice
+      expect(SecureRandom).to have_received(:random_number).with(1000).twice
+    end
   end
 
   describe '.normalize' do

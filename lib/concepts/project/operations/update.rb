@@ -3,12 +3,13 @@
 class Project
   class Update
     class << self
-      def call(project:, update_hash:, current_user:)
+      def call(project:, update_hash:)
         response = setup_response(project)
 
         setup_deletions(response, update_hash)
-        update_project_attributes(response, update_hash, current_user)
+        update_project_attributes(response, update_hash)
         update_component_attributes(response, update_hash)
+        update_scratch_component_attributes(response, update_hash)
         persist_changes(response)
         response
       rescue StandardError => e
@@ -42,24 +43,10 @@ class Project
         response[:error] = I18n.t 'errors.project.editing.delete_default_component'
       end
 
-      def student_project_instructions_updated?(response, update_hash, current_user)
-        is_school_project = response[:project].school.present?
-        user_is_student = current_user.student?
-        instructions_updated = response[:project].instructions != update_hash[:instructions]
-        is_school_project && user_is_student && instructions_updated
-      end
-
-      def validate_update(response, update_hash, current_user)
-        return unless student_project_instructions_updated?(response, update_hash, current_user)
-
-        response[:error] = I18n.t 'errors.project.editing.student_update_instructions'
-      end
-
-      def update_project_attributes(response, update_hash, current_user)
-        validate_update(response, update_hash, current_user)
+      def update_project_attributes(response, update_hash)
         return if response.failure?
 
-        response[:project].assign_attributes(update_hash.slice(:name, :instructions))
+        response[:project].assign_attributes(update_hash.slice(:name, :instructions, :project_type))
       end
 
       def update_component_attributes(response, update_hash)
@@ -79,11 +66,20 @@ class Project
         component.assign_attributes(component_params)
       end
 
+      def update_scratch_component_attributes(response, update_hash)
+        return if response.failure? || update_hash[:scratch_component].nil?
+
+        scratch_component = response[:project].scratch_component || response[:project].build_scratch_component
+        scratch_component.assign_attributes(update_hash[:scratch_component].slice(:content))
+        response[:scratch_component] = scratch_component
+      end
+
       def persist_changes(response)
         return if response.failure?
 
         ActiveRecord::Base.transaction do
           response[:project].save!
+          response[:scratch_component]&.save!
           response[:project].components.where(id: response[:component_ids_to_delete]).destroy_all
         end
       end

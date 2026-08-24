@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'securerandom'
+
 class JoinCodeGenerator
   # Omit K, X, Z — commonly confused or offensive in short codes.
   CONSONANTS = %w[B C D F G H J L M N P Q R S T V W Y].freeze
@@ -7,13 +9,10 @@ class JoinCodeGenerator
   # Format: CDDD-CDDD (e.g., B123-C456). C = consonant from CONSONANTS, D = digit.
   FORMAT_REGEX = Regexp.new("\\A(?:#{CONSONANTS.join('|')})\\d{3}-(?:#{CONSONANTS.join('|')})\\d{3}\\z").freeze
 
-  cattr_accessor :random
-
-  self.random ||= Random.new
-
   def self.generate
     seg = lambda do
-      "#{CONSONANTS.sample(random: random)}#{format('%03d', random.rand(1000))}"
+      consonant = CONSONANTS[SecureRandom.random_number(CONSONANTS.length)]
+      "#{consonant}#{format('%03d', SecureRandom.random_number(1000))}"
     end
 
     "#{seg.call}-#{seg.call}"

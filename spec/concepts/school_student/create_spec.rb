@@ -77,17 +77,28 @@ RSpec.describe SchoolStudent::Create, type: :unit do
     end
   end
 
-  context 'when the student cannot be created in profile api because of a 422 response' do
-    let(:error) { { 'message' => "something's up with the username" } }
+  context 'when Profile API rejects the student details' do
+    let(:error) do
+      {
+        'errorCode' => 'isComplex',
+        'message' => 'Password is too simple'
+      }
+    end
     let(:exception) { ProfileApiClient::Student422Error.new(error) }
 
     before do
       allow(ProfileApiClient).to receive(:create_school_student).and_raise(exception)
+      allow(Sentry).to receive(:capture_exception)
     end
 
-    it 'adds a useful error message' do
+    it 'returns the translatable error code' do
       response = described_class.call(school:, school_student_params:, token:)
-      expect(response[:error]).to eq("something's up with the username")
+      expect(response[:error]).to eq('isComplex')
+    end
+
+    it 'does not send the expected validation error to Sentry' do
+      described_class.call(school:, school_student_params:, token:)
+      expect(Sentry).not_to have_received(:capture_exception)
     end
   end
 

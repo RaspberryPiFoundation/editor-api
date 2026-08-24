@@ -65,16 +65,28 @@ module App
 
     config.generators.system_tests = nil
 
-    config.active_record.encryption.primary_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')
-    config.active_record.encryption.deterministic_key = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_DETERMINISTIC_KEY')
+    config.active_record.encryption.primary_key = [
+      ENV.fetch('PREVIOUS_ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY', nil),
+      ENV.fetch('ACTIVE_RECORD_ENCRYPTION_PRIMARY_KEY')
+    ].compact
     config.active_record.encryption.key_derivation_salt = ENV.fetch('ACTIVE_RECORD_ENCRYPTION_KEY_DERIVATION_SALT')
 
     config.x.subscriptions.pardot_form_handler_url = ENV.fetch('PARDOT_SUBSCRIPTION_URL', '')
 
     config.x.cloudflare_turnstile.secret_key = ENV.fetch('CLOUDFLARE_TURNSTILE_SECRET_KEY', nil)
     config.x.cloudflare_turnstile.enabled = ENV['CLOUDFLARE_TURNSTILE_SECRET_KEY'].present?
+    config.x.experience_cs.service_api_key = ENV.fetch('EXPERIENCE_CS_API_KEY', nil)
 
-    config.rails_semantic_logger.format = :json
-    config.semantic_logger.application = 'editor-api'
+    if ENV['RAILS_LOG_TO_STDOUT'].present?
+      config.rails_semantic_logger.appenders do |appenders|
+        # Log to STDOUT on Heroku in JSON format, where this variable is set automatically.
+        appenders.add(io: $stdout, formatter: :json, application: "editor-api@#{ENV['HEROKU_SLUG_COMMIT'] || 'unknown'}")
+      end
+    end
+
+    config.before_initialize do |app|
+      previous_secret_key_base = ENV.fetch('PREVIOUS_SECRET_KEY_BASE', nil)
+      app.message_verifiers.rotate(secret_key_base: previous_secret_key_base) if previous_secret_key_base.present?
+    end
   end
 end

@@ -8,6 +8,12 @@ class Project < ApplicationRecord
     CODE_EDITOR_SCRATCH = 'code_editor_scratch'
   end
 
+  module Origins
+    EXPERIENCE_CS = 'experience_cs'
+  end
+
+  EXPERIENCE_CS_PROJECT_TYPES = [Types::SCRATCH, Types::CODE_EDITOR_SCRATCH].freeze
+
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
@@ -35,6 +41,8 @@ class Project < ApplicationRecord
   validate :project_with_instructions_must_belong_to_school
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
+  validates :origin, inclusion: { in: [Origins::EXPERIENCE_CS], allow_nil: true }
+  validate :origin_cannot_change, on: :update
 
   scope :internal_projects, -> { where(user_id: nil) }
 
@@ -74,6 +82,15 @@ class Project < ApplicationRecord
     super(value.is_a?(Hash) ? ScratchComponent.new(value) : value)
   end
 
+  def instructions
+    self[:instruction_steps].nil? ? self[:instructions] : self[:instruction_steps]
+  end
+
+  def instructions=(value)
+    self[:instructions] = value unless value.is_a?(Array)
+    self[:instruction_steps] = value
+  end
+
   def last_edited_at
     # datetime that the project or one of its components was last updated
     [updated_at, components.maximum(:updated_at)].compact.max
@@ -85,6 +102,10 @@ class Project < ApplicationRecord
 
   def scratch_project?
     project_type == Types::CODE_EDITOR_SCRATCH
+  end
+
+  def public_experience_cs_project?
+    user_id.nil? && school_id.nil? && EXPERIENCE_CS_PROJECT_TYPES.include?(project_type)
   end
 
   def self_and_ancestors
@@ -152,9 +173,14 @@ class Project < ApplicationRecord
   end
 
   def project_with_instructions_must_belong_to_school
+    return if public_code_editor_scratch_project?
     return unless instructions && !school_id
 
     errors.add(:instructions, 'Projects with instructions must belong to a school')
+  end
+
+  def public_code_editor_scratch_project?
+    user_id.nil? && locale.present? && project_type == Types::CODE_EDITOR_SCRATCH
   end
 
   def project_with_school_id_has_school_project
@@ -167,5 +193,13 @@ class Project < ApplicationRecord
     return unless school_id && school_project && school_id != school_project.school_id
 
     errors.add(:school_project, 'School project school_id must match project school_id')
+  end
+
+  def origin_cannot_change
+    return unless origin_changed?
+    # allow filling in origin when it's nil
+    return if origin_was.nil?
+
+    errors.add(:origin, 'cannot be changed once set')
   end
 end

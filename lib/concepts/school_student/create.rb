@@ -4,13 +4,13 @@ module SchoolStudent
   class Create
     class << self
       def call(school:, school_student_params:, token:)
-        response = OperationResponse.new
-        response[:student_id] = create_student(school, school_student_params, token)
-        response
+        student_id = create_student(school, school_student_params, token)
+        OperationResponse[student_id:]
+      rescue ProfileApiClient::Student422Error => e
+        OperationResponse[error: e.to_s]
       rescue StandardError => e
         Sentry.capture_exception(e)
-        response[:error] = e.to_s
-        response
+        OperationResponse[error: e.to_s]
       end
 
       private

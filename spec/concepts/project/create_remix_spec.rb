@@ -74,6 +74,20 @@ RSpec.describe Project::CreateRemix, type: :unit do
       expect(remixed_project.remix_origin).to eq(remix_origin)
     end
 
+    it 'does not set an origin when the original project has none' do
+      remixed_project = create_remix[:project]
+      expect(remixed_project.origin).to be_nil
+    end
+
+    context 'when the original project has an origin' do
+      let!(:original_project) { create(:project, :with_components, origin: Project::Origins::EXPERIENCE_CS) }
+
+      it 'copies the origin to the remix' do
+        remixed_project = create_remix[:project]
+        expect(remixed_project.origin).to eq(Project::Origins::EXPERIENCE_CS)
+      end
+    end
+
     it 'links remix to attached images' do
       remixed_project = create_remix[:project]
       expect(remixed_project.images.length).to eq(original_project.images.length)

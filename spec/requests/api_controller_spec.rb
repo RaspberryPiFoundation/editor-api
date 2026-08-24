@@ -42,6 +42,34 @@ RSpec.describe ApiController do
     Rails.application.reload_routes!
   end
 
+  describe 'request logging' do
+    def completed_request_payload(headers: {})
+      payload = nil
+
+      callback = lambda do |event|
+        payload = event.payload
+      end
+
+      ActiveSupport::Notifications.subscribed(callback, 'process_action.action_controller') do
+        get '/test', headers:
+      end
+
+      payload
+    end
+
+    it 'includes the request origin in the completed request payload' do
+      payload = completed_request_payload(headers: { 'Origin' => 'https://editor.raspberrypi.org' })
+
+      expect(payload).to include(origin: 'https://editor.raspberrypi.org')
+    end
+
+    it 'omits the origin when the request does not include one' do
+      payload = completed_request_payload
+
+      expect(payload).not_to have_key(:origin)
+    end
+  end
+
   context 'when ActionController::ParameterMissing is raised' do
     before do
       test_controller.error = ActionController::ParameterMissing.new('foo')
