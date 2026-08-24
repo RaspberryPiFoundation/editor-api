@@ -250,7 +250,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_20_122510) do
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
     t.index ["identifier"], name: "index_projects_on_identifier"
     t.index ["lesson_id"], name: "index_projects_on_lesson_id"
-    t.index ["origin"], name: "index_projects_on_origin", where: "(origin IS NOT NULL)"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
     t.index ["school_id"], name: "index_projects_on_school_id"
   end
