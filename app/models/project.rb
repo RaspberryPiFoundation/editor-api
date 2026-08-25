@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Project < ApplicationRecord
+  self.ignored_columns += [:instructions]
+
   module Types
     PYTHON = 'python'
     HTML = 'html'
@@ -83,12 +85,11 @@ class Project < ApplicationRecord
   end
 
   def instructions
-    self[:instruction_steps].nil? ? self[:instructions] : self[:instruction_steps]
+    instruction_steps
   end
 
   def instructions=(value)
-    self[:instructions] = value unless value.is_a?(Array)
-    self[:instruction_steps] = value
+    self.instruction_steps = value
   end
 
   def last_edited_at
