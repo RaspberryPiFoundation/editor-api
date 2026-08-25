@@ -19,7 +19,8 @@ if lesson.project
   json.project(
     lesson.project,
     :identifier,
-    :project_type
+    :project_type,
+    :locale
   )
 end
 

@@ -45,7 +45,7 @@ RSpec.describe 'Listing lessons', type: :request do
   it 'responds with the project JSON' do
     get('/api/lessons', headers:)
     data = JSON.parse(response.body, symbolize_names: true)
-    expected_project = JSON.parse(lesson.project.to_json(only: %i[identifier project_type]), symbolize_names: true)
+    expected_project = JSON.parse(lesson.project.to_json(only: %i[identifier project_type locale]), symbolize_names: true)
 
     expect(data.first[:project]).to eq(expected_project)
   end

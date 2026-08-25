@@ -75,6 +75,33 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
     end
   end
 
+  context 'when a locale is supplied for each project' do
+    let(:lesson_project_params) do
+      [
+        {
+          name: 'Lesson 1',
+          school_id: school.id,
+          project_attributes: { name: 'Project 1', project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: 'fr-FR' }
+        },
+        {
+          name: 'Lesson 2',
+          school_id: school.id,
+          project_attributes: { name: 'Project 2', project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: 'fr-FR' }
+        }
+      ]
+    end
+
+    it 'persists the locale on each created project' do
+      expect(Project.where(locale: 'fr-FR').count).to eq(2)
+    end
+
+    it 'returns the locale on each project so callers can confirm it' do
+      data = JSON.parse(response.body, symbolize_names: true)
+
+      expect(data.map { |entry| entry.dig(:project, :locale) }).to all(eq('fr-FR'))
+    end
+  end
+
   context 'when some entries are invalid' do
     let(:lesson_projects) do
       lesson_project_params + [{
