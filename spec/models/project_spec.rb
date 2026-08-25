@@ -293,6 +293,13 @@ RSpec.describe Project, :versioning do
       expect(project).not_to be_experience_cs_migration_target
     end
 
+    it 'rejects a marked non-Scratch project' do
+      project.project_type = described_class::Types::PYTHON
+      project.experience_cs_migrated_at = Time.current
+
+      expect(project).not_to be_experience_cs_migration_target
+    end
+
     it 'rejects public and non-school projects', :aggregate_failures do
       project.user_id = nil
       expect(project).not_to be_experience_cs_migration_target

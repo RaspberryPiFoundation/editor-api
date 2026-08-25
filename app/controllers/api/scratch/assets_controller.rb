@@ -120,7 +120,11 @@ module Api
         return render json: { error: 'X-Project-ID header is required' }, status: :bad_request if identifier.blank?
 
         project_scope = Project.where(identifier:)
-        project_scope = project_scope.where(locale: nil) if current_user&.experience_cs_service_account?
+        project_scope = if current_user&.experience_cs_service_account?
+                          project_scope.where(locale: nil, project_type: Project::EXPERIENCE_CS_PROJECT_TYPES)
+                        else
+                          project_scope.where(project_type: Project::Types::CODE_EDITOR_SCRATCH)
+                        end
         @project_from_header = project_scope.first!
         return if project_accepts_asset_upload?(@project_from_header)
 

@@ -229,6 +229,28 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         authenticated_in_hydra_as(teacher)
       end
 
+      context 'when another project type has the same identifier' do
+        let(:identifier) { 'shared-project-identifier' }
+        let(:project) { create_scratch_project(identifier:, user_id: teacher.id) }
+
+        before do
+          create(
+            :project,
+            identifier:,
+            locale: 'en',
+            project_type: Project::Types::PYTHON,
+            user_id: nil
+          )
+        end
+
+        it 'uploads the asset to the Scratch project' do
+          make_request
+
+          expect(ScratchAsset.find_by!(filename:).project).to eq(project)
+          expect(response).to have_http_status(:created)
+        end
+      end
+
       it 'responds 400 Bad Request when X-Project-ID is not provided' do
         post '/api/scratch/assets/test_image_1.png',
              headers: { 'Content-Type' => 'application/octet-stream' }.merge(auth_headers),
