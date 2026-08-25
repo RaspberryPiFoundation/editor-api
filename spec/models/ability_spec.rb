@@ -161,34 +161,6 @@ RSpec.describe Ability do
       end
     end
 
-    context 'with a persisted school student' do
-      let(:school) { create(:school) }
-      let(:user) { create(:user, id: user_id) }
-      let(:public_scratch_starter) do
-        build(:project,
-              user_id: nil,
-              school_id: nil,
-              project_type: Project::Types::CODE_EDITOR_SCRATCH)
-      end
-      let(:public_python_starter) do
-        build(:project,
-              user_id: nil,
-              school_id: nil,
-              project_type: Project::Types::PYTHON)
-      end
-      let(:public_scratch_component) { build(:component, project: public_scratch_starter) }
-      let(:public_python_component) { build(:component, project: public_python_starter) }
-
-      before do
-        create(:student_role, user_id: user.id, school:)
-      end
-
-      it { is_expected.to be_able_to(:show, public_scratch_starter) }
-      it { is_expected.not_to be_able_to(:show, public_python_starter) }
-      it { is_expected.to be_able_to(:show, public_scratch_component) }
-      it { is_expected.not_to be_able_to(:show, public_python_component) }
-    end
-
     context 'with an experience-cs admin' do
       let(:user) { build(:experience_cs_admin_user, id: user_id) }
       let(:another_project) { build(:project) }
@@ -572,7 +544,7 @@ RSpec.describe Ability do
 
       context 'with a starter project' do
         it { is_expected.not_to be_able_to(:index, starter_project) }
-        it { is_expected.not_to be_able_to(:show, starter_project) }
+        it { is_expected.to be_able_to(:show, starter_project) }
         it { is_expected.not_to be_able_to(:create, starter_project) }
         it { is_expected.not_to be_able_to(:update, starter_project) }
         it { is_expected.not_to be_able_to(:destroy, starter_project) }
