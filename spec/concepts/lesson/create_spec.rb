@@ -159,4 +159,101 @@ RSpec.describe Lesson::Create, type: :unit do
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end
+
+  # Lesson::Create builds the lesson's project as a remix of an
+  # already-synced Experience CS project instead of a stub.
+  # Assumed signature: described_class.call(lesson_params:, source_project: nil)
+  # The controller resolves the locale row (ProjectLoader) and hands over the Project.
+  context 'when a source project is given' do
+    let(:source_project_en) do
+      create(:scratch_project, identifier: 'my-digital-canvas', locale: 'en', user_id: nil,
+                               name: 'My digital canvas', origin: Project::Origins::EXPERIENCE_CS)
+    end
+
+    let(:source_project_fr) do
+      create(:scratch_project, identifier: source_project_en.identifier, locale: 'fr-FR', user_id: nil,
+                               name: 'Ma toile numérique', origin: Project::Origins::EXPERIENCE_CS)
+    end
+
+    let(:source_project) { source_project_fr }
+
+    let(:lesson_params) do
+      {
+        name: 'Test Lesson',
+        user_id: teacher.id,
+        school_id: school.id,
+        project_attributes: { name: 'My digital canvas' }
+      }
+    end
+
+    let(:lesson_project) { result[:lesson].project }
+
+    before do
+      allow(User).to receive(:from_userinfo).with(ids: teacher.id).and_return([teacher])
+    end
+
+    it 'returns a successful operation response' do
+      response = described_class.call(lesson_params:, source_project:)
+      expect(response.success?).to be(true)
+    end
+
+    it 'creates a lesson' do
+      expect { described_class.call(lesson_params:, source_project:) }.to change(Lesson, :count).by(1)
+    end
+
+    it 'creates one project for the lesson'
+
+    it 'does not create a second project for the source'
+
+    # remix of the RPF project already in Code Classroom
+    it 'sets remixed_from_id to the source project'
+
+    it 'generates a new identifier rather than reusing the source identifier'
+
+    it 'copies the scratch component content from the source project'
+
+    it 'copies the project_type from the source project'
+
+    it 'copies the instructions from the source project'
+
+    # remix of the requested locale row, but locale is null
+    it 'copies content from the requested locale row, not the en row'
+
+    it 'sets the lesson project locale to nil'
+
+    # same origin as the remixed project
+    it 'inherits origin from the source project'
+
+    it 'leaves origin nil when the source project has no origin'
+
+    # Lesson wiring the plain CreateRemix path does not do
+    it 'assigns the lesson id to the project'
+
+    it 'assigns the teacher user id to the project'
+
+    it 'assigns the school id to the project'
+
+    it 'builds a school project for the school'
+
+    it 'sets a remix_origin on the lesson project'
+
+    it 'uses the name from project_attributes when one is given'
+
+    it 'falls back to the source project name when project_attributes has no name'
+
+    it 'does not change the source project'
+
+    it 'does not copy scratch assets (global assets resolve through the lineage)'
+
+    context 'when the lesson project is invalid' do
+      # e.g. teacher is not a teacher of the given school_class
+      it 'returns a failed operation response'
+
+      it 'does not create a lesson'
+
+      it 'does not create a project'
+
+      it 'sent the exception to Sentry'
+    end
+  end
 end
