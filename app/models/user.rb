@@ -55,7 +55,7 @@ class User
   end
 
   def student_account_type?
-    @sub.starts_with?('student')
+    sub.to_s.starts_with?('student:')
   end
 
   def admin?
