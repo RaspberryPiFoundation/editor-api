@@ -164,12 +164,20 @@ RSpec.describe 'test_seeds', type: :task do
       )
     end
 
-    it 'creates lessons with projects' do
+    it 'creates lessons with projects, one per language, for each class' do
       school = School.find_by(creator_id:)
       expect(SchoolClass.where(school_id: school.id)).to exist
       lesson = Lesson.where(school_id: school.id)
-      expect(lesson.length).to eq(4)
-      expect(Project.where(lesson_id: lesson.pluck(:id)).length).to eq(4)
+      expect(lesson.length).to eq(6)
+      expect(lesson.pluck(:name)).to contain_exactly(
+        'Lesson 1 python', 'Lesson 2 html/css', 'Lesson 3 scratch',
+        'Lesson 1 python', 'Lesson 2 html/css', 'Lesson 3 scratch'
+      )
+
+      projects = Project.where(lesson_id: lesson.pluck(:id))
+      expect(projects.length).to eq(6)
+      expect(projects.find_by(name: 'Lesson 2 html/css').project_type).to eq(Project::Types::HTML)
+      expect(projects.find_by(name: 'Lesson 3 scratch').project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
     end
 
     it 'assigns a teacher' do
@@ -182,7 +190,7 @@ RSpec.describe 'test_seeds', type: :task do
       school_class = SchoolClass.joins(:teachers).find_by(school_id:, teachers: { teacher_id: creator_id })
 
       expect(school_class).not_to be_nil
-      expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(2)
+      expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(3)
     end
 
     it 'creates a class teacher association for the owner' do
@@ -193,7 +201,7 @@ RSpec.describe 'test_seeds', type: :task do
       school_id = School.find_by(creator_id:).id
       school_class = SchoolClass.joins(:teachers).find_by(school_id:, teachers: { teacher_id: })
       expect(school_class).not_to be_nil
-      expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(2)
+      expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(3)
     end
 
     it 'creates a class teacher association for the teacher' do
@@ -210,8 +218,8 @@ RSpec.describe 'test_seeds', type: :task do
         task.invoke
       end.not_to change { [SchoolClass.where(school_id: school.id).count, Lesson.where(school_id: school.id).count, Project.where(school_id: school.id).count] }
 
-      expect(owner_class.reload.lessons.count).to eq(2)
-      expect(teacher_class.reload.lessons.count).to eq(2)
+      expect(owner_class.reload.lessons.count).to eq(3)
+      expect(teacher_class.reload.lessons.count).to eq(3)
     end
 
     it 'assigns students' do
@@ -221,6 +229,11 @@ RSpec.describe 'test_seeds', type: :task do
       expect(ClassStudent.where(student_id: student_1, school_class_id:)).to exist
       expect(Role.student.where(user_id: student_2, school_id:)).to exist
       expect(ClassStudent.where(student_id: student_2, school_class_id:)).to exist
+    end
+
+    it 'enables scratch for the school' do
+      school = School.find_by(creator_id:)
+      expect(school.scratch_enabled?).to be true
     end
 
     context 'when the seeded school is in the US' do
@@ -234,7 +247,7 @@ RSpec.describe 'test_seeds', type: :task do
         expect(school.district_nces_id).to match(/\A\d{7}\z/)
         expect(school.district_name).to be_present
         expect(school_class).not_to be_nil
-        expect(Lesson.where(school_id: school.id, school_class_id: school_class.id).length).to eq(2)
+        expect(Lesson.where(school_id: school.id, school_class_id: school_class.id).length).to eq(3)
       end
     end
   end

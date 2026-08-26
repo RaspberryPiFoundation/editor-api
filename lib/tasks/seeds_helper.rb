@@ -2,6 +2,7 @@
 
 require_relative 'project_preview_seeds_helper'
 
+# rubocop:disable Metrics/ModuleLength
 module SeedsHelper
   include ProjectPreviewSeedsHelper
 
@@ -93,21 +94,39 @@ module SeedsHelper
     end
   end
 
+  LESSON_PROJECT_TYPES = ['python', 'html/css', 'scratch'].freeze
+
+  LESSON_SCRATCH_CONTENT_PATH = Rails.root.join('lib/tasks/seed_data/lesson_scratch_starter.json')
+
+  LESSON_HTML_CONTENT = <<~HTML
+    <html>
+      <head>
+        <link rel="stylesheet" type="text/css" href="style.css">
+      </head>
+      <body>
+        <h1>Heading</h1>
+        <p>Paragraph</p>
+      </body>
+    </html>
+  HTML
+
   def create_lessons(user_id, school, school_class, visibility = 'students')
-    Array.new(2) do |i|
-      lesson_name = "Lesson #{i + 1}: #{Faker::ProgrammingLanguage.name}"
-      Lesson.find_or_create_by!(school:, school_class:, name: lesson_name, user_id:) do |lesson|
+    LESSON_PROJECT_TYPES.each_with_index.map do |project_type, i|
+      lesson_name = "Lesson #{i + 1} #{project_type}"
+      lesson = Lesson.find_or_create_by!(school:, school_class:, name: lesson_name, user_id:) do |l|
         Rails.logger.info "Seeding Lesson #{i + 1}..."
-        lesson.user_id = user_id
-        lesson.school = school
-        lesson.school_class = school_class
-        lesson.name = lesson_name
-        lesson.visibility = visibility
+        l.user_id = user_id
+        l.school = school
+        l.school_class = school_class
+        l.name = lesson_name
+        l.visibility = visibility
       end
+      create_project(user_id, school, lesson, project_type)
+      lesson
     end
   end
 
-  def create_project(user_id, school, lesson, code = '')
+  def create_project(user_id, school, lesson, project_type)
     Project.find_or_create_by!(user_id:, school:, lesson:) do |project|
       Rails.logger.info "Seeding a project for #{lesson.name}..."
       project.name = lesson.name
@@ -115,9 +134,20 @@ module SeedsHelper
       project.school = school
       project.lesson = lesson
       project.locale = 'en'
-      project.project_type = Project::Types::PYTHON
-      project.components << Component.new({ extension: 'py', name: 'main',
-                                            content: code })
+
+      case project_type
+      when 'scratch'
+        project.project_type = Project::Types::CODE_EDITOR_SCRATCH
+        project.build_scratch_component(content: JSON.parse(File.read(LESSON_SCRATCH_CONTENT_PATH)))
+      when 'html/css'
+        project.project_type = Project::Types::HTML
+        project.components << Component.new(extension: 'html', name: 'index', content: LESSON_HTML_CONTENT)
+        project.components << Component.new(extension: 'css', name: 'style', content: "h1 {\n  color: blue;\n}")
+      else
+        project.project_type = Project::Types::PYTHON
+        project.components << Component.new(extension: 'py', name: 'main', content: 'print("Hello World!")')
+      end
     end
   end
 end
+# rubocop:enable Metrics/ModuleLength

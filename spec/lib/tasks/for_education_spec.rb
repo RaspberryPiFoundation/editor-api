@@ -70,22 +70,26 @@ RSpec.describe 'for_education', type: :task do
       expect(SchoolClass.where(school_id: school.id)).to exist
     end
 
-    it 'adds two lessons to the school' do
-      lesson = Lesson.where(school_id: school.id)
-      expect(lesson.length).to eq(2)
+    it 'adds three lessons to the school, one per project type' do
+      lessons = Lesson.where(school_id: school.id)
+      expect(lessons.pluck(:name)).to contain_exactly(
+        'Lesson 1 python', 'Lesson 2 html/css', 'Lesson 3 scratch'
+      )
     end
 
-    it 'adds two projects' do
+    it 'adds three projects, matching each lesson project type' do
       lessons = Lesson.where(school_id: school.id)
       projects = Project.where(lesson_id: lessons.pluck(:id))
 
-      if projects.length != 2
+      if projects.length != 3
         $stdout.puts('Debug info for intermittent test')
         lessons.each { |lesson| $stdout.puts(lesson.inspect) }
         projects.each { |project| $stdout.puts(project.inspect) }
       end
 
-      expect(projects.length).to eq(2)
+      expect(projects.length).to eq(3)
+      expect(projects.find_by(name: 'Lesson 2 html/css').project_type).to eq(Project::Types::HTML)
+      expect(projects.find_by(name: 'Lesson 3 scratch').project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
     end
 
     it 'does not add more lessons or projects when run again' do
