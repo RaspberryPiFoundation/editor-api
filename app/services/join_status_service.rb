@@ -38,7 +38,7 @@ class JoinStatusService
 
   # The user has no role in this school yet: may they join as a new student?
   def new_user_join_status
-    return :not_a_student if user_has_non_student_role?
+    return :not_a_student if user_has_non_student_role? || user_has_non_student_account_type?
     return :wrong_school if user_in_different_school?
     return :domain_mismatch unless @school.email_domain_in_school_domains?(@user.email)
 
@@ -64,6 +64,10 @@ class JoinStatusService
 
   def user_has_non_student_role?
     Role.where(user_id: @user.id).where.not(role: Role.roles[:student]).exists?
+  end
+
+  def user_has_non_student_account_type?
+    !@user.student_account_type?
   end
 
   def user_in_different_school?

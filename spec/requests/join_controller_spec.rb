@@ -41,7 +41,7 @@ RSpec.describe 'Join endpoint' do
     end
 
     context 'when the user is authenticated' do
-      before { authenticated_in_hydra_as(student) }
+      before { authenticated_in_hydra_as(student, :student) }
 
       it 'returns status: joinable when the user can join' do
         get "/api/join/#{school_class.join_code}", headers: headers
@@ -139,7 +139,7 @@ RSpec.describe 'Join endpoint' do
     end
 
     context 'when the user is authenticated' do
-      before { authenticated_in_hydra_as(student) }
+      before { authenticated_in_hydra_as(student, :student) }
 
       it 'adds the user to the school and class and returns a redirect URL' do
         expect do
