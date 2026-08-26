@@ -246,4 +246,97 @@ RSpec.describe 'Creating a lesson', type: :request do
       expect(response).to have_http_status(:forbidden)
     end
   end
+
+  # #create resolves `lesson[:source_project_identifier]` through
+  # ProjectLoader, authorizes it, and hands the Project to Lesson::Create
+  # so the lesson project is built as a remix instead of a stub.
+  describe 'creating a lesson from a source project' do
+    let(:source_content) { { 'targets' => [{ 'name' => 'Stage' }], 'monitors' => [], 'extensions' => [], 'meta' => {} } }
+
+    let!(:source_project) do
+      create(:scratch_project, identifier: 'my-digital-canvas', locale: 'en', user_id: nil, school_id: nil,
+                               name: 'My digital canvas', origin: Project::Origins::EXPERIENCE_CS,
+                               instructions: 'English instructions')
+        .tap { |project| project.scratch_component.update!(content: source_content) }
+    end
+
+    let(:params) do
+      {
+        lesson: {
+          name: 'Test Lesson',
+          school_id: school.id,
+          source_project_identifier: source_project.identifier,
+          project_attributes: {
+            name: 'My digital canvas',
+            locale: 'en'
+          }
+        }
+      }
+    end
+
+    let(:lesson_project) { Lesson.find(JSON.parse(response.body, symbolize_names: true)[:id]).project }
+
+    context 'when the source project is a shared Experience CS project' do
+      before do
+        post('/api/lessons', headers:, params:)
+      end
+
+      it 'responds 201 Created' do
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'responds with the lesson JSON' do
+        data = JSON.parse(response.body, symbolize_names: true)
+
+        expect(data[:name]).to eq('Test Lesson')
+      end
+
+      it 'copies the scratch component content from the source project' do
+        expect(lesson_project.scratch_component.content).to eq(source_content)
+      end
+
+      it 'gives the lesson project a new identifier' do
+        expect(lesson_project.identifier).not_to eq(source_project.identifier)
+      end
+
+      it 'sets the lesson project locale to nil' do
+        expect(lesson_project.locale).to be_nil
+      end
+
+      it 'inherits project_type from the source project' do
+        expect(lesson_project.project_type).to eq(source_project.project_type)
+      end
+
+      it 'inherits origin from the source project' do
+        expect(lesson_project.origin).to eq(source_project.origin)
+      end
+    end
+
+    context 'when choosing the locale of the source project' do
+      # ProjectLoader is given [project_attributes[:locale]] and falls back to 'en' then nil.
+      it 'remixes the row matching the requested locale when one exists'
+
+      it 'falls back to the en row when the requested locale does not exist'
+    end
+
+    context 'when the source project cannot be used' do
+      it 'responds 422 Unprocessable Entity when no project matches the identifier'
+
+      it 'responds 422 Unprocessable Entity when the source scratch project is not an Experience CS project'
+
+      # find_source_project! returns nil for non-scratch projects, so the stub path is kept.
+      it 'ignores a non-scratch source project and builds a stub project from project_attributes'
+    end
+
+    context 'when the user cannot view the source project' do
+      it 'responds 403 Forbidden when the source project belongs to another user'
+    end
+
+    context 'when the school does not have Scratch enabled' do
+      # verify_can_create_scratch_projects reads project_attributes[:project_type], which a
+      # source-project request need not send — decide whether the source project type should
+      # also be gated here.
+      it 'responds 403 Forbidden when only source_project_identifier points at a scratch project'
+    end
+  end
 end

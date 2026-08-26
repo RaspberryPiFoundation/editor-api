@@ -31,7 +31,11 @@ module Api
     end
 
     def create
-      result = Lesson::Create.call(lesson_params: create_params)
+      source_project = find_source_project!(source_project_identifier, create_params.dig(:project_attributes, :locale))
+
+      authorize! :show, source_project if source_project
+
+      result = Lesson::Create.call(lesson_params: create_params, source_project:)
       if result.success?
         track_project_event('Project - Created', result[:lesson].project)
         @lesson_with_user = result[:lesson].with_user
@@ -123,6 +127,24 @@ module Api
 
     def school
       @school ||= @lesson&.school || School.find_by(id: create_params[:school_id]) || SchoolClass.find_by(id: params[:school_class_id])&.school
+    end
+
+    def source_project_identifier
+      params.dig(:lesson, :source_project_identifier)
+    end
+
+    def find_source_project!(identifier, locale)
+      return nil if identifier.blank?
+
+      project = ProjectLoader.new(identifier, [locale]).load
+      raise ParameterError, "source project '#{identifier}' not found" if project.nil?
+
+      # Only ExCS 'code editor' projects are remixed here; legacy scratch projects keep the stub path.
+      return nil unless project.scratch_project?
+
+      raise ParameterError, 'source project must be an Experience CS project' unless project.origin == Project::Origins::EXPERIENCE_CS
+
+      project
     end
   end
 end

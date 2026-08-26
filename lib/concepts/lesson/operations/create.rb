@@ -24,9 +24,9 @@ class Lesson
 
       def build_lesson(lesson_hash, source_project)
         new_lesson = Lesson.new(lesson_hash.except(:project_attributes))
-        project_params = lesson_hash[:project_attributes].merge({ user_id: lesson_hash[:user_id],
-                                                                  school_id: lesson_hash[:school_id],
-                                                                  lesson_id: new_lesson.id })
+        project_params = (lesson_hash[:project_attributes] || {}).merge({ user_id: lesson_hash[:user_id],
+                                                                          school_id: lesson_hash[:school_id],
+                                                                          lesson_id: new_lesson.id })
         new_lesson.project = source_project ? build_remix(source_project, project_params) : Project.new(project_params)
         new_lesson
       end
@@ -47,8 +47,7 @@ class Lesson
           name: project_params[:name].presence || source_project.name,
           user_id: project_params[:user_id],
           school_id: project_params[:school_id],
-          lesson_id: project_params[:lesson_id],
-          origin: source_project.origin
+          lesson_id: project_params[:lesson_id]
         }
       end
 
