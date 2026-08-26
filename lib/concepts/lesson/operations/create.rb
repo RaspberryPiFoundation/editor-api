@@ -32,8 +32,51 @@ class Lesson
       end
 
       def build_remix(source_project, project_params)
-        # Project_type, origin and instructions from the source project.
-        # Only the name to be taken from the caller's project_attributes.
+        source_project.dup.tap do |remix|
+          remix.assign_attributes(remix_attributes(source_project, project_params))
+          copy_components(source_project, remix)
+          copy_scratch_component(source_project, remix)
+          copy_media(source_project, remix)
+        end
+      end
+
+      def remix_attributes(source_project, project_params)
+        {
+          identifier: PhraseIdentifier.generate,
+          locale: nil,
+          name: project_params[:name].presence || source_project.name,
+          user_id: project_params[:user_id],
+          school_id: project_params[:school_id],
+          lesson_id: project_params[:lesson_id],
+          remixed_from_id: source_project.id,
+          remix_origin: project_params[:remix_origin]
+        }
+      end
+
+      def copy_components(source_project, remix)
+        source_project.components.each do |component|
+          remix.components.build(component.attributes.slice('name', 'extension', 'content'))
+        end
+      end
+
+      def copy_scratch_component(source_project, remix)
+        return if source_project.scratch_component.blank?
+
+        remix.build_scratch_component(content: source_project.scratch_component.content.deep_dup)
+      end
+
+      def copy_media(source_project, remix)
+        source_project.images.each do |image|
+          remix.images.attach(image.blob)
+        end
+
+        source_project.videos.each do |video|
+          remix.videos.attach(video.blob)
+        end
+
+        source_project.audio.each do |audio_file|
+          remix.audio.attach(audio_file.blob)
+        end
       end
     end
   end
