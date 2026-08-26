@@ -48,8 +48,7 @@ class Lesson
           user_id: project_params[:user_id],
           school_id: project_params[:school_id],
           lesson_id: project_params[:lesson_id],
-          remixed_from_id: source_project.id,
-          remix_origin: project_params[:remix_origin]
+          origin: source_project.origin
         }
       end
 

@@ -212,11 +212,6 @@ RSpec.describe Lesson::Create, type: :unit do
       expect { response }.to change(Project, :count).by(1)
     end
 
-    # remix of the RPF project already in Code Classroom
-    it 'sets remixed_from_id to the source project' do
-      expect(lesson_project.remixed_from_id).to eq(source_project.id)
-    end
-
     it 'generates a new identifier rather than reusing the source identifier' do
       expect(lesson_project.identifier).not_to eq(source_project.identifier)
     end
@@ -286,21 +281,6 @@ RSpec.describe Lesson::Create, type: :unit do
 
       it 'leaves the origin nil on the lesson project' do
         expect(lesson_project.origin).to be_nil
-      end
-    end
-
-    context 'when a remix origin is given' do
-      let(:lesson_params) do
-        {
-          name: 'Test Lesson',
-          user_id: teacher.id,
-          school_id: school.id,
-          project_attributes: { name: 'My digital canvas', remix_origin: 'https://editor-scratch.raspberrypi.org' }
-        }
-      end
-
-      it 'sets the remix_origin on the lesson project' do
-        expect(lesson_project.remix_origin).to eq('https://editor-scratch.raspberrypi.org')
       end
     end
 
