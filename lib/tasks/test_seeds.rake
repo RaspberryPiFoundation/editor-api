@@ -12,6 +12,7 @@ namespace :test_seeds do
       creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
       teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
       teacher_signup_id = TEST_USERS[:jim_dun]
+      teacher_unassigned_id = TEST_USERS[:johan_doe]
 
       # Hard coded as the student's school needs to match
       student_ids = [TEST_USERS[:jane_smith], TEST_USERS[:john_smith], TEST_USERS[:emily_ssouser]]
@@ -21,6 +22,7 @@ namespace :test_seeds do
 
       # Remove the roles first
       Role.where(user_id: teacher_signup_id).destroy_all
+      Role.where(user_id: teacher_unassigned_id).destroy_all
       Role.where(user_id: [creator_id, teacher_id] + student_ids).destroy_all
 
       # Destroy the project and then the lesson itself (The lesson's `before_destroy` prevents us using destroy)
@@ -58,11 +60,16 @@ namespace :test_seeds do
 
         creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
         teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
+        teacher_unassigned_id = TEST_USERS[:johan_doe]
 
         school = create_school(creator_id, TEST_SCHOOL)
 
         verify_school(school)
+
+        school.school_email_domains.build(domain: 'example.com').save!
+
         assign_a_teacher(teacher_id, school)
+        assign_a_teacher(teacher_unassigned_id, school)
 
         # for each of the owner and teacher, create a class and assign students
         [creator_id, teacher_id].each do |user_id|
