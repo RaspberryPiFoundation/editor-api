@@ -91,15 +91,13 @@ namespace :for_education do
 
       school = create_school(creator_id, TEST_SCHOOL)
       verify_school(school)
+      school.update!(scratch_enabled: true)
       assign_a_teacher(teacher_id, school)
 
       school_class = create_school_class(creator_id, school)
       assign_students(school_class, school)
 
-      lessons = create_lessons(creator_id, school, school_class)
-      lessons.each do |lesson|
-        create_project(creator_id, school, lesson)
-      end
+      create_lessons(creator_id, school, school_class)
       Rails.logger.info 'Done...'
     end
   end

@@ -65,6 +65,7 @@ namespace :test_seeds do
         school = create_school(creator_id, TEST_SCHOOL)
 
         verify_school(school)
+        school.update!(scratch_enabled: true)
 
         school.school_email_domains.build(domain: 'example.com').save!
 
@@ -77,10 +78,7 @@ namespace :test_seeds do
           school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
           assign_students(school_class, school)
 
-          lessons = create_lessons(user_id, school, school_class)
-          lessons.each do |lesson|
-            create_project(user_id, school, lesson, 'print("Hello World!")')
-          end
+          create_lessons(user_id, school, school_class)
         end
         Rails.logger.info 'Done...'
       end
