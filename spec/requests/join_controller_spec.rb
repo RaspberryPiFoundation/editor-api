@@ -5,7 +5,9 @@ require 'rails_helper'
 RSpec.describe 'Join endpoint' do
   let(:school) { create(:school, code: '12-34-56') }
   let(:school_class) { create(:school_class, school:, join_code: 'B123-C456') }
-  let(:student) { create(:user, email: 'student@example.edu') }
+  let(:student) { build(:student, email: 'student@example.edu') }
+  let(:teacher) { build(:teacher, email: 'teacher@example.edu') }
+  let(:owner) { build(:owner, email: 'owner@example.edu') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
 
   before do
@@ -40,7 +42,7 @@ RSpec.describe 'Join endpoint' do
       end
     end
 
-    context 'when the user is authenticated' do
+    context 'when the user is authenticated as a student' do
       before { authenticated_in_hydra_as(student, :student) }
 
       it 'returns status: joinable when the user can join' do
@@ -70,46 +72,8 @@ RSpec.describe 'Join endpoint' do
         expect(data[:status]).to eq('wrong_school')
       end
 
-      it 'returns status: joinable_as_teacher when the user is a teacher of this school not yet in the class' do
-        create(:teacher_role, school:, user_id: student.id)
-
-        get "/api/join/#{school_class.join_code}", headers: headers
-
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('joinable_as_teacher')
-      end
-
-      it 'returns status: already_member when the user is already a teacher in the class' do
-        create(:teacher_role, school:, user_id: student.id)
-        ClassTeacher.create!(school_class:, teacher_id: student.id)
-
-        get "/api/join/#{school_class.join_code}", headers: headers
-
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('already_member')
-      end
-
-      it 'returns status: owner when the user is an owner of this school' do
-        create(:owner_role, school:, user_id: student.id)
-
-        get "/api/join/#{school_class.join_code}", headers: headers
-
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('owner')
-      end
-
-      it 'returns status: not_a_student for a teacher of a different school (not wrong_school)' do
-        other_school = create(:school)
-        create(:teacher_role, school: other_school, user_id: student.id)
-
-        get "/api/join/#{school_class.join_code}", headers: headers
-
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('not_a_student')
-      end
-
       context 'when the email domain is not registered for the school' do
-        let(:student) { create(:user, email: 'student@other.edu') }
+        let(:student) { build(:student, email: 'student@other.edu') }
 
         it 'returns status: domain_mismatch' do
           get "/api/join/#{school_class.join_code}", headers: headers
@@ -128,6 +92,52 @@ RSpec.describe 'Join endpoint' do
         end
       end
     end
+
+    context 'when the user is authenticated as a teacher' do
+      before { authenticated_in_hydra_as(teacher) }
+
+      it 'returns status: joinable_as_teacher when the user is a teacher of this school not yet in the class' do
+        create(:teacher_role, school:, user_id: teacher.id)
+
+        get "/api/join/#{school_class.join_code}", headers: headers
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:status]).to eq('joinable_as_teacher')
+      end
+
+      it 'returns status: already_member when the user is already a teacher in the class' do
+        create(:teacher_role, school:, user_id: teacher.id)
+        ClassTeacher.create!(school_class:, teacher_id: teacher.id)
+
+        get "/api/join/#{school_class.join_code}", headers: headers
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:status]).to eq('already_member')
+      end
+
+      it 'returns status: not_a_student for a teacher of a different school (not wrong_school)' do
+        other_school = create(:school)
+        create(:teacher_role, school: other_school, user_id: teacher.id)
+
+        get "/api/join/#{school_class.join_code}", headers: headers
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:status]).to eq('not_a_student')
+      end
+    end
+
+    context 'when the user is authenticated as an owner' do
+      before { authenticated_in_hydra_as(owner) }
+
+      it 'returns status: owner when the user is an owner of this school' do
+        create(:owner_role, school:, user_id: owner.id)
+
+        get "/api/join/#{school_class.join_code}", headers: headers
+
+        data = JSON.parse(response.body, symbolize_names: true)
+        expect(data[:status]).to eq('owner')
+      end
+    end
   end
 
   describe 'POST /api/join/:join_code' do
@@ -138,7 +148,7 @@ RSpec.describe 'Join endpoint' do
       end
     end
 
-    context 'when the user is authenticated' do
+    context 'when the user is authenticated as a student' do
       before { authenticated_in_hydra_as(student, :student) }
 
       it 'adds the user to the school and class and returns a redirect URL' do
@@ -188,8 +198,24 @@ RSpec.describe 'Join endpoint' do
         expect(data[:error]).to eq('wrong_school')
       end
 
+      it 'responds with 404 when the join code does not exist' do
+        post '/api/join/INVALID123', headers: headers
+        expect(response).to have_http_status(:not_found)
+      end
+
+      # rubocop:disable RSpec/AnyInstance
+      it 'responds with 500 when action_status returns an unexpected value' do
+        allow_any_instance_of(Api::JoinController).to receive(:action_status).and_return(:something_unexpected)
+
+        post "/api/join/#{school_class.join_code}", headers: headers
+
+        expect(response).to have_http_status(:internal_server_error)
+        expect(response.body).to include('Unexpected join action_status')
+      end
+      # rubocop:enable RSpec/AnyInstance
+
       context 'when the email domain is not registered for the school' do
-        let(:student) { create(:user, email: 'student@other.edu') }
+        let(:student) { build(:student, email: 'student@other.edu') }
 
         it 'responds with 403 domain_mismatch and does not enroll the user' do
           expect do
@@ -213,9 +239,13 @@ RSpec.describe 'Join endpoint' do
           expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
         end
       end
+    end
+
+    context 'when the user is authenticated as a teacher' do
+      before { authenticated_in_hydra_as(teacher) }
 
       it 'adds the user to the class as a teacher and returns a redirect URL' do
-        create(:teacher_role, school:, user_id: student.id)
+        create(:teacher_role, school:, user_id: teacher.id)
         school_class # force creation before the request
 
         expect do
@@ -225,14 +255,14 @@ RSpec.describe 'Join endpoint' do
         expect(response).to have_http_status(:ok)
         data = JSON.parse(response.body, symbolize_names: true)
         expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
-        expect(ClassTeacher.exists?(school_class:, teacher_id: student.id)).to be(true)
-        expect(ClassStudent.exists?(school_class:, student_id: student.id)).to be(false)
-        expect(Role.where(user_id: student.id, school:).pluck(:role)).to eq(['teacher'])
+        expect(ClassTeacher.exists?(school_class:, teacher_id: teacher.id)).to be(true)
+        expect(ClassStudent.exists?(school_class:, student_id: teacher.id)).to be(false)
+        expect(Role.where(user_id: teacher.id, school:).pluck(:role)).to eq(['teacher'])
       end
 
       it 'is idempotent when the user is already a teacher in the class' do
-        create(:teacher_role, school:, user_id: student.id)
-        ClassTeacher.create!(school_class:, teacher_id: student.id)
+        create(:teacher_role, school:, user_id: teacher.id)
+        ClassTeacher.create!(school_class:, teacher_id: teacher.id)
 
         expect do
           post "/api/join/#{school_class.join_code}", headers: headers
@@ -242,9 +272,13 @@ RSpec.describe 'Join endpoint' do
         data = JSON.parse(response.body, symbolize_names: true)
         expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
       end
+    end
+
+    context 'when the user is authenticated as an owner' do
+      before { authenticated_in_hydra_as(owner) }
 
       it 'redirects an owner into the class without adding them to it' do
-        create(:owner_role, school:, user_id: student.id)
+        create(:owner_role, school:, user_id: owner.id)
 
         expect do
           post "/api/join/#{school_class.join_code}", headers: headers
@@ -253,25 +287,9 @@ RSpec.describe 'Join endpoint' do
         expect(response).to have_http_status(:ok)
         data = JSON.parse(response.body, symbolize_names: true)
         expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
-        expect(ClassTeacher.exists?(school_class:, teacher_id: student.id)).to be(false)
-        expect(Role.where(user_id: student.id, school:).pluck(:role)).to eq(['owner'])
+        expect(ClassTeacher.exists?(school_class:, teacher_id: owner.id)).to be(false)
+        expect(Role.where(user_id: owner.id, school:).pluck(:role)).to eq(['owner'])
       end
-
-      it 'responds with 404 when the join code does not exist' do
-        post '/api/join/INVALID123', headers: headers
-        expect(response).to have_http_status(:not_found)
-      end
-
-      # rubocop:disable RSpec/AnyInstance
-      it 'responds with 500 when action_status returns an unexpected value' do
-        allow_any_instance_of(Api::JoinController).to receive(:action_status).and_return(:something_unexpected)
-
-        post "/api/join/#{school_class.join_code}", headers: headers
-
-        expect(response).to have_http_status(:internal_server_error)
-        expect(response.body).to include('Unexpected join action_status')
-      end
-      # rubocop:enable RSpec/AnyInstance
     end
   end
 end
