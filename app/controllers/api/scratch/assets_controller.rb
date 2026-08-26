@@ -7,10 +7,12 @@ module Api
     class AssetsController < ApiController
       include ActiveStorage::SetCurrent
 
-      prepend_before_action :load_experience_cs_service_user, only: :create_global
-      prepend_before_action :load_project_asset_context, only: %i[show create]
+      prepend_before_action :load_experience_cs_service_user, only: %i[create_global create_migration]
       before_action :authorize_user, except: %i[show]
-      before_action :authorize_project_from_header, except: %i[create_global]
+      prepend_before_action :load_project_from_header, only: %i[show create]
+      authorize_resource :project_from_header, except: %i[create_global create_migration]
+      before_action :load_migration_project, only: :create_migration
+      before_action :authorize_migration_asset, only: :create_migration
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
@@ -29,9 +31,17 @@ module Api
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
         create_asset(
           project: @project_from_header,
-          uploaded_user_id: asset_uploader_id,
-          filename: filename_with_extension,
-          reject_conflicting_content: current_user.experience_cs_service_account?
+          uploaded_user_id: current_user.id,
+          filename: filename_with_extension
+        )
+      end
+
+      def create_migration
+        create_asset(
+          project: @migration_project,
+          uploaded_user_id: @migration_project.user_id,
+          filename: "#{params[:id]}.#{params[:format]}",
+          reject_conflicting_content: true
         )
       end
 
@@ -102,50 +112,25 @@ module Api
         request.body.rewind
       end
 
-      def load_project_asset_context
-        authenticate_experience_cs_service_asset_upload if action_name == 'create'
-
-        load_project_from_header
-      end
-
-      def authenticate_experience_cs_service_asset_upload
-        return if request.headers[ExperienceCsServiceAuthenticator::HEADER].blank?
-
-        load_experience_cs_service_user
-        raise CanCan::AccessDenied unless current_user&.experience_cs_service_account?
-      end
-
       def load_project_from_header
         identifier = request.headers['X-Project-ID']
         return render json: { error: 'X-Project-ID header is required' }, status: :bad_request if identifier.blank?
 
-        project_scope = Project.where(identifier:)
-        project_scope = if current_user&.experience_cs_service_account?
-                          project_scope.where(locale: nil, project_type: Project::EXPERIENCE_CS_PROJECT_TYPES)
-                        else
-                          project_scope.where(project_type: Project::Types::CODE_EDITOR_SCRATCH)
-                        end
-        @project_from_header = project_scope.first!
-        return if project_accepts_asset_upload?(@project_from_header)
-
-        raise ActiveRecord::RecordNotFound, 'Not Found'
+        @project_from_header = Project.find_by!(
+          identifier:,
+          project_type: Project::Types::CODE_EDITOR_SCRATCH
+        )
       end
 
-      def authorize_project_from_header
-        action = current_user&.experience_cs_service_account? ? :upload_migration_asset : :show
-        authorize!(action, @project_from_header)
+      def load_migration_project
+        @migration_project = Project.find_by!(
+          identifier: params.expect(:project_id),
+          locale: nil
+        )
       end
 
-      def project_accepts_asset_upload?(project)
-        return project.experience_cs_migration_target? if current_user&.experience_cs_service_account?
-
-        project.scratch_project?
-      end
-
-      def asset_uploader_id
-        return @project_from_header.user_id if current_user.experience_cs_service_account?
-
-        current_user.id
+      def authorize_migration_asset
+        authorize! :upload_migration_asset, @migration_project
       end
     end
   end

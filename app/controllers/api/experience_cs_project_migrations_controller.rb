@@ -5,7 +5,6 @@ module Api
     prepend_before_action :load_experience_cs_service_user
     before_action :authorize_user
     before_action :load_project
-    before_action :authorize_migration
 
     def update
       migrate_project!
@@ -24,17 +23,13 @@ module Api
       @project = Project.find_by!(identifier: params.expect(:id), locale: nil)
     end
 
-    def authorize_migration
-      authorize! :migrate_from_experience_cs, @project
-    end
-
     def migrate_project!
       attributes = migration_params
       @project.with_lock do
+        authorize! :migrate_from_experience_cs, @project
         @project.update!(
           attributes.slice(:name, :instructions).merge(
-            project_type: Project::Types::CODE_EDITOR_SCRATCH,
-            experience_cs_migrated_at: @project.experience_cs_migrated_at || Time.current
+            project_type: Project::Types::CODE_EDITOR_SCRATCH
           )
         )
         scratch_component = @project.scratch_component || @project.build_scratch_component

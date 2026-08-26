@@ -109,10 +109,7 @@ class Project < ApplicationRecord
   end
 
   def experience_cs_migration_target?
-    return false unless user_id.present? && school_id.present?
-
-    project_type == Types::SCRATCH ||
-      (project_type == Types::CODE_EDITOR_SCRATCH && experience_cs_migrated_at.present?)
+    user_id.present? && school_id.present? && project_type == Types::SCRATCH
   end
 
   def self_and_ancestors

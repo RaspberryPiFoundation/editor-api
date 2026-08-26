@@ -62,13 +62,6 @@ RSpec.describe Ability do
       expect(ability).not_to be_able_to(:migrate_from_experience_cs, migratable_project)
       expect(ability).not_to be_able_to(:upload_migration_asset, migratable_project)
     end
-
-    it 'can replay a previously migrated Experience CS project' do
-      migratable_project.project_type = Project::Types::CODE_EDITOR_SCRATCH
-      migratable_project.experience_cs_migrated_at = Time.current
-
-      expect(ability).to be_able_to(:migrate_from_experience_cs, migratable_project)
-    end
   end
 
   describe 'Project' do

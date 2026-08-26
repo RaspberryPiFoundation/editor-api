@@ -73,12 +73,12 @@ class Ability
     can(%i[read], :school_member)
     can(%i[read create import update destroy regenerate_join_code], SchoolClass, school: { id: school.id })
     can(%i[read update show_context], Project, school_id: school.id, lesson: { visibility: %w[teachers students] })
-    lesson_project_ids = Project.where(
+    can(
+      %i[read show_context],
+      Project,
       school_id: school.id,
-      remixed_from_id: nil,
-      lesson_id: Lesson.where(school_id: school.id, visibility: %w[teachers students]).select(:id)
-    ).pluck(:id)
-    can(%i[read show_context], Project, school_id: school.id, remixed_from_id: lesson_project_ids)
+      parent: { school_id: school.id, lesson: { visibility: %w[teachers students] } }
+    )
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)

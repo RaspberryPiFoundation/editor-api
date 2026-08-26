@@ -217,11 +217,13 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
 
   describe 'POST #create' do
     let(:upload) { File.binread(file_fixture(filename)) }
+    let(:request_path) { '/api/scratch/assets/test_image_1.png' }
     let(:request_headers) do
       { 'Content-Type' => 'application/octet-stream', 'X-Project-ID' => project.identifier }.merge(auth_headers)
     end
-    let(:make_request) do
-      post '/api/scratch/assets/test_image_1.png', headers: request_headers, params: upload
+
+    def make_request
+      post request_path, headers: request_headers, params: upload
     end
 
     context 'when a teacher is logged in' do
@@ -446,20 +448,19 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       let(:request_headers) do
         {
           'Content-Type' => 'application/octet-stream',
-          'X-Project-ID' => project.identifier,
           ExperienceCsServiceAuthenticator::HEADER => 'service-api-key'
         }
       end
+      let(:request_path) { "/api/experience-cs/projects/#{project.identifier}/assets/test_image_1.png" }
       let(:project) do
         create(
           :project,
           school:,
           user_id: teacher.id,
           locale: nil,
-          project_type:
+          project_type: Project::Types::SCRATCH
         )
       end
-      let(:project_type) { Project::Types::SCRATCH }
 
       before do
         allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
@@ -500,16 +501,12 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         expect(existing_asset.reload.file.download).to eq('existing bytes')
       end
 
-      it 'accepts the upload after the stub has already been converted' do
-        project.update!(
-          experience_cs_migrated_at: Time.current,
-          project_type: Project::Types::CODE_EDITOR_SCRATCH
-        )
+      it 'rejects uploads after the stub has been converted' do
+        project.update!(project_type: Project::Types::CODE_EDITOR_SCRATCH)
 
-        make_request
+        expect { make_request }.not_to change(ScratchAsset, :count)
 
-        expect(response).to have_http_status(:created)
-        expect(ScratchAsset.find_by!(filename:, project:).uploaded_user_id).to eq(teacher.id)
+        expect(response).to have_http_status(:forbidden)
       end
     end
 

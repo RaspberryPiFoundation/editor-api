@@ -52,11 +52,15 @@ RSpec.describe 'Experience CS project migration requests' do
     expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
   end
 
-  it 'allows an idempotent replay' do
-    2.times { put(path, params:, headers:, as: :json) }
+  it 'rejects a replay without overwriting Code Classroom changes' do
+    put(path, params:, headers:, as: :json)
+    code_classroom_data = scratch_data.merge(meta: { updated_in_code_classroom: true })
+    project.reload.scratch_component.update!(content: code_classroom_data)
 
-    expect(response).to have_http_status(:ok)
-    expect(Project.where(id: project.id).count).to eq(1)
+    put(path, params:, headers:, as: :json)
+
+    expect(response).to have_http_status(:forbidden)
+    expect(project.reload.scratch_component.content.to_h).to eq(code_classroom_data.deep_stringify_keys)
   end
 
   it 'does not authorize a human Experience CS admin' do

@@ -167,11 +167,10 @@ Experience CS's `EDITOR_API_SYNC_API_KEY`. The corresponding request header is
 accepted for public project create/update and global Scratch asset upload.
 
 `PUT /api/experience-cs/projects/:identifier/migrate` lets the service replace
-an exact locale-less legacy user-project stub with its Markdown instructions
-and Scratch content. Successful migrations are marked so retries remain safe
-without granting access to native Code Classroom projects. Project-scoped asset
-uploads use `X-Project-ID` and remain subject to the project's normal viewing
-permissions.
+an exact locale-less Experience CS user-project stub with its Markdown
+instructions and Scratch content. Project-scoped migration assets use
+`POST /api/experience-cs/projects/:identifier/assets/:filename` and remain
+subject to the project's normal viewing permissions.
 
 ### Code Editor for Education
 

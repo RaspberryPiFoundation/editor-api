@@ -36,6 +36,7 @@ Rails.application.routes.draw do
 
   namespace :api do
     put '/experience-cs/projects/:id/migrate', to: 'experience_cs_project_migrations#update'
+    post '/experience-cs/projects/:project_id/assets/:id.:format', to: 'scratch/assets#create_migration'
 
     namespace :scratch do
       resources :projects, only: %i[show update create]

@@ -276,26 +276,18 @@ RSpec.describe Project, :versioning do
       )
     end
 
-    it 'allows a user-owned school legacy Scratch stub' do
+    it 'allows a user-owned school Scratch stub' do
       expect(project).to be_experience_cs_migration_target
     end
 
-    it 'allows a replay after a successful migration' do
-      project.project_type = described_class::Types::CODE_EDITOR_SCRATCH
-      project.experience_cs_migrated_at = Time.current
-
-      expect(project).to be_experience_cs_migration_target
-    end
-
-    it 'rejects an unmarked native Code Classroom Scratch project' do
+    it 'rejects a Code Classroom Scratch project' do
       project.project_type = described_class::Types::CODE_EDITOR_SCRATCH
 
       expect(project).not_to be_experience_cs_migration_target
     end
 
-    it 'rejects a marked non-Scratch project' do
+    it 'rejects a non-Scratch project' do
       project.project_type = described_class::Types::PYTHON
-      project.experience_cs_migrated_at = Time.current
 
       expect(project).not_to be_experience_cs_migration_target
     end
