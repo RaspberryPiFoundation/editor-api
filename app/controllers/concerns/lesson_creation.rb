@@ -32,8 +32,8 @@ module LessonCreation
     raise ParameterError, 'school_class_id does not correspond to school_id'
   end
 
-  def verify_lesson_scratch!(lesson_params)
-    return unless scratch_project?(lesson_params)
+  def verify_lesson_scratch!(lesson_params, source_project: nil)
+    return unless scratch_project?(lesson_params) || source_project&.scratch_project?
 
     school = School.find_by(id: lesson_params[:school_id])
     return if school&.scratch_enabled?

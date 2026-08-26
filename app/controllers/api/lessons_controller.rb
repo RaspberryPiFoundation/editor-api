@@ -31,8 +31,6 @@ module Api
     end
 
     def create
-      source_project = find_source_project!(source_project_identifier, create_params.dig(:project_attributes, :locale))
-
       authorize! :show, source_project if source_project
 
       result = Lesson::Create.call(lesson_params: create_params, source_project:)
@@ -89,7 +87,7 @@ module Api
     end
 
     def verify_can_create_scratch_projects
-      verify_lesson_scratch!(create_params)
+      verify_lesson_scratch!(create_params, source_project:)
     end
 
     def user_remixes(lessons)
@@ -127,6 +125,12 @@ module Api
 
     def school
       @school ||= @lesson&.school || School.find_by(id: create_params[:school_id]) || SchoolClass.find_by(id: params[:school_class_id])&.school
+    end
+
+    def source_project
+      return @source_project if defined?(@source_project)
+
+      @source_project = find_source_project!(source_project_identifier, create_params.dig(:project_attributes, :locale))
     end
 
     def source_project_identifier
