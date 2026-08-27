@@ -21,6 +21,7 @@ class User
     username
     roles
     sso_providers
+    sub
   ].freeze
 
   attr_accessor(*ATTRIBUTES)
@@ -51,6 +52,10 @@ class User
 
   def student?
     Role.student.exists?(user_id: id)
+  end
+
+  def student_account_type?
+    sub.to_s.starts_with?('student:')
   end
 
   def admin?

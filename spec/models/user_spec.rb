@@ -74,6 +74,10 @@ RSpec.describe User do
         expect(user.username).to be_nil
       end
 
+      it 'returns a user with the correct sub' do
+        expect(user.sub).to eq owner.id
+      end
+
       context 'when BYPASS_OAUTH is true' do
         around do |example|
           ClimateControl.modify(BYPASS_OAUTH: 'true') do
@@ -117,6 +121,10 @@ RSpec.describe User do
 
       it 'returns a user without an email' do
         expect(user.email).to be_nil
+      end
+
+      it 'returns a user with the correct sub' do
+        expect(user.sub).to eq "student:#{student.id}"
       end
     end
 
@@ -263,6 +271,20 @@ RSpec.describe User do
     it 'returns false when the user does not have a student role' do
       create(:owner_role, school:, user_id: user.id)
       expect(user).not_to be_student
+    end
+  end
+
+  describe '#student_account_type?' do
+    it 'returns true for a student account' do
+      expect(build(:student)).to be_student_account_type
+    end
+
+    it 'returns false for a non-student account' do
+      expect(build(:user)).not_to be_student_account_type
+    end
+
+    it 'returns false for a teacher account' do
+      expect(build(:teacher)).not_to be_student_account_type
     end
   end
 
