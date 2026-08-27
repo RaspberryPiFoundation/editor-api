@@ -7,7 +7,7 @@ module ProjectPreviewSeedsHelper
   PROJECT_PREVIEW_LOCALE_FR = 'fr-FR'
   PROJECT_PREVIEW_NAME = 'Experience CS Preview Starter'
   PROJECT_PREVIEW_NAME_FR = 'Démo Aperçu Experience CS'
-  PROJECT_PREVIEW_CONTENT_PATH = Rails.root.join('lib/tasks/seed_data/excs_preview_starter.json')
+  PROJECT_PREVIEW_CONTENT_PATH = Rails.root.join('lib/tasks/seed_data/scratch_starter_example.json')
   PROJECT_PREVIEW_INSTRUCTIONS_PATH = Rails.root.join('lib/tasks/seed_data/excs_preview_starter_instructions.json')
   PROJECT_PREVIEW_INSTRUCTIONS_FR_PATH = Rails.root.join('lib/tasks/seed_data/excs_preview_starter_instructions_fr.json')
 
