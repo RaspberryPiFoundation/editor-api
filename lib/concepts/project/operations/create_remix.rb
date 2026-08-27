@@ -35,17 +35,7 @@ class Project
       def create_remix(original_project, params, user_id, remix_origin)
         remix = format_project(original_project, params, user_id, remix_origin)
 
-        original_project.images.each do |image|
-          remix.images.attach(image.blob)
-        end
-
-        original_project.videos.each do |video|
-          remix.videos.attach(video.blob)
-        end
-
-        original_project.audio.each do |audio_file|
-          remix.audio.attach(audio_file.blob)
-        end
+        Project::Copying.copy_media(original_project, remix, %i[images videos audio])
 
         params[:components].each do |x|
           remix.components.build(x.slice(:name, :extension, :content))
