@@ -7,6 +7,7 @@ FactoryBot.define do
     email { Faker::Internet.email }
     username { nil }
     sso_providers { [] }
+    sub { id }
 
     factory :admin_user do
       roles { 'editor-admin' }
@@ -20,6 +21,7 @@ FactoryBot.define do
       email { nil }
       username { Faker::Internet.username }
       sso_providers { [] } # standard students have no SSO providers
+      sub { "student:#{id}" }
 
       trait :sso do
         email { Faker::Internet.email }
