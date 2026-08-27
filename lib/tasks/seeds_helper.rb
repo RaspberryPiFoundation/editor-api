@@ -96,7 +96,7 @@ module SeedsHelper
 
   LESSON_PROJECT_TYPES = ['python', 'html/css', 'scratch'].freeze
 
-  LESSON_SCRATCH_CONTENT_PATH = Rails.root.join('lib/tasks/seed_data/lesson_scratch_starter.json')
+  LESSON_SCRATCH_CONTENT_PATH = Rails.root.join('lib/tasks/seed_data/scratch_starter_example.json')
 
   LESSON_HTML_CONTENT = <<~HTML
     <html>
