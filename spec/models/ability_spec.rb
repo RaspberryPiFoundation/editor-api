@@ -32,6 +32,38 @@ RSpec.describe Ability do
     end
   end
 
+  describe 'Experience CS service account' do
+    let(:user) do
+      build(
+        :user,
+        id: User::EXPERIENCE_CS_SERVICE_ACCOUNT_ID,
+        roles: 'experience-cs-admin'
+      )
+    end
+    let(:migratable_project) do
+      build(
+        :project,
+        school_id: SecureRandom.uuid,
+        user_id: SecureRandom.uuid,
+        locale: nil,
+        project_type: Project::Types::SCRATCH
+      )
+    end
+
+    it { is_expected.to be_able_to(:migrate_from_experience_cs, migratable_project) }
+    it { is_expected.to be_able_to(:upload_migration_asset, migratable_project) }
+    it { is_expected.not_to be_able_to(:update, migratable_project) }
+    it { is_expected.not_to be_able_to(:create, migratable_project) }
+    it { is_expected.not_to be_able_to(:show, migratable_project) }
+
+    it 'cannot migrate a native Code Classroom Scratch project' do
+      migratable_project.project_type = Project::Types::CODE_EDITOR_SCRATCH
+
+      expect(ability).not_to be_able_to(:migrate_from_experience_cs, migratable_project)
+      expect(ability).not_to be_able_to(:upload_migration_asset, migratable_project)
+    end
+  end
+
   describe 'Project' do
     context 'with no user' do
       let(:user) { nil }

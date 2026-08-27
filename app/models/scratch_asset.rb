@@ -40,7 +40,7 @@ class ScratchAsset < ApplicationRecord
   private
 
   def belongs_to_scratch_project
-    return if project.blank? || project.scratch_project?
+    return if project.blank? || Project::EXPERIENCE_CS_PROJECT_TYPES.include?(project.project_type)
 
     errors.add(:project, 'must be a Scratch project')
   end

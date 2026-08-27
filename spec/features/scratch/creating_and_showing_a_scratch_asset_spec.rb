@@ -217,16 +217,40 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
 
   describe 'POST #create' do
     let(:upload) { File.binread(file_fixture(filename)) }
+    let(:request_path) { '/api/scratch/assets/test_image_1.png' }
     let(:request_headers) do
       { 'Content-Type' => 'application/octet-stream', 'X-Project-ID' => project.identifier }.merge(auth_headers)
     end
-    let(:make_request) do
-      post '/api/scratch/assets/test_image_1.png', headers: request_headers, params: upload
+
+    def make_request
+      post request_path, headers: request_headers, params: upload
     end
 
     context 'when a teacher is logged in' do
       before do
         authenticated_in_hydra_as(teacher)
+      end
+
+      context 'when another project type has the same identifier' do
+        let(:identifier) { 'shared-project-identifier' }
+        let(:project) { create_scratch_project(identifier:, user_id: teacher.id) }
+
+        before do
+          create(
+            :project,
+            identifier:,
+            locale: 'en',
+            project_type: Project::Types::PYTHON,
+            user_id: nil
+          )
+        end
+
+        it 'uploads the asset to the Scratch project' do
+          make_request
+
+          expect(ScratchAsset.find_by!(filename:).project).to eq(project)
+          expect(response).to have_http_status(:created)
+        end
       end
 
       it 'responds 400 Bad Request when X-Project-ID is not provided' do
@@ -420,9 +444,121 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       end
     end
 
+    context 'when the Experience CS service uploads a migration asset' do
+      let(:request_headers) do
+        {
+          'Content-Type' => 'application/octet-stream',
+          ExperienceCsServiceAuthenticator::HEADER => 'service-api-key'
+        }
+      end
+      let(:request_path) { "/api/experience-cs/projects/#{project.identifier}/assets/test_image_1.png" }
+      let(:project) do
+        create(
+          :project,
+          school:,
+          user_id: teacher.id,
+          locale: nil,
+          project_type: Project::Types::SCRATCH
+        )
+      end
+
+      before do
+        allow(Rails.configuration.x.experience_cs).to receive(:service_api_key).and_return('service-api-key')
+      end
+
+      it 'stores the asset against the existing stub as an upload by its owner' do
+        expect { make_request }.to change(ScratchAsset, :count).by(1)
+
+        asset = ScratchAsset.find_by!(filename:, project:)
+        expect(asset.uploaded_user_id).to eq(teacher.id)
+        expect(asset.file.download).to eq(upload)
+        expect(response).to have_http_status(:created)
+      end
+
+      it 'accepts repeated uploads with identical bytes' do
+        make_request
+
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:created)
+        expect(ScratchAsset.find_by!(filename:, project:).file.download).to eq(upload)
+      end
+
+      it 'rejects repeated uploads with conflicting bytes' do
+        existing_asset = create_uploaded_scratch_asset(
+          filename:,
+          project:,
+          uploaded_user_id: teacher.id,
+          body: 'existing bytes'
+        )
+
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:conflict)
+        expect(response.parsed_body).to eq(
+          'error' => 'Asset content conflicts with the existing project asset'
+        )
+        expect(existing_asset.reload.file.download).to eq('existing bytes')
+      end
+
+      it 'rejects uploads after the stub has been converted' do
+        project.update!(project_type: Project::Types::CODE_EDITOR_SCRATCH)
+
+        expect { make_request }.not_to change(ScratchAsset, :count)
+
+        expect(response).to have_http_status(:forbidden)
+      end
+    end
+
     it 'responds 401 unauthorized when user is not signed in' do
       post '/api/scratch/assets/example.svg', headers: { 'X-Project-ID' => project.identifier }
 
+      expect(response).to have_http_status(:unauthorized)
+    end
+  end
+
+  describe 'visibility of a migrated project asset' do
+    let(:student) { create(:student, school:) }
+    let(:class_teacher) { create(:teacher, school:) }
+    let(:school_owner) { create(:owner, school:) }
+    let(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id, class_teacher.id]) }
+    let(:lesson) { create(:lesson, school:, school_class:, user_id: teacher.id, visibility: 'students') }
+    let(:lesson_project) { create_scratch_project(school:, lesson:, user_id: teacher.id) }
+    let(:project) { create_scratch_project(school:, user_id: student.id, remixed_from_id: lesson_project.id) }
+
+    before do
+      create(:class_student, school_class:, student_id: student.id)
+      create_uploaded_scratch_asset(filename:, project:, uploaded_user_id: student.id, body: 'private migration bytes')
+    end
+
+    it 'is available to the student, class teachers, and school owners' do
+      [student, teacher, class_teacher, school_owner].each do |viewer|
+        authenticated_in_hydra_as(viewer)
+
+        get(
+          '/api/scratch/assets/internalapi/asset/test_image_1.png/get/',
+          headers: { Authorization: UserProfileMock::TOKEN, 'X-Project-ID' => project.identifier }
+        )
+        follow_redirect! while response.redirect?
+
+        expect(response.body).to eq('private migration bytes')
+      end
+    end
+
+    it 'is unavailable to unrelated and unauthenticated callers' do
+      unrelated_teacher = create(:teacher, school: create(:school))
+      authenticated_in_hydra_as(unrelated_teacher)
+
+      get(
+        '/api/scratch/assets/internalapi/asset/test_image_1.png/get/',
+        headers: { Authorization: UserProfileMock::TOKEN, 'X-Project-ID' => project.identifier }
+      )
+      expect(response).to have_http_status(:forbidden)
+
+      get(
+        '/api/scratch/assets/internalapi/asset/test_image_1.png/get/',
+        headers: { 'X-Project-ID' => project.identifier }
+      )
       expect(response).to have_http_status(:unauthorized)
     end
   end

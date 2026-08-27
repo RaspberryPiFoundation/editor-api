@@ -7,10 +7,12 @@ module Api
     class AssetsController < ApiController
       include ActiveStorage::SetCurrent
 
-      prepend_before_action :load_experience_cs_service_user, only: %i[create_global]
+      prepend_before_action :load_experience_cs_service_user, only: %i[create_global create_migration]
       before_action :authorize_user, except: %i[show]
       prepend_before_action :load_project_from_header, only: %i[show create]
-      authorize_resource :project_from_header, except: %i[create_global]
+      authorize_resource :project_from_header, except: %i[create_global create_migration]
+      before_action :load_migration_project, only: :create_migration
+      before_action :authorize_migration_asset, only: :create_migration
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
@@ -31,6 +33,15 @@ module Api
           project: @project_from_header,
           uploaded_user_id: current_user.id,
           filename: filename_with_extension
+        )
+      end
+
+      def create_migration
+        create_asset(
+          project: @migration_project,
+          uploaded_user_id: @migration_project.user_id,
+          filename: "#{params[:id]}.#{params[:format]}",
+          reject_conflicting_content: true
         )
       end
 
@@ -60,7 +71,7 @@ module Api
         end
 
         if reject_conflicting_content
-          return if attach_global_file(scratch_asset, attributes.fetch(:filename)) == :conflict
+          return if attach_file_with_conflict_check(scratch_asset, attributes.fetch(:filename)) == :conflict
         else
           attach_file_unless_present(scratch_asset, attributes.fetch(:filename))
         end
@@ -68,12 +79,12 @@ module Api
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
       end
 
-      def attach_global_file(scratch_asset, filename)
+      def attach_file_with_conflict_check(scratch_asset, filename)
         scratch_asset.with_lock do
           if scratch_asset.file.attached?
-            next :unchanged if global_file_matches?(scratch_asset)
+            next :unchanged if file_matches?(scratch_asset)
 
-            next reject_conflicting_global_file
+            next reject_conflicting_file(scratch_asset)
           end
 
           scratch_asset.file.attach(io: request.body, filename:)
@@ -85,12 +96,13 @@ module Api
         scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
       end
 
-      def global_file_matches?(scratch_asset)
+      def file_matches?(scratch_asset)
         scratch_asset.file.blob.checksum == request_body_checksum
       end
 
-      def reject_conflicting_global_file
-        render json: { error: 'Asset content conflicts with the existing global asset' }, status: :conflict
+      def reject_conflicting_file(scratch_asset)
+        scope = scratch_asset.global? ? 'global' : 'project'
+        render json: { error: "Asset content conflicts with the existing #{scope} asset" }, status: :conflict
         :conflict
       end
 
@@ -108,6 +120,17 @@ module Api
           identifier:,
           project_type: Project::Types::CODE_EDITOR_SCRATCH
         )
+      end
+
+      def load_migration_project
+        @migration_project = Project.find_by!(
+          identifier: params.expect(:project_id),
+          locale: nil
+        )
+      end
+
+      def authorize_migration_asset
+        authorize! :upload_migration_asset, @migration_project
       end
     end
   end
