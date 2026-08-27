@@ -27,17 +27,17 @@ class Lesson
         project_params = (lesson_hash[:project_attributes] || {}).merge({ user_id: lesson_hash[:user_id],
                                                                           school_id: lesson_hash[:school_id],
                                                                           lesson_id: new_lesson.id })
-        new_lesson.project = source_project ? build_remix(source_project, project_params) : Project.new(project_params)
+        new_lesson.project = source_project ? build_copy(source_project, project_params) : Project.new(project_params)
         new_lesson
       end
 
-      def build_remix(source_project, project_params)
+      def build_copy(source_project, project_params)
         Project::Copying.copy_project(source_project,
-                                      attributes: remix_attributes(source_project, project_params),
+                                      attributes: attributes_for_copy(source_project, project_params),
                                       media: %i[images videos audio])
       end
 
-      def remix_attributes(source_project, project_params)
+      def attributes_for_copy(source_project, project_params)
         {
           locale: nil,
           name: project_params[:name].presence || source_project.name,
