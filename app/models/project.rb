@@ -18,6 +18,8 @@ class Project < ApplicationRecord
   belongs_to :lesson, optional: true
   belongs_to :parent, optional: true, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :remixes
   has_many :remixes, dependent: :nullify, class_name: :Project, foreign_key: :remixed_from_id, inverse_of: :parent
+  belongs_to :source_project, optional: true, class_name: :Project, inverse_of: :derived_projects
+  has_many :derived_projects, dependent: :nullify, class_name: :Project, foreign_key: :source_project_id, inverse_of: :source_project
   has_many :components, -> { order(default: :desc, name: :asc) }, dependent: :destroy, inverse_of: :project
   has_one :scratch_component, dependent: :destroy, inverse_of: :project, required: false
   has_many :scratch_assets, dependent: :destroy

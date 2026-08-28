@@ -9,10 +9,12 @@ RSpec.describe Project, :versioning do
     it { is_expected.to belong_to(:school).optional(true) }
     it { is_expected.to belong_to(:lesson).optional(true) }
     it { is_expected.to belong_to(:parent).optional(true) }
+    it { is_expected.to belong_to(:source_project).optional(true) }
     it { is_expected.to have_many(:remixes).dependent(:nullify) }
     it { is_expected.to have_many(:components) }
     it { is_expected.to have_many(:scratch_assets).dependent(:destroy) }
     it { is_expected.to have_many(:project_errors).dependent(:nullify) }
+    it { is_expected.to have_many(:derived_projects).dependent(:nullify) }
     it { is_expected.to have_many_attached(:images) }
     it { is_expected.to have_many_attached(:videos) }
     it { is_expected.to have_many_attached(:audio) }
@@ -66,6 +68,11 @@ RSpec.describe Project, :versioning do
     it 'is invalid with an unrecognised origin' do
       invalid_project = build(:project, origin: 'invalid_origin')
       expect(invalid_project).not_to be_valid
+    end
+
+    it 'is valid without a source project' do
+      valid_project = build(:project, source_project: nil)
+      expect(valid_project).to be_valid
     end
 
     it 'allows a public Code Classroom Blocks project to have instructions' do
@@ -227,6 +234,18 @@ RSpec.describe Project, :versioning do
 
       expect(project.update(origin: nil)).to be(false)
       expect(project.errors[:origin]).to include(/cannot be changed once set/)
+    end
+  end
+
+  describe 'source project lineage' do
+    let(:source_project) { create(:project) }
+
+    it 'nullifies source_project_id on derived projects when the source project is destroyed' do
+      project = create(:project, source_project:)
+
+      source_project.destroy!
+
+      expect(project.reload.source_project_id).to be_nil
     end
   end
 
