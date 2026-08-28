@@ -265,6 +265,10 @@ RSpec.describe Lesson::Create, type: :unit do
       expect(lesson_project.name).to eq('My digital canvas')
     end
 
+    it 'records the source project id on the lesson project' do
+      expect(lesson_project.source_project_id).to eq(source_project.id)
+    end
+
     it 'does not change the source project' do
       expect { response }.not_to(change { source_project.reload.attributes })
     end
@@ -272,6 +276,25 @@ RSpec.describe Lesson::Create, type: :unit do
     it 'does not copy scratch assets (global assets resolve through the lineage)' do
       create(:scratch_asset, :with_file, project: nil, uploaded_user_id: nil)
       expect { response }.not_to change(ScratchAsset, :count)
+    end
+
+    context 'when the source project is itself a remix' do
+      let(:source_project_fr) do
+        create(:scratch_project, identifier: source_project_en.identifier, locale: 'fr-FR', user_id: nil,
+                                 name: 'Ma toile numérique', origin: Project::Origins::EXPERIENCE_CS,
+                                 instructions: 'Instructions en français',
+                                 remixed_from_id: create(:project).id,
+                                 remix_origin: 'example.com')
+          .tap { |project| project.scratch_component.update!(content: french_content) }
+      end
+
+      it 'does not inherit remixed_from_id from the source project' do
+        expect(lesson_project.remixed_from_id).to be_nil
+      end
+
+      it 'does not inherit remix_origin from the source project' do
+        expect(lesson_project.remix_origin).to be_nil
+      end
     end
 
     context 'when the source project has no origin' do
