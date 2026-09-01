@@ -43,6 +43,17 @@ RSpec.describe Salesforce::LessonSyncJob, :requires_salesforce_db do
     end
   end
 
+  context 'when the lesson project originates from Experience CS' do
+    Project::EXPERIENCE_CS_PROJECT_TYPES.each do |project_type|
+      it "syncs teacherprojecttype__c as scratch when the underlying project_type is #{project_type}" do
+        lesson.project.update!(origin: Project::Origins::EXPERIENCE_CS, project_type:)
+        perform_job
+        sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
+        expect(sf_lesson.teacherprojecttype__c).to eq(Project::Types::SCRATCH)
+      end
+    end
+  end
+
   describe 'numberofassignedprojects__c' do
     let(:students) { Array.new(3) { create(:student, school:) } }
 
