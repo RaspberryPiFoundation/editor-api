@@ -27,6 +27,8 @@ Rails.application.routes.draw do
     root to: 'projects#index'
   end
 
+  get '/info/release', to: 'info#release'
+
   post '/test/reseed', to: 'test_utilities#reseed'
   post '/test/enable_feature', to: 'test_utilities#enable_feature'
   post '/test/disable_feature', to: 'test_utilities#disable_feature'
