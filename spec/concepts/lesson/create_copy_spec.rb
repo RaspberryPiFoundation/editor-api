@@ -109,6 +109,22 @@ RSpec.describe Lesson::CreateCopy, type: :unit do
     expect(copied_component.content).to eq(original_component.content)
   end
 
+  context 'when copying a lesson whose project has a source_project' do
+    let!(:source_project) { create(:project, :with_components) }
+    let!(:original_project) { create(:project, :with_components, source_project:) }
+
+    before do
+      lesson.project = original_project
+      lesson.save!
+    end
+
+    it 'copies the source_project to the new project' do
+      response = described_class.call(lesson:, lesson_params:)
+      copied_project = response[:lesson].reload.project
+      expect(copied_project.source_project_id).to eq(source_project.id)
+    end
+  end
+
   context 'when the project is a Scratch project' do
     let(:copied_teacher_id) { SecureRandom.uuid }
     let(:lesson_params) { { user_id: copied_teacher_id } }

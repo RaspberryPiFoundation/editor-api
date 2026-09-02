@@ -43,7 +43,10 @@ class Lesson
           name: project_params[:name].presence || source_project.name,
           user_id: project_params[:user_id],
           school_id: project_params[:school_id],
-          lesson_id: project_params[:lesson_id]
+          lesson_id: project_params[:lesson_id],
+          source_project_id: source_project.id,
+          remixed_from_id: nil,
+          remix_origin: nil
         }
       end
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_25_144345) do
+ActiveRecord::Schema[8.1].define(version: 2026_08_28_095502) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -245,6 +245,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_144345) do
     t.string "remix_origin"
     t.uuid "remixed_from_id"
     t.uuid "school_id"
+    t.uuid "source_project_id"
     t.datetime "updated_at", null: false
     t.uuid "user_id"
     t.index ["identifier", "locale"], name: "index_projects_on_identifier_and_locale", unique: true
@@ -252,6 +253,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_144345) do
     t.index ["lesson_id"], name: "index_projects_on_lesson_id"
     t.index ["remixed_from_id"], name: "index_projects_on_remixed_from_id"
     t.index ["school_id"], name: "index_projects_on_school_id"
+    t.index ["source_project_id"], name: "index_projects_on_source_project_id"
   end
 
   create_table "roles", force: :cascade do |t|
@@ -419,6 +421,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_25_144345) do
   add_foreign_key "lessons", "schools"
   add_foreign_key "project_errors", "projects"
   add_foreign_key "projects", "lessons"
+  add_foreign_key "projects", "projects", column: "source_project_id", on_delete: :nullify
   add_foreign_key "projects", "schools"
   add_foreign_key "roles", "schools"
   add_foreign_key "school_classes", "schools"

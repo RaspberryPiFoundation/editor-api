@@ -186,6 +186,21 @@ RSpec.describe Project::CreateRemix, type: :unit do
       end
     end
 
+    context 'when remixing a project that has a source_project' do
+      let!(:source_project) { create(:project, :with_components) }
+      let!(:original_project) { create(:project, :with_components, source_project:) }
+
+      it 'copies the source_project to the remix' do
+        remixed_project = create_remix[:project]
+        expect(remixed_project.source_project_id).to eq(source_project.id)
+      end
+
+      it 'sets remixed_from_id to the immediate parent, not the source project' do
+        remixed_project = create_remix[:project]
+        expect(remixed_project.remixed_from_id).to eq(original_project.id)
+      end
+    end
+
     context 'when user_id is not present' do
       let(:user_id) { nil }
       let(:params) { { project_id: original_project.identifier } }
