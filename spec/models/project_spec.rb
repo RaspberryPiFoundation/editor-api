@@ -493,31 +493,12 @@ RSpec.describe Project, :versioning do
   end
 
   describe '#instructions' do
-    let(:project) { create(:project, :with_instructions, school:, user_id: create(:teacher, school:).id) }
+    let(:project) { create(:project, school:, user_id: create(:teacher, school:).id) }
 
-    it 'falls back to the legacy text column for rows that predate instruction_steps' do
-      project.instruction_steps = nil
-      project.save!
-      expect(project.instructions).to eq(project[:instructions])
-    end
-
-    it 'returns instruction_steps once set, without touching the legacy column for arrays' do
-      legacy_value = project[:instructions]
+    it 'delegates to instruction_steps' do
       project.update!(instructions: [{ markdown_content: 'step 1' }])
       expect(project.instructions).to eq([{ 'markdown_content' => 'step 1' }])
-      expect(project[:instructions]).to eq(legacy_value)
-    end
-
-    it 'does not fall back to stale legacy text once instruction_steps is set to an empty array' do
-      project.update!(instructions: [])
-      expect(project.instructions).to eq([])
-    end
-
-    it 'also clears the legacy column when instructions are set to nil' do
-      project.update!(instructions: [{ markdown_content: 'step 1' }])
-      project.update!(instructions: nil)
-      expect(project.instructions).to be_nil
-      expect(project[:instructions]).to be_nil
+      expect(project.instruction_steps).to eq([{ 'markdown_content' => 'step 1' }])
     end
   end
 

@@ -29,7 +29,7 @@ module Salesforce
     def sf_lesson_attributes(lesson:)
       mapped_attributes(lesson:).merge(
         teacherprojecttitle__c: lesson.project&.name,
-        teacherprojecttype__c: lesson.project&.project_type,
+        teacherprojecttype__c: project_type_attribute(lesson),
         numberofassignedprojects__c: assigned_projects_count(lesson),
         # Sum of the two completion paths: state-machine `:submitted` (Code Editor flow)
         # and `school_projects.finished` (Experience CS flow). They are mutually exclusive
@@ -47,6 +47,12 @@ module Salesforce
       FIELD_MAPPINGS.transform_values do |lesson_field|
         lesson.send(lesson_field)
       end
+    end
+
+    def project_type_attribute(lesson)
+      return Project::Types::SCRATCH if lesson.project&.origin == Project::Origins::EXPERIENCE_CS
+
+      lesson.project&.project_type
     end
 
     # A lesson is "assigned" to every student in its class iff it's visible to them
