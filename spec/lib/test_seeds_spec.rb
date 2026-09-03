@@ -223,8 +223,7 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'assigns students' do
-      school_id = School.find_by(creator_id:).id
-      school_class_id = SchoolClass.find_by(school_id:).id
+      school_class_id = SchoolClass.joins(:teachers).find_by!(school_id:, teachers: { teacher_id: }).id
       expect(Role.student.where(user_id: student_1, school_id:)).to exist
       expect(ClassStudent.where(student_id: student_1, school_class_id:)).to exist
       expect(Role.student.where(user_id: student_2, school_id:)).to exist

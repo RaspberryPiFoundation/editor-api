@@ -76,8 +76,7 @@ namespace :test_seeds do
         [creator_id, teacher_id].each do |user_id|
           teacher_name = user_id == creator_id ? 'Jane Doe' : 'John Doe'
           school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
-          assign_students(school_class, school)
-
+          assign_students(school_class, school) if user_id == teacher_id
           create_lessons(user_id, school, school_class)
         end
         Rails.logger.info 'Done...'
