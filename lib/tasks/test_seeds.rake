@@ -73,9 +73,10 @@ namespace :test_seeds do
         assign_a_teacher(teacher_unassigned_id, school)
 
         # for each of the owner and teacher, create a class and assign students
-        [creator_id, teacher_id].each do |user_id|
+        [creator_id, teacher_id].each_with_index do |user_id, index|
           teacher_name = user_id == creator_id ? 'Jane Doe' : 'John Doe'
-          school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
+          code = "C000-C#{index.to_s.rjust(3, '0')}"
+          school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students", code)
           assign_students(school_class, school) if user_id == teacher_id
           create_lessons(user_id, school, school_class)
         end
