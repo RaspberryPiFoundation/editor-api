@@ -64,7 +64,7 @@ module SeedsHelper
     # rubocop:enable Rails/SkipsModelValidations
   end
 
-  def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample)
+  def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample, join_code = nil)
     SchoolClass.joins(:teachers)
                .where(teachers: { teacher_id: }, school:)
                .first_or_create! do |school_class|
@@ -73,6 +73,7 @@ module SeedsHelper
       school_class.description = description
       school_class.school = school
       school_class.teachers = [ClassTeacher.new(teacher_id:)]
+      school_class.join_code = join_code
     end
   end
 
