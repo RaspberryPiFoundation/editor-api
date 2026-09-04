@@ -3,11 +3,10 @@
 module SignInStubs
   # Use this method if you don't want to bother going through the login process
   # itself.
-  # rubocop:disable RSpec/AnyInstance
+  # rubocop:disable-next RSpec/AnyInstance
   def stub_sign_in(user)
     allow_any_instance_of(AuthenticationHelper).to receive(:current_user).and_return(user)
   end
-  # rubocop:enable RSpec/AnyInstance
 
   def stub_auth_for(user)
     OmniAuth.config.add_mock(:rpi, uid: user.id, extra: { raw_info: user.serializable_hash(except: :id) })

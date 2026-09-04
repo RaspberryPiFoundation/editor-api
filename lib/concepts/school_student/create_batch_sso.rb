@@ -67,9 +67,8 @@ module SchoolStudent
         end
 
         # We know the school and uniqueness is ok at this stage, so we can skip validations
-        # rubocop:disable Rails/SkipsModelValidations
+        # rubocop:disable-next Rails/SkipsModelValidations
         Role.insert_all(new_roles, unique_by: %i[user_id school_id role])
-        # rubocop:enable Rails/SkipsModelValidations
       end
 
       def format_student_responses(responses)
