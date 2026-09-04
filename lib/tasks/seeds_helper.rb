@@ -2,7 +2,7 @@
 
 require_relative 'project_preview_seeds_helper'
 
-# rubocop:disable Metrics/ModuleLength
+# rubocop:disable-next Metrics/ModuleLength
 module SeedsHelper
   include ProjectPreviewSeedsHelper
 
@@ -59,9 +59,8 @@ module SeedsHelper
       Role.teacher.create!(user_id: school.creator_id, school:)
     end
 
-    # rubocop:disable Rails/SkipsModelValidations
+    # rubocop:disable-next Rails/SkipsModelValidations
     school.update_column(:code, SCHOOL_CODE) # The code needs to match the one in the profile
-    # rubocop:enable Rails/SkipsModelValidations
   end
 
   def create_school_class(teacher_id, school, name = Faker::Educator.course_name, description = Faker::Hacker.phrases.sample)
@@ -150,4 +149,3 @@ module SeedsHelper
     end
   end
 end
-# rubocop:enable Metrics/ModuleLength

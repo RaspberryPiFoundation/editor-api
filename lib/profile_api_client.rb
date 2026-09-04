@@ -6,9 +6,8 @@ class ProfileApiClient
     owner: 'school:owner'
   }.freeze
 
-  # rubocop:disable Naming/MethodName
+  # rubocop:disable-next Naming/MethodName
   Student = Data.define(:id, :schoolId, :name, :username, :createdAt, :updatedAt, :discardedAt, :email, :ssoProviders)
-  # rubocop:enable Naming/MethodName
 
   class Error < StandardError; end
 

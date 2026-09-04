@@ -203,7 +203,7 @@ RSpec.describe 'Join endpoint' do
         expect(response).to have_http_status(:not_found)
       end
 
-      # rubocop:disable RSpec/AnyInstance
+      # rubocop:disable-next RSpec/AnyInstance
       it 'responds with 500 when action_status returns an unexpected value' do
         allow_any_instance_of(Api::JoinController).to receive(:action_status).and_return(:something_unexpected)
 
@@ -212,7 +212,6 @@ RSpec.describe 'Join endpoint' do
         expect(response).to have_http_status(:internal_server_error)
         expect(response.body).to include('Unexpected join action_status')
       end
-      # rubocop:enable RSpec/AnyInstance
 
       context 'when the email domain is not registered for the school' do
         let(:student) { build(:student, email: 'student@other.edu') }
