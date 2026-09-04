@@ -44,4 +44,18 @@ module LessonCreation
   def scratch_project?(lesson_params)
     lesson_params.dig(:project_attributes, :project_type) == Project::Types::CODE_EDITOR_SCRATCH
   end
+
+  def find_source_project!(identifier, locale)
+    return nil if identifier.blank?
+
+    project = ProjectLoader.new(identifier, [locale]).load
+    raise ParameterError, "source project '#{identifier}' not found" if project.nil?
+
+    # Only ExCS 'code editor' projects are remixed here; legacy scratch projects keep the stub path.
+    return nil unless project.scratch_project?
+
+    raise ParameterError, 'source project must be an Experience CS project' unless project.origin == Project::Origins::EXPERIENCE_CS
+
+    project
+  end
 end
