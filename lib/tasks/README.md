@@ -60,7 +60,7 @@ The `.sb3` itself can be copied straight across. For Neil the Seal it came from 
 
 ### Making a Scratch project reachable from the Code Club Projects site
 
-projects-ui only opens the editor when the projects-admin record for a 'project' has `direct_to_editor` set and `editor_starter_project` pointing at the `IDENTIFIER` used here. For local development that link is seeded in projects-admin at `db/seeds/006_editor_blocks_projects.rb`. If you add a Scratch `project` here that needs to be reachable through the projects site, it needs a matching entry there.
+projects-ui only opens the editor when the projects-admin record for a 'project' has `direct_to_editor` set and `editor_starter_project` pointing at the `IDENTIFIER` used here. For local development that link is seeded in the projects-admin repository at `db/seeds/006_editor_blocks_projects.rb`. If you add a Scratch `project` here that needs to be reachable through the projects site, it needs a matching entry there.
 
 ## Getting the projects created in the database
 Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-api/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
