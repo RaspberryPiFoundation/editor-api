@@ -17,10 +17,10 @@ module Api
       when :wrong_school, :domain_mismatch, :not_a_student
         render json: { error: action_status.to_s }, status: :forbidden
       when :already_member
-        render json: { redirect_url: class_redirect_path }, status: :ok
+        render json: {}, status: :ok
       when :joinable
         add_student_to_school_and_class
-        render json: { redirect_url: class_redirect_path }, status: :ok
+        render json: {}, status: :ok
       else
         raise "Unexpected join action_status: #{action_status.inspect}"
       end
@@ -41,10 +41,6 @@ module Api
 
     def action_status
       @action_status ||= JoinStatusService.new(school: @school, school_class: @school_class, user: current_user).call
-    end
-
-    def class_redirect_path
-      "/school/#{@school.code}/class/#{@school_class.code}"
     end
 
     def add_student_to_school_and_class

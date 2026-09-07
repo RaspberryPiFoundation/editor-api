@@ -151,14 +151,12 @@ RSpec.describe 'Join endpoint' do
     context 'when the user is authenticated as a student' do
       before { authenticated_in_hydra_as(student, :student) }
 
-      it 'adds the user to the school and class and returns a redirect URL' do
+      it 'adds the user to the school' do
         expect do
           post "/api/join/#{school_class.join_code}", headers: headers
         end.to change(ClassStudent, :count).by(1).and change(Role, :count).by(1)
 
         expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
 
         created_role = Role.find_by(user_id: student.id, school:)
         expect(created_role.role).to eq('student')
@@ -173,8 +171,6 @@ RSpec.describe 'Join endpoint' do
         end.not_to change(ClassStudent, :count)
 
         expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
       end
 
       it 'does not duplicate the school role if the user is already in the school' do
@@ -234,8 +230,6 @@ RSpec.describe 'Join endpoint' do
           end.to change(ClassStudent, :count).by(1)
 
           expect(response).to have_http_status(:ok)
-          data = JSON.parse(response.body, symbolize_names: true)
-          expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
         end
       end
     end
