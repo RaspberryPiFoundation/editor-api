@@ -28,8 +28,8 @@ describe JoinStatusService do
 
       before { ClassTeacher.create!(school_class:, teacher_id: user.id) }
 
-      it 'returns :already_member' do
-        expect(service.call).to eq(:already_member)
+      it 'returns :not_a_student' do
+        expect(service.call).to eq(:not_a_student)
       end
     end
 
@@ -38,16 +38,16 @@ describe JoinStatusService do
 
       before { create(:owner_role, school:, user_id: user.id) }
 
-      it 'returns :owner' do
-        expect(service.call).to eq(:owner)
+      it 'returns :not_a_student' do
+        expect(service.call).to eq(:not_a_student)
       end
     end
 
-    context 'when the user is a teacher of the school but not in this class' do
+    context 'when the user is a teacher of the school' do
       let(:user) { create(:teacher, school:) }
 
-      it 'returns :joinable_as_teacher' do
-        expect(service.call).to eq(:joinable_as_teacher)
+      it 'returns :not_a_student' do
+        expect(service.call).to eq(:not_a_student)
       end
     end
 

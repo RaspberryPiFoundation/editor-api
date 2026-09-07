@@ -16,10 +16,7 @@ module Api
       case action_status
       when :wrong_school, :domain_mismatch, :not_a_student
         render json: { error: action_status.to_s }, status: :forbidden
-      when :already_member, :owner
-        render json: { redirect_url: class_redirect_path }, status: :ok
-      when :joinable_as_teacher
-        add_user_to_class_as_teacher
+      when :already_member
         render json: { redirect_url: class_redirect_path }, status: :ok
       when :joinable
         add_student_to_school_and_class
@@ -63,17 +60,6 @@ module Api
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors.of_kind?(:student_id, :taken)
       # Concurrent join request raced the in-memory uniqueness validator. Already enrolled.
-    end
-
-    def add_user_to_class_as_teacher
-      ClassTeacher.find_or_create_by!(school_class: @school_class, teacher_id: current_user.id) do |class_teacher|
-        class_teacher.teacher = current_user
-      end
-    rescue ActiveRecord::RecordNotUnique
-      # Concurrent join request for the same teacher/class — already enrolled.
-    rescue ActiveRecord::RecordInvalid => e
-      raise unless e.record.errors.of_kind?(:teacher_id, :taken)
-      # Concurrent join raced the in-memory uniqueness validator. Already enrolled.
     end
   end
 end
