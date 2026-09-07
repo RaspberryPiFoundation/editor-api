@@ -7,9 +7,9 @@ class ClassTeachersField < Administrate::Field::Base
     @teachers ||= data.sort_by(&:created_at)
   end
 
-  def user_display(teacher, users_by_id)
-    user = users_by_id[teacher.teacher_id]
-    user.present? ? user_dashboard.display_resource(user) : teacher.teacher_id
+  def user_display(teacher, users_by_id = {})
+    user = users_by_id[teacher.user_id]
+    user.present? ? user_dashboard.display_resource(user) : teacher.user_id
   end
 
   private

@@ -7,7 +7,7 @@ module Admin
     private
 
     def class_teacher_users_by_id
-      @class_teacher_users_by_id ||= User.from_userinfo(ids: requested_resource.teacher_ids).index_by(&:id)
+      @class_teacher_users_by_id ||= User.from_userinfo(ids: requested_resource.teachers.map(&:user_id).uniq).index_by(&:id)
     end
   end
 end
