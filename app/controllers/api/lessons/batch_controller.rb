@@ -36,8 +36,8 @@ module Api
       def verify_can_create_scratch_projects
         return unless lesson_projects?
 
-        batch_lessons_params.each_with_index do |lesson_params, index|
-          verify_lesson_scratch!(lesson_params, source_project: batch_source_projects[index])
+        batch_lessons_params.each_index do |index|
+          verify_lesson_scratch!(batch_lessons_params[index], source_project: source_project_for(index))
           break if performed?
         end
       end
@@ -47,9 +47,18 @@ module Api
       end
 
       def batch_source_projects
-        @batch_source_projects ||= batch_lessons_params.map do |lesson_params|
-          find_source_project!(lesson_params[:source_project_identifier], lesson_params.dig(:project_attributes, :locale))
-        end
+        batch_lessons_params.each_index.map { |index| source_project_for(index) }
+      end
+
+      def source_project_for(index)
+        @source_project_by_index ||= {}
+        return @source_project_by_index[index] if @source_project_by_index.key?(index)
+
+        lesson_params = batch_lessons_params[index]
+        @source_project_by_index[index] = find_source_project!(
+          lesson_params[:source_project_identifier],
+          lesson_params.dig(:project_attributes, :locale)
+        )
       end
 
       def create_batch_params(lesson_project)
@@ -76,7 +85,10 @@ module Api
       def authorize_source_projects!
         return unless lesson_projects?
 
-        batch_source_projects.compact.each { |source_project| authorize! :show, source_project }
+        batch_lessons_params.each_index do |index|
+          source_project = source_project_for(index)
+          authorize! :show, source_project if source_project
+        end
       end
 
       def authorize_blank_lesson_batch!
