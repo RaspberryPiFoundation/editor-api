@@ -3,8 +3,7 @@
     <thead>
       <tr>
         <th>Teacher</th>
-        <th>Created</th>
-        <th>Updated</th>
+        <th>Added to class</th>
       </tr>
     </thead>
     <tbody>
@@ -12,7 +11,6 @@
         <tr>
           <td><%= field.user_display(teacher, class_teacher_users_by_id) %></td>
           <td><%= l(teacher.created_at) %></td>
-          <td><%= l(teacher.updated_at) %></td>
         </tr>
       <% end %>
     </tbody>

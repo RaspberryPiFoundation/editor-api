@@ -20,6 +20,8 @@ RSpec.describe 'Admin school classes', type: :request do
 
     expect(response).to have_http_status(:success)
     expect(response.body).to include('Tariq Teacher (teacher@example.com)', 'Olivia Teacher (olivia@example.com)')
+    expect(response.body).to include('<th>Added to class</th>')
+    expect(response.body).not_to include('<th>Updated</th>')
     expect(response.body).not_to include(teacher.id, other_teacher.id)
     expect(User).to have_received(:from_userinfo).with(ids: contain_exactly(teacher.id, other_teacher.id)).once
   end
