@@ -2,6 +2,8 @@
 
 require_relative 'seeds_helper'
 
+SchoolClassData = Data.define(:owner, :name, :description, :code, :assign_students)
+
 namespace :test_seeds do
   include SeedsHelper
 
@@ -48,6 +50,25 @@ namespace :test_seeds do
     end
   end
 
+  def school_class_data
+    [
+      SchoolClassData.new(
+        owner: ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe]),
+        name: "Jane Doe's Class",
+        description: "A class for Jane Doe's students",
+        code: 'C000-C000',
+        assign_students: false
+      ),
+      SchoolClassData.new(
+        owner: ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:john_doe]),
+        name: "John Doe's Class",
+        description: "A class for John Doe's students",
+        code: 'C000-C001',
+        assign_students: true
+      )
+    ]
+  end
+
   desc 'Create a school with lessons and students'
   task create: :environment do
     if School.exists?(id: TEST_SCHOOL)
@@ -72,13 +93,10 @@ namespace :test_seeds do
         assign_a_teacher(teacher_id, school)
         assign_a_teacher(teacher_unassigned_id, school)
 
-        # for each of the owner and teacher, create a class and assign students
-        [creator_id, teacher_id].each do |user_id|
-          teacher_name = user_id == creator_id ? 'Jane Doe' : 'John Doe'
-          school_class = create_school_class(user_id, school, "#{teacher_name}'s Class", "A class for #{teacher_name}'s students")
-          assign_students(school_class, school)
-
-          create_lessons(user_id, school, school_class)
+        school_class_data.each do |school_class|
+          created_school_class = create_school_class(school_class.owner, school, school_class.name, school_class.description, school_class.code)
+          assign_students(created_school_class, school) if school_class.assign_students
+          create_lessons(school_class.owner, school, created_school_class)
         end
         Rails.logger.info 'Done...'
       end
