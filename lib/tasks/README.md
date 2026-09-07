@@ -54,7 +54,7 @@ type: 'code_editor_scratch'
 build: true
 ```
 
-The seeding task in this directory reads **uppercase** keys only. Copying the content-repo version verbatim parses without error and silently produces a `python` `project` with no name, so retype it in the uppercase form above and drop `build`.
+The seeding task in this directory reads **uppercase** keys only. Copying the content-repo version verbatim parses without error, but leaves `NAME`/`IDENTIFIER` unset (and defaults `TYPE` to `python`), so the import will fail validation — retype it in the uppercase form above and drop `build`.
 
 The `.sb3` itself can be copied straight across. For Neil the Seal it came from [`raspberrypilearning/editor-neil-the-seal`](https://github.com/raspberrypilearning/editor-neil-the-seal) at `en/code/neil-the-seal-starter/neil-the-seal-starter.sb3`.
 
