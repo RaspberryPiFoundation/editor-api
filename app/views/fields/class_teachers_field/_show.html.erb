@@ -1,0 +1,22 @@
+<% if field.teachers.any? %>
+  <table>
+    <thead>
+      <tr>
+        <th>Teacher</th>
+        <th>Created</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% field.teachers.each do |teacher| %>
+        <tr>
+          <td><%= field.user_display(teacher, class_teacher_users_by_id) %></td>
+          <td><%= l(teacher.created_at) %></td>
+          <td><%= l(teacher.updated_at) %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+<% else %>
+  <%= t('administrate.fields.has_many.none', default: '–') %>
+<% end %>
