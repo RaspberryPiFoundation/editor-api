@@ -248,4 +248,86 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
       expect(Lesson.count).to eq(0)
     end
   end
+
+  # #create_batch resolves each row's `source_project_identifier` through
+  # ProjectLoader, authorizes it, and hands the Project to Lesson::CreateBatch
+  # so that row's lesson project is built as a remix instead of a stub.
+  context 'when entries reference source projects' do
+    let(:source_content) { { 'targets' => [{ 'name' => 'Stage' }], 'monitors' => [], 'extensions' => [], 'meta' => {} } }
+
+    let!(:source_project) do
+      create(:scratch_project, identifier: 'my-digital-canvas', locale: 'en', user_id: nil, school_id: nil,
+                               name: 'My digital canvas', origin: Project::Origins::EXPERIENCE_CS)
+        .tap { |project| project.scratch_component.update!(content: source_content) }
+    end
+
+    let(:lesson_project_params) do
+      [
+        {
+          name: 'Lesson 1',
+          school_id: school.id,
+          source_project_identifier: source_project.identifier,
+          project_attributes: { name: 'My digital canvas', locale: 'en' }
+        },
+        {
+          name: 'Lesson 2',
+          school_id: school.id,
+          project_attributes: { name: 'Project 2', locale: 'en' }
+        }
+      ]
+    end
+
+    let(:lesson_projects_json) { JSON.parse(response.body, symbolize_names: true) }
+    let(:lesson_project_with_source) { Lesson.find(lesson_projects_json.first[:id]).project }
+    let(:stub_lesson_project) { Lesson.find(lesson_projects_json.second[:id]).project }
+
+    it 'responds 201 Created' do
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'records the source project on the lesson_project_with_source' do
+      expect(lesson_project_with_source.source_project_id).to eq(source_project.id)
+    end
+
+    it 'sets the lesson_project_with_source locale to nil' do
+      expect(lesson_project_with_source.locale).to be_nil
+    end
+
+    it 'leaves source_project_identifier as nil in the stub project' do
+      expect(stub_lesson_project.source_project_id).to be_nil
+    end
+
+    context 'when the source project cannot be found' do
+      let(:lesson_project_params) do
+        [
+          {
+            name: 'Lesson 1',
+            school_id: school.id,
+            source_project_identifier: 'does-not-exist',
+            project_attributes: { name: 'My digital canvas', locale: 'en' }
+          }
+        ]
+      end
+
+      it 'responds 422 Unprocessable' do
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+
+      it 'does not create any lessons' do
+        expect(Lesson.count).to eq(0)
+      end
+    end
+
+    context 'when a source_project_identifier points at a scratch project and the school does not have Scratch enabled' do
+      let(:scratch_enabled) { false }
+
+      it 'responds 403 Forbidden' do
+        expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'does not create any lessons' do
+        expect(Lesson.count).to eq(0)
+      end
+    end
+  end
 end

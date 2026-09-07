@@ -58,9 +58,9 @@ RSpec.describe Lesson::CreateBatch, type: :unit do
 
     it 'does not pass origin_identifier to lesson creation' do
       received_params = []
-      allow(Lesson::Create).to receive(:call).and_wrap_original do |method, lesson_params:|
+      allow(Lesson::Create).to receive(:call).and_wrap_original do |method, lesson_params:, source_project: nil|
         received_params << lesson_params
-        method.call(lesson_params:)
+        method.call(lesson_params:, source_project:)
       end
 
       described_class.call(lessons_params:)
@@ -74,6 +74,25 @@ RSpec.describe Lesson::CreateBatch, type: :unit do
 
     it 'appends the origin_identifier to the second created lesson' do
       expect(result.second[:origin_identifier]).to eq('test-lesson-identifier-two')
+    end
+
+    context 'when a source project is given' do
+      let!(:source_project) do
+        create(:scratch_project, user_id: nil, school_id: nil, origin: Project::Origins::EXPERIENCE_CS)
+      end
+      let(:lessons_params) do
+        super().tap { |params| params.first[:source_project_identifier] = source_project.identifier }
+      end
+      let(:source_projects) { [source_project, nil] }
+      let(:result) { described_class.call(lessons_params:, source_projects:) }
+
+      it 'builds the corresponding lesson project with the source project' do
+        expect(result.first[:lesson].project.source_project_id).to eq(source_project.id)
+      end
+
+      it 'leaves other lessons unaffected' do
+        expect(result.second[:lesson].project.source_project_id).to be_nil
+      end
     end
   end
 end
