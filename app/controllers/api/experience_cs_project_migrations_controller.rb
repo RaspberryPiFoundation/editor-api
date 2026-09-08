@@ -29,7 +29,8 @@ module Api
         authorize! :migrate_from_experience_cs, @project
         @project.update!(
           attributes.slice(:name, :instructions).merge(
-            project_type: Project::Types::CODE_EDITOR_SCRATCH
+            project_type: Project::Types::CODE_EDITOR_SCRATCH,
+            origin: Project::Origins::EXPERIENCE_CS
           )
         )
         scratch_component = @project.scratch_component || @project.build_scratch_component

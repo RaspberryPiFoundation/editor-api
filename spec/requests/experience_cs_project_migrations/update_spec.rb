@@ -47,7 +47,8 @@ RSpec.describe 'Experience CS project migration requests' do
       school_id: school.id,
       name: 'Migrated project',
       instructions: [{ 'markdown_content' => 'Make the sprite move.' }],
-      project_type: Project::Types::CODE_EDITOR_SCRATCH
+      project_type: Project::Types::CODE_EDITOR_SCRATCH,
+      origin: Project::Origins::EXPERIENCE_CS
     )
     expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
   end
