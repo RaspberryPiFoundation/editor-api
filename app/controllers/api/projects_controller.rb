@@ -43,7 +43,7 @@ module Api
     end
 
     def update
-      result = Project::Update.call(project: @project, update_hash: project_params)
+      result = Project::Update.call(project: @project, update_hash: project_params, current_user:)
 
       if result.success?
         track_project_event('Project - Saved', @project)

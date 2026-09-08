@@ -43,12 +43,19 @@ RSpec.describe 'Project update requests' do
       expect(response.body).to include('updated component content')
     end
 
-    it 'calls update operation' do
+    it 'calls update operation with the current user' do
       mock_response = instance_double(OperationResponse)
       allow(mock_response).to receive(:success?).and_return(true)
       allow(Project::Update).to receive(:call).and_return(mock_response)
       put("/api/projects/#{project.identifier}", params:, headers:)
-      expect(Project::Update).to have_received(:call)
+      expect(Project::Update).to have_received(:call).with(
+        a_hash_including(project:, current_user: owner)
+      )
+    end
+
+    it 'does not set the project origin' do
+      put("/api/projects/#{project.identifier}", params:, headers:)
+      expect(project.reload.origin).to be_nil
     end
 
     context 'when no components specified' do
@@ -181,6 +188,28 @@ RSpec.describe 'Project update requests' do
       expect(project.scratch_component.reload.content.to_h).to eq(scratch_data.deep_stringify_keys)
     end
 
+    it 'sets the project origin to experience_cs' do
+      put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+      expect(project.reload.origin).to eq(Project::Origins::EXPERIENCE_CS)
+    end
+
+    it 'sets the origin when overwriting an existing template project in the en locale' do
+      project.update!(locale: 'en', origin: nil)
+
+      put('/api/projects/experience-cs-project?locale=en', params:, headers:, as: :json)
+
+      expect(project.reload.origin).to eq(Project::Origins::EXPERIENCE_CS)
+    end
+
+    it 'leaves the origin as experience_cs when re-syncing a project' do
+      project.update!(origin: Project::Origins::EXPERIENCE_CS)
+
+      put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+      expect(project.reload.origin).to eq(Project::Origins::EXPERIENCE_CS)
+    end
+
     context 'when authenticated with the Experience CS service API key' do
       let(:headers) { { ExperienceCsServiceAuthenticator::HEADER => 'service-api-key' } }
 
@@ -241,6 +270,12 @@ RSpec.describe 'Project update requests' do
         put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
 
         expect(response).to have_http_status(:forbidden)
+      end
+
+      it 'sets the project origin to experience_cs' do
+        put('/api/projects/experience-cs-project?locale=fr', params:, headers:, as: :json)
+
+        expect(project.reload.origin).to eq(Project::Origins::EXPERIENCE_CS)
       end
     end
   end

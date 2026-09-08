@@ -3,11 +3,11 @@
 class Project
   class Update
     class << self
-      def call(project:, update_hash:)
+      def call(project:, update_hash:, current_user: nil)
         response = setup_response(project)
 
         setup_deletions(response, update_hash)
-        update_project_attributes(response, update_hash)
+        update_project_attributes(response, update_hash, current_user)
         update_component_attributes(response, update_hash)
         update_scratch_component_attributes(response, update_hash)
         persist_changes(response)
@@ -43,10 +43,12 @@ class Project
         response[:error] = I18n.t 'errors.project.editing.delete_default_component'
       end
 
-      def update_project_attributes(response, update_hash)
+      def update_project_attributes(response, update_hash, current_user)
         return if response.failure?
 
-        response[:project].assign_attributes(update_hash.slice(:name, :instructions, :project_type))
+        attributes = update_hash.slice(:name, :instructions, :project_type)
+        attributes[:origin] = Project::Origins::EXPERIENCE_CS if current_user&.experience_cs_admin?
+        response[:project].assign_attributes(attributes)
       end
 
       def update_component_attributes(response, update_hash)
