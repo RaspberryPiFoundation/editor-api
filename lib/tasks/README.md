@@ -15,7 +15,7 @@ Each directory for a `project` should contain copies of the `python` files and a
 Every directory representing a `project` must contain a `project_config.yml`. This should include the following information:
 
 - `NAME` - the name of the project to be displayed in the header bar on the editor site
-- `IDENTIFIER` - a unique list of three words separated by dashes `-`. This will form the end of the URL for the `project` on the editor site. For example, a `project` with `IDENTIFIER` `python-emoji-example` will be available to view at `/projects/python-emoji-example` once the `project` has been entered into the database.
+- `IDENTIFIER` - words separated by dashes `-`, conventionally three, though the format is not enforced and some existing `project`s use more (for example `editor-scratch-testing-starter`). It must be unique per locale. This will form the end of the URL for the `project` on the editor site. For example, a `project` with `IDENTIFIER` `python-emoji-example` will be available to view at `/projects/python-emoji-example` once the `project` has been entered into the database. Where a `project` also exists in production, use the same `IDENTIFIER` as production so the local and deployed data match.
 - `COMPONENTS` - a list of the non-image files associated with the project. There should be exactly one `main.py` per `project`. The entry corresponding to each file should include the following information:
   - `name` - name of the file without the extension
   - `extension` - file extension (without the `.`)
@@ -25,6 +25,42 @@ Every directory representing a `project` must contain a `project_config.yml`. Th
 - `IMAGES` - a list of the names of the image files associated with the project, including their extensions. This property can be omitted if the `project` has no images.
 
 An example `project_config.yml` with all of the above properties can be seen [here](https://github.com/RaspberryPiFoundation/editor-api/blob/main/lib/tasks/project_components/persuasive_data_presentation_iss_starter/project_config.yml).
+
+## Scratch (Blocks) projects
+
+Scratch `project`s work differently and need much less configuration. The directory should contain **exactly two files**: the `.sb3` and a `project_config.yml` with three keys.
+
+```yaml
+NAME: "Neil the Seal starter"
+IDENTIFIER: "neil-the-seal-starter"
+TYPE: "code_editor_scratch"
+```
+
+Notes:
+
+- Omit `COMPONENTS` and `IMAGES`. The importer discovers the `.sb3` by file extension, and the `.sb3` already contains all of the project's costumes and sounds — they are extracted into shared Scratch assets automatically.
+- `TYPE` must be exactly `code_editor_scratch`. Do not use `scratch`, which is reserved for Experience CS projects and is deliberately excluded from the Scratch API endpoints.
+- The `.sb3` filename is not significant, but `main.sb3` matches the convention used elsewhere in this directory.
+- Keep the directory to just those two files. Any extra file must still be a type the importer recognises, and a stray file such as `.DS_Store` will fail the whole import run rather than just this `project`.
+
+### ⚠️ Do not copy `project_config.yml` from a content repository
+
+Content repositories in `raspberrypilearning` also contain a `project_config.yml` next to their `.sb3`, but it is a **different format**, read by a different code path (the GitHub webhook and `UploadJob`). It uses **lowercase** keys and an extra `build` key:
+
+```yaml
+name: "Neil the Seal starter"
+identifier: "neil-the-seal-starter"
+type: 'code_editor_scratch'
+build: true
+```
+
+The seeding task in this directory reads **uppercase** keys only. Copying the content-repo version verbatim parses without error, but leaves `NAME`/`IDENTIFIER` unset (and defaults `TYPE` to `python`), so the import will fail validation — retype it in the uppercase form above and drop `build`.
+
+The `.sb3` itself can be copied straight across. For Neil the Seal it came from [`raspberrypilearning/editor-neil-the-seal`](https://github.com/raspberrypilearning/editor-neil-the-seal) at `en/code/neil-the-seal-starter/neil-the-seal-starter.sb3`.
+
+### Making a Scratch project reachable from the Code Club Projects site
+
+projects-ui only opens the editor when the projects-admin record for a 'project' has `direct_to_editor` set and `editor_starter_project` pointing at the `IDENTIFIER` used here. For local development that link is seeded in the projects-admin repository at `db/seeds/006_editor_blocks_projects.rb`. If you add a Scratch `project` here that needs to be reachable through the projects site, it needs a matching entry there.
 
 ## Getting the projects created in the database
 Please commit the required changes to a branch in the [`editor-api` repository](https://github.com/RaspberryPiFoundation/editor-api/) and create a pull request to merge your branch into `main`. Once merged, we will run the task to create your `project`s in the database.
