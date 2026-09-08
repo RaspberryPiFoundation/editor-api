@@ -132,6 +132,32 @@ RSpec.describe Project::Update, type: :unit do
         expect { update }.to change { project.reload.instructions }.to('new instructions')
       end
     end
+
+    context 'when the current user is an Experience CS admin' do
+      subject(:update_as_admin) { described_class.call(project:, update_hash:, current_user:) }
+
+      let(:current_user) { create(:experience_cs_admin_user) }
+      let(:update_hash) do
+        {
+          name: 'updated project name',
+          components: component_hash,
+          instructions:
+        }
+      end
+
+      it 'returns success? true' do
+        expect(update_as_admin.success?).to be(true)
+      end
+
+      it 'sets the project origin to experience_cs' do
+        expect(update_as_admin[:project].origin).to eq(Project::Origins::EXPERIENCE_CS)
+      end
+
+      it 'succeeds when the origin is already experience_cs' do
+        project.update(origin: Project::Origins::EXPERIENCE_CS)
+        expect(update_as_admin.success?).to be(true)
+      end
+    end
   end
 
   def component_properties_hash(component)
