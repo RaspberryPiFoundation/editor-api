@@ -11,7 +11,7 @@ class SchoolClassDashboard < Administrate::BaseDashboard
   # on pages throughout the dashboard.
   ATTRIBUTE_TYPES = {
     school: Field::BelongsTo,
-    teachers: Field::HasMany,
+    teachers: ClassTeachersField,
     students: Field::HasMany,
     lessons: Field::HasMany,
     id: Field::String,
