@@ -16,14 +16,11 @@ module Api
       case action_status
       when :wrong_school, :domain_mismatch, :not_a_student
         render json: { error: action_status.to_s }, status: :forbidden
-      when :already_member, :owner
-        render json: { redirect_url: class_redirect_path }, status: :ok
-      when :joinable_as_teacher
-        add_user_to_class_as_teacher
-        render json: { redirect_url: class_redirect_path }, status: :ok
+      when :already_member
+        render json: {}, status: :ok
       when :joinable
         add_student_to_school_and_class
-        render json: { redirect_url: class_redirect_path }, status: :ok
+        render json: {}, status: :ok
       else
         raise "Unexpected join action_status: #{action_status.inspect}"
       end
@@ -46,10 +43,6 @@ module Api
       @action_status ||= JoinStatusService.new(school: @school, school_class: @school_class, user: current_user).call
     end
 
-    def class_redirect_path
-      "/school/#{@school.code}/class/#{@school_class.code}"
-    end
-
     def add_student_to_school_and_class
       ActiveRecord::Base.transaction do
         Role.find_or_create_by!(school: @school, user_id: current_user.id, role: :student)
@@ -63,17 +56,6 @@ module Api
     rescue ActiveRecord::RecordInvalid => e
       raise unless e.record.errors.of_kind?(:student_id, :taken)
       # Concurrent join request raced the in-memory uniqueness validator. Already enrolled.
-    end
-
-    def add_user_to_class_as_teacher
-      ClassTeacher.find_or_create_by!(school_class: @school_class, teacher_id: current_user.id) do |class_teacher|
-        class_teacher.teacher = current_user
-      end
-    rescue ActiveRecord::RecordNotUnique
-      # Concurrent join request for the same teacher/class — already enrolled.
-    rescue ActiveRecord::RecordInvalid => e
-      raise unless e.record.errors.of_kind?(:teacher_id, :taken)
-      # Concurrent join raced the in-memory uniqueness validator. Already enrolled.
     end
   end
 end

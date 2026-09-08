@@ -96,23 +96,23 @@ RSpec.describe 'Join endpoint' do
     context 'when the user is authenticated as a teacher' do
       before { authenticated_in_hydra_as(teacher) }
 
-      it 'returns status: joinable_as_teacher when the user is a teacher of this school not yet in the class' do
+      it 'returns status: :not_a_student when the user is a teacher of this school not yet in the class' do
         create(:teacher_role, school:, user_id: teacher.id)
 
         get "/api/join/#{school_class.join_code}", headers: headers
 
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('joinable_as_teacher')
+        expect(data[:status]).to eq('not_a_student')
       end
 
-      it 'returns status: already_member when the user is already a teacher in the class' do
+      it 'returns status: not_a_student when the user is already a teacher in the class' do
         create(:teacher_role, school:, user_id: teacher.id)
         ClassTeacher.create!(school_class:, teacher_id: teacher.id)
 
         get "/api/join/#{school_class.join_code}", headers: headers
 
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('already_member')
+        expect(data[:status]).to eq('not_a_student')
       end
 
       it 'returns status: not_a_student for a teacher of a different school (not wrong_school)' do
@@ -129,13 +129,13 @@ RSpec.describe 'Join endpoint' do
     context 'when the user is authenticated as an owner' do
       before { authenticated_in_hydra_as(owner) }
 
-      it 'returns status: owner when the user is an owner of this school' do
+      it 'returns status: not_a_student' do
         create(:owner_role, school:, user_id: owner.id)
 
         get "/api/join/#{school_class.join_code}", headers: headers
 
         data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:status]).to eq('owner')
+        expect(data[:status]).to eq('not_a_student')
       end
     end
   end
@@ -151,14 +151,12 @@ RSpec.describe 'Join endpoint' do
     context 'when the user is authenticated as a student' do
       before { authenticated_in_hydra_as(student, :student) }
 
-      it 'adds the user to the school and class and returns a redirect URL' do
+      it 'adds the user to the school' do
         expect do
           post "/api/join/#{school_class.join_code}", headers: headers
         end.to change(ClassStudent, :count).by(1).and change(Role, :count).by(1)
 
         expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
 
         created_role = Role.find_by(user_id: student.id, school:)
         expect(created_role.role).to eq('student')
@@ -173,8 +171,6 @@ RSpec.describe 'Join endpoint' do
         end.not_to change(ClassStudent, :count)
 
         expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
       end
 
       it 'does not duplicate the school role if the user is already in the school' do
@@ -234,8 +230,6 @@ RSpec.describe 'Join endpoint' do
           end.to change(ClassStudent, :count).by(1)
 
           expect(response).to have_http_status(:ok)
-          data = JSON.parse(response.body, symbolize_names: true)
-          expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
         end
       end
     end
@@ -243,51 +237,25 @@ RSpec.describe 'Join endpoint' do
     context 'when the user is authenticated as a teacher' do
       before { authenticated_in_hydra_as(teacher) }
 
-      it 'adds the user to the class as a teacher and returns a redirect URL' do
+      it 'does not add the teacher to the school' do
         create(:teacher_role, school:, user_id: teacher.id)
         school_class # force creation before the request
 
-        expect do
-          post "/api/join/#{school_class.join_code}", headers: headers
-        end.to change(ClassTeacher, :count).by(1)
+        post "/api/join/#{school_class.join_code}", headers: headers
 
-        expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
-        expect(ClassTeacher.exists?(school_class:, teacher_id: teacher.id)).to be(true)
-        expect(ClassStudent.exists?(school_class:, student_id: teacher.id)).to be(false)
-        expect(Role.where(user_id: teacher.id, school:).pluck(:role)).to eq(['teacher'])
-      end
-
-      it 'is idempotent when the user is already a teacher in the class' do
-        create(:teacher_role, school:, user_id: teacher.id)
-        ClassTeacher.create!(school_class:, teacher_id: teacher.id)
-
-        expect do
-          post "/api/join/#{school_class.join_code}", headers: headers
-        end.not_to change(ClassTeacher, :count)
-
-        expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
+        expect(response).to have_http_status(:forbidden)
       end
     end
 
     context 'when the user is authenticated as an owner' do
       before { authenticated_in_hydra_as(owner) }
 
-      it 'redirects an owner into the class without adding them to it' do
+      it 'returns a forbidden status' do
         create(:owner_role, school:, user_id: owner.id)
 
-        expect do
-          post "/api/join/#{school_class.join_code}", headers: headers
-        end.not_to change(ClassStudent, :count)
+        post "/api/join/#{school_class.join_code}", headers: headers
 
-        expect(response).to have_http_status(:ok)
-        data = JSON.parse(response.body, symbolize_names: true)
-        expect(data[:redirect_url]).to eq("/school/#{school.code}/class/#{school_class.code}")
-        expect(ClassTeacher.exists?(school_class:, teacher_id: owner.id)).to be(false)
-        expect(Role.where(user_id: owner.id, school:).pluck(:role)).to eq(['owner'])
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
