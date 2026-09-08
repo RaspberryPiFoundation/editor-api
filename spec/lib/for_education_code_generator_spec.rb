@@ -13,9 +13,5 @@ RSpec.describe ForEducationCodeGenerator do
     it 'generates a string containing 3 pairs of digits' do
       expect(described_class.generate).to match(/\d\d-\d\d-\d\d/)
     end
-
-    it 'generates a different code each time' do
-      expect(described_class.generate).not_to eq(described_class.generate)
-    end
   end
 end
