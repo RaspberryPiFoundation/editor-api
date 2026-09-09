@@ -226,8 +226,7 @@ RSpec.describe 'Creating a lesson', type: :request do
       }
     end
 
-    it 'creates a lesson with a scratch component when school has Scratch enabled' do
-      school.update!(scratch_enabled: true)
+    it 'creates a lesson with a scratch component' do
       post('/api/lessons', headers:, params:)
       expect(response).to have_http_status(:created)
 
@@ -238,12 +237,6 @@ RSpec.describe 'Creating a lesson', type: :request do
       project = Lesson.find(lesson_id).project
       expect(project.project_type).to eq(Project::Types::CODE_EDITOR_SCRATCH)
       expect(project.scratch_component.content).to eq({ 'example_data' => 'true' })
-    end
-
-    it 'returns forbidden when school does not have Scratch enabled' do
-      school.update!(scratch_enabled: false)
-      post('/api/lessons', headers:, params:)
-      expect(response).to have_http_status(:forbidden)
     end
   end
 
@@ -278,7 +271,6 @@ RSpec.describe 'Creating a lesson', type: :request do
 
     context 'when the source project is a shared Experience CS project' do
       before do
-        school.update!(scratch_enabled: true)
         post('/api/lessons', headers:, params:)
       end
 
@@ -310,33 +302,6 @@ RSpec.describe 'Creating a lesson', type: :request do
 
       it 'inherits origin from the source project' do
         expect(lesson_project.origin).to eq(source_project.origin)
-      end
-    end
-
-    context 'when the school does not have Scratch enabled' do
-      # The request carries no project_attributes[:project_type], so the scratch gate has to
-      # look at the source project to see that a Scratch project is about to be created.
-      let(:params) do
-        {
-          lesson: {
-            name: 'Test Lesson',
-            school_id: school.id,
-            source_project_identifier: source_project.identifier,
-            project_attributes: {
-              name: 'My digital canvas',
-              locale: 'en'
-            }
-          }
-        }
-      end
-
-      before do
-        school.update!(scratch_enabled: false)
-      end
-
-      it 'responds 403 Forbidden when only source_project_identifier points at a scratch project' do
-        post('/api/lessons', headers:, params:)
-        expect(response).to have_http_status(:forbidden)
       end
     end
   end

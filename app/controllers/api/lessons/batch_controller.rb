@@ -8,7 +8,6 @@ module Api
 
       before_action :authorize_user
       before_action :verify_school_class_belongs_to_school
-      before_action :verify_can_create_scratch_projects
       before_action :authorize_lesson_projects!
       before_action :authorize_source_projects!
 
@@ -31,15 +30,6 @@ module Api
         return unless lesson_projects?
 
         params[:lesson_projects].each { |lesson_params| verify_lesson_school_class!(lesson_params) }
-      end
-
-      def verify_can_create_scratch_projects
-        return unless lesson_projects?
-
-        batch_lessons_params.each_index do |index|
-          verify_lesson_scratch!(batch_lessons_params[index], source_project: source_project_for(index))
-          break if performed?
-        end
       end
 
       def batch_lessons_params

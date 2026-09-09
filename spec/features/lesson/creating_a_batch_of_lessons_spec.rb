@@ -20,8 +20,7 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
   end
 
   let(:teacher) { create(:teacher, school:) }
-  let(:school) { create(:school, scratch_enabled:) }
-  let(:scratch_enabled) { true }
+  let(:school) { create(:school) }
   let(:batch_path) { '/api/lessons/batch' }
   let(:lesson_projects) { lesson_project_params }
 
@@ -176,7 +175,7 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
   end
 
   context 'when the user does not belong to the school' do
-    let(:other_school) { create(:school, scratch_enabled: true) }
+    let(:other_school) { create(:school) }
     let(:lesson_project_params) do
       [
         {
@@ -193,18 +192,6 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
     end
 
     it 'responds 403 Forbidden' do
-      expect(response).to have_http_status(:forbidden)
-    end
-
-    it 'does not create any lessons' do
-      expect(Lesson.count).to eq(0)
-    end
-  end
-
-  context 'when the school does not have Scratch enabled' do
-    let(:scratch_enabled) { false }
-
-    it 'returns forbidden' do
       expect(response).to have_http_status(:forbidden)
     end
 
@@ -311,18 +298,6 @@ RSpec.describe 'Creating a batch of lessons', type: :request do
 
       it 'responds 422 Unprocessable' do
         expect(response).to have_http_status(:unprocessable_content)
-      end
-
-      it 'does not create any lessons' do
-        expect(Lesson.count).to eq(0)
-      end
-    end
-
-    context 'when a source_project_identifier points at a scratch project and the school does not have Scratch enabled' do
-      let(:scratch_enabled) { false }
-
-      it 'responds 403 Forbidden' do
-        expect(response).to have_http_status(:forbidden)
       end
 
       it 'does not create any lessons' do

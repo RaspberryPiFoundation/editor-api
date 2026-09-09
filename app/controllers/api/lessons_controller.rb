@@ -7,7 +7,6 @@ module Api
 
     before_action :authorize_user, except: %i[index show]
     before_action :verify_school_class_belongs_to_school, only: :create
-    before_action :verify_can_create_scratch_projects, only: %i[create create_copy]
     load_and_authorize_resource :lesson
 
     def index
@@ -84,10 +83,6 @@ module Api
 
     def verify_school_class_belongs_to_school
       verify_lesson_school_class!(create_params)
-    end
-
-    def verify_can_create_scratch_projects
-      verify_lesson_scratch!(create_params, source_project:)
     end
 
     def user_remixes(lessons)
