@@ -38,7 +38,7 @@ RSpec.describe SchoolProject do
     it 'calls transition_to! on the state machine with the new status and user_id' do
       allow(state_machine).to receive(:transition_to!)
       school_project.transition_status_to!(:submitted, student.id)
-      expect(state_machine).to have_received(:transition_to!).with(:submitted, metadata: { changed_by: student.id })
+      expect(state_machine).to have_received(:transition_to!).with(:submitted, { changed_by: student.id })
     end
   end
 
