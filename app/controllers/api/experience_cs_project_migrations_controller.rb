@@ -35,6 +35,21 @@ module Api
         )
         scratch_component = @project.scratch_component || @project.build_scratch_component
         scratch_component.update!(attributes.require(:scratch_component).slice(:content))
+        convert_finished_flag_to_submission!
+      end
+    end
+
+    def convert_finished_flag_to_submission!
+      school_project = @project.school_project
+      return unless school_project&.finished?
+
+      school_project.transaction do
+        school_project.update!(finished: false)
+        if school_project.can_transition_to?(:complete)
+          school_project.transition_status_to!(:complete, nil, info: 'backfilled_from_finished')
+        else
+          Rails.logger.warn("School project #{school_project.id} cannot transition to complete, in state #{school_project.status}")
+        end
       end
     end
 

@@ -53,6 +53,18 @@ RSpec.describe 'Experience CS project migration requests' do
     expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
   end
 
+  it 'converts a finished flag into a complete' do
+    project.school_project.update!(finished: true)
+
+    put(path, params:, headers:, as: :json)
+
+    expect(response).to have_http_status(:ok)
+    school_project = project.reload.school_project
+    expect(school_project).to have_attributes(finished: false, status: 'complete')
+    expect(school_project.school_project_transitions.order(:sort_key).last.metadata)
+      .to include('info' => 'backfilled_from_finished')
+  end
+
   it 'rejects a replay without overwriting Code Classroom changes' do
     put(path, params:, headers:, as: :json)
     code_classroom_data = scratch_data.merge(meta: { updated_in_code_classroom: true })
