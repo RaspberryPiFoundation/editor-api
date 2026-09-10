@@ -105,7 +105,12 @@ module Api
       end
 
       def load_project
-        @project = Project.find_by!(identifier: params.expect(:id), project_type: Project::Types::CODE_EDITOR_SCRATCH)
+        @project = ProjectLoader.new(params[:id], project_locale).load
+        raise ActiveRecord::RecordNotFound unless @project&.scratch_project?
+      end
+
+      def project_locale
+        request.headers['X-Project-Locale']
       end
     end
   end

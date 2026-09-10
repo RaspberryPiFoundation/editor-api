@@ -57,6 +57,19 @@ RSpec.describe 'Showing a Scratch project', type: :request do
     expect(response.parsed_body.fetch('targets').pluck('name')).to eq(%w[Stage Sprite1 Sprite2])
   end
 
+  it 'prefers the project matching the project locale header' do
+    identifier = 'locale-specific-project'
+    english_project = create(:project, project_type: Project::Types::CODE_EDITOR_SCRATCH, identifier:, locale: 'en', user_id: nil)
+    create(:scratch_component, project: english_project, content: { targets: [{ name: 'English Stage', isStage: true }] })
+    french_project = create(:project, project_type: Project::Types::CODE_EDITOR_SCRATCH, identifier:, locale: 'fr-FR', user_id: nil)
+    create(:scratch_component, project: french_project, content: { targets: [{ name: 'French Stage', isStage: true }] })
+
+    get "/api/scratch/projects/#{identifier}", headers: { 'X-Project-Locale' => 'fr-FR' }
+
+    expect(response).to have_http_status(:ok)
+    expect(response.parsed_body.fetch('targets').pluck('name')).to eq(['French Stage'])
+  end
+
   it 'returns a 404 if project does not exist' do
     authenticated_in_hydra_as(teacher)
     get '/api/scratch/projects/non_existent_project', headers: headers
