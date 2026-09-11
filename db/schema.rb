@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_08_28_095502) do
+ActiveRecord::Schema[8.1].define(version: 2026_09_11_104254) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -222,6 +222,15 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_095502) do
     t.index ["visibility"], name: "index_lessons_on_visibility"
   end
 
+  create_table "ownership_transfers", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.datetime "created_at", null: false
+    t.string "email_address"
+    t.uuid "school_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["school_id"], name: "index_ownership_transfers_on_school_id"
+  end
+
   create_table "project_errors", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "error", null: false
@@ -419,6 +428,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_08_28_095502) do
   add_foreign_key "lessons", "lessons", column: "copied_from_id"
   add_foreign_key "lessons", "school_classes"
   add_foreign_key "lessons", "schools"
+  add_foreign_key "ownership_transfers", "schools"
   add_foreign_key "project_errors", "projects"
   add_foreign_key "projects", "lessons"
   add_foreign_key "projects", "projects", column: "source_project_id", on_delete: :nullify
