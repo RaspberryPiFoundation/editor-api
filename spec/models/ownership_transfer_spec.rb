@@ -18,7 +18,13 @@ RSpec.describe OwnershipTransfer do
     expect(ownership_transfer).not_to be_valid
   end
 
-  # TODO: add mailer test
+  it 'sends an ownership transfer request email after create' do
+    school = create(:verified_school)
+
+    ownership_transfer = described_class.create!(email_address: 'new-owner@example.com', school:)
+
+    assert_enqueued_email_with SchoolOwnershipMailer, :request_ownership_transfer, params: { ownership_transfer: }
+  end
 
   it 'generates a token for ownership transfer' do
     ownership_transfer = create(:ownership_transfer)
