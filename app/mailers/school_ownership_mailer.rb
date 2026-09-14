@@ -6,7 +6,6 @@ class SchoolOwnershipMailer < ApplicationMailer
   def request_ownership_transfer
     ownership_transfer = params[:ownership_transfer]
     @school = ownership_transfer.school
-    @token = ownership_transfer.generate_token_for(:ownership_transfer)
 
     mail(to: ownership_transfer.email_address,
          subject: "You've been nominated to be an owner of #{@school.name}",
