@@ -9,7 +9,7 @@ class SchoolOwnershipMailer < ApplicationMailer
     @token = ownership_transfer.generate_token_for(:ownership_transfer)
 
     mail(to: ownership_transfer.email_address,
-         subject: "You have been asked to take ownership of #{@school.name}",
+         subject: "You've been nominated to be an owner of #{@school.name}",
          track_opens: 'true',
          message_stream: 'outbound')
   end
