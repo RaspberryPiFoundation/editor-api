@@ -9,10 +9,6 @@ class OwnershipTransfer < ApplicationRecord
   after_create_commit :send_ownership_transfer_request_email
   encrypts :email_address
 
-  generates_token_for :ownership_transfer, expires_in: 30.days do
-    email_address
-  end
-
   private
 
   def send_ownership_transfer_request_email
