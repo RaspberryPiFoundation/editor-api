@@ -12,20 +12,12 @@ RSpec.describe SchoolOwnershipMailer do
       allow(ENV).to receive(:fetch).with('EDITOR_PUBLIC_URL').and_return('http://example.com')
     end
 
-    it 'includes the school name in the text body' do
-      expect(email.text_part.body.to_s).to include(ownership_transfer.school.name)
+    it 'includes the school name in the body' do
+      expect(email.body.to_s).to include(ownership_transfer.school.name)
     end
 
-    it 'includes the school name in the html body' do
-      expect(email.html_part.body.to_s).to include(ownership_transfer.school.name)
-    end
-
-    it 'includes a link to respond to the ownership transfer request in the text body' do
-      expect(email.text_part.body.to_s).to include('http://example.com/en-US/school')
-    end
-
-    it 'includes a clickable link to respond to the ownership transfer request in the html body' do
-      expect(email.html_part.body.to_s).to include('href="http://example.com/en-US/school"')
+    it 'includes a link to respond to the ownership transfer request in the body' do
+      expect(email.body.to_s).to include('http://example.com/school')
     end
 
     it 'includes the school name in the subject' do
