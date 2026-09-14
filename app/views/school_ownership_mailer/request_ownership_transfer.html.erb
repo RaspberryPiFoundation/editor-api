@@ -1,0 +1,21 @@
+<p>Hi <%= @nominee_name || 'there' %>,</p>
+
+<p><%= @current_owner_name || @school.name %> has nominated you to become the new owner of the Code Classroom account for <%= @school.name %>.</p>
+
+<p>If you accept, you’ll take over ownership of the school account and be able to:</p>
+
+<ul>
+  <li>Invite a new teacher to the account</li>
+  <li>Manage teachers, students, and their access</li>
+  <li>View and manage Code Classroom settings</li>
+  <li>Transfer ownership to someone else in the future</li>
+</ul>
+
+<p>To continue, please <%= link_to 'log in', "#{ENV.fetch('EDITOR_PUBLIC_URL')}/en-US/school" %> to your account to review and accept the ownership transfer.</p>
+
+<p>If you weren’t expecting this invitation or don’t recognise the request, you can safely decline it.</p>
+
+<p>
+  Kind Regards,<br>
+  The Code Editor team
+</p>

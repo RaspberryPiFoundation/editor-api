@@ -1,14 +1,17 @@
-You have been asked to take ownership of:
+Hi <%= @nominee_name || 'there' %>,
 
-<%= @school.name %>
+<%= @current_owner_name || @school.name %> has nominated you to become the new owner of the Code Classroom account for <%= @school.name %>.
 
-Log in to your account to accept this request and become the owner of this school account.
+If you accept, you’ll take over ownership of the school account and be able to:
 
-Accept ownership transfer:
+- Invite a new teacher to the account
+- Manage teachers, students, and their access
+- View and manage Code Classroom settings
+- Transfer ownership to someone else in the future
 
-<%= "#{ENV.fetch('EDITOR_PUBLIC_URL')}/en/ownership_transfers/#{@token}" %>
+To continue, please log in to your account to review and accept the ownership transfer: <%= "#{ENV.fetch('EDITOR_PUBLIC_URL')}/en-US/school" %>
 
---
-Raspberry Pi Foundation
-Copyright Raspberry Pi Foundation UK registered charity 1129409
-All rights reserved
+If you weren’t expecting this invitation or don’t recognise the request, you can safely decline it.
+
+Kind Regards,
+The Code Editor team
