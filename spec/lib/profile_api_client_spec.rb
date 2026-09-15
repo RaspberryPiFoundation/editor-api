@@ -410,8 +410,8 @@ RSpec.describe ProfileApiClient do
     let(:username) { 'username' }
     let(:password) { 'password' }
     let(:name) { 'name' }
-    let(:school) { build(:school, id: SecureRandom.uuid) }
-    let(:student) { create(:student, school:) }
+    let(:school) { create(:school, id: SecureRandom.uuid) }
+    let(:student) { create(:student, school_id: school.id) }
     let(:update_student_url) { "#{api_url}/api/v1/schools/#{school.id}/students/#{student.id}" }
 
     before do
