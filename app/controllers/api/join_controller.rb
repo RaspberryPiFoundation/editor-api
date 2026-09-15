@@ -19,7 +19,7 @@ module Api
       when :already_member
         render json: {}, status: :ok
       when :joinable
-        add_student_to_school_and_class
+        add_student_to_class
         render json: {}, status: :ok
       else
         raise "Unexpected join action_status: #{action_status.inspect}"
@@ -43,13 +43,8 @@ module Api
       @action_status ||= JoinStatusService.new(school: @school, school_class: @school_class, user: current_user).call
     end
 
-    def add_student_to_school_and_class
-      ActiveRecord::Base.transaction do
-        Role.find_or_create_by!(school: @school, user_id: current_user.id, role: :student)
-        ClassStudent.find_or_create_by!(school_class: @school_class, student_id: current_user.id) do |class_student|
-          class_student.student = current_user
-        end
-      end
+    def add_student_to_class
+      @school_class.students.find_or_create_by!(student_id: current_user.id)
     rescue ActiveRecord::RecordNotUnique
       # Concurrent join request for the same user/class — DB unique index
       # caught a race we couldn't catch at validation time. Already enrolled.
