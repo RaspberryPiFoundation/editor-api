@@ -7,14 +7,14 @@ module Api
     authorize_resource :ownership_transfer, class: false
 
     def show
-      @ownership_transfer = pending_ownership_transfer
+      @ownership_transfer = most_recent_ownership_transfer
 
       if @ownership_transfer.blank? || cannot?(:read, @ownership_transfer)
         head :not_found
       elsif current_user_is_requester?
-        render json: { you_are: 'owner', nominee_name: nominee_name }, status: :ok
+        render json: { status: @ownership_transfer.status, you_are: 'owner', nominee_name: nominee_name }, status: :ok
       else
-        render json: { you_are: 'nominee' }, status: :ok
+        render json: { status: @ownership_transfer.status, you_are: 'nominee' }, status: :ok
       end
     end
 
@@ -38,8 +38,8 @@ module Api
       ownership_transfer_params[:nominated_user_id]
     end
 
-    def pending_ownership_transfer
-      @school.ownership_transfers.pending.order(created_at: :desc).first
+    def most_recent_ownership_transfer
+      @school.ownership_transfers.order(created_at: :desc).first
     end
 
     def current_user_is_requester?

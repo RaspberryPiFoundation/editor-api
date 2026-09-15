@@ -18,7 +18,7 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
     expect(response).to have_http_status(:forbidden)
   end
 
-  context 'when there is no pending transfer for the school' do
+  context 'when the school has never had an ownership transfer' do
     before { authenticated_in_hydra_as(owner) }
 
     it 'responds 404 Not Found' do
@@ -62,6 +62,13 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
         json = JSON.parse(response.body)
         expect(json['nominee_name']).to eq(nominee.name)
       end
+
+      it 'includes the transfer status' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        json = JSON.parse(response.body)
+        expect(json['status']).to eq('pending')
+      end
     end
 
     context 'when the current user is the nominee' do
@@ -77,6 +84,13 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
 
         json = JSON.parse(response.body)
         expect(json['you_are']).to eq('nominee')
+      end
+
+      it 'includes the transfer status' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        json = JSON.parse(response.body)
+        expect(json['status']).to eq('pending')
       end
     end
 
@@ -96,16 +110,61 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
       it_behaves_like 'a hidden ownership transfer'
     end
 
-    context 'when the pending transfer is no longer pending' do
+    context 'when the transfer has completed' do
       before do
         ownership_transfer.update!(status: :completed)
+        stub_user_info_api_for(nominee)
         authenticated_in_hydra_as(owner)
       end
 
-      it 'responds 404 Not Found' do
+      it 'responds 200 OK, still visible to the requester' do
         get("/api/schools/#{school.id}/ownership_transfer", headers:)
-        expect(response).to have_http_status(:not_found)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json).to include('status' => 'completed', 'you_are' => 'owner', 'nominee_name' => nominee.name)
       end
+    end
+
+    context 'when the transfer was rejected' do
+      before do
+        ownership_transfer.update!(status: :rejected)
+        authenticated_in_hydra_as(nominee)
+      end
+
+      it 'responds 200 OK, still visible to the nominee who rejected it' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json).to include('status' => 'rejected', 'you_are' => 'nominee')
+      end
+    end
+
+    context 'when the transfer was cancelled' do
+      before do
+        ownership_transfer.update!(status: :cancelled)
+        authenticated_in_hydra_as(nominee)
+      end
+
+      it 'responds 200 OK, still visible to the nominee' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json).to include('status' => 'cancelled', 'you_are' => 'nominee')
+      end
+    end
+
+    context 'when a resolved transfer is viewed by someone who was never involved' do
+      let(:other_teacher) { create(:teacher, school:) }
+
+      before do
+        ownership_transfer.update!(status: :completed)
+        authenticated_in_hydra_as(other_teacher)
+      end
+
+      it_behaves_like 'a hidden ownership transfer'
     end
   end
 end
