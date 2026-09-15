@@ -41,6 +41,17 @@ RSpec.describe School do
       expect(school.school_email_domains.size).to eq(2)
     end
 
+    it 'has many ownership transfers' do
+      owner_one = create(:owner_role, school:)
+      owner_two = create(:owner_role, school:)
+      stub_user_info_api_fetch_by_ids(user_ids: [owner_one.user_id])
+      create(:ownership_transfer, school:, requested_by_user_id: owner_one.user_id, nominated_user_id: owner_one.user_id)
+      stub_user_info_api_fetch_by_ids(user_ids: [owner_two.user_id])
+      create(:ownership_transfer, school:, requested_by_user_id: owner_two.user_id, nominated_user_id: owner_two.user_id)
+      
+      expect(school.ownership_transfers.size).to eq(2)
+    end
+
     context 'when a school is destroyed' do
       let!(:school_class) { create(:school_class, school:, teacher_ids: [teacher.id]) }
       let!(:lesson_1) { create(:lesson, user_id: teacher.id, school_class:) }
