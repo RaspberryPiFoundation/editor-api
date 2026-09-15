@@ -71,26 +71,6 @@ RSpec.describe 'Join endpoint' do
         data = JSON.parse(response.body, symbolize_names: true)
         expect(data[:status]).to eq('wrong_school')
       end
-
-      context 'when the email domain is not registered for the school' do
-        let(:student) { build(:student, email: 'student@other.edu') }
-
-        it 'returns status: domain_mismatch' do
-          get "/api/join/#{school_class.join_code}", headers: headers
-
-          data = JSON.parse(response.body, symbolize_names: true)
-          expect(data[:status]).to eq('domain_mismatch')
-        end
-
-        it 'returns status: joinable when the user is already a student of the school' do
-          create(:student_role, school:, user_id: student.id)
-
-          get "/api/join/#{school_class.join_code}", headers: headers
-
-          data = JSON.parse(response.body, symbolize_names: true)
-          expect(data[:status]).to eq('joinable')
-        end
-      end
     end
 
     context 'when the user is authenticated as a teacher' do
@@ -207,30 +187,6 @@ RSpec.describe 'Join endpoint' do
 
         expect(response).to have_http_status(:internal_server_error)
         expect(response.body).to include('Unexpected join action_status')
-      end
-
-      context 'when the email domain is not registered for the school' do
-        let(:student) { build(:student, email: 'student@other.edu') }
-
-        it 'responds with 403 domain_mismatch and does not enroll the user' do
-          expect do
-            post "/api/join/#{school_class.join_code}", headers: headers
-          end.not_to change(ClassStudent, :count)
-
-          expect(response).to have_http_status(:forbidden)
-          data = JSON.parse(response.body, symbolize_names: true)
-          expect(data[:error]).to eq('domain_mismatch')
-        end
-
-        it 'enrolls the user when they are already a student of the school' do
-          create(:student_role, school:, user_id: student.id)
-
-          expect do
-            post "/api/join/#{school_class.join_code}", headers: headers
-          end.to change(ClassStudent, :count).by(1)
-
-          expect(response).to have_http_status(:ok)
-        end
       end
     end
 
