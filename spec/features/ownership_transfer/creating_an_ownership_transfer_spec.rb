@@ -5,10 +5,8 @@ require 'rails_helper'
 RSpec.describe 'Creating an ownership transfer', type: :request do
   include ActionMailer::TestHelper
 
-  let(:headers) { { Authorization: UserProfileMock::TOKEN } }
-  let(:school) { create(:school) }
-  let(:owner) { create(:owner, school:) }
-  let(:nominee) { create(:teacher, school:) }
+  include_context 'with a school owner and nominated teacher'
+
   let(:params) { { ownership_transfer: { nominated_user_id: nominee.id } } }
 
   before do

@@ -6,6 +6,18 @@ module Api
     load_and_authorize_resource :school
     authorize_resource :ownership_transfer, class: false
 
+    def show
+      @ownership_transfer = pending_ownership_transfer
+
+      if @ownership_transfer.blank? || cannot?(:read, @ownership_transfer)
+        head :not_found
+      elsif current_user_is_requester?
+        render json: { you_are: 'owner', nominee_name: nominee_name }, status: :ok
+      else
+        render json: { you_are: 'nominee' }, status: :ok
+      end
+    end
+
     def create
       result = OwnershipTransfer::Create.call(school: @school, nominated_user_id:, requested_by_user_id: current_user.id)
 
@@ -24,6 +36,18 @@ module Api
 
     def nominated_user_id
       ownership_transfer_params[:nominated_user_id]
+    end
+
+    def pending_ownership_transfer
+      @school.ownership_transfers.pending.order(created_at: :desc).first
+    end
+
+    def current_user_is_requester?
+      @ownership_transfer.requested_by_user_id == current_user.id
+    end
+
+    def nominee_name
+      User.from_userinfo(ids: @ownership_transfer.nominated_user_id).first&.name
     end
   end
 end
