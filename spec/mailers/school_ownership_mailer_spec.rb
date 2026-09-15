@@ -6,7 +6,9 @@ RSpec.describe SchoolOwnershipMailer do
   describe 'request_ownership_transfer' do
     subject(:email) { described_class.with(ownership_transfer:).request_ownership_transfer }
 
-    let(:ownership_transfer) { create(:ownership_transfer) }
+    let(:school) { create(:school) }
+    let(:nominee) { create(:teacher, school:) }
+    let(:ownership_transfer) { create(:ownership_transfer, school:, nominated_user_id: nominee.id) }
 
     before do
       allow(ENV).to receive(:fetch).with('EDITOR_PUBLIC_URL').and_return('http://example.com')
