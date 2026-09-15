@@ -12,6 +12,12 @@ describe StudentRoleService do
       expect { described_class.ensure_student_role(user) }.not_to change(Role, :count)
     end
 
+    it 'does not create a role when the school_id is not set' do
+      user = build(:student, school_id: nil)
+
+      expect { described_class.ensure_student_role(user) }.not_to change(Role, :count)
+    end
+
     it 'creates a student role in the school of a student account' do
       user = build(:student, school_id: school.id)
 
