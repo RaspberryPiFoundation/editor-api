@@ -229,7 +229,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_093824) do
     t.uuid "nominated_user_id", null: false
     t.uuid "requested_by_user_id", null: false
     t.uuid "school_id", null: false
-    t.string "status", default: "pre_pending", null: false
+    t.string "status", default: "pending", null: false
     t.datetime "updated_at", null: false
     t.index ["school_id"], name: "index_ownership_transfers_on_school_id"
   end
