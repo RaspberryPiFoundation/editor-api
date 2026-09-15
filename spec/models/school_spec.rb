@@ -44,7 +44,13 @@ RSpec.describe School do
     it 'has many ownership transfers' do
       owner_one = create(:owner_role, school:)
       owner_two = create(:owner_role, school:)
-      create(:ownership_transfer, school:, requested_by_user_id: owner_one.user_id, nominated_user_id: owner_one.user_id)
+      create(
+        :ownership_transfer,
+        school:,
+        requested_by_user_id: owner_one.user_id,
+        nominated_user_id: owner_one.user_id,
+        status: :completed
+      )
       create(:ownership_transfer, school:, requested_by_user_id: owner_two.user_id, nominated_user_id: owner_two.user_id)
 
       expect(school.ownership_transfers.size).to eq(2)

@@ -23,6 +23,8 @@ en:
       school_roll_number_exists: "School roll number already exists"
     invitation:
       email_address: "'%<value>s' is invalid"
+    ownership_transfer:
+      school_pending: "already has a pending ownership transfer"
   activerecord:
     attributes:
       school_class:
