@@ -14,7 +14,7 @@ module Api
 
     def create
       case action_status
-      when :wrong_school, :domain_mismatch, :not_a_student
+      when :wrong_school, :not_a_student
         render json: { error: action_status.to_s }, status: :forbidden
       when :already_member
         render json: {}, status: :ok

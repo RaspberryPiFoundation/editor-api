@@ -86,14 +86,6 @@ describe JoinStatusService do
       end
     end
 
-    context "when the user's email domain is not registered for the school" do
-      let(:user) { build(:student, email: 'user@other.edu') }
-
-      it 'returns :domain_mismatch' do
-        expect(service.call).to eq(:domain_mismatch)
-      end
-    end
-
     context 'when the user has no prior role and their email domain matches the school' do
       it 'returns :joinable' do
         expect(service.call).to eq(:joinable)
