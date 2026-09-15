@@ -6,11 +6,8 @@ class OwnershipTransfer < ApplicationRecord
   belongs_to :school
 
   enum :status, {
-    pre_pending: 'pre_pending', pending: 'pending',
-    pre_completion: 'pre_completion', completed: 'completed',
-    pre_rejected: 'pre_rejected', rejected: 'rejected',
-    pre_cancelled: 'pre_cancelled', cancelled: 'cancelled'
-  }, default: :pre_pending, validate: true
+    pending: 'pending', completed: 'completed', rejected: 'rejected', cancelled: 'cancelled'
+  }, default: :pending, validate: true
 
   validates :nominated_user_id, presence: true
   validates :requested_by_user_id, presence: true
@@ -26,10 +23,7 @@ class OwnershipTransfer < ApplicationRecord
   def nominee_has_the_school_owner_or_school_teacher_role_for_the_school
     return unless nominated_user_id_changed? && errors.blank? && school
 
-    nominated_user = User.from_userinfo(ids: [nominated_user_id]).first
-
-    return if nominated_user.school_owner?(school)
-    return if nominated_user.school_teacher?(school)
+    return if school.roles.exists?(user_id: nominated_user_id, role: %i[owner teacher])
 
     msg = "'#{nominated_user_id}' does not have the 'owner' or 'teacher' role for school '#{school.id}'"
     errors.add(:nominated_user_id, msg)
