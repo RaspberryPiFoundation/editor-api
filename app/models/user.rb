@@ -17,6 +17,7 @@ class User
     picture
     postcode
     profile
+    school_id
     token
     username
     roles
@@ -52,6 +53,10 @@ class User
 
   def student?
     Role.student.exists?(user_id: id)
+  end
+
+  def school_id
+    @school_id if student_account_type?
   end
 
   def student_account_type?
