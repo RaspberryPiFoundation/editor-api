@@ -396,7 +396,7 @@ GEM
     rails-html-sanitizer (1.7.1)
       loofah (~> 2.25, >= 2.25.2)
       nokogiri (>= 1.15.7, != 1.16.7, != 1.16.6, != 1.16.5, != 1.16.4, != 1.16.3, != 1.16.2, != 1.16.1, != 1.16.0.rc1, != 1.16.0)
-    rails_semantic_logger (5.1.0)
+    rails_semantic_logger (5.2.0)
       rack
       railties (>= 7.2)
       semantic_logger (>= 5.1)
@@ -596,6 +596,7 @@ DEPENDENCIES
   image_processing
   importmap-rails
   jbuilder
+  json (~> 2.21.2)
   kaminari
   omniauth-rails_csrf_protection (~> 2.0.1)
   omniauth-rpi!
@@ -610,7 +611,7 @@ DEPENDENCIES
   rack-cors
   rack_content_type_default (~> 1.1)
   rails (~> 8.1.3.1)
-  rails_semantic_logger (~> 5.1)
+  rails_semantic_logger (~> 5.2)
   rspec
   rspec-rails
   rspec_junit_formatter
