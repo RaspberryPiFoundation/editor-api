@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Experience CS project migration requests' do
+  include ActiveJob::TestHelper
+
   let(:headers) { { ExperienceCsServiceAuthenticator::HEADER => 'service-api-key' } }
   let(:school) { create(:school) }
   let(:owner) { create(:teacher, school:) }
@@ -13,7 +15,8 @@ RSpec.describe 'Experience CS project migration requests' do
       school:,
       user_id: owner.id,
       locale: nil,
-      project_type: Project::Types::SCRATCH
+      project_type: Project::Types::SCRATCH,
+      lesson: create(:lesson, school: school, user_id: owner.id)
     )
   end
   let(:scratch_data) { { targets: [], monitors: [], extensions: [], meta: {} } }
@@ -51,6 +54,32 @@ RSpec.describe 'Experience CS project migration requests' do
       origin: Project::Origins::EXPERIENCE_CS
     )
     expect(project.scratch_component.content.to_h).to eq(scratch_data.deep_stringify_keys)
+  end
+
+  it 'converts a finished flag into a complete' do
+    project.school_project.update!(finished: true)
+
+    put(path, params:, headers:, as: :json)
+
+    expect(response).to have_http_status(:ok)
+    school_project = project.reload.school_project
+    expect(school_project).to have_attributes(finished: false, status: 'complete')
+    expect(school_project.school_project_transitions.order(:sort_key).last.metadata)
+      .to include('info' => 'backfilled_from_finished')
+  end
+
+  it 'does not run salesforce sync' do
+    project.school_project.update!(finished: true)
+
+    allow(Salesforce::LessonSyncJob).to receive(:perform_later)
+
+    ClimateControl.modify(SALESFORCE_ENABLED: 'true') do
+      put(path, params:, headers:, as: :json)
+    end
+
+    expect(Salesforce::LessonSyncJob).not_to have_received(:perform_later)
+
+    expect(response).to have_http_status(:ok)
   end
 
   it 'rejects a replay without overwriting Code Classroom changes' do

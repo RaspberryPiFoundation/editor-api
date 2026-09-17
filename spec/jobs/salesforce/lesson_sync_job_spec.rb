@@ -108,15 +108,19 @@ RSpec.describe Salesforce::LessonSyncJob, :requires_salesforce_db do
       expect(sf_lesson.numberofcompletedprojects__c).to eq(1)
     end
 
-    it 'sums state-machine submissions and Experience CS finishes' do
-      lesson.update!(submitted_projects_count: 4)
-      2.times do
-        finished_remix = create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
-        finished_remix.school_project.update!(finished: true)
-      end
+    it 'sums submissions, completed and finished projects' do
+      lesson.update!(submitted_projects_count: 1)
+
+      finished_remix = create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
+      finished_remix.school_project.update!(finished: true)
+
+      submitted_remix = create(:project, school:, user_id: student.id, remixed_from_id: lesson.project.id)
+      submitted_remix.school_project.transition_status_to!(:complete, nil)
+
       perform_job
+
       sf_lesson = Salesforce::Lesson.find_by(lesson_uuid__c: lesson.id)
-      expect(sf_lesson.numberofcompletedprojects__c).to eq(6)
+      expect(sf_lesson.numberofcompletedprojects__c).to eq(3)
     end
   end
 
