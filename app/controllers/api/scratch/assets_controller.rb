@@ -64,7 +64,9 @@ module Api
         if scratch_asset.new_record?
           begin
             scratch_asset.save!
-          rescue ActiveRecord::RecordNotUnique
+          rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
+            raise unless duplicate_filename_error?(e)
+
             logger.info("Scratch asset already created during concurrent upload: #{attributes.fetch(:filename)}")
             scratch_asset = ScratchAsset.find_by!(attributes)
           end
@@ -77,6 +79,12 @@ module Api
         end
 
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
+      end
+
+      def duplicate_filename_error?(error)
+        return true if error.is_a?(ActiveRecord::RecordNotUnique)
+
+        error.record.errors.of_kind?(:filename, :taken)
       end
 
       def attach_file_with_conflict_check(scratch_asset, filename)
@@ -93,7 +101,9 @@ module Api
       end
 
       def attach_file_unless_present(scratch_asset, filename)
-        scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
+        scratch_asset.with_lock do
+          scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
+        end
       end
 
       def file_matches?(scratch_asset)
