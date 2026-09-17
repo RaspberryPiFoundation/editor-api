@@ -380,6 +380,22 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
         expect(ActiveStorage::Blob.count).to eq(blob_count)
       end
 
+      it 'does not attach a second file when another request attaches one first' do
+        existing_asset = ScratchAsset.create!(filename:, project:, uploaded_user_id: teacher.id)
+        second_asset = ScratchAsset.find(existing_asset.id)
+        second_asset.file.attached?
+        stub_find_or_initialize_scratch_asset(second_asset, filename:, project:, uploaded_user_id: teacher.id)
+        ScratchAsset.find(existing_asset.id).file.attach(
+          io: StringIO.new('winner-body'), filename:, content_type: 'image/png'
+        )
+
+        expect { make_request }.not_to change(ActiveStorage::Blob, :count)
+
+        expect(response).to have_http_status(:created)
+        expect(ActiveStorage::Attachment.where(record: existing_asset, name: 'file').count).to eq(1)
+        expect(existing_asset.reload.file.download).to eq('winner-body')
+      end
+
       it 'raises any other errors not related to the race condition' do
         invalid_asset = ScratchAsset.new(filename:, project:, uploaded_user_id: nil)
         stub_find_or_initialize_scratch_asset(invalid_asset, filename:, project:, uploaded_user_id: teacher.id)

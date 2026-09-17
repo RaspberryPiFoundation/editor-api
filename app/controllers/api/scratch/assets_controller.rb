@@ -101,7 +101,9 @@ module Api
       end
 
       def attach_file_unless_present(scratch_asset, filename)
-        scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
+        scratch_asset.with_lock do
+          scratch_asset.file.attach(io: request.body, filename:) unless scratch_asset.file.attached?
+        end
       end
 
       def file_matches?(scratch_asset)
