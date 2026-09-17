@@ -14,9 +14,9 @@ RSpec.describe SchoolOwnershipMailer do
     end
 
     before do
-      stub_user_info_api_fetch_by_ids(user_ids: [nominee.id], users: [{ id: nominee.id, name: nominee.name }])
       stub_user_info_api_fetch_by_ids(
-        user_ids: [requested_owner.id], users: [{ id: requested_owner.id, name: requested_owner.name }]
+        user_ids: [nominee.id, requested_owner.id],
+        users: [{ id: nominee.id, name: nominee.name }, { id: requested_owner.id, name: requested_owner.name }]
       )
       allow(ENV).to receive(:fetch).with('EDITOR_PUBLIC_URL').and_return('http://example.com')
     end

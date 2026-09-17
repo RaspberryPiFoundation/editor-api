@@ -7,21 +7,27 @@ class SchoolOwnershipMailerPreview < ActionMailer::Preview
 
   def request_ownership_transfer
     school = School.new(name: 'Elmwood Secondary School')
-    stub_user_info_api
-
     ownership_transfer = OwnershipTransfer.new(
       email_address: 'teacher@example.com',
       school:,
       nominated_user_id: NOMINEE[:id],
       requested_by_user_id: REQUESTED_OWNER[:id]
     )
-    SchoolOwnershipMailer.with(ownership_transfer:).request_ownership_transfer
+
+    with_stubbed_user_info_api { SchoolOwnershipMailer.with(ownership_transfer:).request_ownership_transfer.message }
   end
 
   private
 
-  def stub_user_info_api
+  # fake the user info response, but only for the duration of
+  # this call, so other previews/requests in the same dev server aren't affected
+  def with_stubbed_user_info_api
     users = [NOMINEE, REQUESTED_OWNER]
+    original_fetch_by_ids = UserInfoApiClient.method(:fetch_by_ids)
+
     UserInfoApiClient.define_singleton_method(:fetch_by_ids) { |ids| users.select { |u| ids.include?(u[:id]) } }
+    yield
+  ensure
+    UserInfoApiClient.define_singleton_method(:fetch_by_ids, original_fetch_by_ids)
   end
 end
