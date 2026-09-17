@@ -25,17 +25,19 @@ module Api
 
     def migrate_project!
       attributes = migration_params
-      @project.with_lock do
-        authorize! :migrate_from_experience_cs, @project
-        @project.update!(
-          attributes.slice(:name, :instructions).merge(
-            project_type: Project::Types::CODE_EDITOR_SCRATCH,
-            origin: Project::Origins::EXPERIENCE_CS
+      FeatureFlags.without_salesforce_sync do
+        @project.with_lock do
+          authorize! :migrate_from_experience_cs, @project
+          @project.update!(
+            attributes.slice(:name, :instructions).merge(
+              project_type: Project::Types::CODE_EDITOR_SCRATCH,
+              origin: Project::Origins::EXPERIENCE_CS
+            )
           )
-        )
-        scratch_component = @project.scratch_component || @project.build_scratch_component
-        scratch_component.update!(attributes.require(:scratch_component).slice(:content))
-        convert_finished_flag_to_complete!
+          scratch_component = @project.scratch_component || @project.build_scratch_component
+          scratch_component.update!(attributes.require(:scratch_component).slice(:content))
+          convert_finished_flag_to_complete!
+        end
       end
     end
 
