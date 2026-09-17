@@ -44,6 +44,10 @@ class Lesson < ApplicationRecord
     end
   end
 
+  def completed_projects_count
+    school_projects.in_state(:complete).count
+  end
+
   def finished_projects_count
     school_projects.where(finished: true).count
   end
