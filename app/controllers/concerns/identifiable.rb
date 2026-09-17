@@ -16,6 +16,8 @@ module Identifiable
 
     @current_user = User.from_token(token:)
     return if @current_user.blank?
+
+    StudentRoleService.ensure_student_role(@current_user)
     return unless RequestStore.respond_to?(:active?) && RequestStore.active?
 
     RequestStore.store[:safeguarding_flag_users_by_token] ||= {}

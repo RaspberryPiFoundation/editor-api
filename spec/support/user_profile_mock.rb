@@ -32,7 +32,8 @@ module UserProfileMock
       name: user.name,
       email: user.email,
       username: user.username,
-      roles: user.roles
+      roles: user.roles,
+      school_id: user.school_id
     }
   end
 
