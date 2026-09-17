@@ -63,7 +63,7 @@ services:
   salesforce_connect:
     image: ghcr.io/raspberrypifoundation/heroku-connect
     volumes:
-      - salesforce_connect_data:/var/lib/postgres/data/
+      - salesforce_connect_data:/var/lib/postgresql/data
     environment:
       - POSTGRES_DB=salesforce_development
       - POSTGRES_CLONE_DB=salesforce_test
