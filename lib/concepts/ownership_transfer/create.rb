@@ -22,7 +22,7 @@ class OwnershipTransfer
       rescue StandardError => e
         response ||= OperationResponse.new
         Sentry.capture_exception(e)
-        response[:error] = "Error creating ownership transfer: #{e}"
+        response[:error] = 'Error creating ownership transfer'
         response
       end
 
