@@ -28,7 +28,23 @@ module Api
       end
     end
 
+    def accept
+      resolve!(:completed)
+    end
+
     private
+
+    def resolve!(status)
+      transfer = pending_ownership_transfer
+
+      if transfer.blank? || cannot?(action_name.to_sym, transfer)
+        head :not_found
+      elsif transfer.update(status:)
+        head :ok
+      else
+        render json: { error: transfer.errors }, status: :unprocessable_content
+      end
+    end
 
     def ownership_transfer_params
       params.expect(ownership_transfer: [:nominated_user_id])
@@ -40,6 +56,10 @@ module Api
 
     def most_recent_ownership_transfer
       @school.ownership_transfers.order(created_at: :desc).first
+    end
+
+    def pending_ownership_transfer
+      @school.ownership_transfers.pending.first
     end
 
     def current_user_is_requester?
