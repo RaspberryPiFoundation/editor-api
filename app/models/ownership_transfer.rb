@@ -24,7 +24,7 @@ class OwnershipTransfer < ApplicationRecord
   private
 
   def nominee_has_the_school_owner_or_school_teacher_role_for_the_school
-    return unless nominated_user_id_changed? && errors.blank? && school
+    return unless nominated_user_id_changed? && school
 
     return if school.owner_or_teacher?(nominated_user_id)
 
