@@ -244,7 +244,7 @@ GEM
       actionview (>= 7.0.0)
       activesupport (>= 7.0.0)
     jmespath (1.6.2)
-    json (2.21.2)
+    json (3.0.1)
     jwt (2.10.3)
       base64
     kaminari (1.2.2)
@@ -596,7 +596,7 @@ DEPENDENCIES
   image_processing
   importmap-rails
   jbuilder
-  json (~> 2.21.2)
+  json (~> 3.0.1)
   kaminari
   omniauth-rails_csrf_protection (~> 2.0.1)
   omniauth-rpi!
