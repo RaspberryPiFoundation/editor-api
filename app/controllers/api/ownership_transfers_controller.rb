@@ -38,15 +38,20 @@ module Api
 
     private
 
+    # Wrapped in a transaction so the row lock below is held across the
+    # read-and-update, preventing a concurrent accept/decline on the same
+    # transfer from also finding it pending.
     def resolve!(status)
-      transfer = pending_ownership_transfer
+      OwnershipTransfer.transaction do
+        transfer = pending_ownership_transfer
 
-      if transfer.blank? || cannot?(action_name.to_sym, transfer)
-        head :not_found
-      elsif transfer.update(status:)
-        head :ok
-      else
-        render json: { error: transfer.errors }, status: :unprocessable_content
+        if transfer.blank? || cannot?(action_name.to_sym, transfer)
+          head :not_found
+        elsif transfer.update(status:)
+          head :ok
+        else
+          render json: { error: transfer.errors }, status: :unprocessable_content
+        end
       end
     end
 
@@ -63,7 +68,7 @@ module Api
     end
 
     def pending_ownership_transfer
-      @school.ownership_transfers.pending.first
+      @school.ownership_transfers.lock.pending.first
     end
 
     def current_user_is_requester?
