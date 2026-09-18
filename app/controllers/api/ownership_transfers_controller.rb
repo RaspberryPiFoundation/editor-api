@@ -28,7 +28,32 @@ module Api
       end
     end
 
+    def accept
+      resolve!(:completed)
+    end
+
+    def decline
+      resolve!(:rejected)
+    end
+
     private
+
+    # Wrapped in a transaction so the row lock below is held across the
+    # read-and-update, preventing a concurrent accept/decline on the same
+    # transfer from also finding it pending.
+    def resolve!(status)
+      OwnershipTransfer.transaction do
+        transfer = pending_ownership_transfer
+
+        if transfer.blank? || cannot?(action_name.to_sym, transfer)
+          head :not_found
+        elsif transfer.update(status:)
+          head :ok
+        else
+          render json: { error: transfer.errors }, status: :unprocessable_content
+        end
+      end
+    end
 
     def ownership_transfer_params
       params.expect(ownership_transfer: [:nominated_user_id])
@@ -40,6 +65,10 @@ module Api
 
     def most_recent_ownership_transfer
       @school.ownership_transfers.order(created_at: :desc).first
+    end
+
+    def pending_ownership_transfer
+      @school.ownership_transfers.lock.pending.first
     end
 
     def current_user_is_requester?
