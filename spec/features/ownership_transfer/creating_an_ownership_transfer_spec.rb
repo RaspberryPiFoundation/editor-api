@@ -85,6 +85,13 @@ RSpec.describe 'Creating an ownership transfer', type: :request do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
+      it 'includes a validation error in the response body' do
+        post("/api/schools/#{school.id}/ownership_transfer", params:, headers:)
+
+        json = JSON.parse(response.body)
+        expect(json['error']).to be_present
+      end
+
       it 'does not create an ownership transfer' do
         expect do
           post("/api/schools/#{school.id}/ownership_transfer", params:, headers:)
@@ -98,6 +105,13 @@ RSpec.describe 'Creating an ownership transfer', type: :request do
       it 'responds 422 Unprocessable entity' do
         post("/api/schools/#{school.id}/ownership_transfer", params:, headers:)
         expect(response).to have_http_status(:unprocessable_content)
+      end
+
+      it 'includes the pending-transfer error in the response body' do
+        post("/api/schools/#{school.id}/ownership_transfer", params:, headers:)
+
+        json = JSON.parse(response.body)
+        expect(json['error']['school_id']).to include('already has a pending ownership transfer')
       end
 
       it 'does not create a second ownership transfer' do
