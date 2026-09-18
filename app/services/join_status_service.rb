@@ -9,7 +9,6 @@
 #   :joinable             — user can be enrolled as a student of this class
 #   :not_a_student        — user has a non-student role
 #   :wrong_school         — user is a student of a different school
-#   :domain_mismatch      — user's email domain isn't registered for the school
 class JoinStatusService
   def initialize(school:, school_class:, user:)
     @school = school
@@ -30,7 +29,6 @@ class JoinStatusService
   def new_user_join_status
     return :not_a_student if user_has_non_student_account_type?
     return :wrong_school if user_in_different_school?
-    return :domain_mismatch unless @school.email_domain_in_school_domains?(@user.email)
 
     :joinable
   end

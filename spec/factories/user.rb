@@ -18,10 +18,15 @@ FactoryBot.define do
     end
 
     factory :student do
+      transient do
+        school { nil }
+      end
+
       email { nil }
       username { Faker::Internet.username }
       sso_providers { [] } # standard students have no SSO providers
       sub { "student:#{id}" }
+      school_id { school&.id || create(:school).id }
 
       trait :sso do
         email { Faker::Internet.email }
@@ -29,12 +34,8 @@ FactoryBot.define do
         sso_providers { ['google'] } # SSO students have SSO providers
       end
 
-      transient do
-        school { nil }
-      end
-
-      after(:create) do |user, context|
-        create(:student_role, user_id: user.id, school: context.school)
+      after(:create) do |user|
+        create(:student_role, user_id: user.id, school_id: user.school_id)
       end
     end
 
