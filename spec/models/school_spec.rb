@@ -117,6 +117,25 @@ RSpec.describe School do
     end
   end
 
+  describe '#owner_or_teacher?' do
+    it 'is true for a user with the owner role at the school' do
+      owner = create(:owner, school:)
+      expect(school.owner_or_teacher?(owner.id)).to be(true)
+    end
+
+    it 'is true for a user with the teacher role at the school' do
+      expect(school.owner_or_teacher?(teacher.id)).to be(true)
+    end
+
+    it 'is false for a user with only the student role at the school' do
+      expect(school.owner_or_teacher?(student.id)).to be(false)
+    end
+
+    it 'is false for a user with no role at the school' do
+      expect(school.owner_or_teacher?(SecureRandom.uuid)).to be(false)
+    end
+  end
+
   describe 'validations' do
     subject(:school) { create(:school) }
 

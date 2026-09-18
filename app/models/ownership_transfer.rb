@@ -26,7 +26,7 @@ class OwnershipTransfer < ApplicationRecord
   def nominee_has_the_school_owner_or_school_teacher_role_for_the_school
     return unless nominated_user_id_changed? && errors.blank? && school
 
-    return if school.roles.exists?(user_id: nominated_user_id, role: %i[owner teacher])
+    return if school.owner_or_teacher?(nominated_user_id)
 
     msg = "'#{nominated_user_id}' does not have the 'owner' or 'teacher' role for school '#{school.id}'"
     errors.add(:nominated_user_id, msg)
