@@ -32,6 +32,10 @@ module Api
       resolve!(:completed)
     end
 
+    def decline
+      resolve!(:rejected)
+    end
+
     private
 
     def resolve!(status)

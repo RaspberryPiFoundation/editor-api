@@ -39,7 +39,7 @@ class Ability
         invitation.email_address.present? &&
         invitation.email_address.casecmp?(user.email)
     end
-    can :accept, OwnershipTransfer do |transfer|
+    can %i[accept decline], OwnershipTransfer do |transfer|
       user.id == transfer.nominated_user_id
     end
   end
@@ -85,7 +85,7 @@ class Ability
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
-    can(%i[read create accept], :ownership_transfer)
+    can(%i[read create accept decline], :ownership_transfer)
     can(:read, OwnershipTransfer, school_id: school.id, requested_by_user_id: user.id)
     can(%i[read create create_batch update destroy destroy_batch], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
@@ -103,7 +103,7 @@ class Ability
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id }, teachers: { teacher_id: user.id } })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
-    can(%i[read accept], :ownership_transfer)
+    can(%i[read accept decline], :ownership_transfer)
     can(:read, OwnershipTransfer, school_id: school.id, nominated_user_id: user.id)
     can(%i[read create create_batch update], :school_student)
     can(%i[create update destroy], Lesson) do |lesson|
