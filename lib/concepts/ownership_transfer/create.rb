@@ -14,6 +14,11 @@ class OwnershipTransfer
         end
 
         response
+      rescue ActiveRecord::RecordNotUnique
+        response ||= OperationResponse.new
+        ownership_transfer.errors.add(:school_id, I18n.t('validations.ownership_transfer.school_pending'))
+        response[:error] = ownership_transfer.errors
+        response
       rescue StandardError => e
         response ||= OperationResponse.new
         Sentry.capture_exception(e)
