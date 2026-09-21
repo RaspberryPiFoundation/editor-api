@@ -39,9 +39,6 @@ class Ability
         invitation.email_address.present? &&
         invitation.email_address.casecmp?(user.email)
     end
-    can %i[accept decline], OwnershipTransfer do |transfer|
-      user.id == transfer.nominated_user_id
-    end
   end
 
   def define_authenticated_non_student_abilities(user)
@@ -103,8 +100,8 @@ class Ability
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id }, teachers: { teacher_id: user.id } })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
-    can(%i[read accept decline], :ownership_transfer)
-    can(:read, OwnershipTransfer, school_id: school.id, nominated_user_id: user.id)
+    can(%i[read], :ownership_transfer)
+    can(%i[read accept decline], OwnershipTransfer, school_id: school.id, nominated_user_id: user.id)
     can(%i[read create create_batch update], :school_student)
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
