@@ -13,7 +13,7 @@ class Ability
     user.schools.active.each do |school|
       define_school_student_abilities(user:, school:) if user.school_student?(school)
       define_school_teacher_abilities(user:, school:) if user.school_teacher?(school)
-      define_school_owner_abilities(school:) if user.school_owner?(school)
+      define_school_owner_abilities(user:, school:) if user.school_owner?(school)
     end
 
     define_editor_admin_abilities(user)
@@ -38,9 +38,6 @@ class Ability
       user.email.present? &&
         invitation.email_address.present? &&
         invitation.email_address.casecmp?(user.email)
-    end
-    can :read, OwnershipTransfer do |transfer|
-      user.id == transfer.requested_by_user_id || user.id == transfer.nominated_user_id
     end
   end
 
@@ -71,7 +68,7 @@ class Ability
     can %i[read update destroy], Component, project: { user_id: user.id }
   end
 
-  def define_school_owner_abilities(school:)
+  def define_school_owner_abilities(user:, school:)
     can(%i[read update], School, id: school.id)
     can(%i[read], :school_member)
     can(%i[read create import update destroy regenerate_join_code], SchoolClass, school: { id: school.id })
@@ -86,6 +83,8 @@ class Ability
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
     can(%i[read create], :ownership_transfer)
+    can(:read, OwnershipTransfer, school_id: school.id, requested_by_user_id: user.id)
+    can(:read, OwnershipTransfer, school_id: school.id, nominated_user_id: user.id)
     can(%i[read create create_batch update destroy destroy_batch], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
@@ -103,6 +102,7 @@ class Ability
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
     can(:read, :ownership_transfer)
+    can(:read, OwnershipTransfer, school_id: school.id, nominated_user_id: user.id)
     can(%i[read create create_batch update], :school_student)
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)
