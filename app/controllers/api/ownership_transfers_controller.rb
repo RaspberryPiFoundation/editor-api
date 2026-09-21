@@ -4,7 +4,9 @@ module Api
   class OwnershipTransfersController < ApiController
     before_action :authorize_user
     load_and_authorize_resource :school
-    authorize_resource :ownership_transfer, class: false
+    authorize_resource :ownership_transfer, class: false, except: %i[accept decline]
+    # Only role-gate here; resolve! checks the actual transfer.
+    before_action -> { authorize!(:read, :ownership_transfer) }, only: %i[accept decline]
 
     def show
       @ownership_transfer = most_recent_ownership_transfer
