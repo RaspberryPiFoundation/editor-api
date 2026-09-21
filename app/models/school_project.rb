@@ -25,8 +25,8 @@ class SchoolProject < ApplicationRecord
     state_machine.current_state
   end
 
-  def transition_status_to!(new_status, user_id)
-    state_machine.transition_to!(new_status, metadata: { changed_by: user_id })
+  def transition_status_to!(new_status, user_id, **metadata)
+    state_machine.transition_to!(new_status, metadata.merge(changed_by: user_id))
   end
 
   def unread_feedback?

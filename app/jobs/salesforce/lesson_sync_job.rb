@@ -31,10 +31,7 @@ module Salesforce
         teacherprojecttitle__c: lesson.project&.name,
         teacherprojecttype__c: project_type_attribute(lesson),
         numberofassignedprojects__c: assigned_projects_count(lesson),
-        # Sum of the two completion paths: state-machine `:submitted` (Code Editor flow)
-        # and `school_projects.finished` (Experience CS flow). They are mutually exclusive
-        # per project, so the sum is safe.
-        numberofcompletedprojects__c: lesson.submitted_projects_count + lesson.finished_projects_count,
+        numberofcompletedprojects__c: lesson.submitted_projects_count + lesson.finished_projects_count + lesson.completed_projects_count,
         lastsyncdate__c: Time.current
       ).to_h do |sf_field, value|
         value = truncate_value(sf_field:, value:) if value.is_a?(String)
