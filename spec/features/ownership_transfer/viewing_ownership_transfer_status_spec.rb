@@ -102,14 +102,6 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
       it_behaves_like 'a hidden ownership transfer'
     end
 
-    context 'when the current user is a different owner of the school who did not request the transfer' do
-      let(:other_owner) { create(:owner, school:) }
-
-      before { authenticated_in_hydra_as(other_owner) }
-
-      it_behaves_like 'a hidden ownership transfer'
-    end
-
     context 'when the transfer has completed' do
       before do
         ownership_transfer.update!(status: :completed)

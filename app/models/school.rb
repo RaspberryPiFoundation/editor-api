@@ -133,8 +133,8 @@ class School < ApplicationRecord
     roles.student.count
   end
 
-  def owner_or_teacher?(user_id)
-    roles.exists?(user_id:, role: %i[owner teacher])
+  def teacher?(user_id)
+    roles.exists?(user_id:, role: :teacher)
   end
 
   def postal_code=(str)

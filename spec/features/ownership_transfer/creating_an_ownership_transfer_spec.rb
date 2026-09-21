@@ -77,7 +77,7 @@ RSpec.describe 'Creating an ownership transfer', type: :request do
       end
     end
 
-    context 'when the nominee does not have the owner or teacher role at the school' do
+    context 'when the nominee does not have the teacher role at the school' do
       let(:params) { { ownership_transfer: { nominated_user_id: SecureRandom.uuid } } }
 
       it 'responds 422 Unprocessable entity' do

@@ -132,11 +132,11 @@ RSpec.describe OwnershipTransfer do
       expect(ownership_transfer).to be_valid
     end
 
-    it 'is valid when the nominee has the owner role for the school' do
+    it 'is invalid when the nominee has only the owner role for the school' do
       owner = create(:owner, school:)
       ownership_transfer.nominated_user_id = owner.id
 
-      expect(ownership_transfer).to be_valid
+      expect(ownership_transfer).not_to be_valid
     end
 
     it 'is invalid when the nominee has only the student role for the school' do

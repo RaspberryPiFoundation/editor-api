@@ -28,6 +28,13 @@ RSpec.describe OwnershipTransfer::Create, type: :unit do
     expect(response[:error][:nominated_user_id]).to be_present
   end
 
+  it 'returns a failure response naming the ineligible nominee when the nominee has the owner role' do
+    response = described_class.call(school:, nominated_user_id: owner.id, requested_by_user_id: owner.id)
+
+    expect(response.failure?).to be(true)
+    expect(response[:error][:nominated_user_id]).to be_present
+  end
+
   context 'when a duplicate pending transfer is created concurrently' do
     before do
       allow(OwnershipTransfer).to receive(:new).and_wrap_original do |method, *args|

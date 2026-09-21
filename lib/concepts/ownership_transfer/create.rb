@@ -34,7 +34,7 @@ class OwnershipTransfer
       end
 
       def nominee_email(school:, nominated_user_id:)
-        return unless school.owner_or_teacher?(nominated_user_id)
+        return unless school.teacher?(nominated_user_id)
 
         User.from_userinfo(ids: nominated_user_id).first&.email
       end

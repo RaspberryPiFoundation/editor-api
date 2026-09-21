@@ -16,19 +16,19 @@ class OwnershipTransfer < ApplicationRecord
   validates :school_id,
             uniqueness: { conditions: -> { where(status: :pending) }, message: I18n.t('validations.ownership_transfer.school_pending') },
             on: :create
-  validate :nominee_has_the_school_owner_or_school_teacher_role_for_the_school
+  validate :nominee_has_the_school_teacher_role_for_the_school
 
   after_create_commit :send_ownership_transfer_request_email
   encrypts :email_address
 
   private
 
-  def nominee_has_the_school_owner_or_school_teacher_role_for_the_school
+  def nominee_has_the_school_teacher_role_for_the_school
     return unless nominated_user_id_changed? && school
 
-    return if school.owner_or_teacher?(nominated_user_id)
+    return if school.teacher?(nominated_user_id)
 
-    msg = "'#{nominated_user_id}' does not have the 'owner' or 'teacher' role for school '#{school.id}'"
+    msg = "'#{nominated_user_id}' does not have the 'teacher' role for school '#{school.id}'"
     errors.add(:nominated_user_id, msg)
   end
 
