@@ -133,6 +133,10 @@ class School < ApplicationRecord
     roles.student.count
   end
 
+  def teacher?(user_id)
+    roles.exists?(user_id:, role: :teacher)
+  end
+
   def postal_code=(str)
     super(str.to_s.upcase)
   end
