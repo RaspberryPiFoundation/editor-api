@@ -11,7 +11,7 @@ module Api
 
       if @ownership_transfer.blank? || cannot?(:read, @ownership_transfer)
         head :not_found
-      elsif current_user_is_requester?
+      elsif current_user_is_an_owner?
         render json: { status: @ownership_transfer.status, you_are: 'owner', nominee_name:, nominee_email: }, status: :ok
       else
         render json: { status: @ownership_transfer.status, you_are: 'nominee' }, status: :ok
@@ -42,8 +42,8 @@ module Api
       @school.ownership_transfers.order(created_at: :desc).first
     end
 
-    def current_user_is_requester?
-      @ownership_transfer.requested_by_user_id == current_user.id
+    def current_user_is_an_owner?
+      current_user.school_owner?(@school)
     end
 
     def nominee_name
