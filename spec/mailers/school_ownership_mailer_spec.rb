@@ -40,6 +40,32 @@ RSpec.describe SchoolOwnershipMailer do
     it 'includes the school name in the subject' do
       expect(email.subject).to include(ownership_transfer.school.name)
     end
+
+    context 'when the nominee is missing from the user-info response' do
+      before do
+        stub_user_info_api_fetch_by_ids(
+          user_ids: [nominee.id, requested_owner.id],
+          users: [{ id: requested_owner.id, name: requested_owner.name }]
+        )
+      end
+
+      it 'greets them generically instead of leaving the greeting blank' do
+        expect(email.body.to_s).to include('Hi there,')
+      end
+    end
+
+    context 'when the requested owner is missing from the user-info response' do
+      before do
+        stub_user_info_api_fetch_by_ids(
+          user_ids: [nominee.id, requested_owner.id],
+          users: [{ id: nominee.id, name: nominee.name }]
+        )
+      end
+
+      it 'falls back to a generic label instead of leaving it blank' do
+        expect(email.body.to_s).to include('The school owner')
+      end
+    end
   end
 
   describe 'cancel_ownership_transfer' do
