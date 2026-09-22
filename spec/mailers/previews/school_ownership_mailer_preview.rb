@@ -17,6 +17,19 @@ class SchoolOwnershipMailerPreview < ActionMailer::Preview
     with_stubbed_user_info_api { SchoolOwnershipMailer.with(ownership_transfer:).request_ownership_transfer.message }
   end
 
+  def cancel_ownership_transfer
+    school = School.new(name: 'Elmwood Secondary School')
+    ownership_transfer = OwnershipTransfer.new(
+      email_address: 'teacher@example.com',
+      school:,
+      nominated_user_id: NOMINEE[:id],
+      requested_by_user_id: REQUESTED_OWNER[:id],
+      status: :cancelled
+    )
+
+    with_stubbed_user_info_api { SchoolOwnershipMailer.with(ownership_transfer:).cancel_ownership_transfer.message }
+  end
+
   private
 
   # fake the user info response, but only for the duration of

@@ -15,6 +15,16 @@ class SchoolOwnershipMailer < ApplicationMailer
          message_stream: 'outbound')
   end
 
+  def cancel_ownership_transfer
+    @school = ownership_transfer.school
+    @nominee_name = users_by_id[ownership_transfer.nominated_user_id]&.name.presence || 'there'
+
+    mail(to: ownership_transfer.email_address,
+         subject: "The ownership nomination for #{@school.name} has been cancelled",
+         track_opens: 'true',
+         message_stream: 'outbound')
+  end
+
   private
 
   def ownership_transfer

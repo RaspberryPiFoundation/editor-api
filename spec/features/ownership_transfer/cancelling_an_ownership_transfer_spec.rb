@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe 'Cancelling an ownership transfer', type: :request do
+  include ActionMailer::TestHelper
+
   include_context 'with a school owner and nominated teacher'
 
   it 'responds 401 Unauthorized when no token is given' do
@@ -57,6 +59,14 @@ RSpec.describe 'Cancelling an ownership transfer', type: :request do
       it 'marks the transfer as cancelled' do
         put("/api/schools/#{school.id}/ownership_transfer/cancel", headers:)
         expect(ownership_transfer.reload.status).to eq('cancelled')
+      end
+
+      it 'sends the cancellation email' do
+        put("/api/schools/#{school.id}/ownership_transfer/cancel", headers:)
+
+        assert_enqueued_email_with(
+          SchoolOwnershipMailer, :cancel_ownership_transfer, params: { ownership_transfer: }
+        )
       end
     end
 
