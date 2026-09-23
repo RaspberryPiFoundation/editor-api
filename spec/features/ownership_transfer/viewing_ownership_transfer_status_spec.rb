@@ -63,6 +63,13 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
         expect(json['nominee_name']).to eq(nominee.name)
       end
 
+      it 'includes the nominated teacher\'s email' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        json = JSON.parse(response.body)
+        expect(json['nominee_email']).to eq(ownership_transfer.email_address)
+      end
+
       it 'includes the transfer status' do
         get("/api/schools/#{school.id}/ownership_transfer", headers:)
 
@@ -114,7 +121,7 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
 
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
-        expect(json).to include('status' => 'completed', 'you_are' => 'owner', 'nominee_name' => nominee.name)
+        expect(json).to include('status' => 'completed', 'you_are' => 'owner', 'nominee_name' => nominee.name, 'nominee_email' => ownership_transfer.email_address)
       end
     end
 
