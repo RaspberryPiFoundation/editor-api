@@ -12,7 +12,7 @@ module Api
       if @ownership_transfer.blank? || cannot?(:read, @ownership_transfer)
         head :not_found
       elsif current_user_is_requester?
-        render json: { status: @ownership_transfer.status, you_are: 'owner', nominee_name: nominee_name }, status: :ok
+        render json: { status: @ownership_transfer.status, you_are: 'owner', nominee_name:, nominee_email: }, status: :ok
       else
         render json: { status: @ownership_transfer.status, you_are: 'nominee' }, status: :ok
       end
@@ -48,6 +48,10 @@ module Api
 
     def nominee_name
       User.from_userinfo(ids: @ownership_transfer.nominated_user_id).first&.name
+    end
+
+    def nominee_email
+      @ownership_transfer.email_address
     end
   end
 end
