@@ -21,6 +21,8 @@ class OwnershipTransfer < ApplicationRecord
   after_create_commit :send_ownership_transfer_request_email
   after_update_commit :send_ownership_transfer_cancelled_email,
                       if: -> { saved_change_to_status?(from: 'pending', to: 'cancelled') }
+  after_update_commit :send_ownership_transfer_completed_email,
+                      if: -> { saved_change_to_status?(from: 'pending', to: 'completed') }
   encrypts :email_address
 
   private
@@ -40,5 +42,9 @@ class OwnershipTransfer < ApplicationRecord
 
   def send_ownership_transfer_cancelled_email
     SchoolOwnershipMailer.with(ownership_transfer: self).cancel_ownership_transfer.deliver_later
+  end
+
+  def send_ownership_transfer_completed_email
+    SchoolOwnershipMailer.with(ownership_transfer: self).complete_ownership_transfer.deliver_later
   end
 end

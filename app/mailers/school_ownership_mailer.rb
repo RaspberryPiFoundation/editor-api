@@ -25,6 +25,16 @@ class SchoolOwnershipMailer < ApplicationMailer
          message_stream: 'outbound')
   end
 
+  def complete_ownership_transfer
+    @school = ownership_transfer.school
+    @new_owner_name = users_by_id[ownership_transfer.nominated_user_id]&.name.presence || 'there'
+
+    mail(to: ownership_transfer.email_address,
+         subject: "You're now the owner of the Code Classroom account for #{@school.name}",
+         track_opens: 'true',
+         message_stream: 'outbound')
+  end
+
   private
 
   def ownership_transfer
