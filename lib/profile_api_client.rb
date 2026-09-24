@@ -221,7 +221,7 @@ class ProfileApiClient
     private
 
     def connection(token)
-      Faraday.new(ENV.fetch('IDENTITY_URL')) do |faraday|
+      HttpClient.new(ENV.fetch('IDENTITY_URL')) do |faraday|
         faraday.request :json
         faraday.response :json
         faraday.response :raise_error, allowed_statuses: [401]

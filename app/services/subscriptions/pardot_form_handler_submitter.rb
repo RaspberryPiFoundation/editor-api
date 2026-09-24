@@ -39,7 +39,7 @@ module Subscriptions
     attr_reader :endpoint_url
 
     def faraday
-      @faraday ||= Faraday.new do |f|
+      @faraday ||= HttpClient.new do |f|
         f.request :url_encoded
         f.options.timeout = REQUEST_TIMEOUT_SECONDS
         f.options.open_timeout = OPEN_TIMEOUT_SECONDS

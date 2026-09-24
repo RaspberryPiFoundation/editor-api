@@ -40,7 +40,7 @@ module Subscriptions
     attr_reader :secret_key, :remote_ip, :token
 
     def faraday
-      @faraday ||= Faraday.new do |f|
+      @faraday ||= HttpClient.new do |f|
         f.request :url_encoded
         f.options.timeout = 5
         f.options.open_timeout = 2

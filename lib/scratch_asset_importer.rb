@@ -102,7 +102,7 @@ class ScratchAssetImporter
   end
 
   def connection
-    @connection ||= Faraday.new(url: asset_base_url) do |faraday|
+    @connection ||= HttpClient.new(url: asset_base_url) do |faraday|
       faraday.response :raise_error
     end
   end

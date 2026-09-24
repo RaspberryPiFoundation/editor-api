@@ -20,7 +20,7 @@ class ScratchConfigImporter
   end
 
   def connection
-    Faraday.new(url: asset_config_url) do |faraday|
+    HttpClient.new(url: asset_config_url) do |faraday|
       faraday.response :raise_error
     end
   end
