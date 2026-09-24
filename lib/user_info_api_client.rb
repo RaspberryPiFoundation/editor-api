@@ -49,7 +49,7 @@ class UserInfoApiClient
     end
 
     def conn
-      Faraday.new(
+      HttpClient.new(
         headers: { authorization: "Bearer #{API_KEY}" },
         url: API_URL
       ) do |f|

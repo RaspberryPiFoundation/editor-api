@@ -20,7 +20,7 @@ namespace :integration_tests do
   end
 
   def connection
-    Faraday.new do |faraday|
+    HttpClient.new do |faraday|
       faraday.request :json
       faraday.headers = {
         'Accept' => 'application/vnd.github+json',

@@ -23,7 +23,7 @@ module Api
     private
 
     def faraday
-      Faraday.new do |f|
+      HttpClient.new do |f|
         f.request :url_encoded
         f.options.timeout = 10
         f.options.open_timeout = 5
