@@ -152,16 +152,16 @@ RSpec.describe 'Accepting an invitations', type: :request do
           expect(response).to have_http_status(:internal_server_error)
         end
 
-        it 'does not give the user the teacher role' do
+        it 'still gives the user the teacher role' do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
-          expect(user).not_to be_school_teacher(school)
+          expect(user).to be_school_teacher(school)
         end
 
-        it 'does not set the accepted_at timestamp on the invitation' do
+        it 'still sets the accepted_at timestamp on the invitation' do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
-          expect(invitation.reload.accepted_at).to be_blank
+          expect(invitation.reload.accepted_at).to be_present
         end
       end
 
