@@ -27,9 +27,9 @@ module Api
     # attempt raises and is rescued below into the same 404 a nonexistent
     # transfer gets, instead of leaking that a pending transfer exists.
     #
-    # head/render happen after the transaction returns, not inside it, so a
-    # commit-time callback failure (e.g. enqueuing a notification) surfaces as
-    # a clean 500 instead of racing an already-performed response.
+    # head/render stay outside the transaction block: the transfer's
+    # after_update_commit callback (sends the cancellation email) runs inside
+    # it, and we want a failure there to be the only thing we respond with.
     def resolve!(status)
       transfer = OwnershipTransfer.transaction do
         loaded = pending_ownership_transfer
