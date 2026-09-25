@@ -93,21 +93,27 @@ RSpec.describe SchoolOnboardingService do
 
     describe 'when the safeguarding flags cannot be created in Profile API' do
       before do
+        allow(Sentry).to receive(:capture_exception)
         allow(ProfileApiClient).to receive(:create_safeguarding_flag).and_raise(RuntimeError)
       end
 
-      it 'does not create owner role' do
-        suppress(RuntimeError) { service.onboard(token:) }
-        expect(school_creator).not_to be_school_owner(school)
+      it 'keeps the owner role' do
+        service.onboard(token:)
+        expect(school_creator).to be_school_owner(school)
       end
 
-      it 'does not create teacher role' do
-        suppress(RuntimeError) { service.onboard(token:) }
-        expect(school_creator).not_to be_school_teacher(school)
+      it 'keeps the teacher role' do
+        service.onboard(token:)
+        expect(school_creator).to be_school_teacher(school)
       end
 
-      it 'raises the underlying error' do
-        expect { service.onboard(token:) }.to raise_error(RuntimeError)
+      it 'reports the error to Sentry' do
+        service.onboard(token:)
+        expect(Sentry).to have_received(:capture_exception)
+      end
+
+      it 'does not raise' do
+        expect { service.onboard(token:) }.not_to raise_error
       end
     end
 
