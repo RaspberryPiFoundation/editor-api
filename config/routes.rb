@@ -87,6 +87,11 @@ Rails.application.routes.draw do
 
       resources :owners, only: %i[index], controller: 'school_owners'
       resources :teachers, only: %i[index create], controller: 'school_teachers'
+      resource :ownership_transfer, only: %i[show create], controller: 'ownership_transfers' do
+        put :accept, to: 'ownership_transfer_resolutions#accept'
+        put :decline, to: 'ownership_transfer_resolutions#decline'
+        put :cancel, to: 'ownership_transfer_resolutions#cancel'
+      end
       resources :students, only: %i[index create update destroy], controller: 'school_students' do
         post :batch, on: :collection, to: 'school_students#create_batch'
         delete :batch, on: :collection, to: 'school_students#destroy_batch'

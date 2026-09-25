@@ -13,7 +13,7 @@ class UserInfoApiClient
         r.url '/users'
         r.body = { userIds: user_ids }
       end
-      return if response.body.blank?
+      return [] if response.body.blank?
 
       transform_result(response.body.fetch('users', []))
     end
@@ -49,7 +49,7 @@ class UserInfoApiClient
     end
 
     def conn
-      Faraday.new(
+      HttpClient.new(
         headers: { authorization: "Bearer #{API_KEY}" },
         url: API_URL
       ) do |f|

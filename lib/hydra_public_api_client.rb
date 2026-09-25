@@ -50,7 +50,7 @@ class HydraPublicApiClient
   end
 
   def conn
-    @conn ||= Faraday.new(API_URL) do |f|
+    @conn ||= HttpClient.new(API_URL) do |f|
       f.request :url_encoded
       f.response :raise_error
       f.response :json

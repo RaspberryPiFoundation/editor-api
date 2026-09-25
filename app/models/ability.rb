@@ -82,6 +82,9 @@ class Ability
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id } })
     can(%i[read create destroy], :school_owner)
     can(%i[read create destroy], :school_teacher)
+    can(%i[read create], :ownership_transfer)
+    can(:read, OwnershipTransfer, school_id: school.id)
+    can(:cancel, OwnershipTransfer, school_id: school.id, status: 'pending')
     can(%i[read create create_batch update destroy destroy_batch], :school_student)
     can(%i[create create_copy], Lesson, school_id: school.id)
     can(%i[read update destroy], Lesson, school_id: school.id, visibility: %w[teachers students public])
@@ -98,6 +101,8 @@ class Ability
     can(%i[read create create_batch destroy], ClassStudent, school_class: { school: { id: school.id }, teachers: { teacher_id: user.id } })
     can(%i[read], :school_owner)
     can(%i[read], :school_teacher)
+    can(%i[read], :ownership_transfer)
+    can(%i[read accept decline], OwnershipTransfer, school_id: school.id, nominated_user_id: user.id)
     can(%i[read create create_batch update], :school_student)
     can(%i[create update destroy], Lesson) do |lesson|
       school_teacher_can_manage_lesson?(user:, school:, lesson:)

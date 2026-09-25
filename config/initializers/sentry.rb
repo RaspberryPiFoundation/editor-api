@@ -7,4 +7,12 @@ Sentry.init do |config|
 
   config.rails.structured_logging.enabled = false
   config.traces_sample_rate = 0.1
+
+  config.before_send = lambda do |event, hint|
+    exception = hint[:exception]
+    next event unless exception.is_a?(Faraday::Error)
+
+    event.fingerprint = [exception.class.name, exception.try(:request_host) || 'unknown-host']
+    event
+  end
 end

@@ -42,10 +42,17 @@ RSpec.describe School do
     end
 
     it 'has many ownership transfers' do
-      owner_one = create(:owner_role, school:)
-      owner_two = create(:owner_role, school:)
-      create(:ownership_transfer, school:, requested_by_user_id: owner_one.user_id, nominated_user_id: owner_one.user_id)
-      create(:ownership_transfer, school:, requested_by_user_id: owner_two.user_id, nominated_user_id: owner_two.user_id)
+      owner = create(:owner_role, school:)
+      teacher_one = create(:teacher_role, school:)
+      teacher_two = create(:teacher_role, school:)
+      create(
+        :ownership_transfer,
+        school:,
+        requested_by_user_id: owner.user_id,
+        nominated_user_id: teacher_one.user_id,
+        status: :completed
+      )
+      create(:ownership_transfer, school:, requested_by_user_id: owner.user_id, nominated_user_id: teacher_two.user_id)
 
       expect(school.ownership_transfers.size).to eq(2)
     end
@@ -108,6 +115,25 @@ RSpec.describe School do
         SchoolEmailDomain.create!(school:, domain: 'example.edu')
         expect { school.destroy! }.to change(SchoolEmailDomain, :count).by(-1)
       end
+    end
+  end
+
+  describe '#teacher?' do
+    it 'is true for a user with the teacher role at the school' do
+      expect(school.teacher?(teacher.id)).to be(true)
+    end
+
+    it 'is false for a user with only the owner role at the school' do
+      owner = create(:owner, school:)
+      expect(school.teacher?(owner.id)).to be(false)
+    end
+
+    it 'is false for a user with only the student role at the school' do
+      expect(school.teacher?(student.id)).to be(false)
+    end
+
+    it 'is false for a user with no role at the school' do
+      expect(school.teacher?(SecureRandom.uuid)).to be(false)
     end
   end
 

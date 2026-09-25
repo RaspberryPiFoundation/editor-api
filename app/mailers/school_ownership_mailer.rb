@@ -6,11 +6,31 @@ class SchoolOwnershipMailer < ApplicationMailer
   def request_ownership_transfer
     @school = ownership_transfer.school
 
-    @nominee_name = users_by_id[ownership_transfer.nominated_user_id]&.name
-    @requested_owner_name = users_by_id[ownership_transfer.requested_by_user_id]&.name
+    @nominee_name = users_by_id[ownership_transfer.nominated_user_id]&.name.presence || 'there'
+    @requested_owner_name = users_by_id[ownership_transfer.requested_by_user_id]&.name.presence || 'The school owner'
 
     mail(to: ownership_transfer.email_address,
          subject: "You've been nominated to be an owner of #{@school.name}",
+         track_opens: 'true',
+         message_stream: 'outbound')
+  end
+
+  def cancel_ownership_transfer
+    @school = ownership_transfer.school
+    @nominee_name = users_by_id[ownership_transfer.nominated_user_id]&.name.presence || 'there'
+
+    mail(to: ownership_transfer.email_address,
+         subject: "The ownership nomination for #{@school.name} has been cancelled",
+         track_opens: 'true',
+         message_stream: 'outbound')
+  end
+
+  def complete_ownership_transfer
+    @school = ownership_transfer.school
+    @new_owner_name = users_by_id[ownership_transfer.nominated_user_id]&.name.presence || 'there'
+
+    mail(to: ownership_transfer.email_address,
+         subject: "You're now the owner of the Code Classroom account for #{@school.name}",
          track_opens: 'true',
          message_stream: 'outbound')
   end

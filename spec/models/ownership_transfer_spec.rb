@@ -52,6 +52,44 @@ RSpec.describe OwnershipTransfer do
     end
   end
 
+  describe 'pending transfer uniqueness' do
+    it 'is invalid when the school already has a pending transfer' do
+      create(:ownership_transfer, school:, nominated_user_id: nominee.id)
+
+      second_transfer = build(:ownership_transfer, school:, nominated_user_id: nominee.id)
+
+      expect(second_transfer).not_to be_valid
+      expect(second_transfer.errors[:school_id]).to include('already has a pending ownership transfer')
+    end
+
+    it 'is valid for a second school even when another school has a pending transfer' do
+      create(:ownership_transfer, school:, nominated_user_id: nominee.id)
+
+      other_school = create(:verified_school)
+      other_nominee = create(:teacher, school: other_school)
+      second_transfer = build(:ownership_transfer, school: other_school, nominated_user_id: other_nominee.id)
+
+      expect(second_transfer).to be_valid
+    end
+
+    it "is valid when the school's only existing transfer is no longer pending" do
+      create(:ownership_transfer, school:, nominated_user_id: nominee.id, status: :completed)
+
+      second_transfer = build(:ownership_transfer, school:, nominated_user_id: nominee.id)
+
+      expect(second_transfer).to be_valid
+    end
+
+    it 'rejects a duplicate pending transfer created concurrently, bypassing application-level validation' do
+      first_transfer = build(:ownership_transfer, school:, nominated_user_id: nominee.id)
+      second_transfer = build(:ownership_transfer, school:, nominated_user_id: nominee.id)
+
+      first_transfer.save!(validate: false)
+
+      expect { second_transfer.save!(validate: false) }.to raise_error(ActiveRecord::RecordNotUnique)
+    end
+  end
+
   describe 'status' do
     it 'defaults to pending on a new record' do
       expect(ownership_transfer.status).to eq('pending')
@@ -94,11 +132,11 @@ RSpec.describe OwnershipTransfer do
       expect(ownership_transfer).to be_valid
     end
 
-    it 'is valid when the nominee has the owner role for the school' do
+    it 'is invalid when the nominee has only the owner role for the school' do
       owner = create(:owner, school:)
       ownership_transfer.nominated_user_id = owner.id
 
-      expect(ownership_transfer).to be_valid
+      expect(ownership_transfer).not_to be_valid
     end
 
     it 'is invalid when the nominee has only the student role for the school' do
@@ -133,6 +171,74 @@ RSpec.describe OwnershipTransfer do
       assert_enqueued_email_with(
         SchoolOwnershipMailer, :request_ownership_transfer, params: { ownership_transfer: }
       )
+    end
+  end
+
+  describe 'the cancellation email' do
+    before { ownership_transfer.save! }
+
+    it 'is enqueued with the transfer as the mailer param when the transfer is cancelled' do
+      ownership_transfer.update!(status: :cancelled)
+
+      assert_enqueued_email_with(
+        SchoolOwnershipMailer, :cancel_ownership_transfer, params: { ownership_transfer: }
+      )
+    end
+
+    it 'is not enqueued when the transfer resolves to a different status' do
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :rejected)
+      end
+    end
+
+    it 'is not enqueued when an already-cancelled transfer is saved again unchanged' do
+      ownership_transfer.update!(status: :cancelled)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :cancelled)
+      end
+    end
+
+    it 'is not enqueued when a non-pending transfer is corrected to cancelled' do
+      ownership_transfer.update!(status: :completed)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :cancelled)
+      end
+    end
+  end
+
+  describe 'the completion email' do
+    before { ownership_transfer.save! }
+
+    it 'is enqueued with the transfer as the mailer param when the transfer completes' do
+      ownership_transfer.update!(status: :completed)
+
+      assert_enqueued_email_with(
+        SchoolOwnershipMailer, :complete_ownership_transfer, params: { ownership_transfer: }
+      )
+    end
+
+    it 'is not enqueued when the transfer resolves to a different status' do
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :rejected)
+      end
+    end
+
+    it 'is not enqueued when an already-completed transfer is saved again unchanged' do
+      ownership_transfer.update!(status: :completed)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :completed)
+      end
+    end
+
+    it 'is not enqueued when a non-pending transfer is corrected to completed' do
+      ownership_transfer.update!(status: :rejected)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :completed)
+      end
     end
   end
 end
