@@ -121,4 +121,57 @@ RSpec.describe SchoolOwnershipMailer do
       end
     end
   end
+
+  describe 'complete_ownership_transfer' do
+    subject(:email) { described_class.with(ownership_transfer:).complete_ownership_transfer }
+
+    let(:school) { create(:verified_school) }
+    let(:nominee) { create(:teacher, school:) }
+    let(:requested_owner) { create(:owner, school:) }
+    let(:ownership_transfer) do
+      create(
+        :ownership_transfer,
+        school:,
+        nominated_user_id: nominee.id,
+        requested_by_user_id: requested_owner.id,
+        status: :completed
+      )
+    end
+
+    before do
+      stub_user_info_api_fetch_by_ids(
+        user_ids: [nominee.id, requested_owner.id],
+        users: [{ id: nominee.id, name: nominee.name }, { id: requested_owner.id, name: requested_owner.name }]
+      )
+    end
+
+    it 'is sent to the new owner' do
+      expect(email.to).to eq([ownership_transfer.email_address])
+    end
+
+    it 'includes the new owner\'s name in the body' do
+      expect(email.body.to_s).to include(nominee.name)
+    end
+
+    it 'includes the school name in the body' do
+      expect(email.body.to_s).to include(ownership_transfer.school.name)
+    end
+
+    it 'includes the school name in the subject' do
+      expect(email.subject).to include(ownership_transfer.school.name)
+    end
+
+    context 'when the new owner is missing from the user-info response' do
+      before do
+        stub_user_info_api_fetch_by_ids(
+          user_ids: [nominee.id, requested_owner.id],
+          users: [{ id: requested_owner.id, name: requested_owner.name }]
+        )
+      end
+
+      it 'greets them generically instead of leaving the greeting blank' do
+        expect(email.body.to_s).to include('Hi there,')
+      end
+    end
+  end
 end
