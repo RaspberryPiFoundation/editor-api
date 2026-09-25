@@ -140,6 +140,31 @@ RSpec.describe 'Accepting an invitations', type: :request do
         end
       end
 
+      context 'when the safeguarding flag cannot be created' do
+        before do
+          allow(Sentry).to receive(:capture_exception)
+          allow(ProfileApiClient).to receive(:create_safeguarding_flag).and_raise(RuntimeError)
+        end
+
+        it 'responds 500 Internal server error' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(response).to have_http_status(:internal_server_error)
+        end
+
+        it 'does not give the user the teacher role' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(user).not_to be_school_teacher(school)
+        end
+
+        it 'does not set the accepted_at timestamp on the invitation' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(invitation.reload.accepted_at).to be_blank
+        end
+      end
+
       context 'when invitation token is valid' do
         it 'responds 200 OK' do
           put("/api/teacher_invitations/#{token}/accept", headers:)
