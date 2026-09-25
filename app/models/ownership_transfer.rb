@@ -19,6 +19,8 @@ class OwnershipTransfer < ApplicationRecord
   validate :nominee_has_the_school_teacher_role_for_the_school
 
   after_create_commit :send_ownership_transfer_request_email
+  after_update_commit :send_ownership_transfer_cancelled_email,
+                      if: -> { saved_change_to_status?(from: 'pending', to: 'cancelled') }
   encrypts :email_address
 
   private
@@ -34,5 +36,9 @@ class OwnershipTransfer < ApplicationRecord
 
   def send_ownership_transfer_request_email
     SchoolOwnershipMailer.with(ownership_transfer: self).request_ownership_transfer.deliver_later
+  end
+
+  def send_ownership_transfer_cancelled_email
+    SchoolOwnershipMailer.with(ownership_transfer: self).cancel_ownership_transfer.deliver_later
   end
 end

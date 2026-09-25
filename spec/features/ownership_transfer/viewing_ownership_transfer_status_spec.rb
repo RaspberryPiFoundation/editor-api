@@ -78,6 +78,25 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
       end
     end
 
+    context 'when the current user is a different owner of the same school' do
+      let(:other_owner) { create(:owner, school:) }
+
+      before do
+        stub_user_info_api_for(nominee)
+        authenticated_in_hydra_as(other_owner)
+      end
+
+      it 'responds 200 OK, identifying them as an owner even though they did not request the transfer' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json).to include(
+          'status' => 'pending', 'you_are' => 'owner', 'nominee_name' => nominee.name, 'nominee_email' => nominee.email
+        )
+      end
+    end
+
     context 'when the current user is the nominee' do
       before { authenticated_in_hydra_as(nominee) }
 
@@ -152,6 +171,22 @@ RSpec.describe 'Viewing ownership transfer status', type: :request do
         expect(response).to have_http_status(:ok)
         json = JSON.parse(response.body)
         expect(json).to include('status' => 'cancelled', 'you_are' => 'nominee')
+      end
+    end
+
+    context 'when the transfer was cancelled by the owner' do
+      before do
+        ownership_transfer.update!(status: :cancelled)
+        stub_user_info_api_for(nominee)
+        authenticated_in_hydra_as(owner)
+      end
+
+      it 'responds 200 OK, still visible to the owner who cancelled it' do
+        get("/api/schools/#{school.id}/ownership_transfer", headers:)
+
+        expect(response).to have_http_status(:ok)
+        json = JSON.parse(response.body)
+        expect(json).to include('status' => 'cancelled', 'you_are' => 'owner', 'nominee_name' => nominee.name)
       end
     end
 

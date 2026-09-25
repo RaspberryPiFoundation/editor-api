@@ -173,4 +173,38 @@ RSpec.describe OwnershipTransfer do
       )
     end
   end
+
+  describe 'the cancellation email' do
+    before { ownership_transfer.save! }
+
+    it 'is enqueued with the transfer as the mailer param when the transfer is cancelled' do
+      ownership_transfer.update!(status: :cancelled)
+
+      assert_enqueued_email_with(
+        SchoolOwnershipMailer, :cancel_ownership_transfer, params: { ownership_transfer: }
+      )
+    end
+
+    it 'is not enqueued when the transfer resolves to a different status' do
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :completed)
+      end
+    end
+
+    it 'is not enqueued when an already-cancelled transfer is saved again unchanged' do
+      ownership_transfer.update!(status: :cancelled)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :cancelled)
+      end
+    end
+
+    it 'is not enqueued when a non-pending transfer is corrected to cancelled' do
+      ownership_transfer.update!(status: :completed)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :cancelled)
+      end
+    end
+  end
 end
