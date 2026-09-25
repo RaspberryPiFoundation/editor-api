@@ -6,6 +6,7 @@ RSpec.describe 'Creating a school', type: :request do
   before do
     authenticated_in_hydra_as(user)
     stub_profile_api_create_school
+    stub_profile_api_create_safeguarding_flag
   end
 
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }

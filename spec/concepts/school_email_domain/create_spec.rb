@@ -7,7 +7,10 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
   let(:domain) { 'school.edu' }
   let(:token) { UserProfileMock::TOKEN }
 
-  before { stub_profile_api_update_school_email_domains }
+  before do
+    stub_profile_api_update_school_email_domains
+    allow(SafeguardingFlagService).to receive(:create_for_token)
+  end
 
   context 'with valid values' do
     it 'returns a successful operation response' do
@@ -32,6 +35,11 @@ RSpec.describe SchoolEmailDomain::Create, type: :unit do
     it 'assigns the school' do
       response = described_class.call(school:, domain:, token:)
       expect(response[:school_email_domain].school_id).to eq(school.id)
+    end
+
+    it 'creates the safeguarding flags for the user' do
+      described_class.call(school:, domain:, token:)
+      expect(SafeguardingFlagService).to have_received(:create_for_token).with(token:, school:)
     end
 
     it 'syncs the domains to Profile' do
