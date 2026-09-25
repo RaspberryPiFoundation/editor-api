@@ -17,6 +17,7 @@ module Api
       role = Role.unscoped.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school)
       role.archived_at = nil
       if role.save
+        SafeguardingFlagService.create_for_school_roles(user: current_user, school: @invitation.school)
         @invitation.update!(accepted_at: Time.current) if @invitation.accepted_at.blank?
         head :ok
       else

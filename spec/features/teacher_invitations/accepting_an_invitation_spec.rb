@@ -18,6 +18,7 @@ RSpec.describe 'Accepting an invitations', type: :request do
   context 'when user is logged in' do
     before do
       authenticated_in_hydra_as(user)
+      stub_profile_api_create_safeguarding_flag
     end
 
     context 'when invitation does not exist' do
@@ -96,6 +97,12 @@ RSpec.describe 'Accepting an invitations', type: :request do
             expect(invitation.reload.accepted_at).to be_blank
           end
         end
+
+        it 'does not create a safeguarding flag for the user' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(ProfileApiClient).not_to have_received(:create_safeguarding_flag)
+        end
       end
 
       context 'when user already has a role for another school' do
@@ -144,6 +151,12 @@ RSpec.describe 'Accepting an invitations', type: :request do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
           expect(user).to be_school_teacher(school)
+        end
+
+        it 'creates the teacher safeguarding flag for the user' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: 'school:teacher', email: user.email, school_id: school.id)
         end
 
         it 'sets the accepted_at timestamp on the invitation' do
@@ -250,6 +263,13 @@ RSpec.describe 'Accepting an invitations', type: :request do
           put("/api/teacher_invitations/#{token}/accept", headers:)
 
           expect(user).to be_school_owner(school)
+        end
+
+        it 'creates the owner and teacher safeguarding flags for the user' do
+          put("/api/teacher_invitations/#{token}/accept", headers:)
+
+          expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: 'school:owner', email: user.email, school_id: school.id)
+          expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: 'school:teacher', email: user.email, school_id: school.id)
         end
 
         it 'sets the accepted_at timestamp on the invitation' do

@@ -21,10 +21,13 @@ RSpec.describe School::Create, type: :unit do
   end
 
   let(:token) { UserProfileMock::TOKEN }
-  let(:creator_id) { SecureRandom.uuid }
+  let(:creator) { create(:user) }
+  let(:creator_id) { creator.id }
 
   before do
+    authenticated_in_hydra_as(creator)
     allow(ProfileApiClient).to receive(:create_school).and_return(true)
+    stub_profile_api_create_safeguarding_flag
   end
 
   it 'returns a successful operation response' do

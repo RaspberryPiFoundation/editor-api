@@ -9,7 +9,9 @@ RSpec.describe SchoolOnboardingService do
   let(:service) { described_class.new(school) }
 
   before do
+    authenticated_in_hydra_as(school_creator)
     allow(ProfileApiClient).to receive(:create_school)
+    stub_profile_api_create_safeguarding_flag
   end
 
   describe '#onboard' do
@@ -27,6 +29,25 @@ RSpec.describe SchoolOnboardingService do
       it 'creates the school in Profile API' do
         service.onboard(token:)
         expect(ProfileApiClient).to have_received(:create_school).with(token:, id: school.id, code: school.code)
+      end
+
+      it 'creates the owner safeguarding flag for the creator' do
+        service.onboard(token:)
+        expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token:, flag: 'school:owner', email: school_creator.email, school_id: school.id)
+      end
+
+      it 'creates the teacher safeguarding flag for the creator' do
+        service.onboard(token:)
+        expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token:, flag: 'school:teacher', email: school_creator.email, school_id: school.id)
+      end
+
+      it 'creates the school in Profile API before the safeguarding flags' do
+        profile_api_calls = []
+        allow(ProfileApiClient).to receive(:create_school) { profile_api_calls << :create_school }
+        allow(ProfileApiClient).to receive(:create_safeguarding_flag) { profile_api_calls << :create_safeguarding_flag }
+
+        service.onboard(token:)
+        expect(profile_api_calls.first).to eq(:create_school)
       end
     end
 
@@ -67,6 +88,26 @@ RSpec.describe SchoolOnboardingService do
 
       it 'raises the underlying error' do
         expect { service.onboard(token:) }.to raise_error(ProfileApiClient::UnauthorizedError)
+      end
+    end
+
+    describe 'when the safeguarding flags cannot be created in Profile API' do
+      before do
+        allow(ProfileApiClient).to receive(:create_safeguarding_flag).and_raise(RuntimeError)
+      end
+
+      it 'does not create owner role' do
+        suppress(RuntimeError) { service.onboard(token:) }
+        expect(school_creator).not_to be_school_owner(school)
+      end
+
+      it 'does not create teacher role' do
+        suppress(RuntimeError) { service.onboard(token:) }
+        expect(school_creator).not_to be_school_teacher(school)
+      end
+
+      it 'raises the underlying error' do
+        expect { service.onboard(token:) }.to raise_error(RuntimeError)
       end
     end
 
