@@ -47,6 +47,7 @@ class SchoolEmailDomain
 
       def update_profile(school, token)
         school_email_domains = school.school_email_domains.order(:created_at).pluck(:domain)
+        SafeguardingFlagService.create_for_token(token:, school:)
         ProfileApiClient.update_school_email_domains(token:, school_id: school.id, school_email_domains:)
       end
 

@@ -15,7 +15,10 @@ RSpec.describe 'Creating school email domains', type: :request do
   end
   let(:owner) { create(:owner, school:, name: 'School Owner') }
 
-  before { stub_profile_api_update_school_email_domains }
+  before do
+    stub_profile_api_update_school_email_domains
+    stub_profile_api_create_safeguarding_flag
+  end
 
   describe '#create' do
     shared_examples 'a successful school email domain creation response' do
@@ -56,6 +59,10 @@ RSpec.describe 'Creating school email domains', type: :request do
       end
 
       it_behaves_like 'a successful school email domain creation response'
+
+      it 'creates the school owner safeguarding flag' do
+        expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:owner], email: owner.email, school_id: school.id)
+      end
     end
 
     context 'with an authorised teacher' do
@@ -67,6 +74,10 @@ RSpec.describe 'Creating school email domains', type: :request do
       end
 
       it_behaves_like 'a successful school email domain creation response'
+
+      it 'creates the school teacher safeguarding flag' do
+        expect(ProfileApiClient).to have_received(:create_safeguarding_flag).with(token: UserProfileMock::TOKEN, flag: ProfileApiClient::SAFEGUARDING_FLAGS[:teacher], email: teacher.email, school_id: school.id)
+      end
     end
 
     context 'with missing params' do
