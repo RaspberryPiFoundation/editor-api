@@ -29,9 +29,7 @@ module Api
     private
 
     def teacher_role
-      role = Role.unscoped.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school)
-      role.archived_at = nil
-      role
+      Role.unscoped.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school).tap { |role| role.archived_at = nil }
     end
 
     def load_invitation

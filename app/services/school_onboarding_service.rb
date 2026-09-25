@@ -20,8 +20,7 @@ class SchoolOnboardingService
 
   private
 
-  # Runs outside the transaction: a rollback cannot undo the school Profile has already created,
-  # and any flag missed here is created by the next action that needs one
+  # Runs outside the transaction: a rollback cannot undo the school Profile has already created
   def create_safeguarding_flags(token:)
     SafeguardingFlagService.create_for_token(token:, school:)
   rescue StandardError => e
