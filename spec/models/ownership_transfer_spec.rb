@@ -186,9 +186,9 @@ RSpec.describe OwnershipTransfer do
     end
 
     it 'is not enqueued when the transfer resolves to a different status' do
-      assert_no_enqueued_emails do
+      expect do
         ownership_transfer.update!(status: :rejected)
-      end
+      end.not_to have_enqueued_mail(SchoolOwnershipMailer, :cancel_ownership_transfer)
     end
 
     it 'is not enqueued when an already-cancelled transfer is saved again unchanged' do
@@ -220,9 +220,9 @@ RSpec.describe OwnershipTransfer do
     end
 
     it 'is not enqueued when the transfer resolves to a different status' do
-      assert_no_enqueued_emails do
+      expect do
         ownership_transfer.update!(status: :rejected)
-      end
+      end.not_to have_enqueued_mail(SchoolOwnershipMailer, :complete_ownership_transfer)
     end
 
     it 'is not enqueued when an already-completed transfer is saved again unchanged' do
@@ -254,9 +254,9 @@ RSpec.describe OwnershipTransfer do
     end
 
     it 'is not enqueued when the transfer resolves to a different status' do
-      assert_no_enqueued_emails do
+      expect do
         ownership_transfer.update!(status: :rejected)
-      end
+      end.not_to have_enqueued_mail(SchoolOwnershipMailer, :complete_ownership_transfer_previous_owner)
     end
 
     it 'is not enqueued when an already-completed transfer is saved again unchanged' do
@@ -272,6 +272,40 @@ RSpec.describe OwnershipTransfer do
 
       assert_no_enqueued_emails do
         ownership_transfer.update!(status: :completed)
+      end
+    end
+  end
+
+  describe 'the decline email to the previous owner' do
+    before { ownership_transfer.save! }
+
+    it 'is enqueued with the transfer as the mailer param when the transfer is declined' do
+      ownership_transfer.update!(status: :rejected)
+
+      assert_enqueued_email_with(
+        SchoolOwnershipMailer, :decline_ownership_transfer_previous_owner, params: { ownership_transfer: }
+      )
+    end
+
+    it 'is not enqueued when the transfer resolves to a different status' do
+      expect do
+        ownership_transfer.update!(status: :completed)
+      end.not_to have_enqueued_mail(SchoolOwnershipMailer, :decline_ownership_transfer_previous_owner)
+    end
+
+    it 'is not enqueued when an already-declined transfer is saved again unchanged' do
+      ownership_transfer.update!(status: :rejected)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :rejected)
+      end
+    end
+
+    it 'is not enqueued when a non-pending transfer is corrected to rejected' do
+      ownership_transfer.update!(status: :completed)
+
+      assert_no_enqueued_emails do
+        ownership_transfer.update!(status: :rejected)
       end
     end
   end

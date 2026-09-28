@@ -58,6 +58,21 @@ class SchoolOwnershipMailerPreview < ActionMailer::Preview
     end
   end
 
+  def decline_ownership_transfer_previous_owner
+    school = School.new(name: 'Elmwood Secondary School')
+    ownership_transfer = OwnershipTransfer.new(
+      email_address: 'teacher@example.com',
+      school:,
+      nominated_user_id: NOMINEE[:id],
+      requested_by_user_id: REQUESTED_OWNER[:id],
+      status: :rejected
+    )
+
+    with_stubbed_user_info_api do
+      SchoolOwnershipMailer.with(ownership_transfer:).decline_ownership_transfer_previous_owner.message
+    end
+  end
+
   private
 
   # fake the user info response, but only for the duration of

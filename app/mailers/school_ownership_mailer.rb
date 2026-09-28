@@ -46,6 +46,17 @@ class SchoolOwnershipMailer < ApplicationMailer
          message_stream: 'outbound')
   end
 
+  def decline_ownership_transfer_previous_owner
+    @school = ownership_transfer.school
+    previous_owner = users_by_id[ownership_transfer.requested_by_user_id]
+    @previous_owner_name = previous_owner&.name.presence || 'there'
+
+    mail(to: previous_owner&.email,
+         subject: "New owner declined ownership of the Code Classroom account for #{@school.name}",
+         track_opens: 'true',
+         message_stream: 'outbound')
+  end
+
   private
 
   def ownership_transfer
