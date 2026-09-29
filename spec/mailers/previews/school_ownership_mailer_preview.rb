@@ -3,7 +3,7 @@
 # Preview all emails at http://localhost:3009/rails/mailers/school_ownership_mailer
 class SchoolOwnershipMailerPreview < ActionMailer::Preview
   NOMINEE = { id: SecureRandom.uuid, name: 'Eliseo Ortiz' }.freeze
-  REQUESTED_OWNER = { id: SecureRandom.uuid, name: 'Oaklynn Duran' }.freeze
+  REQUESTED_OWNER = { id: SecureRandom.uuid, name: 'Oaklynn Duran', email: 'oaklynn@example.com' }.freeze
 
   def request_ownership_transfer
     school = School.new(name: 'Elmwood Secondary School')
@@ -41,6 +41,36 @@ class SchoolOwnershipMailerPreview < ActionMailer::Preview
     )
 
     with_stubbed_user_info_api { SchoolOwnershipMailer.with(ownership_transfer:).complete_ownership_transfer.message }
+  end
+
+  def complete_ownership_transfer_previous_owner
+    school = School.new(name: 'Elmwood Secondary School')
+    ownership_transfer = OwnershipTransfer.new(
+      email_address: 'teacher@example.com',
+      school:,
+      nominated_user_id: NOMINEE[:id],
+      requested_by_user_id: REQUESTED_OWNER[:id],
+      status: :completed
+    )
+
+    with_stubbed_user_info_api do
+      SchoolOwnershipMailer.with(ownership_transfer:).complete_ownership_transfer_previous_owner.message
+    end
+  end
+
+  def decline_ownership_transfer_previous_owner
+    school = School.new(name: 'Elmwood Secondary School')
+    ownership_transfer = OwnershipTransfer.new(
+      email_address: 'teacher@example.com',
+      school:,
+      nominated_user_id: NOMINEE[:id],
+      requested_by_user_id: REQUESTED_OWNER[:id],
+      status: :rejected
+    )
+
+    with_stubbed_user_info_api do
+      SchoolOwnershipMailer.with(ownership_transfer:).decline_ownership_transfer_previous_owner.message
+    end
   end
 
   private
