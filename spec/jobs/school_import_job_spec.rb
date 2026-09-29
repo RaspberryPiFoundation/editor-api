@@ -40,6 +40,7 @@ RSpec.describe SchoolImportJob do
 
     before do
       allow(ProfileApiClient).to receive(:create_school).and_return(true)
+      allow(SafeguardingFlagService).to receive(:create_for_token)
     end
 
     context 'when all schools can be created successfully' do

@@ -14,5 +14,16 @@ class SchoolOnboardingService
 
       ProfileApiClient.create_school(token:, id: school.id, code: school.code)
     end
+
+    create_safeguarding_flags(token:)
+  end
+
+  private
+
+  # Runs outside the transaction: a rollback cannot undo the school Profile has already created
+  def create_safeguarding_flags(token:)
+    SafeguardingFlagService.create_for_token(token:, school:)
+  rescue StandardError => e
+    Sentry.capture_exception(e)
   end
 end

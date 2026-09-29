@@ -14,17 +14,24 @@ module Api
     end
 
     def accept
-      role = Role.unscoped.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school)
-      role.archived_at = nil
-      if role.save
+      role = teacher_role
+      return render json: { error: role.errors }, status: :unprocessable_content unless role.valid?
+
+      Role.transaction do
+        role.save!
         @invitation.update!(accepted_at: Time.current) if @invitation.accepted_at.blank?
-        head :ok
-      else
-        render json: { error: role.errors }, status: :unprocessable_content
       end
+
+      SafeguardingFlagService.create_for_school_roles(user: current_user, school: @invitation.school)
+
+      head :ok
     end
 
     private
+
+    def teacher_role
+      Role.unscoped.teacher.find_or_initialize_by(user_id: current_user.id, school: @invitation.school).tap { |role| role.archived_at = nil }
+    end
 
     def load_invitation
       @invitation = TeacherInvitation.find_by_token_for!(:teacher_invitation, params[:token])
