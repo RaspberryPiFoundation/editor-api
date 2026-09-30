@@ -1,0 +1,30 @@
+.editor-app {
+  --editor-color-layer-1: var(--rpf-off-white);
+  --editor-color-layer-2: var(--rpf-white);
+  --editor-color-layer-3: var(--rpf-white);
+  --editor-color-outline: var(--rpf-grey-150);
+  --editor-color-theme: var(--rpf-raspberry-800);
+  --editor-color-theme-secondary: var(--rpf-raspberry-900);
+  --editor-color-theme-tertiary: var(--rpf-raspberry-100);
+  --editor-color-text: var(--rpf-text-primary);
+  --editor-color-text-secondary: var(--rpf-text-secondary);
+  --editor-color-action: var(--rpf-navy-800);
+  --editor-color-layer-accent: var(--rpf-off-white-warm);
+
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+  color: var(--editor-color-text);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}

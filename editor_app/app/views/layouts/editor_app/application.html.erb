@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title).presence || t('editor_app.meta.title') %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="<%= t('editor_app.meta.description') %>">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= render DesignSystem::Meta::GoogleFontsComponent.new(fonts: :default) %>
+    <%= stylesheet_link_tag DesignSystem::STYLESHEET_URL %>
+    <%= stylesheet_link_tag 'editor_app/application' %>
+    <%= content_for :head %>
+    <%= javascript_importmap_tags %>
+  </head>
+  <body>
+    <div class="editor-app">
+      <%= yield %>
+    </div>
+  </body>
+</html>

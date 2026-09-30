@@ -10,6 +10,7 @@ module EditorApp
       'es-LA' => 'Español (Latinoamericano)',
       'fr-FR' => 'Français'
     }.freeze
+    PROJECTS_SITE_OVERRIDES = { 'en-US' => 'en' }.freeze
 
     def self.resolve(path: nil, cookie: nil, accept_language: nil)
       supported(path) || supported(cookie) || from_accept_language(accept_language) || DEFAULT
@@ -17,6 +18,10 @@ module EditorApp
 
     def self.supported(locale)
       locale if SUPPORTED.include?(locale)
+    end
+
+    def self.projects_site(locale)
+      PROJECTS_SITE_OVERRIDES.fetch(locale.to_s, locale.to_s)
     end
 
     def self.from_accept_language(header)

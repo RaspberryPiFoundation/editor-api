@@ -1,0 +1,22 @@
+es-LA:
+  editor_app:
+    home:
+      show:
+        title: "Code Editor"
+        subtitle: "¡Empieza a programar! No hace falta configurar nada"
+        choose_language: "¿En qué lenguaje quieres programar?"
+        python: "Python"
+        html: "HTML/CSS"
+        where_to_start: "¿No sabes por dónde empezar?"
+        project_python: "Ruta de Python"
+        project_html: "Ruta web"
+        follow_a_path_html: "Explora la %{python_link} o la %{html_link} en nuestro sitio de proyectos para acceder a un aprendizaje guiado."
+        also_discover_html: "Si eres docente, también puedes explorar %{experience_cs_link}, un plan de estudios basado en Scratch con proyectos paso a paso para el aula."
+        experience_cs: "Experience CS"
+        ready_to_continue: "¿Quieres continuar?"
+        continue_your_projects: "Ir a tus proyectos"
+        using_code_classroom: "¿Usas Code Classroom?"
+        login_to_code_editor: "Inicia sesión en el Code Editor"
+        login_as_a_student: "Inicia sesión como estudiante"
+        login_as_a_teacher: "Inicia sesión como docente"
+        go_to_classroom: "Ir a Code Classroom"

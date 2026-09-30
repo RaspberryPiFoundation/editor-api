@@ -1,0 +1,22 @@
+ga-IE:
+  editor_app:
+    home:
+      show:
+        title: "Code Editor"
+        subtitle: "Tosaigh ag códú, ní gá aon rud a shocrú!"
+        choose_language: "Céard is mian leat códú leis?"
+        python: "Python"
+        html: "HTML/CSS"
+        where_to_start: "Níl tú cinnte cá háit le tosú?"
+        project_python: "Cosán Python"
+        project_html: "Cosán gréasáin"
+        follow_a_path_html: "Fiosraigh an %{python_link} nó %{html_link} ar ár suíomh Tionscadail chun foghlaim threoraithe a fháil."
+        also_discover_html: "Is féidir le múinteoirí %{experience_cs_link} a fhoghlaim freisin, curaclam bunaithe ar Scratch le tionscadail céim ar chéim don seomra ranga."
+        experience_cs: "Experience CS"
+        ready_to_continue: "Réidh le dul ar aghaidh?"
+        continue_your_projects: "Lean le do thionscadail"
+        using_code_classroom: "Ag úsáid Code Classroom?"
+        login_to_code_editor: "Logáil isteach sa Code Editor"
+        login_as_a_student: "Logáil isteach mar dhalta"
+        login_as_a_teacher: "Logáil isteach mar mhúinteoir"
+        go_to_classroom: "Téigh go Code Classroom"
