@@ -28,3 +28,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
+rpf-global-nav {
+  min-block-size: 2.875rem;
+}

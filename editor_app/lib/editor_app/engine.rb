@@ -6,8 +6,6 @@ module EditorApp
   class Engine < ::Rails::Engine
     isolate_namespace EditorApp
 
-    config.autoload_paths << root.join('app/components').to_s
-
     initializer 'editor_app.assets' do |app|
       app.config.assets.paths << root.join('app/javascript')
     end

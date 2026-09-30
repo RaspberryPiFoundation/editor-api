@@ -94,6 +94,8 @@ RSpec.configure do |config|
   config.include SignInStubs, type: :request
   config.include SignInStubs, type: :system
 
+  config.include ViewComponent::TestHelpers, type: :component
+
   if Bullet.enable?
     config.before { Bullet.start_request }
     config.after  { Bullet.end_request }

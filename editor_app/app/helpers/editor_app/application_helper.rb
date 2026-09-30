@@ -10,14 +10,18 @@ module EditorApp
       "https://projects.raspberrypi.org/#{Locale.projects_site(I18n.locale)}#{path}"
     end
 
-    # The engine adds :locale to default_url_options for its own routes, so it
-    # has to be cleared when generating host application routes.
-    def login_path(return_to:)
-      main_app.login_path(returnTo: return_to, locale: nil)
+    # Login happens in the host application, so :locale is cleared from the
+    # engine's default_url_options to keep it out of host application paths.
+    def editor_login_path(return_to:, login_options: nil)
+      main_app.login_path({ returnTo: return_to, login_options: }.compact.merge(locale: nil))
     end
 
-    def logout_path
+    def editor_logout_path
       main_app.logout_path(locale: nil)
+    end
+
+    def editor_login_authenticity_token
+      form_authenticity_token(form_options: { action: main_app.login_path(locale: nil), method: 'post' })
     end
   end
 end

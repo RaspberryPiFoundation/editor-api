@@ -59,7 +59,7 @@
             <h2 class="information-card__title"><%= t('.ready_to_continue') %></h2>
             <h3 class="information-card__subtitle"><%= t('.continue_your_projects') %></h3>
             <%= button_to t('.login_to_code_editor'),
-                          login_path(return_to: projects_path),
+                          editor_login_path(return_to: projects_path),
                           class: 'landing-page__text-link' %>
             <h3 class="information-card__subtitle"><%= t('.using_code_classroom') %></h3>
             <div class="information-card__buttons">

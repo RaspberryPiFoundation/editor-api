@@ -14,6 +14,11 @@
   </head>
   <body>
     <div class="editor-app">
+      <%= render EditorApp::GlobalNavComponent.new(
+            current_path: request.path,
+            signed_in: current_user.present?,
+            student: current_user&.student? || false
+          ) %>
       <%= yield %>
     </div>
   </body>
