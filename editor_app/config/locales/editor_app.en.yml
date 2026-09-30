@@ -36,6 +36,46 @@ en:
         heading: You cannot access this page
         text: If this is your project, log in to see it. If it is not, visit the
           Projects site for cool project ideas or start coding in a new project.
+    project_types:
+      python: Python
+      html: Web
+      code_editor_scratch: Blocks
+      scratch: Scratch
+    projects:
+      empty: No projects created yet
+      updated: Edited %{time_ago} ago
+      rename: Rename
+      rename_label: Rename project
+      delete: Delete
+      delete_label: Delete project
+      renamed: Project renamed
+      deleted: Project deleted
+      index:
+        title: Your projects
+        subtitle: Select a project to continue coding, view, or edit it.
+        home: Code Editor home
+        new_project: Create a new project
+        load_more: Load more projects
+      new_dialog:
+        heading: Create a new project
+        name_label: Project name
+        name_hint: You can always rename your project later
+        default_name: Untitled
+        type_label: What kind of project do you want to make?
+        python_description: Wide range of built-in libraries
+        html_description: HTML, CSS, and JavaScript
+        submit: Create project
+        cancel: Cancel
+      rename_dialog:
+        heading: Rename project
+        label: Change the name of your project
+        submit: Save
+        cancel: Do not save
+      delete_dialog:
+        heading: Delete project
+        text: Are you sure you want to delete %{name}?
+        submit: Delete
+        cancel: Cancel
     session:
       expired: You have been logged out. Log in again to carry on saving your work.
       log_in_again: Log in again

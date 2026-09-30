@@ -1,0 +1,48 @@
+<dialog id="<%= DIALOG_ID %>" class="dialog">
+  <%= form_with url: projects_path, method: :post, class: 'dialog__form' do %>
+    <h2 class="dialog__heading"><%= t('editor_app.projects.new_dialog.heading') %></h2>
+    <label class="dialog__label" for="new-project-name"><%= t('editor_app.projects.new_dialog.name_label') %></label>
+    <p class="dialog__hint"><%= t('editor_app.projects.new_dialog.name_hint') %></p>
+    <input
+      class="dialog__input"
+      id="new-project-name"
+      type="text"
+      name="project[name]"
+      value="<%= t('editor_app.projects.new_dialog.default_name') %>"
+      required
+    >
+    <fieldset class="dialog__fieldset">
+      <legend class="dialog__label"><%= t('editor_app.projects.new_dialog.type_label') %></legend>
+      <% types.each do |project_type| %>
+        <label class="project-type" for="new-project-type-<%= project_type %>">
+          <input
+            class="project-type__input"
+            id="new-project-type-<%= project_type %>"
+            type="radio"
+            name="project[project_type]"
+            value="<%= project_type %>"
+            required
+          >
+          <%= image_tag icon(project_type), alt: '', aria: { hidden: true }, class: 'project-type__icon' %>
+          <span class="project-type__copy">
+            <span class="project-type__name"><%= type_name(project_type) %></span>
+            <span class="project-type__description"><%= type_description(project_type) %></span>
+          </span>
+        </label>
+      <% end %>
+    </fieldset>
+    <div class="dialog__actions">
+      <%= render DesignSystem::ButtonComponent.new(
+            type: 'submit',
+            text: t('editor_app.projects.new_dialog.submit')
+          ) %>
+      <%= render DesignSystem::ButtonComponent.new(
+            type: 'submit',
+            text: t('editor_app.projects.new_dialog.cancel'),
+            modifiers: ['secondary'],
+            formmethod: 'dialog',
+            formnovalidate: true
+          ) %>
+    </div>
+  <% end %>
+</dialog>
