@@ -17,8 +17,8 @@ else the goal is less client-side JavaScript and more content rendered on the se
 
 ## What has been done
 
-Phases 0, 1 and 2 are complete and verified against a running server, not only in
-specs. 92 specs, lint clean. In order:
+Phases 0 to 4 are complete and verified against a running server, not only in
+specs. 114 specs, lint clean. In order:
 
 | Commit | Delivered |
 |---|---|
@@ -33,24 +33,37 @@ specs. 92 specs, lint clean. In order:
 | `cbf0ebac` | Login returning to `omniauth.origin` behind a local-path check, the `admin_root_path` redirect demoted to a fallback, logout returning to the host it was triggered from, `session[:oauth_expires_at]` |
 | `2287c6f9` | The token bridge: `AuthTokenComponent` writes `localStorage[auth_key]` from a JSON data block in `<head>`, and clears it when signed out |
 | `f905240b` | Silent renewal: `SilentRenewController#start`/`#callback`, `User.from_id_token`, `SessionRenewalComponent`, `session_renewal.js` scheduling a hidden iframe, and the in-place "log in again" prompt |
+| `6cd002ef` | Removal of the engine's import map, which resolved to `{"imports": {}}` and emitted a dead `import "application"` — see [No Stimulus, no Turbo](#no-stimulus-no-turbo) |
+| `db69ae47` | Project show page: `ProjectsController#show`, `ProjectComponent` rendering `<editor-wc>`, `EditorApp::WebComponent` following `latest_version`, Scratch handed to Experience CS, Rails 404/403 pages, `project.js` |
+| `9375227e` | Project index, create, rename and delete: kaminari pagination, `ProjectList{,Item}Component`, `NewProjectDialogComponent`, `ProjectTemplate`, `dialogs.js` |
 
 What exists in the engine now:
 
 ```
 lib/editor_app.rb                              serves_host?, hosts
 app/models/editor_app/locale.rb                SUPPORTED, SELECTABLE, resolve, projects_site
+app/models/editor_app/web_component.rb         script_url, latest_version indirection
+app/models/editor_app/project_template.rb      starter components per project type
 app/controllers/editor_app/
-  application_controller.rb                    locale resolution, check_authorization, show_footer?
+  application_controller.rb                    locale resolution, check_authorization, show_footer?,
+                                               404/403 rescues
   home_controller.rb  locales_controller.rb  education_controller.rb
+  projects_controller.rb                       index, show, create, update, destroy
+  errors_controller.rb                         /:locale/error, for editor-projectLoadFailed
 app/components/editor_app/
   base_component.rb  global_nav_component.rb  secondary_nav_component.rb  footer_component.rb
   auth_token_component.rb                      localStorage[auth_key] bridge
   session_renewal_component.rb                 renewal script + "log in again" prompt
+  project_component.rb                          <editor-wc> and its attributes
+  project_list_component.rb  project_list_item_component.rb  new_project_dialog_component.rb
 app/helpers/editor_app/application_helper.rb   editor_login_path, code_classroom_url, …
 app/views/layouts/editor_app/application.html.erb
 app/views/editor_app/home/show.html.erb
-app/assets/javascripts/editor_app/session_renewal.js
-app/assets/stylesheets/editor_app/             application, landing_page, secondary_nav, footer (plain CSS)
+app/views/editor_app/projects/{index,show}.html.erb
+app/views/editor_app/errors/{_error,not_found,forbidden}.html.erb
+app/assets/javascripts/editor_app/             session_renewal, project, dialogs
+app/assets/stylesheets/editor_app/             application, landing_page, secondary_nav, footer,
+                                               project, projects (plain CSS)
 config/locales/editor_app.{en,en-US,es-LA,fr-FR,ga-IE}.yml
 ```
 
@@ -58,7 +71,8 @@ And in the host tree: `lib/editor_hydra_client.rb`,
 `app/controllers/silent_renew_controller.rb`, `app/views/silent_renew/callback.html.erb`,
 `User.from_id_token`.
 
-Specs in the host tree: `spec/requests/editor_app/{mounting,home,education}_spec.rb`,
+Specs in the host tree:
+`spec/requests/editor_app/{mounting,home,education,project,project_index}_spec.rb`,
 `spec/requests/{auth,silent_renew}_spec.rb`, `spec/components/editor_app/*_spec.rb`,
 `spec/models/editor_app/locale_spec.rb`,
 `spec/lib/{editor_app,editor_hydra_client}_spec.rb`.
@@ -67,19 +81,44 @@ Specs in the host tree: `spec/requests/editor_app/{mounting,home,education}_spec
 
 | | |
 |---|---|
-| Next | Phase 3 (project show page) — needs no token for starter projects |
-| Not started | Phase 4 (project index), Phase 5 (cutover) |
+| Next | Phase 5 (cutover) |
 | Blocked elsewhere | Hydra client registration for staging and production — see [Outstanding dependency](#outstanding-dependency) |
 
 **Dangling route.** `session_tokens#show` has been replaced by the silent-renew routes
-and is gone from `config/routes.rb`. `projects#*` is still declared without a
-controller, so `/:locale/projects…` raises until Phase 3 lands.
+and is gone from `config/routes.rb`.
 
-Nothing of the project index or project show page is built. The only JavaScript is
-`app/assets/javascripts/editor_app/session_renewal.js`, served by Propshaft; there is
-still no `app/javascript/editor_app/controllers/` content and no Stimulus, so the
-Plausible click events on the home page buttons are currently inert
-`data-plausible-event` attributes.
+**Not verified in a browser.** The project index was checked through request specs and
+its HTML read by hand, but never rendered signed-in in a running browser, because login
+on the editor host needs the Hydra editor client and a session cookie cannot easily be
+forged from the console. What is unverified is therefore the *appearance* of the index,
+the list rows and the three dialogs, not their markup. The show page, the 404 page, the
+Scratch redirect, the signed-out index redirect and every asset were verified against
+the running server.
+
+Two loose ends carried forward:
+
+- The Plausible click events on the home page buttons are still inert
+  `data-plausible-event` attributes; nothing reads them.
+- `ProjectTemplate` reproduces an asymmetry in `defaultProjects.js`: the Python starter
+  marks `main.py` as the default component, the web starter marks neither `index.html`
+  nor `style.css`. That is what the React app created, so it was ported as-is, but it
+  looks unintended and is worth confirming with whoever owns the editor.
+
+### No Stimulus, no Turbo
+
+The plan assumed both. Neither is actually available: `turbo-rails` is not in the
+Gemfile, there is no host `application.js`, and importmap-rails silently drops pins it
+cannot resolve — so the engine's import map rendered as `{"imports": {}}` with a dead
+`import "application"` on every page. Rather than add two gems, the remaining phases use
+the pattern the engine already had for `session_renewal.js`: plain scripts under
+`app/assets/javascripts/editor_app/`, served by Propshaft, included with
+`javascript_include_tag ... defer: true`.
+
+This costs little. `project.js` and `dialogs.js` are each about twenty lines. The index
+pagination is a link to `?page=2` instead of a Turbo-appended frame, and flashes are
+ordinary Rails flashes rendered through `DesignSystem::AlertComponent` instead of Turbo
+Streams. Turbo Drive would also have had to be kept away from the project page, since
+it tears down `<editor-wc>` on navigation.
 
 ## Architecture
 
@@ -238,47 +277,92 @@ Still open from this phase: `editor_app.session.expired` and
 `editor_app.session.log_in_again` exist in `en` only and fall back to English elsewhere,
 so they need to go through Crowdin with the rest of the engine's strings in Phase 5.
 
-### Phase 3 — Project show page
+### Phase 3 — Project show page — **done**
 
-- `ProjectsController#show`: `ProjectLoader.new(params[:identifier], [params[:locale], 'en', nil])`
-  then `authorize! :show, @project`.
-- Redirect `project_type == 'scratch'` to `EXPERIENCE_CS_WEB_URL`, as
-  `src/components/ProjectPage/ProjectPage.jsx` does.
-- Render `<editor-wc>` with the attribute set from
-  `src/components/Editor/Project/Project.jsx`. Two things improve for free:
-  `friendly_errors_enabled` can read `Flipper.enabled?` directly instead of
-  round-tripping `/api/features`, and the API endpoint is now same-origin.
-  `offline_enabled` is `"false"` while the service worker is out of scope.
-- `EditorApp::WebComponent.script_url` should port the `latest_version` indirection from
-  `src/scripts/getEditorWebComponentURL.js`, cached in `Rails.cache`.
-- Override `show_footer?` to `false`; the editor fills the viewport.
-- One Stimulus controller replaces the `useEffect` listeners in
-  `src/containers/ProjectComponentLoader.jsx`, for the events in
-  `editor-ui/src/events/WebComponentCustomEvents.js`:
-  `editor-projectIdentifierChanged` → `history.replaceState`;
-  `editor-navigateToProjectsPage` → the index; `editor-projectLoadFailed` → error page;
-  `editor-logIn` → submit the login form.
-- Not-found and access-denied become Rails 404/403, not the React modals.
+`ProjectsController#show` resolves the project through
+`ProjectLoader.new(params[:identifier], [params[:locale]])` — the loader appends `'en'`
+and `nil` itself, so passing those again would only duplicate them — then
+`authorize! :show, @project`. `EditorApp::ProjectComponent` renders `<editor-wc>` with
+the attributes `src/components/Editor/Project/Project.jsx` set. Two improved for free:
+`friendly_errors_enabled` reads `Flipper.enabled?(:friendly_errors)` directly instead of
+round-tripping `/api/features`, and the API is now same-origin so
+`react_app_api_endpoint` is not passed at all.
 
-Anonymous starter projects (`blank-python-starter`, `blank-html-starter`) need no token,
-so this phase can be built and verified before Phase 2 exists.
+**Boolean attributes must be spelled out.** `web-component.jsx` parses every boolean
+attribute as `rawValue !== "false"`, so `offline_enabled` and a disabled
+`friendly_errors_enabled` are rendered as the string `"false"` rather than omitted.
+`tag.attributes` does the right thing here: it drops `nil` but renders `false`.
 
-### Phase 4 — Project index, create, rename, delete
+`EditorApp::WebComponent.script_url` ports the `latest_version` indirection from
+`src/scripts/getEditorWebComponentURL.js`, reading `EDITOR_WEB_COMPONENT_URL` and
+caching the resolved release in `Rails.cache` for five minutes with `skip_nil: true`, so
+a failed lookup is retried rather than cached. A failure is reported to Sentry and
+leaves the URL unresolved.
 
-- `#index` uses the same filter as `Types::QueryType#projects`:
-  `Project.accessible_by(current_ability, :show).where(user_id: current_user.id, school_id: nil, lesson_id: nil).order(updated_at: :desc)`,
-  paginated with the `kaminari` gem already in the Gemfile. The GraphQL cursor
-  "Load more" becomes a Turbo-appended next-page link.
-- Login required; students get 403, matching `ProjectLayout`'s student redirect.
-- Port `ProjectIndexHeader`, `ProjectListTable`, `ProjectListItem` as view components.
-  "Edited X ago" uses `time_ago_in_words` rather than `date-fns`.
-- `#create`, `#update`, `#destroy` call `Project::Create` and `Project::Update` in
-  `lib/concepts/project/operations/`. Starter content mirrors
-  `src/utils/defaultProjects.js`: an empty `main.py`, or empty `index.html` + `style.css`.
-  Confirm whether the index should also offer `code_editor_scratch`, which the React
-  modal offers behind a feature flag.
-- Forms in `<dialog>` inside Turbo Frames, flashes via Turbo Streams, one small Stimulus
-  controller to open and close.
+Scratch projects redirect to `EXPERIENCE_CS_WEB_URL`, as `ProjectPage.jsx` does.
+`show_footer?` is false for `show` only, so the editor fills the viewport but the index
+keeps its footer.
+
+`project.js` replaces the `useEffect` listeners in `ProjectComponentLoader.jsx`:
+`editor-projectIdentifierChanged` → `history.replaceState` (never a navigation — that
+would tear down `<editor-wc>` and lose the unsaved code a remix has just produced);
+`editor-navigateToProjectsPage` → the index; `editor-projectLoadFailed` →
+`/:locale/error`; `editor-logIn` → submits a hidden login form, which only exists when
+nobody is signed in, so the React `if (!auth.user)` guard is structural here.
+
+That error path needed a destination, so `/:locale/error` and a two-line
+`ErrorsController` were added, contradicting the out-of-scope list below. It renders the
+same 404 template as everything else.
+
+Not-found and access-denied are Rails 404 and 403 pages, rescued in the engine's
+`ApplicationController` and rendered from `app/views/editor_app/errors/`, not React
+modals. They carry the copy from `notFoundModal` and `accessDeniedNoAuthModal`, and
+offer a login when signed out, since the common case is somebody opening their own
+project link in a browser that is not logged in.
+
+### Phase 4 — Project index, create, rename, delete — **done**
+
+`#index` applies the same filter `Types::QueryType#projects` applied for the React
+index:
+
+```ruby
+Project.accessible_by(current_ability, :show)
+       .where(user_id: current_user.id, school_id: nil, lesson_id: nil)
+       .order(updated_at: :desc)
+```
+
+paginated with `kaminari`, eight to a page. "Edited X ago" is `time_ago_in_words`.
+
+**Login is required, and it is a redirect, not a prompt.** Login is a POST under
+`omniauth-rails_csrf_protection`, so it cannot be redirected to. Anybody signed out is
+sent to the home page, which already carries the "Log in to Code Editor" button that
+returns to `/:locale/projects` — the same thing `useRequiresUser` did with
+`navigate("/")`. School students get a 403, matching `ProjectLayout`'s redirect.
+
+**The index does not offer Blocks.** `ProjectModal.jsx` computes
+`showScratchProjectType = forLesson && Boolean(scratchEnabledForSchool)`, and `forLesson`
+is false on the editor index, so `code_editor_scratch` was never offered there. That
+settles the open question from the original plan. `EditorApp::ProjectTemplate` therefore
+holds Python and web only, and an unrecognised `project_type` is rejected as a bad
+request rather than reaching `Project::Create` with no components.
+
+**Dialogs, without a component library.** Create, rename and delete are ordinary forms
+inside `<dialog>` elements, posting to `#create`, `#update` and `#destroy`, which call
+`Project::Create` and `Project::Update`. Because eight rows means eight rename and eight
+delete forms are already in the page, opening one needs nothing but `showModal`, and the
+native `formmethod="dialog"` on the cancel button closes it — so `dialogs.js` is a
+single delegated click listener with no per-dialog wiring. `formnovalidate` is on the
+cancel buttons so `required` fields do not block closing.
+
+The project type picker is engine-local markup rather than the design system's
+"detailed" radio variant, which `design_system_rails` does not ship.
+
+Still open from Phases 3 and 4: every new string — `editor_app.errors.*`,
+`editor_app.project_types.*` and `editor_app.projects.*` — exists in `en` only and falls
+back to English elsewhere, so they go through Crowdin in Phase 5 alongside
+`editor_app.session.*`. The React source strings they were ported from are
+`project.notFoundModal`, `project.accessDeniedNoAuthModal`, `projectHeader`,
+`projectList`, `projectModal` and `projectTypes`.
 
 ### Phase 5 — Cutover
 
@@ -296,8 +380,13 @@ so this phase can be built and verified before Phase 2 exists.
 
 ## Out of scope
 
-`/embed/viewer/:identifier`, a dedicated `/error` page, the service worker and offline
-mode, the Blocks/Scratch editor path, dark mode, and the whole classroom app.
+`/embed/viewer/:identifier`, the service worker and offline mode, the Blocks/Scratch
+editor path, dark mode, and the whole classroom app.
+
+A dedicated `/error` page was out of scope, but Phase 3 needed somewhere to send the
+browser when the web component fires `editor-projectLoadFailed`, so `/:locale/error`
+exists and renders the ordinary 404 page. It is not a ported version of the React
+`UnableToAccess` route.
 
 `/education` is **not** being ported. Its entire content was a notice that Code Editor
 for Education is now Code Classroom, so `EducationController` redirects there instead.
@@ -346,7 +435,14 @@ also uncommitted.
 # .env
 EDITOR_APP_HOSTS=editor.localhost
 EDITOR_HYDRA_CLIENT_ID=editor-dev
+EDITOR_WEB_COMPONENT_URL=http://localhost:3011
+EXPERIENCE_CS_WEB_URL=https://staging.experience-cs.org
 ```
+
+`EDITOR_WEB_COMPONENT_URL` expects `editor-ui` running locally on 3011
+(`npm start` in that repo). Point it at
+`https://staging-editor-static.raspberrypi.org/branches/main` to use a deployed build
+instead.
 
 Then `http://editor.localhost:3009/en`. Rails allows `.localhost` hosts in development,
 so no `config.hosts` change is needed locally. Restart the container after changing
@@ -354,7 +450,8 @@ so no `config.hosts` change is needed locally. Restart the container after chang
 
 ```bash
 docker compose run --rm api bundle exec rspec spec/requests/editor_app spec/components/editor_app \
-  spec/requests/auth_spec.rb spec/requests/silent_renew_spec.rb spec/lib/editor_hydra_client_spec.rb
+  spec/models/editor_app spec/requests/auth_spec.rb spec/requests/silent_renew_spec.rb \
+  spec/lib/editor_app_spec.rb spec/lib/editor_hydra_client_spec.rb
 docker compose run --rm api bundle exec rubocop editor_app
 ```
 
