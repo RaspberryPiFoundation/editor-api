@@ -126,9 +126,15 @@ Rails.application.routes.draw do
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
 
-  root to: 'auth#index'
-
   post '/auth/rpi', as: 'login'
   get '/auth/callback', to: 'auth#callback', as: 'callback'
   get '/logout', to: 'auth#destroy', as: 'logout'
+
+  constraints(->(request) { !EditorApp.serves_host?(request.host) }) do
+    root to: 'auth#index'
+  end
+
+  constraints(->(request) { EditorApp.serves_host?(request.host) }) do
+    mount EditorApp::Engine => '/'
+  end
 end
