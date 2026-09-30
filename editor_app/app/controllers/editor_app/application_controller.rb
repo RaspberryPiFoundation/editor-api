@@ -10,7 +10,18 @@ module EditorApp
 
     helper_method :show_footer?
 
+    rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+    rescue_from CanCan::AccessDenied, with: :render_forbidden
+
     private
+
+    def render_not_found
+      render 'editor_app/errors/not_found', status: :not_found
+    end
+
+    def render_forbidden
+      render 'editor_app/errors/forbidden', status: :forbidden
+    end
 
     # The editor takes over the whole viewport, so its pages opt out.
     def show_footer?

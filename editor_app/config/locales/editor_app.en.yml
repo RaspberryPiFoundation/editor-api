@@ -24,6 +24,18 @@ en:
         login_as_a_teacher: Log in as a teacher
         go_to_classroom: Go to Code Classroom
         ide_image_alt: A Code Editor project with instructions alongside the code
+    errors:
+      log_in: Log in to your account
+      your_projects: Your projects
+      projects_site: Explore Projects site
+      not_found:
+        heading: This page does not exist
+        text: You can start coding in a new project, or visit the Projects site for
+          cool project ideas.
+      forbidden:
+        heading: You cannot access this page
+        text: If this is your project, log in to see it. If it is not, visit the
+          Projects site for cool project ideas or start coding in a new project.
     session:
       expired: You have been logged out. Log in again to carry on saving your work.
       log_in_again: Log in again
