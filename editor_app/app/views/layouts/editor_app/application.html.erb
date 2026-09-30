@@ -12,6 +12,7 @@
     <%= stylesheet_link_tag 'editor_app/secondary_nav' %>
     <%= stylesheet_link_tag 'editor_app/footer' %>
     <%= content_for :head %>
+    <%= render EditorApp::AuthTokenComponent.new(user: current_user, expires_at: session[:oauth_expires_at]) %>
     <%= javascript_importmap_tags %>
   </head>
   <body>

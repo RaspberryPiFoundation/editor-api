@@ -1,0 +1,15 @@
+<% if user %>
+  <script type="application/json" id="<%= ELEMENT_ID %>"><%= raw ERB::Util.json_escape(stored_user.to_json) %></script>
+<% end %>
+<script>
+  (function () {
+    var key = <%= raw ERB::Util.json_escape(auth_key.to_json) %>;
+    var stored = document.getElementById("<%= ELEMENT_ID %>");
+
+    if (stored) {
+      window.localStorage.setItem(key, stored.textContent);
+    } else {
+      window.localStorage.removeItem(key);
+    }
+  })();
+</script>
