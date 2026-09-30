@@ -10,6 +10,7 @@
     <%= stylesheet_link_tag DesignSystem::STYLESHEET_URL %>
     <%= stylesheet_link_tag 'editor_app/application' %>
     <%= stylesheet_link_tag 'editor_app/secondary_nav' %>
+    <%= stylesheet_link_tag 'editor_app/footer' %>
     <%= content_for :head %>
     <%= javascript_importmap_tags %>
   </head>
@@ -22,6 +23,9 @@
           ) %>
       <%= render EditorApp::SecondaryNavComponent.new(current_path: request.path, user: current_user) %>
       <%= yield %>
+      <% if show_footer? %>
+        <%= render EditorApp::FooterComponent.new(user: current_user, show_feedback_link: true) %>
+      <% end %>
     </div>
   </body>
 </html>

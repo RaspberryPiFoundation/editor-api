@@ -25,6 +25,12 @@ RSpec.describe 'Code Editor home page' do
     expect(response.body).to include('secondary-nav__title')
   end
 
+  it 'renders the footer with the feedback link' do
+    get 'http://editor.example.com/en'
+    expect(response.body).to include('<footer class="footer">')
+      .and include(EditorApp::FooterComponent::FEEDBACK_URL)
+  end
+
   it 'offers a starter project for each language' do
     get 'http://editor.example.com/en'
     expect(response.body).to include('/en/projects/blank-python-starter')

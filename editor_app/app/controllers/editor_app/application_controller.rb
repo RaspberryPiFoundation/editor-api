@@ -8,7 +8,14 @@ module EditorApp
 
     around_action :switch_locale
 
+    helper_method :show_footer?
+
     private
+
+    # The editor takes over the whole viewport, so its pages opt out.
+    def show_footer?
+      true
+    end
 
     def switch_locale(&)
       I18n.with_locale(requested_locale, &)
