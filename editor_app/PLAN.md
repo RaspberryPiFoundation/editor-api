@@ -17,8 +17,8 @@ else the goal is less client-side JavaScript and more content rendered on the se
 
 ## What has been done
 
-Phases 0 and 1 are complete and verified against a running server, not only in specs.
-61 specs, lint clean. In order:
+Phases 0, 1 and 2 are complete and verified against a running server, not only in
+specs. 92 specs, lint clean. In order:
 
 | Commit | Delivered |
 |---|---|
@@ -29,6 +29,10 @@ Phases 0 and 1 are complete and verified against a running server, not only in s
 | `f88c2fd5` | Secondary nav as a view component, `BaseComponent`, and `/:locale/education` redirecting to Code Classroom |
 | `d61ad7ca` | Footer as a view component, with the `show_footer?` opt-out for full-viewport pages |
 | `37ed492b` | Fix for `Locales.load_locales` clobbering `I18n.available_locales` — see [Bugs found](#bugs-found-in-the-react-app--do-not-reintroduce) |
+| `a3f78f84` | The editor host logging in against the **editor** Hydra client: `EditorHydraClient`, OmniAuth `setup` swapping client by host, public client + PKCE + `:request_body`, `allow-u13-login` added to the scope |
+| `cbf0ebac` | Login returning to `omniauth.origin` behind a local-path check, the `admin_root_path` redirect demoted to a fallback, logout returning to the host it was triggered from, `session[:oauth_expires_at]` |
+| `2287c6f9` | The token bridge: `AuthTokenComponent` writes `localStorage[auth_key]` from a JSON data block in `<head>`, and clears it when signed out |
+| `f905240b` | Silent renewal: `SilentRenewController#start`/`#callback`, `User.from_id_token`, `SessionRenewalComponent`, `session_renewal.js` scheduling a hidden iframe, and the in-place "log in again" prompt |
 
 What exists in the engine now:
 
@@ -40,35 +44,42 @@ app/controllers/editor_app/
   home_controller.rb  locales_controller.rb  education_controller.rb
 app/components/editor_app/
   base_component.rb  global_nav_component.rb  secondary_nav_component.rb  footer_component.rb
+  auth_token_component.rb                      localStorage[auth_key] bridge
+  session_renewal_component.rb                 renewal script + "log in again" prompt
 app/helpers/editor_app/application_helper.rb   editor_login_path, code_classroom_url, …
 app/views/layouts/editor_app/application.html.erb
 app/views/editor_app/home/show.html.erb
+app/assets/javascripts/editor_app/session_renewal.js
 app/assets/stylesheets/editor_app/             application, landing_page, secondary_nav, footer (plain CSS)
 config/locales/editor_app.{en,en-US,es-LA,fr-FR,ga-IE}.yml
 ```
 
+And in the host tree: `lib/editor_hydra_client.rb`,
+`app/controllers/silent_renew_controller.rb`, `app/views/silent_renew/callback.html.erb`,
+`User.from_id_token`.
+
 Specs in the host tree: `spec/requests/editor_app/{mounting,home,education}_spec.rb`,
-`spec/components/editor_app/*_spec.rb`, `spec/models/editor_app/locale_spec.rb`,
-`spec/lib/editor_app_spec.rb`.
+`spec/requests/{auth,silent_renew}_spec.rb`, `spec/components/editor_app/*_spec.rb`,
+`spec/models/editor_app/locale_spec.rb`,
+`spec/lib/{editor_app,editor_hydra_client}_spec.rb`.
 
 ### What is left
 
 | | |
 |---|---|
-| Next | Phase 2 (auth + token bridge) and Phase 3 (project show page) — independent of each other, and Phase 3 needs no token for starter projects |
+| Next | Phase 3 (project show page) — needs no token for starter projects |
 | Not started | Phase 4 (project index), Phase 5 (cutover) |
-| Blocked elsewhere | Hydra client registration — see [Outstanding dependency](#outstanding-dependency) |
+| Blocked elsewhere | Hydra client registration for staging and production — see [Outstanding dependency](#outstanding-dependency) |
 
-**Dangling routes.** `config/routes.rb` already declares `projects#*` and
-`session_tokens#show`, whose controllers do not exist yet. Requests to
-`/:locale/projects…` or `/session/token` will raise until Phases 2 and 3 land. The
-`session_tokens` route is a leftover from an earlier design and should be replaced by
-the silent-renew routes described below.
+**Dangling route.** `session_tokens#show` has been replaced by the silent-renew routes
+and is gone from `config/routes.rb`. `projects#*` is still declared without a
+controller, so `/:locale/projects…` raises until Phase 3 lands.
 
-Nothing of the project index or project show page is built. No JavaScript has been
-written yet: there is no `app/javascript/editor_app/controllers/` content, so the
+Nothing of the project index or project show page is built. The only JavaScript is
+`app/assets/javascripts/editor_app/session_renewal.js`, served by Propshaft; there is
+still no `app/javascript/editor_app/controllers/` content and no Stimulus, so the
 Plausible click events on the home page buttons are currently inert
-`data-plausible-event` attributes awaiting a Stimulus controller.
+`data-plausible-event` attributes.
 
 ## Architecture
 
@@ -144,107 +155,88 @@ matches the `fallbackLng` the React app set.
 
 ## Remaining work
 
-### Phase 2 — Auth and the token bridge
+### Phase 2 — Auth and the token bridge — **done**
 
-`editor-ui` reads its user from `localStorage[auth_key]` once at mount
-(`src/web-component.jsx:227`) and re-reads it every 45s
-(`src/hooks/useSyncUserFromLocalStorage.js`). Rails owns the session and keeps that key
-populated, so **no `editor-ui` change is needed**.
+How it ended up working, and the decisions worth keeping.
 
-- Extend `AuthController#callback` to honour `request.env['omniauth.origin']`
-  (`origin_param: 'returnTo'` is already configured) with an allow-list check, so login
-  returns to the page you came from.
-- Fix `redirect_to admin_root_path if current_user.admin?` in that callback. On the
-  editor host it sends admins to `/admin` from the editor home page.
-- Add `allow-u13-login` to the OmniAuth scope. It is already permitted on both clients.
-- Store `access_token` and `expires_at` in `session[:oauth_credentials]` rather than
-  widening `User::ATTRIBUTES`. Watch the 4KB cookie store: there is no `session_store`
-  initializer and the session already carries all of `session[:current_user]`.
-- Bridge: the page embeds `<script type="application/json">` with the token, then a
-  synchronous inline script writes `localStorage[auth_key]`, and only then loads
-  `web-component.js` deferred. That ordering is what lets `loadInitialUser()` find a
-  user. No CSP is enforced today, so no nonce is needed.
-- `auth_key` is ours to choose but must match between the bridge and the
-  `<editor-wc auth_key=…>` attribute. Derive it from `HYDRA_PUBLIC_URL` and the client
-  id, in the format `getOidcAuthKey` used.
-
-**Renewal is by silent re-authorisation, not refresh tokens.** Access tokens last an
-hour and an editor page may be open far longer, so the token in localStorage has to be
-replaced while the page lives. `offline_access` was rejected deliberately: Hydra is told
-`remember_for = 0` at login (`profile/app/lib/login.js`), so its session cookie lasts
-the whole browser session, whereas a refresh token expires in its own right — 2h locally
-— and would die on an idle page. A probe of the authorize endpoint also confirmed the
-client is refused `offline_access` today (`invalid_scope`).
-
-- `SilentRenewController#start` builds the Hydra authorize URL itself with `prompt=none`,
-  a `state` in the session, and `redirect_uri` pointing at `#callback`. It bypasses
-  OmniAuth on purpose: the request phase requires a POST under
-  `omniauth-rails_csrf_protection`, which an iframe navigation cannot do.
-- `#callback` exchanges the code server-side, updates the session, and renders a bare
-  page whose only job is writing the fresh token to `localStorage[auth_key]`. Same-origin
-  with the editor page, so no postMessage. The existing 45s poll picks it up.
-- Load `#start` in a **hidden iframe** shortly before expiry. Never a top-level
-  redirect: that tears down `<editor-wc>` and loses unsaved code, which is the whole
-  reason for renewing. The iframe works because the editor host and the auth host are
-  both under `raspberrypi.org`, so Hydra's session cookie is same-site there and is not
-  affected by third-party cookie restrictions.
-- On `error=login_required` the session has genuinely gone. Surface a "log in again"
-  prompt in place and never navigate away, so the user can still recover their work.
-
-#### Requirement: the editor host must use the editor Hydra client
-
-**Two Hydra clients, not one, and the editor host must use the editor client** — the one
-defined by `profile/dev-config/hydra/clients/v2/editor-client.json`, client id
-`editor-dev` locally. The admin and API pages on the editor-api host keep using
-`HYDRA_CLIENT_ID` (`editor-dashboard-dev` locally). This is a requirement, not a
-preference.
-
-Why it matters beyond tidiness: Profile resolves the `roles` claim **per client id**
-(`Assignment.getUserRolesForApplication(user, clientID)` in
+**Two Hydra clients, and the editor host uses the editor one.** Profile resolves the
+`roles` claim per client id (`Assignment.getUserRolesForApplication(user, clientID)` in
 `profile/app/services/account-authorization/scopes.js`), and editor-api reads that claim
 for `User#admin?`, which drives `Ability`. One shared client would give a session created
-on the public editor host the same `editor-admin` role as the admin dashboard. Using
-distinct clients also sidesteps `frontchannel_logout_uri` being a single URI per client,
-unlike `redirect_uris`.
+on the public editor host the same `editor-admin` role as the admin dashboard. Distinct
+clients also sidestep `frontchannel_logout_uri` being a single URI per client, unlike
+`redirect_uris`. The admin and API pages on the editor-api host keep using
+`HYDRA_CLIENT_ID`; the editor host uses `EDITOR_HYDRA_CLIENT_ID` (`editor-dev` locally).
 
-**Implement it as a public client with PKCE, and change nothing about the client.**
-`editor-client.json` is registered `"token_endpoint_auth_method": "none"`, so Hydra
-expects no client authentication, whereas this app's OmniAuth config sends a secret with
-`auth_scheme: :basic_auth`. Do not flip that client to `client_secret_basic` to resolve
-it: `editor-dev` is also editor-ui's dev client (`editor-ui/.env.example`) and its
-production counterpart is the SPA's client, both of which are browser apps that require
-`none`. A client has one `token_endpoint_auth_method`, so changing it would break them.
+The editor client is registered `"token_endpoint_auth_method": "none"`, and **nothing
+about the client was changed** — it is also editor-ui's browser client, which requires
+`none`. So `EditorHydraClient.configure_strategy` runs from OmniAuth's per-request
+`setup` callable, which fires on **both** the request and callback phases
+(`omniauth/strategy.rb:234` and `:269`), and switches client id, clears the secret, sets
+`pkce: true` and — this is the part that is easy to miss — sets
+`client_options[:auth_scheme]` to `:request_body`. With `:basic_auth` the `oauth2` gem
+sends `Authorization: Basic <id>:` even when the secret is nil, and Hydra rejects client
+authentication outright for a `none` client. There is a spec asserting no Authorization
+header is produced. Mutating `strategy.options` per request is safe because
+`Strategy#call` does `dup.call!(env)` and `initialize_copy` dups the Hashie::Mash
+options deeply.
 
-`omniauth-oauth2` supports PKCE (`pkce: true` — see `omniauth/strategies/oauth2.rb:32`,
-which adds `code_challenge` on the authorize request and `code_verifier` on the token
-request). That lets editor-api authenticate against the unmodified public client.
+A consequence accepted deliberately: `editor-admin` should not be assigned to the editor
+client in Profile, so **admins are not admins on the editor host**.
 
-OmniAuth also supports a per-request `setup` callable and runs it on **both** the request
-and callback phases (`omniauth/strategy.rb:234` and `:269`), so one provider can switch
-client and auth style by host — keeping a single `/auth/rpi` and `/auth/callback`, and
-leaving the global nav and every login link untouched:
+**Login returns where it started.** `AuthController#callback` honours
+`request.env['omniauth.origin']` (OmniAuth is configured `origin_param: 'returnTo'`) when
+it is a path on this site — `%r{\A/(?![\\/])}`, which rejects `//host` and absolute
+URLs. `redirect_to admin_root_path if current_user.admin?` is now only the fallback when
+no origin was named. Logging out returns to `request.base_url` on editor hosts rather
+than always `HOST_URL`.
 
-```ruby
-setup: lambda { |env|
-  next unless EditorApp.serves_host?(Rack::Request.new(env).host)
+**The token bridge.** `EditorApp::AuthTokenComponent` renders in `<head>`: a
+`<script type="application/json">` data block holding an oidc-client-ts shaped user
+(`access_token`, `token_type`, `scope`, `expires_at`, `profile`), then a synchronous
+inline script that copies its `textContent` into `localStorage[auth_key]`. Synchronous
+and in `<head>` is what guarantees the key is populated before any deferred script can
+mount `<editor-wc>` and call `loadInitialUser()`. When nobody is signed in the same
+script *removes* the key — that is what clears it after logging out. The payload is
+`ERB::Util.json_escape`d rather than interpolated into JavaScript. No `editor-ui` change
+was needed.
 
-  strategy = env['omniauth.strategy']
-  strategy.options[:client_id] = ENV.fetch('EDITOR_HYDRA_CLIENT_ID', nil)
-  strategy.options[:client_secret] = nil
-  strategy.options[:pkce] = true
-}
-```
+`auth_key` is `oidc.user:#{HYDRA_PUBLIC_URL}:#{EDITOR_HYDRA_CLIENT_ID}`, the format
+`getOidcAuthKey` used. It is ours to choose but must match the `<editor-wc auth_key=…>`
+attribute Phase 3 will set — read it from `EditorHydraClient.auth_key`.
 
-Verify at implementation time that no `Authorization: Basic` header is sent on the token
-request once `client_secret` is nil — Hydra rejects client authentication outright for a
-`none` client. `client_options[:auth_scheme]` may need setting to `:request_body` for the
-editor host, and the `oauth2` gem's behaviour with a nil secret is worth asserting in a
-spec rather than assumed.
+The access token was **not** duplicated into the session: `User::ATTRIBUTES` already
+includes `token`, so it is in `session[:current_user]` already, and the session cookie
+only has 4KB. Only `session[:oauth_expires_at]` was added.
 
-A consequence to accept deliberately: `editor-admin` should not be assigned to the editor
-client in Profile, so **admins are not admins on the editor host**. That is the intended
-behaviour — the admin dashboard lives on the editor-api host — and it also removes the
-`redirect_to admin_root_path` misfire noted above.
+**Renewal is silent re-authorisation, not refresh tokens.** `offline_access` was rejected
+deliberately: Hydra is told `remember_for = 0` at login (`profile/app/lib/login.js`), so
+its session cookie lasts the whole browser session, whereas a refresh token expires in
+its own right — 2h locally — and would die on an idle page. A probe of the authorize
+endpoint also confirmed the client is refused `offline_access` today (`invalid_scope`).
+
+- `SilentRenewController#start` builds the authorize URL itself with `prompt=none`, a
+  `state` and PKCE verifier in the session, and `redirect_uri` pointing at `#callback` at
+  `/auth/silent_renew`. It bypasses OmniAuth on purpose: the request phase requires a
+  POST under `omniauth-rails_csrf_protection`, which an iframe navigation cannot do.
+- `#callback` exchanges the code server-side against the public client, rebuilds the user
+  from the id token with `User.from_id_token` (so `current_user.token` stays fresh for
+  server-side Profile API calls too), and renders a bare page that writes the new token to
+  `localStorage[auth_key]` and `postMessage`s the outcome to its opener. Same-origin, so
+  the existing 45s poll in `useSyncUserFromLocalStorage` picks the token up.
+- `session_renewal.js` schedules the hidden iframe two minutes before expiry and
+  reschedules from the `expiresAt` in the message. It returns early when
+  `window.parent !== window` so the iframe never schedules its own renewal. Never a
+  top-level redirect: that tears down `<editor-wc>` and loses unsaved code, which is the
+  whole reason for renewing.
+- On failure `EditorApp::SessionRenewalComponent`'s prompt is unhidden in place and a
+  `editor-app:session-expired` event is dispatched on `window`. The failure path renders
+  no `AuthTokenComponent`, so the stored token is left alone and unsaved work is still
+  recoverable.
+
+Still open from this phase: `editor_app.session.expired` and
+`editor_app.session.log_in_again` exist in `en` only and fall back to English elsewhere,
+so they need to go through Crowdin with the rest of the engine's strings in Phase 5.
 
 ### Phase 3 — Project show page
 
@@ -316,7 +308,7 @@ Hydra client registrations live outside this repo and are per environment. Given
 requirement above, the registration that matters is the **editor** client, not the
 dashboard one.
 
-Locally, `editor-client.json` already lists
+Locally, `editor-client.json` lists
 `http://editor.localhost:3009/auth/callback` and `/auth/silent_renew`, so dev needs no
 registration change once the app is pointed at `editor-dev`. Note that
 `hydra import oauth2-client` refuses to update an existing client, so applying any edit
@@ -326,10 +318,11 @@ For staging and production the editor client needs the editor host's callback an
 silent-renew URIs added, and **nobody can log in on the editor host until that lands**.
 No new grant type and no new scope are required.
 
-Clean up before starting Phase 2: local dev currently carries a throwaway edit adding
+Still to clean up in the `profile` working tree: it carries a throwaway edit adding
 `http://editor.localhost:3009/...` to `editor-dashboard-client.json`, made while
 diagnosing a `redirect_uri` mismatch. It is the wrong client under this requirement and
-should be reverted.
+should be reverted. The matching edit to `editor-client.json` is the one to keep, and is
+also uncommitted.
 
 ## Bugs found in the React app — do not reintroduce
 
@@ -352,6 +345,7 @@ should be reverted.
 ```bash
 # .env
 EDITOR_APP_HOSTS=editor.localhost
+EDITOR_HYDRA_CLIENT_ID=editor-dev
 ```
 
 Then `http://editor.localhost:3009/en`. Rails allows `.localhost` hosts in development,
@@ -359,7 +353,8 @@ so no `config.hosts` change is needed locally. Restart the container after chang
 `.env`; dotenv only reads it at boot.
 
 ```bash
-docker compose run --rm api bundle exec rspec spec/requests/editor_app spec/components/editor_app
+docker compose run --rm api bundle exec rspec spec/requests/editor_app spec/components/editor_app \
+  spec/requests/auth_spec.rb spec/requests/silent_renew_spec.rb spec/lib/editor_hydra_client_spec.rb
 docker compose run --rm api bundle exec rubocop editor_app
 ```
 
