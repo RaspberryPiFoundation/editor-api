@@ -20,6 +20,11 @@ RSpec.describe 'Code Editor home page' do
     expect(response.body).to include('<rpf-global-nav').and include('rpf-global-nav.esm.js')
   end
 
+  it 'renders the secondary navigation' do
+    get 'http://editor.example.com/en'
+    expect(response.body).to include('secondary-nav__title')
+  end
+
   it 'offers a starter project for each language' do
     get 'http://editor.example.com/en'
     expect(response.body).to include('/en/projects/blank-python-starter')

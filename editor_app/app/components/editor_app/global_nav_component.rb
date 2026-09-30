@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 module EditorApp
-  class GlobalNavComponent < ViewComponent::Base
+  class GlobalNavComponent < BaseComponent
     VERSION = 'v1.8.9'
     SCRIPT_URL = "https://static.raspberrypi.org/js/global-nav-web-component/releases/#{VERSION}/rpf-global-nav.esm.js".freeze
     FORCE_SIGNUP = 'force_signup'
@@ -25,19 +25,19 @@ module EditorApp
     end
 
     def log_in_path
-      helpers.editor_login_path(return_to: current_path)
+      editor_login_path(return_to: current_path)
     end
 
     def sign_up_path
-      helpers.editor_login_path(return_to: current_path, login_options: FORCE_SIGNUP)
+      editor_login_path(return_to: current_path, login_options: FORCE_SIGNUP)
     end
 
     def log_out_path
-      helpers.editor_logout_path
+      editor_logout_path
     end
 
     def authenticity_token
-      helpers.editor_login_authenticity_token
+      editor_login_authenticity_token
     end
 
     private

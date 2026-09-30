@@ -20,3 +20,9 @@ en-US:
         login_as_a_student: "Log in as a student"
         login_as_a_teacher: "Log in as a teacher"
         go_to_classroom: "Go to Code Classroom"
+    secondary_nav:
+      code_editor: "Code Editor"
+      home: "Home"
+      education: "For Education"
+      projects: "Your Projects"
+      school: "Your School"

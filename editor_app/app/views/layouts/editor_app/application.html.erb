@@ -9,6 +9,7 @@
     <%= render DesignSystem::Meta::GoogleFontsComponent.new(fonts: :default) %>
     <%= stylesheet_link_tag DesignSystem::STYLESHEET_URL %>
     <%= stylesheet_link_tag 'editor_app/application' %>
+    <%= stylesheet_link_tag 'editor_app/secondary_nav' %>
     <%= content_for :head %>
     <%= javascript_importmap_tags %>
   </head>
@@ -19,6 +20,7 @@
             signed_in: current_user.present?,
             student: current_user&.student? || false
           ) %>
+      <%= render EditorApp::SecondaryNavComponent.new(current_path: request.path, user: current_user) %>
       <%= yield %>
     </div>
   </body>

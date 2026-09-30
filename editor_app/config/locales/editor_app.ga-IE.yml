@@ -20,3 +20,9 @@ ga-IE:
         login_as_a_student: "Logáil isteach mar dhalta"
         login_as_a_teacher: "Logáil isteach mar mhúinteoir"
         go_to_classroom: "Téigh go Code Classroom"
+    secondary_nav:
+      code_editor: "Code Editor"
+      home: "Baile"
+      education: "For Education"
+      projects: "Do Thionscadail"
+      school: "Do Scoil"

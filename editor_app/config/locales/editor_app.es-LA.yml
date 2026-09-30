@@ -20,3 +20,9 @@ es-LA:
         login_as_a_student: "Inicia sesión como estudiante"
         login_as_a_teacher: "Inicia sesión como docente"
         go_to_classroom: "Ir a Code Classroom"
+    secondary_nav:
+      code_editor: "Code Editor"
+      home: "Inicio"
+      education: "For Education"
+      projects: "Tus proyectos"
+      school: "Tu escuela"

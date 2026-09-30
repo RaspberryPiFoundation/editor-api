@@ -20,3 +20,9 @@ fr-FR:
         login_as_a_student: "Se connecter en tant qu’élève"
         login_as_a_teacher: "Se connecter en tant qu’enseignant ou enseignante"
         go_to_classroom: "Aller à Code Classroom"
+    secondary_nav:
+      code_editor: "Code Editor"
+      home: "Accueil"
+      education: "For Education"
+      projects: "Tes projets"
+      school: "Votre école"
