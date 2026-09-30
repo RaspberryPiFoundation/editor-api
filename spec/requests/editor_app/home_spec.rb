@@ -59,6 +59,11 @@ RSpec.describe 'Code Editor home page' do
       expect(response.body).to include(CGI.escapeHTML('/auth/rpi?returnTo=%2Fen%2Fprojects'))
     end
 
+    it 'has nothing to renew' do
+      get 'http://editor.example.com/en'
+      expect(response.body).not_to include('editor_app/session_renewal')
+    end
+
     it 'offers the Code Classroom logins' do
       get 'http://editor.example.com/en'
       expect(response.body).to include('https://classroom.example.com/auth/user_login/student')
@@ -77,6 +82,12 @@ RSpec.describe 'Code Editor home page' do
     it 'still offers the starter projects' do
       get 'http://editor.example.com/en'
       expect(response.body).to include('/en/projects/blank-python-starter')
+    end
+
+    it 'keeps their access token fresh without navigating away from the page' do
+      get 'http://editor.example.com/en'
+      expect(response.body).to include('editor_app/session_renewal')
+        .and include('Log in again')
     end
   end
 

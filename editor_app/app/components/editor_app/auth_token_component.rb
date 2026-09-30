@@ -14,6 +14,10 @@ module EditorApp
       @expires_at = expires_at
     end
 
+    def renewal_path
+      Rails.application.routes.url_helpers.start_silent_renew_path
+    end
+
     def stored_user
       {
         access_token: user.token,

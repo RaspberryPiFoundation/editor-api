@@ -2,7 +2,6 @@
 
 module EditorHydraClient
   SCOPE = 'openid email profile roles force-consent allow-u13-login'
-  SILENT_RENEW_PATH = '/auth/silent_renew'
 
   class << self
     def client_id

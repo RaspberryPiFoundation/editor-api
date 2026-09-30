@@ -33,6 +33,12 @@ RSpec.describe EditorApp::AuthTokenComponent, type: :component do
     expect(rendered.to_html).to include('"oidc.user:https://auth.example.com:editor-dev"')
   end
 
+  it 'tells the page when the token runs out, and where to renew it' do
+    element = rendered.css("script##{described_class::ELEMENT_ID}").first
+    expect(element.attributes.transform_values(&:value))
+      .to include('data-expires-at' => '1800000000', 'data-renewal-url' => '/auth/silent_renew/start')
+  end
+
   context 'when nobody is signed in' do
     let(:component) { described_class.new }
 

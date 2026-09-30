@@ -32,3 +32,40 @@ body {
 rpf-global-nav {
   min-block-size: 2.875rem;
 }
+
+.session-expired {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--editor-color-theme);
+  color: var(--rpf-white);
+}
+
+.session-expired[hidden] {
+  display: none;
+}
+
+.session-expired__message {
+  margin: 0;
+  font-size: var(--font-size-3);
+  line-height: var(--line-height-3);
+}
+
+.session-expired__button {
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background-color: var(--rpf-white);
+  color: var(--editor-color-theme);
+  font-family: inherit;
+  font-size: var(--font-size-3);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}

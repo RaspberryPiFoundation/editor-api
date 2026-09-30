@@ -27,6 +27,7 @@
       <% if show_footer? %>
         <%= render EditorApp::FooterComponent.new(user: current_user, show_feedback_link: true) %>
       <% end %>
+      <%= render EditorApp::SessionRenewalComponent.new(user: current_user) %>
     </div>
   </body>
 </html>

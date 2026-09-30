@@ -24,6 +24,9 @@ en:
         login_as_a_teacher: Log in as a teacher
         go_to_classroom: Go to Code Classroom
         ide_image_alt: A Code Editor project with instructions alongside the code
+    session:
+      expired: You have been logged out. Log in again to carry on saving your work.
+      log_in_again: Log in again
     secondary_nav:
       code_editor: "Code Editor"
       home: "Home"

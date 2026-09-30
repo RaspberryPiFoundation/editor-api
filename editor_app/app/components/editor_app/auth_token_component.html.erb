@@ -1,5 +1,8 @@
 <% if user %>
-  <script type="application/json" id="<%= ELEMENT_ID %>"><%= raw ERB::Util.json_escape(stored_user.to_json) %></script>
+  <script type="application/json"
+          id="<%= ELEMENT_ID %>"
+          data-renewal-url="<%= renewal_path %>"
+          data-expires-at="<%= expires_at %>"><%= raw ERB::Util.json_escape(stored_user.to_json) %></script>
 <% end %>
 <script>
   (function () {
