@@ -5,7 +5,11 @@
 # regexes must be wrapped in forward slashes eg. /https?:\/\/localhost(:[0-9]*)?$/
 module OriginParser
   def self.parse_origins
-    ENV['ALLOWED_ORIGINS']&.split(',')&.map do |origin|
+    parse(ENV.fetch('ALLOWED_ORIGINS', nil))
+  end
+
+  def self.parse(value)
+    value&.split(',')&.map do |origin|
       stripped_origin = origin.strip
       if stripped_origin.start_with?('/') && stripped_origin.end_with?('/')
         Regexp.new(stripped_origin[1..-2])

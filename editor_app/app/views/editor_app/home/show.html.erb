@@ -1,0 +1,74 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'editor_app/landing_page' %>
+<% end %>
+
+<main class="landing-page">
+  <% if @school_student %>
+    <h1 class="landing-page__title"><%= t('.title') %></h1>
+    <%= render DesignSystem::ButtonComponent.new(
+          href: code_classroom_url("/#{I18n.locale}/school"),
+          text: t('.go_to_classroom')
+        ) %>
+    <%= image_tag 'editor_app/ide_instructions.png', alt: t('.ide_image_alt') %>
+  <% else %>
+    <div class="landing-page__projects">
+      <div class="landing-page__title-wrapper">
+        <h1 class="landing-page__title"><%= t('.title') %></h1>
+        <h2 class="landing-page__subtitle"><%= t('.subtitle') %></h2>
+      </div>
+      <div class="landing-page__action-wrapper">
+        <h3 class="landing-page__choose-text"><%= t('.choose_language') %></h3>
+        <div class="landing-page__buttons">
+          <%= render DesignSystem::ButtonComponent.new(
+                href: project_path('blank-python-starter'),
+                data: { plausible_event: 'Start coding Python' }
+              ) do %>
+            <%= image_tag 'editor_app/python_file.svg', alt: '', aria: { hidden: true } %>
+            <%= t('.python') %>
+          <% end %>
+          <%= render DesignSystem::ButtonComponent.new(
+                href: project_path('blank-html-starter'),
+                data: { plausible_event: 'Start coding HTML/CSS' }
+              ) do %>
+            <%= image_tag 'editor_app/html_file.svg', alt: '', aria: { hidden: true } %>
+            <%= t('.html') %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="information-cards">
+      <div class="information-card information-card--decorative <%= 'information-card--left' unless current_user %>">
+        <div class="information-card__content">
+          <h2 class="information-card__title"><%= t('.where_to_start') %></h2>
+          <p class="information-card__copy">
+            <%= t('.follow_a_path_html',
+                  python_link: link_to(t('.project_python'), projects_site_url('/pathways/python-intro'), class: 'landing-page__link'),
+                  html_link: link_to(t('.project_html'), projects_site_url('/pathways/web-intro'), class: 'landing-page__link')) %>
+          </p>
+          <p class="information-card__copy">
+            <%= t('.also_discover_html',
+                  experience_cs_link: link_to(t('.experience_cs'), 'https://experience-cs.org', class: 'landing-page__link')) %>
+          </p>
+        </div>
+      </div>
+
+      <% unless current_user %>
+        <div class="information-card information-card--right">
+          <div class="information-card__content">
+            <h2 class="information-card__title"><%= t('.ready_to_continue') %></h2>
+            <h3 class="information-card__subtitle"><%= t('.continue_your_projects') %></h3>
+            <%= button_to t('.login_to_code_editor'),
+                          editor_login_path(return_to: projects_path),
+                          class: 'landing-page__text-link' %>
+            <h3 class="information-card__subtitle"><%= t('.using_code_classroom') %></h3>
+            <div class="information-card__buttons">
+              <%= link_to t('.login_as_a_student'), code_classroom_url('/auth/user_login/student'), class: 'landing-page__text-link' %>
+              <%= link_to t('.login_as_a_teacher'), code_classroom_url('/auth/user_login/full'), class: 'landing-page__text-link' %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+</main>

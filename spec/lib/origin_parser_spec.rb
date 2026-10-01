@@ -36,4 +36,12 @@ RSpec.describe OriginParser do
       expect(described_class.parse_origins).to eq([])
     end
   end
+
+  describe '.parse' do
+    it 'parses a value given directly rather than from the environment' do
+      expect(described_class.parse('editor.localhost, /^editor\\.example\\.com$/')).to eq(
+        ['editor.localhost', Regexp.new('^editor\\.example\\.com$')]
+      )
+    end
+  end
 end

@@ -1,0 +1,8 @@
+<%= javascript_include_tag 'editor_app/session_renewal', defer: true %>
+<div id="editor-app-session-expired" class="session-expired" role="alert" hidden>
+  <p class="session-expired__message"><%= t('editor_app.session.expired') %></p>
+  <form class="session-expired__form" action="<%= login_path %>" method="post">
+    <input type="hidden" name="authenticity_token" value="<%= editor_login_authenticity_token %>">
+    <button type="submit" class="session-expired__button"><%= t('editor_app.session.log_in_again') %></button>
+  </form>
+</div>

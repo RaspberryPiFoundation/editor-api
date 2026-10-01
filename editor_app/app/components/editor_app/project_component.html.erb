@@ -1,0 +1,14 @@
+<%= javascript_include_tag 'editor_app/project', defer: true %>
+<div
+  class="project__editor"
+  id="editor-app-project"
+  data-projects-path="<%= projects_path %>"
+  data-error-path="<%= error_path %>"
+>
+  <editor-wc class="project__editor-wc" <%= tag.attributes(attributes) %>></editor-wc>
+</div>
+<% unless signed_in %>
+  <form id="editor-app-project-login" action="<%= login_path %>" method="post" hidden>
+    <input type="hidden" name="authenticity_token" value="<%= editor_login_authenticity_token %>">
+  </form>
+<% end %>

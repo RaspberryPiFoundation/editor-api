@@ -1,0 +1,105 @@
+.editor-app {
+  --editor-color-layer-1: var(--rpf-off-white);
+  --editor-color-layer-2: var(--rpf-white);
+  --editor-color-layer-3: var(--rpf-white);
+  --editor-color-outline: var(--rpf-grey-150);
+  --editor-color-theme: var(--rpf-raspberry-800);
+  --editor-color-theme-secondary: var(--rpf-raspberry-900);
+  --editor-color-theme-tertiary: var(--rpf-raspberry-100);
+  --editor-color-text: var(--rpf-text-primary);
+  --editor-color-text-secondary: var(--rpf-text-secondary);
+  --editor-color-action: var(--rpf-navy-800);
+  --editor-color-layer-accent: var(--rpf-off-white-warm);
+
+  display: flex;
+  flex-direction: column;
+  min-block-size: 100vh;
+  color: var(--editor-color-text);
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, -apple-system, BlinkMacSystemFont, "Segoe UI", Oxygen,
+    Ubuntu, Cantarell, "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+rpf-global-nav {
+  min-block-size: 2.875rem;
+}
+
+.session-expired {
+  position: fixed;
+  inset-block-end: 0;
+  inset-inline: 0;
+  z-index: 100;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background-color: var(--editor-color-theme);
+  color: var(--rpf-white);
+}
+
+.session-expired[hidden] {
+  display: none;
+}
+
+.session-expired__message {
+  margin: 0;
+  font-size: var(--font-size-3);
+  line-height: var(--line-height-3);
+}
+
+.session-expired__button {
+  padding: 0.5rem 1rem;
+  border: 0;
+  border-radius: 0.25rem;
+  background-color: var(--rpf-white);
+  color: var(--editor-color-theme);
+  font-family: inherit;
+  font-size: var(--font-size-3);
+  font-weight: var(--font-weight-bold);
+  cursor: pointer;
+}
+
+.error-page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-2);
+  padding: var(--space-6) var(--space-4);
+  max-inline-size: 40rem;
+}
+
+.error-page__heading {
+  margin: 0;
+  font-size: var(--font-size-5);
+  line-height: var(--line-height-5);
+}
+
+.error-page__text {
+  margin: 0;
+  font-size: var(--font-size-2);
+  line-height: var(--line-height-2);
+  color: var(--editor-color-text-secondary);
+}
+
+.error-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.error-page__actions form {
+  margin: 0;
+}

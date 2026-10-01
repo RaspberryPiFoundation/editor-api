@@ -1,0 +1,81 @@
+<li class="project-list__item">
+  <%= link_to project_path(project.identifier), class: 'project-list__link' do %>
+    <%= image_tag icon, alt: '', aria: { hidden: true }, class: 'project-list__icon' %>
+    <span class="project-list__details">
+      <span class="project-list__name"><%= project.name %></span>
+      <span class="project-list__meta">
+        <span class="project-list__type"><%= type_name %></span>
+        <span class="project-list__edited"><%= last_edited %></span>
+      </span>
+    </span>
+  <% end %>
+  <div class="project-list__actions">
+    <%= render DesignSystem::ButtonComponent.new(
+          type: 'button',
+          text: t('editor_app.projects.rename'),
+          title: t('editor_app.projects.rename_label'),
+          icon: 'edit',
+          modifiers: ['tertiary'],
+          data: { dialog_open: rename_dialog_id }
+        ) %>
+    <%= render DesignSystem::ButtonComponent.new(
+          type: 'button',
+          text: t('editor_app.projects.delete'),
+          title: t('editor_app.projects.delete_label'),
+          icon: 'delete',
+          modifiers: ['tertiary'],
+          data: { dialog_open: delete_dialog_id }
+        ) %>
+  </div>
+
+  <dialog id="<%= rename_dialog_id %>" class="dialog">
+    <%= form_with url: project_path(project.identifier), method: :patch, class: 'dialog__form' do %>
+      <h2 class="dialog__heading"><%= t('editor_app.projects.rename_dialog.heading') %></h2>
+      <label class="dialog__label" for="<%= rename_dialog_id %>-name">
+        <%= t('editor_app.projects.rename_dialog.label') %>
+      </label>
+      <input
+        class="dialog__input"
+        id="<%= rename_dialog_id %>-name"
+        type="text"
+        name="project[name]"
+        value="<%= project.name %>"
+        required
+      >
+      <div class="dialog__actions">
+        <%= render DesignSystem::ButtonComponent.new(
+              type: 'submit',
+              text: t('editor_app.projects.rename_dialog.submit')
+            ) %>
+        <%= render DesignSystem::ButtonComponent.new(
+              type: 'submit',
+              text: t('editor_app.projects.rename_dialog.cancel'),
+              modifiers: ['secondary'],
+              formmethod: 'dialog',
+              formnovalidate: true
+            ) %>
+      </div>
+    <% end %>
+  </dialog>
+
+  <dialog id="<%= delete_dialog_id %>" class="dialog">
+    <%= form_with url: project_path(project.identifier), method: :delete, class: 'dialog__form' do %>
+      <h2 class="dialog__heading"><%= t('editor_app.projects.delete_dialog.heading') %></h2>
+      <p class="dialog__text"><%= t('editor_app.projects.delete_dialog.text', name: project.name) %></p>
+      <div class="dialog__actions">
+        <%= render DesignSystem::ButtonComponent.new(
+              type: 'submit',
+              text: t('editor_app.projects.delete_dialog.submit'),
+              modifiers: ['danger']
+            ) %>
+        <%= render DesignSystem::ButtonComponent.new(
+              type: 'submit',
+              text: t('editor_app.projects.delete_dialog.cancel'),
+              modifiers: ['secondary'],
+              formmethod: 'dialog',
+              formnovalidate: true
+            ) %>
+      </div>
+    <% end %>
+  </dialog>
+</li>

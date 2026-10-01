@@ -47,6 +47,13 @@ docker compose up
 - Routes: `config/routes.rb`. Auth: `config/initializers/omniauth.rb`, `app/helpers/authentication_helper.rb`, `app/controllers/concerns/identifiable.rb`.
 - Permissions: `app/models/ability.rb`. Domain ops: `lib/concepts/**`. Models: `app/models/**`. GraphQL: `app/graphql/**`.
 
+## EditorApp engine (in progress)
+- The Code Editor web app is being moved out of the `editor-standalone` repo into the
+  `EditorApp` engine at `editor_app/`, served at the hosts in `EDITOR_APP_HOSTS`.
+- **Read `editor_app/PLAN.md` before working on it.** It records what is built, what is
+  left, the decisions already taken (and why), the cross-repo Hydra dependency, and bugs
+  found in the React app that must not be reintroduced.
+
 ## Security
 - Never commit secrets (`.env`, `config/master.key`, API tokens, webhook secrets).
 - `.env.example` contains placeholder values only.

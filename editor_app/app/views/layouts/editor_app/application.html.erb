@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="<%= I18n.locale %>">
+  <head>
+    <title><%= content_for(:title).presence || t('editor_app.meta.title') %></title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="<%= t('editor_app.meta.description') %>">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= render DesignSystem::Meta::GoogleFontsComponent.new(fonts: :default) %>
+    <%= stylesheet_link_tag DesignSystem::STYLESHEET_URL %>
+    <%= stylesheet_link_tag 'editor_app/application' %>
+    <%= stylesheet_link_tag 'editor_app/secondary_nav' %>
+    <%= stylesheet_link_tag 'editor_app/footer' %>
+    <%= content_for :head %>
+    <%= render EditorApp::AuthTokenComponent.new(user: current_user, expires_at: session[:oauth_expires_at]) %>
+  </head>
+  <body>
+    <div class="editor-app">
+      <%= render EditorApp::GlobalNavComponent.new(
+            current_path: request.path,
+            signed_in: current_user.present?,
+            student: current_user&.student? || false
+          ) %>
+      <%= render EditorApp::SecondaryNavComponent.new(current_path: request.path, user: current_user) %>
+      <%= yield %>
+      <% if show_footer? %>
+        <%= render EditorApp::FooterComponent.new(user: current_user, show_feedback_link: true) %>
+      <% end %>
+      <%= render EditorApp::SessionRenewalComponent.new(user: current_user) %>
+    </div>
+  </body>
+</html>

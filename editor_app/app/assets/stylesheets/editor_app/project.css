@@ -1,0 +1,27 @@
+.project {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--editor-color-layer-accent);
+}
+
+.project__editor {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  block-size: 100%;
+  max-block-size: stretch;
+  overflow: hidden;
+}
+
+.project__editor-wc {
+  container-name: c-editor;
+  container-type: normal;
+  block-size: 100%;
+  inline-size: 100%;
+  min-block-size: stretch;
+  min-inline-size: stretch;
+  overflow: auto;
+  scrollbar-width: none;
+}

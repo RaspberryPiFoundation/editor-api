@@ -1,0 +1,44 @@
+<% content_for :title, t('.title') %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'editor_app/projects' %>
+<% end %>
+<%= javascript_include_tag 'editor_app/dialogs', defer: true %>
+
+<main class="project-index">
+  <header class="project-index__header">
+    <%= link_to t('.home'), home_path, class: 'project-index__back' %>
+    <div class="project-index__headings">
+      <h1 class="project-index__title"><%= t('.title') %></h1>
+      <p class="project-index__subtitle"><%= t('.subtitle') %></p>
+    </div>
+    <%= render DesignSystem::ButtonComponent.new(
+          type: 'button',
+          text: t('.new_project'),
+          icon: 'add',
+          icon_position: 'right',
+          data: { dialog_open: EditorApp::NewProjectDialogComponent::DIALOG_ID }
+        ) %>
+  </header>
+
+  <% if flash[:notice].present? || flash[:alert].present? %>
+    <%= render DesignSystem::AlertComponent.new(
+          title: flash[:notice].presence || flash[:alert],
+          type: flash[:notice].present? ? 'success' : 'error',
+          class: 'project-index__flash'
+        ) %>
+  <% end %>
+
+  <%= render EditorApp::ProjectListComponent.new(projects: @projects) %>
+
+  <% if @projects.next_page %>
+    <div class="project-index__pagination">
+      <%= render DesignSystem::ButtonComponent.new(
+            href: projects_path(page: @projects.next_page),
+            text: t('.load_more'),
+            modifiers: ['secondary']
+          ) %>
+    </div>
+  <% end %>
+
+  <%= render EditorApp::NewProjectDialogComponent.new %>
+</main>
