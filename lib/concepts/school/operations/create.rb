@@ -45,7 +45,7 @@ class School
 
       def failure(response, error)
         school = response[:school]
-        response[:error] = school&.errors&.presence || [error.message]
+        response[:error] = school&.errors.presence || [error.message]
         response[:error_types] = school&.errors&.details || {}
         response
       end
