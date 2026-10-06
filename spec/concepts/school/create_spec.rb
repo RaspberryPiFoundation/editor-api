@@ -55,6 +55,12 @@ RSpec.describe School::Create, type: :unit do
     expect(response[:school].roles.pluck(:user_id).uniq).to eq([owner_id])
   end
 
+  it 'acquires an advisory lock for the owner' do
+    allow(School.connection).to receive(:execute).and_call_original
+    described_class.call(school_params:, owner_id:, token:)
+    expect(School.connection).to have_received(:execute).with(/pg_advisory_xact_lock\(\d+\)/)
+  end
+
   context 'when creation fails' do
     let(:school_params) { {} }
 

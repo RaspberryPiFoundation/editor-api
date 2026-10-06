@@ -8,6 +8,7 @@ class School
         response[:school] = build_school(school_params)
 
         School.transaction do
+          acquire_advisory_lock_for_owner(owner_id)
           response[:school].save!
 
           SchoolOnboardingService.new(response[:school]).onboard(owner_id:, token:)
@@ -32,6 +33,11 @@ class School
       end
 
       private
+
+      def acquire_advisory_lock_for_owner(owner_id)
+        lock_key = Zlib.crc32("#{owner_id}:#{name}")
+        School.connection.execute("SELECT pg_advisory_xact_lock(#{lock_key})")
+      end
 
       def failure(response, error)
         response[:error] = response[:school].errors.presence || [error.message]
