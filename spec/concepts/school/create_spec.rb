@@ -181,5 +181,11 @@ RSpec.describe School::Create, type: :unit do
       described_class.call(school_params:, owner_id:, token:)
       expect(Sentry).not_to have_received(:capture_exception)
     end
+
+    it 'does not create a school when called inside an outer transaction' do
+      expect do
+        School.transaction { described_class.call(school_params:, owner_id:, token:) }
+      end.not_to change(School, :count)
+    end
   end
 end
