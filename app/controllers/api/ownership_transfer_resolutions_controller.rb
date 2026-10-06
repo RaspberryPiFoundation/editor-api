@@ -7,7 +7,15 @@ module Api
     before_action -> { authorize!(:read, :ownership_transfer) }
 
     def accept
-      resolve!(:completed)
+      OwnershipTransfer.transaction do
+        transfer = locked_pending_ownership_transfer
+        authorize!(:accept, transfer)
+        OwnershipTransfer::Accept.call(ownership_transfer: transfer)
+      end
+
+      head :ok
+    rescue CanCan::AccessDenied, ActiveRecord::RecordNotFound
+      head :not_found
     end
 
     def decline
@@ -32,7 +40,7 @@ module Api
     # thing we respond with.
     def resolve!(status)
       transfer = OwnershipTransfer.transaction do
-        loaded = pending_ownership_transfer
+        loaded = locked_pending_ownership_transfer
         authorize!(action_name.to_sym, loaded)
         loaded.update(status:)
         loaded
@@ -47,7 +55,7 @@ module Api
       head :not_found
     end
 
-    def pending_ownership_transfer
+    def locked_pending_ownership_transfer
       @school.ownership_transfers.lock.pending.first!
     end
   end
