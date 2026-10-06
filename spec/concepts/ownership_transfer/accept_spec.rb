@@ -18,7 +18,7 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
   end
 
   it 'returns a successful response with the completed transfer' do
-    response = described_class.call(school:)
+    response = described_class.call(ownership_transfer:)
 
     expect(response.success?).to be(true)
     expect(response[:ownership_transfer]).to eq(ownership_transfer)
@@ -26,13 +26,13 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
   end
 
   it 'gives the nominee the owner role' do
-    described_class.call(school:)
+    described_class.call(ownership_transfer:)
 
     expect(Role.owner.find_by(user_id: nominee.id, school:)).not_to be_nil
   end
 
   it 'archives the previous owner role' do
-    described_class.call(school:)
+    described_class.call(ownership_transfer:)
 
     expect(Role.owner.find_by(user_id: owner.id, school:)).to be_nil
     expect(Role.unscoped.owner.find_by(user_id: owner.id, school:).archived_at).to be_present
@@ -41,7 +41,7 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
   it 'leaves the previous owner any teacher role they held' do
     create(:teacher_role, user_id: owner.id, school:)
 
-    described_class.call(school:)
+    described_class.call(ownership_transfer:)
 
     expect(Role.teacher.find_by(user_id: owner.id, school:)).not_to be_nil
   end
@@ -50,19 +50,11 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
     before { create(:owner_role, user_id: nominee.id, school:, archived_at: Time.zone.now) }
 
     it 'unarchives it instead of creating a second owner role' do
-      response = described_class.call(school:)
+      response = described_class.call(ownership_transfer:)
 
       expect(response.success?).to be(true)
       expect(Role.unscoped.owner.where(user_id: nominee.id, school:).count).to eq(1)
       expect(Role.owner.find_by(user_id: nominee.id, school:)).not_to be_nil
-    end
-  end
-
-  context 'when the school has no pending transfer' do
-    before { ownership_transfer.update!(status: :completed) }
-
-    it 'raises, so the caller can decide what a missing transfer means' do
-      expect { described_class.call(school:) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 
@@ -73,7 +65,7 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
     end
 
     it 'rolls back the whole operation, leaving the transfer pending and the previous owner in place' do
-      described_class.call(school:)
+      described_class.call(ownership_transfer:)
 
       expect(ownership_transfer.reload.status).to eq('pending')
       expect(Role.owner.find_by(user_id: owner.id, school:)).not_to be_nil
