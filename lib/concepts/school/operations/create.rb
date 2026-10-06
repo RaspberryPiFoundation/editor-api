@@ -3,14 +3,14 @@
 class School
   class Create
     class << self
-      def call(school_params:, creator_id:, token:)
+      def call(school_params:, owner_id:, token:)
         response = OperationResponse.new
-        response[:school] = build_school(school_params.merge!(creator_id:))
+        response[:school] = build_school(school_params)
 
         School.transaction do
           response[:school].save!
 
-          SchoolOnboardingService.new(response[:school]).onboard(token:)
+          SchoolOnboardingService.new(response[:school]).onboard(owner_id:, token:)
         end
 
         response

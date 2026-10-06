@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class School < ApplicationRecord
+  self.ignored_columns += [:creator_id]
+
   has_many :classes, class_name: :SchoolClass, inverse_of: :school, dependent: :destroy
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
@@ -34,11 +36,6 @@ class School < ApplicationRecord
             uniqueness: { conditions: -> { active }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.school_roll_number_exists') },
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
             presence: true, on: :create, if: :ireland?, unless: :hidden?
-  validates :creator_id,
-            presence: true,
-            uniqueness: {
-              conditions: -> { active }
-            }, unless: :hidden?
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
   validates :creator_agree_responsible_safeguarding, presence: true, acceptance: true
@@ -63,14 +60,10 @@ class School < ApplicationRecord
   after_commit -> { do_salesforce_sync(is_create: false) }, on: :update, if: -> { FeatureFlags.salesforce_sync? }
 
   def self.find_for_user!(user)
-    school = Role.find_by(user_id: user.id)&.school || active.find_by(creator_id: user.id)
+    school = Role.find_by(user_id: user.id)&.school
     raise ActiveRecord::RecordNotFound unless school
 
     school
-  end
-
-  def creator
-    User.from_userinfo(ids: creator_id).first
   end
 
   def verified?

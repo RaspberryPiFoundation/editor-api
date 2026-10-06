@@ -5,9 +5,9 @@ require 'rails_helper'
 RSpec.describe School do
   let(:student) { create(:student, school:) }
   let(:teacher) { create(:teacher, school:) }
-  let(:school) { create(:school, creator_id: SecureRandom.uuid) }
-  let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000', creator_id: SecureRandom.uuid) }
-  let!(:ireland_school) { create(:school, country_code: 'IE', school_roll_number: '01572D', creator_id: SecureRandom.uuid) }
+  let(:school) { create(:school) }
+  let!(:us_school) { create(:school, country_code: 'US', district_name: 'Some District', district_nces_id: '0100000') }
+  let!(:ireland_school) { create(:school, country_code: 'IE', school_roll_number: '01572D') }
 
   describe 'associations' do
     it 'has many classes' do
@@ -156,25 +156,6 @@ RSpec.describe School do
     it 'requires a website' do
       school.website = ' '
       expect(school).not_to be_valid
-    end
-
-    it 'requires a creator_id' do
-      school.creator_id = nil
-      expect(school).not_to be_valid
-    end
-
-    it 'requires a unique creator_id' do
-      school.save!
-      another_school = build(:school, creator_id: school.creator_id)
-      another_school.valid?
-      expect(another_school.errors[:creator_id]).to include('has already been taken')
-    end
-
-    it 'schools can re-use creator_ids if the original school is rejected' do
-      rejected_school = create(:school, creator_id: SecureRandom.uuid, rejected_at: Time.zone.now)
-      other_school = build(:school, creator_id: rejected_school.creator_id)
-      expect(rejected_school).to be_valid
-      expect(other_school).to be_valid
     end
 
     it 'rejects a badly formed url for website' do
@@ -512,23 +493,6 @@ RSpec.describe School do
     end
   end
 
-  describe '#creator' do
-    let(:creator) { create(:owner, school:) }
-
-    before do
-      school.update!(creator_id: creator.id)
-      stub_user_info_api_for(creator)
-    end
-
-    it 'returns a User instance' do
-      expect(school.creator).to be_instance_of(User)
-    end
-
-    it 'returns the creator from the UserInfo API matching the creator_id' do
-      expect(school.creator.id).to eq(creator.id)
-    end
-  end
-
   describe '.find_for_user!' do
     before do
       stub_user_info_api_for(teacher)
@@ -539,23 +503,9 @@ RSpec.describe School do
       expect(described_class.find_for_user!(user)).to eq(school)
     end
 
-    it "returns the school that the user created if they don't have a role in any school" do
-      creator = create(:user)
-      school.update!(creator_id: creator.id)
-      expect(described_class.find_for_user!(creator)).to eq(school)
-    end
-
     it "raises ActiveRecord::RecordNotFound if the user doesn't have a role in a school" do
       user = build(:user)
       expect { described_class.find_for_user!(user) }.to raise_error(ActiveRecord::RecordNotFound)
-    end
-
-    it('raises ActiveRecord::RecordNotFound if the user is the creator of a rejected school') do
-      creator = create(:user)
-      school.update!(creator_id: creator.id)
-      school.update!(rejected_at: Time.zone.now)
-
-      expect { described_class.find_for_user!(creator) }.to raise_error(ActiveRecord::RecordNotFound)
     end
   end
 

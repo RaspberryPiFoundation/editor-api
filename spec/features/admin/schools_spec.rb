@@ -17,14 +17,12 @@ RSpec.describe 'Schools', type: :request do
   end
 
   describe 'GET #show' do
-    let(:creator) { create(:user) }
     let(:verified_at) { nil }
     let(:rejected_at) { nil }
     let(:code) { nil }
-    let(:school) { create(:school, creator_id: creator.id, verified_at:, rejected_at:, code:) }
+    let(:school) { create(:school, verified_at:, rejected_at:, code:) }
 
     before do
-      stub_user_info_api_for(creator)
       get admin_school_path(school)
     end
 
@@ -82,8 +80,7 @@ RSpec.describe 'Schools', type: :request do
   end
 
   describe 'GET #show with roles' do
-    let(:creator) { create(:user) }
-    let(:school) { create(:school, creator_id: creator.id) }
+    let(:school) { create(:school) }
     let(:owner) { create(:user, name: 'Olivia Owner', email: 'owner@example.com') }
     let(:teacher) { create(:user, name: 'Tariq Teacher', email: 'teacher@example.com') }
     let(:student) { create(:user, name: 'Sam Student', email: 'student@example.com') }
@@ -99,7 +96,6 @@ RSpec.describe 'Schools', type: :request do
       create(:teacher_role, school:, user_id: teacher.id)
       create(:student_role, school:, user_id: student.id)
 
-      allow(User).to receive(:from_userinfo).with(ids: creator.id).and_return([creator])
       allow(User).to receive(:from_userinfo).with(ids: contain_exactly(owner.id, teacher.id)).and_return(role_users)
 
       get admin_school_path(school)
@@ -120,14 +116,12 @@ RSpec.describe 'Schools', type: :request do
   end
 
   describe 'POST #verify' do
-    let(:creator) { create(:user) }
     let(:verified_at) { nil }
-    let(:school) { create(:school, creator_id: creator.id, verified_at:) }
+    let(:school) { create(:school, verified_at:) }
     let(:verification_result) { nil }
     let(:verification_service) { instance_double(SchoolVerificationService, verify: verification_result) }
 
     before do
-      stub_user_info_api_for(creator)
       allow(SchoolVerificationService).to receive(:new).with(school).and_return(verification_service)
 
       post verify_admin_school_path(school)
@@ -163,13 +157,11 @@ RSpec.describe 'Schools', type: :request do
   end
 
   describe 'PUT #reopen' do
-    let(:creator) { create(:user) }
-    let(:school) { create(:verified_school, creator_id: creator.id) }
+    let(:school) { create(:verified_school) }
     let(:reopen_result) { nil }
     let(:verification_service) { instance_double(SchoolVerificationService, reopen: reopen_result) }
 
     before do
-      stub_user_info_api_for(creator)
       allow(SchoolVerificationService).to receive(:new).with(school).and_return(verification_service)
 
       patch reopen_admin_school_path(school)
@@ -206,12 +198,7 @@ RSpec.describe 'Schools', type: :request do
   end
 
   describe 'PUT #archive' do
-    let(:creator) { create(:user) }
-    let(:school) { create(:school, creator_id: creator.id) }
-
-    before do
-      stub_user_info_api_for(creator)
-    end
+    let(:school) { create(:school) }
 
     it 'marks the school as archived' do
       patch archive_admin_school_path(school)
