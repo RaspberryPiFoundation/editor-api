@@ -148,4 +148,32 @@ RSpec.describe School::Create, type: :unit do
       expect(Sentry).not_to have_received(:capture_exception)
     end
   end
+
+  context 'when the school owner already has a role in another school' do
+    let(:other_school) { create(:school) }
+
+    before do
+      create(:owner_role, school: other_school, user_id: owner_id)
+      allow(Sentry).to receive(:capture_exception)
+    end
+
+    it 'does not create a school' do
+      expect { described_class.call(school_params:, owner_id:, token:) }.not_to change(School, :count)
+    end
+
+    it 'returns a failed operation response' do
+      response = described_class.call(school_params:, owner_id:, token:)
+      expect(response.failure?).to be(true)
+    end
+
+    it 'returns the role error on the school' do
+      response = described_class.call(school_params:, owner_id:, token:)
+      expect(response[:error][:base]).to eq(['Cannot create role as this user already has a role in a different school'])
+    end
+
+    it 'does not capture the error in Sentry' do
+      described_class.call(school_params:, owner_id:, token:)
+      expect(Sentry).not_to have_received(:capture_exception)
+    end
+  end
 end
