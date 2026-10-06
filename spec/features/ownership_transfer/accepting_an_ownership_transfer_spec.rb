@@ -50,6 +50,35 @@ RSpec.describe 'Accepting an ownership transfer', type: :request do
         put("/api/schools/#{school.id}/ownership_transfer/accept", headers:)
         expect(ownership_transfer.reload.status).to eq('completed')
       end
+
+      it 'gives the current user the owner role, and removes the old owner role' do
+        put("/api/schools/#{school.id}/ownership_transfer/accept", headers:)
+        expect(Role.owner.find_by(user_id: nominee.id, school:)).not_to be_nil
+        expect(Role.owner.find_by(user_id: owner.id, school:)).to be_nil
+      end
+
+      context 'when the nominee previously held an archived owner role for the school' do
+        before { create(:owner_role, user_id: nominee.id, school:, archived_at: Time.zone.now) }
+
+        it 'unarchives the existing role rather than creating a second one' do
+          put("/api/schools/#{school.id}/ownership_transfer/accept", headers:)
+
+          expect(response).to have_http_status(:ok)
+          expect(Role.unscoped.owner.where(user_id: nominee.id, school:).count).to eq(1)
+          expect(Role.owner.find_by(user_id: nominee.id, school:)).not_to be_nil
+        end
+      end
+
+      context 'when granting the owner role to the nominee fails' do
+        before { allow(OwnershipTransfer::Accept).to receive(:promote_nominee).and_raise(ActiveRecord::RecordInvalid) }
+
+        it 'rolls back the archived owner role and leaves the transfer pending' do
+          put("/api/schools/#{school.id}/ownership_transfer/accept", headers:)
+
+          expect(ownership_transfer.reload.status).to eq('pending')
+          expect(Role.owner.find_by(user_id: owner.id, school:)).not_to be_nil
+        end
+      end
     end
 
     context 'when the current user is the school owner who requested the transfer' do
