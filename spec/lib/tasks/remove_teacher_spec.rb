@@ -8,7 +8,7 @@ RSpec.describe 'remove_teacher', type: :task do
     let(:task) { Rake::Task['remove_teacher:run'] }
     let(:owner_id) { SecureRandom.uuid }
     let(:student_id) { SecureRandom.uuid }
-    let(:school) { create(:school, creator_id: owner_id) }
+    let(:school) { create(:school) }
     let(:teacher_id) { SecureRandom.uuid }
 
     before do

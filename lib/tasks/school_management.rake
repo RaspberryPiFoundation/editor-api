@@ -21,18 +21,11 @@ namespace :school_management do
       next
     end
 
-    if School.exists?(creator_id: new_owner[:id])
-      Rails.logger.error("User #{new_owner[:id]} is already the creator of a school")
-      next
-    end
-
     school = Role.find_by(roles: { user_id: old_owner[:id], role: 'owner' }).school
 
     school.transaction do
       remove_old_owner(school, old_owner[:id], args[:keep_old_owner_as_teacher])
       assign_roles_to_new_owner(school, new_owner[:id])
-
-      school.update!(creator_id: new_owner[:id], creator_agree_to_ux_contact: false)
     end
 
     Rails.logger.info "Ownership transfered to #{new_owner[:email]} successfully."

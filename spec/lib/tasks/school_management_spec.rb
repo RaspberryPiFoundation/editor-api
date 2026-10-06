@@ -8,7 +8,7 @@ RSpec.describe 'school_management', type: :task do
     let(:task) { Rake::Task['school_management:transfer_ownership'] }
     let(:old_user_id) { SecureRandom.uuid }
     let(:new_user_id) { SecureRandom.uuid }
-    let(:school) { create(:school, creator_id: old_user_id) }
+    let(:school) { create(:school) }
 
     before do
       stub_user_info_api_find_by_email(
@@ -32,7 +32,7 @@ RSpec.describe 'school_management', type: :task do
 
       task.invoke('old_owner@example.com', 'not_real_owner@example.com')
 
-      expect(school.creator_id).to eq(old_user_id)
+      expect(school.roles.owner.pluck(:user_id)).to include(old_user_id)
     end
 
     it "exits early if old owner doesn't exist" do
@@ -42,7 +42,7 @@ RSpec.describe 'school_management', type: :task do
 
       task.invoke('old_owner@example.com', 'new_owner@example.com')
 
-      expect(school.creator_id).to eq(old_user_id)
+      expect(school.roles.owner.pluck(:user_id)).to include(old_user_id)
     end
 
     it 'exits early if new owner is already owner of a school' do
@@ -50,15 +50,7 @@ RSpec.describe 'school_management', type: :task do
 
       task.invoke('old_owner@example.com', 'new_owner@example.com')
 
-      expect(school.creator_id).to eq(old_user_id)
-    end
-
-    it 'exits early if new owner is already creator of a school' do
-      create(:school, creator_id: new_user_id)
-
-      task.invoke('old_owner@example.com', 'new_owner@example.com')
-
-      expect(school.creator_id).to eq(old_user_id)
+      expect(school.roles.owner.pluck(:user_id)).to include(old_user_id)
     end
 
     it 'creates owner and teacher roles for the new owner' do
@@ -98,21 +90,6 @@ RSpec.describe 'school_management', type: :task do
       teachers = school.roles.teacher
       teacher_user_ids = teachers.map(&:user_id)
       expect(teacher_user_ids).not_to include(old_user_id)
-    end
-
-    it 'switches creator to the new owner' do
-      task.invoke('old_owner@example.com', 'new_owner@example.com')
-      school.reload
-      expect(school.creator_id).to eq(new_user_id)
-    end
-
-    it 'sets the school UX contact flag to false' do
-      school.update!(creator_agree_to_ux_contact: true)
-
-      task.invoke('old_owner@example.com', 'new_owner@example.com')
-      school.reload
-
-      expect(school.creator_agree_to_ux_contact).to be(false)
     end
   end
 end

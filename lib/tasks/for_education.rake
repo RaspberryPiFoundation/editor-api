@@ -17,7 +17,7 @@ namespace :for_education do
   task destroy_seed_data: :environment do
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Destroying existing seeds...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      owner_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
       teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
       # Hard coded as the student's school needs to match
@@ -25,7 +25,7 @@ namespace :for_education do
       school_id = TEST_SCHOOL
 
       # Remove the roles first
-      Role.where(user_id: [creator_id, teacher_id] + student_ids).destroy_all
+      Role.where(user_id: [owner_id, teacher_id] + student_ids).destroy_all
 
       # Destroy the project and then the lesson itself (The lesson's `before_destroy` prevents us using destroy)
       lesson_ids = Lesson.where(school_id:).pluck(:id)
@@ -53,8 +53,8 @@ namespace :for_education do
 
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
-      create_school(creator_id, TEST_SCHOOL)
+      owner_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      create_school(owner_id, TEST_SCHOOL)
 
       Rails.logger.info 'Done...'
     end
@@ -69,9 +69,9 @@ namespace :for_education do
 
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      owner_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
 
-      school = create_school(creator_id, TEST_SCHOOL)
+      school = create_school(owner_id, TEST_SCHOOL)
       verify_school(school)
       Rails.logger.info 'Done...'
     end
@@ -86,18 +86,18 @@ namespace :for_education do
 
     ActiveRecord::Base.transaction do
       Rails.logger.info 'Attempting to seed data...'
-      creator_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
+      owner_id = ENV.fetch('SEEDING_CREATOR_ID', TEST_USERS[:jane_doe])
       teacher_id = ENV.fetch('SEEDING_TEACHER_ID', TEST_USERS[:john_doe])
 
-      school = create_school(creator_id, TEST_SCHOOL)
+      school = create_school(owner_id, TEST_SCHOOL)
       verify_school(school)
       school.update!(scratch_enabled: true)
       assign_a_teacher(teacher_id, school)
 
-      school_class = create_school_class(creator_id, school)
+      school_class = create_school_class(owner_id, school)
       assign_students(school_class, school)
 
-      create_lessons(creator_id, school, school_class)
+      create_lessons(owner_id, school, school_class)
       Rails.logger.info 'Done...'
     end
   end
