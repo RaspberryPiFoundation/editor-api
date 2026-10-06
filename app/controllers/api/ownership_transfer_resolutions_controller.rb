@@ -7,17 +7,13 @@ module Api
     before_action -> { authorize!(:read, :ownership_transfer) }
 
     def accept
-      result = OwnershipTransfer.transaction do
+      OwnershipTransfer.transaction do
         transfer = locked_pending_ownership_transfer
         authorize!(:accept, transfer)
         OwnershipTransfer::Accept.call(ownership_transfer: transfer)
       end
 
-      if result.success?
-        head :ok
-      else
-        render json: { error: result[:error] }, status: :unprocessable_content
-      end
+      head :ok
     rescue CanCan::AccessDenied, ActiveRecord::RecordNotFound
       head :not_found
     end

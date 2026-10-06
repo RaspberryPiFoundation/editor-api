@@ -18,10 +18,8 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
   end
 
   it 'returns a successful response with the completed transfer' do
-    response = described_class.call(ownership_transfer:)
+    described_class.call(ownership_transfer:)
 
-    expect(response.success?).to be(true)
-    expect(response[:ownership_transfer]).to eq(ownership_transfer)
     expect(ownership_transfer.reload.status).to eq('completed')
   end
 
@@ -50,9 +48,8 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
     before { create(:owner_role, user_id: nominee.id, school:, archived_at: Time.zone.now) }
 
     it 'unarchives it instead of creating a second owner role' do
-      response = described_class.call(ownership_transfer:)
+      described_class.call(ownership_transfer:)
 
-      expect(response.success?).to be(true)
       expect(Role.unscoped.owner.where(user_id: nominee.id, school:).count).to eq(1)
       expect(Role.owner.find_by(user_id: nominee.id, school:)).not_to be_nil
     end
@@ -61,11 +58,14 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
   context 'when an unexpected error occurs' do
     before do
       allow(described_class).to receive(:promote_nominee).and_raise(StandardError, 'some error')
-      allow(Sentry).to receive(:capture_exception)
     end
 
     it 'rolls back the whole operation, leaving the transfer pending and the previous owner in place' do
-      described_class.call(ownership_transfer:)
+      begin
+        described_class.call(ownership_transfer:)
+      rescue StandardError
+        # Expected
+      end
 
       expect(ownership_transfer.reload.status).to eq('pending')
       expect(Role.owner.find_by(user_id: owner.id, school:)).not_to be_nil

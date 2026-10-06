@@ -4,23 +4,13 @@ class OwnershipTransfer
   class Accept
     class << self
       def call(ownership_transfer:)
-        response = OperationResponse.new
-        response[:ownership_transfer] = ownership_transfer
         school = ownership_transfer.school
 
-        OwnershipTransfer.transaction(requires_new: true) do
+        OwnershipTransfer.transaction do
           demote_previous_owners(school, ownership_transfer.nominated_user_id)
           promote_nominee(school, ownership_transfer.nominated_user_id)
           ownership_transfer.update!(status: :completed)
         end
-
-        response
-      rescue ActiveRecord::RecordNotFound
-        raise
-      rescue StandardError => e
-        Sentry.capture_exception(e)
-        response[:error] = ownership_transfer.errors.presence || 'Error accepting ownership transfer'
-        response
       end
 
       private
