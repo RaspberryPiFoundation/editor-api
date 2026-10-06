@@ -645,18 +645,9 @@ RSpec.describe School do
         .with(hash_including(is_create: true))
     end
 
-    it 'enqueues Salesforce::ContactSyncJob on create' do
-      expect { create(:school) }.to have_enqueued_job(Salesforce::ContactSyncJob)
-    end
-
     it 'enqueues Salesforce::SchoolSyncJob on update' do
       school = create(:school)
       expect { school.update!(name: 'Updated Name') }.to have_enqueued_job(Salesforce::SchoolSyncJob).with(hash_including(is_create: false))
-    end
-
-    it 'enqueues Salesforce::ContactSyncJob on update' do
-      school = create(:school)
-      expect { school.update!(name: 'Updated Name') }.to have_enqueued_job(Salesforce::ContactSyncJob)
     end
 
     context 'when SALESFORCE_ENABLED is false' do
@@ -666,10 +657,6 @@ RSpec.describe School do
 
       it 'does not enqueue Salesforce::SchoolSyncJob on create' do
         expect { create(:school) }.not_to have_enqueued_job(Salesforce::SchoolSyncJob)
-      end
-
-      it 'does not enqueue Salesforce::ContactSyncJob on create' do
-        expect { create(:school) }.not_to have_enqueued_job(Salesforce::ContactSyncJob)
       end
     end
   end

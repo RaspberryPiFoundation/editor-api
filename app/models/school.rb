@@ -214,6 +214,5 @@ class School < ApplicationRecord
 
   def do_salesforce_sync(is_create:)
     Salesforce::SchoolSyncJob.perform_later(school_id: id, is_create:)
-    Salesforce::ContactSyncJob.perform_later(school_id: id)
   end
 end

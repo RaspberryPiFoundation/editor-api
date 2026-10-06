@@ -15,13 +15,6 @@ namespace :salesforce_sync do
     end
   end
 
-  desc 'Sync creator_agree_to_ux_contact for all Schools to Salesforce Contact'
-  task contact: :environment do
-    School.find_each do |school|
-      Salesforce::ContactSyncJob.perform_later(school_id: school.id)
-    end
-  end
-
   desc 'Sync all SchoolClasses to Salesforce'
   task school_class: :environment do
     SchoolClass.find_each do |school_class|
