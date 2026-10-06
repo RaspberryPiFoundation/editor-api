@@ -21,7 +21,7 @@ module SeedsHelper
   SCHOOL_CODE = '12-34-56'
 
   def create_school(owner_id, school_id = nil)
-    School.find_or_create_by!(id: school_id) do |school|
+    seeded_school = School.find_or_create_by!(id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
       country_code = Faker::Address.country_code
       school.name = Faker::Educator.secondary_school

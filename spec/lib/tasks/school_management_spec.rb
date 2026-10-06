@@ -40,7 +40,7 @@ RSpec.describe 'school_management', type: :task do
         .with('not_real_owner@example.com')
         .and_return(nil)
 
-      task.invoke('old_owner@example.com', 'new_owner@example.com')
+      task.invoke('not_real_owner@example.com', 'new_owner@example.com')
 
       expect(school.roles.owner.pluck(:user_id)).to include(old_user_id)
     end

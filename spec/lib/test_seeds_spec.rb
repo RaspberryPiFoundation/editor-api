@@ -12,7 +12,7 @@ RSpec.describe 'test_seeds', type: :task do
 
   describe ':destroy' do
     let(:task) { Rake::Task['test_seeds:destroy'] }
-    let(:school) { create(:school, creator_id:, id: school_id) }
+    let(:school) { create(:school, id: school_id) }
     let(:scratch_project_id) { ScratchAsset.first.project_id }
 
     before do
@@ -31,7 +31,7 @@ RSpec.describe 'test_seeds', type: :task do
 
       task.invoke
       expect(Role.where(user_id: [creator_id, teacher_id, student_1, student_2])).not_to exist
-      expect(School.where(creator_id:)).not_to exist
+      expect(School.where(id: school_id)).not_to exist
       expect(ClassStudent.where(student_id: student_1)).not_to exist
       expect(SchoolClass.where(school_id: school.id)).not_to exist
       expect(Lesson.where(school_id: school.id)).not_to exist
@@ -93,7 +93,7 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'creates a verified school' do
-      expect(School.find_by(creator_id:).verified_at).to be_truthy
+      expect(School.find(school_id).verified_at).to be_truthy
     end
 
     it 'creates a public Scratch preview project' do
@@ -165,7 +165,7 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'creates lessons with projects, one per language, for each class' do
-      school = School.find_by(creator_id:)
+      school = School.find(school_id)
       expect(SchoolClass.where(school_id: school.id)).to exist
       lesson = Lesson.where(school_id: school.id)
       expect(lesson.length).to eq(6)
@@ -181,12 +181,11 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'assigns a teacher' do
-      school = School.find_by(creator_id:)
+      school = School.find(school_id)
       expect(Role.teacher.where(user_id: teacher_id, school_id: school.id)).to exist
     end
 
     it 'creates class with lessons for the owner' do
-      school_id = School.find_by(creator_id:).id
       school_class = SchoolClass.joins(:teachers).find_by(school_id:, teachers: { teacher_id: creator_id })
 
       expect(school_class).not_to be_nil
@@ -198,7 +197,6 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'creates class with lessons for the teacher' do
-      school_id = School.find_by(creator_id:).id
       school_class = SchoolClass.joins(:teachers).find_by(school_id:, teachers: { teacher_id: })
       expect(school_class).not_to be_nil
       expect(Lesson.where(school_id:, school_class_id: school_class.id).length).to eq(3)
@@ -209,7 +207,7 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'is idempotent' do
-      school = School.find_by!(creator_id:)
+      school = School.find(school_id)
       owner_class = SchoolClass.joins(:teachers).find_by!(school_id: school.id, teachers: { teacher_id: creator_id })
       teacher_class = SchoolClass.joins(:teachers).find_by!(school_id: school.id, teachers: { teacher_id: })
 
@@ -231,7 +229,7 @@ RSpec.describe 'test_seeds', type: :task do
     end
 
     it 'enables scratch for the school' do
-      school = School.find_by(creator_id:)
+      school = School.find(school_id)
       expect(school.scratch_enabled?).to be true
     end
 
@@ -239,7 +237,7 @@ RSpec.describe 'test_seeds', type: :task do
       let(:seed_country_code) { 'US' }
 
       it 'creates a valid school and owner lessons' do
-        school = School.find_by(creator_id:)
+        school = School.find(school_id)
         school_class = SchoolClass.joins(:teachers).find_by(school_id: school.id, teachers: { teacher_id: creator_id })
 
         expect(school).to be_valid
