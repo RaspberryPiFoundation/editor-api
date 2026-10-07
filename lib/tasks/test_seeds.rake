@@ -86,7 +86,6 @@ namespace :test_seeds do
         school = create_school(creator_id, TEST_SCHOOL)
 
         verify_school(school)
-        school.update!(scratch_enabled: true)
 
         school.school_email_domains.build(domain: 'example.com').save!
 

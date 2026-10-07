@@ -17,8 +17,7 @@ json.call(
   :country_code,
   :verified_at,
   :created_at,
-  :updated_at,
-  :scratch_enabled
+  :updated_at
 )
 
 include_roles = local_assigns.fetch(:roles, false)

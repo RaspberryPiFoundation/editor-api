@@ -116,7 +116,6 @@ Rails.application.routes.draw do
     resources :features, only: %i[index]
 
     resources :profile_auth_check, only: %i[index]
-    resources :subscriptions, only: %i[create]
 
     get  '/join/:join_code', to: 'join#show'
     post '/join/:join_code', to: 'join#create'

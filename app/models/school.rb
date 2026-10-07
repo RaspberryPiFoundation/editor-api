@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class School < ApplicationRecord
+  # This is a temporary measure to allow the scratch_enabled column to be removed from the database without breaking the application.
+  self.ignored_columns += [:scratch_enabled]
+
   has_many :classes, class_name: :SchoolClass, inverse_of: :school, dependent: :destroy
   has_many :lessons, dependent: :nullify
   has_many :projects, dependent: :nullify
