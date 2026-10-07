@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_09_15_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_10_07_131211) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -361,7 +361,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_09_15_100000) do
     t.string "reference"
     t.datetime "rejected_at"
     t.string "school_roll_number"
-    t.boolean "scratch_enabled", default: false, null: false
     t.datetime "updated_at", null: false
     t.integer "user_origin", default: 0
     t.datetime "verified_at"
