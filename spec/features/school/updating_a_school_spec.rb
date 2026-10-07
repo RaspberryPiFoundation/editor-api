@@ -41,6 +41,11 @@ RSpec.describe 'Updating a school', type: :request do
     expect(response).to have_http_status(:ok)
   end
 
+  it 'responds 200 OK when the school param is not a hash' do
+    put("/api/schools/#{school.id}", headers:, params: { school: 'not-a-hash' })
+    expect(response).to have_http_status(:ok)
+  end
+
   it 'responds 404 Not Found when no school exists' do
     put('/api/schools/not-a-real-id', headers:)
     expect(response).to have_http_status(:not_found)

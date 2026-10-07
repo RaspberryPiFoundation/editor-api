@@ -118,7 +118,10 @@ module Api
     # To add one, add a column to `schools`, permit it here, expose it in `api/schools/_school.json.jbuilder`
     # and add an entry to `featureControls.ts` in editor-standalone.
     def update_params
-      params.fetch(:school, {}).permit
+      school_params = params[:school]
+      return {} unless school_params.is_a?(ActionController::Parameters)
+
+      school_params.permit
     end
   end
 end
