@@ -33,6 +33,22 @@ RSpec.describe Salesforce::RoleSyncJob, :requires_salesforce_db do
     expect(sf_role.editor_type__c).to eq(role.school.user_origin)
   end
 
+  it 'sets editor_consent_to_ux_contact__c on the owner contact from school.creator_agree_to_ux_contact' do
+    role.school.update!(creator_agree_to_ux_contact: true)
+    perform_job
+    expect(sf_contact.reload.editor_consent_to_ux_contact__c).to be(true)
+  end
+
+  context 'when the role is a teacher role' do
+    let(:role) { create(:teacher_role) }
+
+    it 'does not update editor_consent_to_ux_contact__c on the contact' do
+      role.school.update!(creator_agree_to_ux_contact: true)
+      perform_job
+      expect(sf_contact.reload.editor_consent_to_ux_contact__c).to be_nil
+    end
+  end
+
   it 'syncs archived roles' do
     role.update!(archived_at: Time.zone.now)
     perform_job

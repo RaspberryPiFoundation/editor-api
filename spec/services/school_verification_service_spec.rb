@@ -4,8 +4,7 @@ require 'rails_helper'
 
 RSpec.describe SchoolVerificationService do
   let(:website) { 'http://example.com' }
-  let(:school) { build(:school, creator_id: school_creator.id, website:) }
-  let(:school_creator) { create(:user) }
+  let(:school) { build(:school, website:) }
   let(:service) { described_class.new(school) }
 
   before do

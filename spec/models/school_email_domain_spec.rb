@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe SchoolEmailDomain do
   subject(:school_email_domain) { described_class.create!(school:, domain:) }
 
-  let(:school) { create(:school, creator_id: SecureRandom.uuid) }
+  let(:school) { create(:school) }
   let(:domain) { 'example.edu' }
 
   describe 'associations' do
@@ -68,7 +68,7 @@ RSpec.describe SchoolEmailDomain do
 
       it 'allows the same domain for a different school' do
         described_class.create!(school:, domain: 'example.edu')
-        other_school = create(:school, creator_id: SecureRandom.uuid)
+        other_school = create(:school)
         other_school_email_domain = described_class.new(school: other_school, domain: 'example.edu')
 
         expect(other_school_email_domain).to be_valid

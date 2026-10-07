@@ -7,10 +7,10 @@ class SchoolOnboardingService
     @school = school
   end
 
-  def onboard(token:)
+  def onboard(owner_id:, token:)
     School.transaction do
-      Role.owner.create!(user_id: school.creator_id, school:)
-      Role.teacher.create!(user_id: school.creator_id, school:)
+      Role.owner.create!(user_id: owner_id, school:)
+      Role.teacher.create!(user_id: owner_id, school:)
 
       ProfileApiClient.create_school(token:, id: school.id, code: school.code)
     end

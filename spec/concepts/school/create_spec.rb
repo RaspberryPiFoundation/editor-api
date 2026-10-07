@@ -21,37 +21,44 @@ RSpec.describe School::Create, type: :unit do
   end
 
   let(:token) { UserProfileMock::TOKEN }
-  let(:creator) { create(:user) }
-  let(:creator_id) { creator.id }
+  let(:owner) { create(:user) }
+  let(:owner_id) { owner.id }
 
   before do
-    authenticated_in_hydra_as(creator)
+    authenticated_in_hydra_as(owner)
     allow(ProfileApiClient).to receive(:create_school).and_return(true)
     stub_profile_api_create_safeguarding_flag
   end
 
   it 'returns a successful operation response' do
-    response = described_class.call(school_params:, creator_id:, token:)
+    response = described_class.call(school_params:, owner_id:, token:)
     expect(response.success?).to be(true)
   end
 
   it 'creates a school' do
-    expect { described_class.call(school_params:, creator_id:, token:) }.to change(School, :count).by(1)
+    expect { described_class.call(school_params:, owner_id:, token:) }.to change(School, :count).by(1)
   end
 
   it 'returns the school in the operation response' do
-    response = described_class.call(school_params:, creator_id:, token:)
+    response = described_class.call(school_params:, owner_id:, token:)
     expect(response[:school]).to be_a(School)
   end
 
   it 'assigns the name' do
-    response = described_class.call(school_params:, creator_id:, token:)
+    response = described_class.call(school_params:, owner_id:, token:)
     expect(response[:school].name).to eq('Test School')
   end
 
-  it 'assigns the creator_id' do
-    response = described_class.call(school_params:, creator_id:, token:)
-    expect(response[:school].creator_id).to eq(creator_id)
+  it 'gives the owner the owner and teacher roles' do
+    response = described_class.call(school_params:, owner_id:, token:)
+    expect(response[:school].roles.map(&:role)).to contain_exactly('owner', 'teacher')
+    expect(response[:school].roles.pluck(:user_id).uniq).to eq([owner_id])
+  end
+
+  it 'acquires an advisory lock for the owner' do
+    allow(School.connection).to receive(:execute).and_call_original
+    described_class.call(school_params:, owner_id:, token:)
+    expect(School.connection).to have_received(:execute).with(/pg_advisory_xact_lock\(\d+\)/)
   end
 
   context 'when creation fails' do
@@ -62,26 +69,26 @@ RSpec.describe School::Create, type: :unit do
     end
 
     it 'does not create a school' do
-      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
+      expect { described_class.call(school_params:, owner_id:, token:) }.not_to change(School, :count)
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(school_params:, creator_id:, token:)
+      response = described_class.call(school_params:, owner_id:, token:)
       expect(response.failure?).to be(true)
     end
 
     it 'returns the correct number of objects in the operation response' do
-      response = described_class.call(school_params:, creator_id:, token:)
+      response = described_class.call(school_params:, owner_id:, token:)
       expect(response[:error].count).to eq(11)
     end
 
     it 'returns the correct type of object in the operation response' do
-      response = described_class.call(school_params:, creator_id:, token:)
+      response = described_class.call(school_params:, owner_id:, token:)
       expect(response[:error].first).to be_a(ActiveModel::Error)
     end
 
     it 'sent the exception to Sentry' do
-      described_class.call(school_params:, creator_id:, token:)
+      described_class.call(school_params:, owner_id:, token:)
       expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
     end
   end
@@ -94,8 +101,8 @@ RSpec.describe School::Create, type: :unit do
     end
 
     it 'calls the onboarding service' do
-      described_class.call(school_params:, creator_id:, token:)
-      expect(onboarding_service).to have_received(:onboard).with(token:)
+      described_class.call(school_params:, owner_id:, token:)
+      expect(onboarding_service).to have_received(:onboard).with(owner_id:, token:)
     end
   end
 
@@ -108,21 +115,21 @@ RSpec.describe School::Create, type: :unit do
     end
 
     it 'does not create a school' do
-      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
+      expect { described_class.call(school_params:, owner_id:, token:) }.not_to change(School, :count)
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(school_params:, creator_id:, token:)
+      response = described_class.call(school_params:, owner_id:, token:)
       expect(response.failure?).to be(true)
     end
 
     it 'sends the underlying error to Sentry rather than a generic error' do
-      described_class.call(school_params:, creator_id:, token:)
+      described_class.call(school_params:, owner_id:, token:)
       expect(Sentry).to have_received(:capture_exception).with(error)
     end
 
     it 'returns the underlying error message in the operation response' do
-      response = described_class.call(school_params:, creator_id:, token:)
+      response = described_class.call(school_params:, owner_id:, token:)
       expect(response[:error]).to eq([error.message])
     end
   end
@@ -134,17 +141,51 @@ RSpec.describe School::Create, type: :unit do
     end
 
     it 'does not create a school' do
-      expect { described_class.call(school_params:, creator_id:, token:) }.not_to change(School, :count)
+      expect { described_class.call(school_params:, owner_id:, token:) }.not_to change(School, :count)
     end
 
     it 'returns a failed operation response' do
-      response = described_class.call(school_params:, creator_id:, token:)
+      response = described_class.call(school_params:, owner_id:, token:)
       expect(response.failure?).to be(true)
     end
 
     it 'does not capture the error in Sentry' do
-      described_class.call(school_params:, creator_id:, token:)
+      described_class.call(school_params:, owner_id:, token:)
       expect(Sentry).not_to have_received(:capture_exception)
+    end
+  end
+
+  context 'when the school owner already has a role in another school' do
+    let(:other_school) { create(:school) }
+
+    before do
+      create(:owner_role, school: other_school, user_id: owner_id)
+      allow(Sentry).to receive(:capture_exception)
+    end
+
+    it 'does not create a school' do
+      expect { described_class.call(school_params:, owner_id:, token:) }.not_to change(School, :count)
+    end
+
+    it 'returns a failed operation response' do
+      response = described_class.call(school_params:, owner_id:, token:)
+      expect(response.failure?).to be(true)
+    end
+
+    it 'returns the role error on the school' do
+      response = described_class.call(school_params:, owner_id:, token:)
+      expect(response[:error][:base]).to eq(['Cannot create role as this user already has a role in a different school'])
+    end
+
+    it 'does not capture the error in Sentry' do
+      described_class.call(school_params:, owner_id:, token:)
+      expect(Sentry).not_to have_received(:capture_exception)
+    end
+
+    it 'does not create a school when called inside an outer transaction' do
+      expect do
+        School.transaction { described_class.call(school_params:, owner_id:, token:) }
+      end.not_to change(School, :count)
     end
   end
 end
