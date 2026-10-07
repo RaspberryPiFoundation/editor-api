@@ -12,7 +12,6 @@ class SchoolDashboard < Administrate::BaseDashboard
   ATTRIBUTE_TYPES = {
     id: Field::String,
     code: Field::String,
-    creator: Field::BelongsTo.with_options(class_name: 'User'),
     postal_code: Field::String,
     creator_role: Field::String,
     creator_department: Field::String,
@@ -64,7 +63,6 @@ class SchoolDashboard < Administrate::BaseDashboard
     name
     code
     user_origin
-    creator
     roles
     student_count
     creator_role

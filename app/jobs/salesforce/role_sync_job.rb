@@ -32,9 +32,17 @@ module Salesforce
       sf_role.editor_type__c = role.school&.user_origin || ::School.new.user_origin
 
       sf_role.save!
+
+      sync_ux_contact_consent(role:) if role.owner?
     end
 
     private
+
+    def sync_ux_contact_consent(role:)
+      sf_contact = Salesforce::Contact.find_by!(pi_accounts_unique_id__c: role.user_id)
+      sf_contact.editor_consent_to_ux_contact__c = role.school.creator_agree_to_ux_contact
+      sf_contact.save!
+    end
 
     def sf_role_attributes(role:)
       mapped_attributes(role:).to_h do |sf_field, value|

@@ -20,7 +20,7 @@ namespace :test_seeds do
       student_ids = [TEST_USERS[:jane_smith], TEST_USERS[:john_smith], TEST_USERS[:emily_ssouser]]
       school_id = TEST_SCHOOL
       teacher_signup_school_id =
-        School.find_by(creator_id: teacher_signup_id)&.id
+        Role.owner.find_by(user_id: teacher_signup_id)&.school_id
 
       # Remove the roles first
       Role.where(user_id: teacher_signup_id).destroy_all

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class School < ApplicationRecord
+  self.ignored_columns += [:creator_id]
   # This is a temporary measure to allow the scratch_enabled column to be removed from the database without breaking the application.
   self.ignored_columns += [:scratch_enabled]
 
@@ -37,11 +38,6 @@ class School < ApplicationRecord
             uniqueness: { conditions: -> { active }, case_sensitive: false, allow_blank: true, message: I18n.t('validations.school.school_roll_number_exists') },
             format: { with: /\A[0-9]+[A-Z]+\z/, allow_nil: true, message: I18n.t('validations.school.school_roll_number') },
             presence: true, on: :create, if: :ireland?, unless: :hidden?
-  validates :creator_id,
-            presence: true,
-            uniqueness: {
-              conditions: -> { active }
-            }, unless: :hidden?
   validates :creator_agree_authority, presence: true, acceptance: true
   validates :creator_agree_terms_and_conditions, presence: true, acceptance: true
   validates :creator_agree_responsible_safeguarding, presence: true, acceptance: true
@@ -66,14 +62,10 @@ class School < ApplicationRecord
   after_commit -> { do_salesforce_sync(is_create: false) }, on: :update, if: -> { FeatureFlags.salesforce_sync? }
 
   def self.find_for_user!(user)
-    school = Role.find_by(user_id: user.id)&.school || active.find_by(creator_id: user.id)
+    school = Role.find_by(user_id: user.id)&.school
     raise ActiveRecord::RecordNotFound unless school
 
     school
-  end
-
-  def creator
-    User.from_userinfo(ids: creator_id).first
   end
 
   def verified?
@@ -224,6 +216,5 @@ class School < ApplicationRecord
 
   def do_salesforce_sync(is_create:)
     Salesforce::SchoolSyncJob.perform_later(school_id: id, is_create:)
-    Salesforce::ContactSyncJob.perform_later(school_id: id)
   end
 end

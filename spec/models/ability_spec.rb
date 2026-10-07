@@ -522,15 +522,6 @@ RSpec.describe Ability do
     let(:school) { create(:school) }
     let(:user) { build(:user) }
 
-    context 'when user is not a school-owner but is the creator of the school' do
-      before do
-        user.id = user_id
-        school.update(creator_id: user_id, verified_at: nil)
-      end
-
-      it { is_expected.to be_able_to(:read, school) }
-    end
-
     context 'when user is a school owner' do
       before do
         create(:owner_role, user_id: user.id, school:)

@@ -20,8 +20,8 @@ module SeedsHelper
   TEST_SCHOOL = 'e52de409-9210-4e94-b08c-dd11439e07d9' # e52de409-9210-4e94-b08c-dd11439e07d9
   SCHOOL_CODE = '12-34-56'
 
-  def create_school(creator_id, school_id = nil)
-    School.find_or_create_by!(creator_id:, id: school_id) do |school|
+  def create_school(owner_id, school_id = nil)
+    seeded_school = School.find_or_create_by!(id: school_id) do |school|
       Rails.logger.info 'Seeding a school...'
       country_code = Faker::Address.country_code
       school.name = Faker::Educator.secondary_school
@@ -31,7 +31,6 @@ module SeedsHelper
       school.municipality = Faker::Address.city
       school.postal_code = Faker::Address.postcode
       school.country_code = country_code
-      school.creator_id = creator_id
       school.creator_agree_authority = true
       school.creator_agree_terms_and_conditions = true
       school.creator_agree_to_ux_contact = true
@@ -43,6 +42,12 @@ module SeedsHelper
       end
       school.school_roll_number = "#{rand(10_000..99_999)}#{('A'..'Z').to_a.sample}" if country_code == 'IE'
     end
+
+    # Mirror SchoolOnboardingService: the owner gets their roles when the school is created
+    Role.owner.find_or_create_by!(user_id: owner_id, school: seeded_school)
+    Role.teacher.find_or_create_by!(user_id: owner_id, school: seeded_school)
+
+    seeded_school
   end
 
   def verify_school(school)
@@ -53,11 +58,7 @@ module SeedsHelper
 
     Rails.logger.info 'Verifying the school...'
 
-    School.transaction do
-      school.verify!
-      Role.owner.create!(user_id: school.creator_id, school:)
-      Role.teacher.create!(user_id: school.creator_id, school:)
-    end
+    school.verify!
 
     # rubocop:disable-next Rails/SkipsModelValidations
     school.update_column(:code, SCHOOL_CODE) # The code needs to match the one in the profile
