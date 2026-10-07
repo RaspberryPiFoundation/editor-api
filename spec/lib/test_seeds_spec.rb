@@ -228,11 +228,6 @@ RSpec.describe 'test_seeds', type: :task do
       expect(ClassStudent.where(student_id: student_2, school_class_id:)).to exist
     end
 
-    it 'enables scratch for the school' do
-      school = School.find(school_id)
-      expect(school.scratch_enabled?).to be true
-    end
-
     context 'when the seeded school is in the US' do
       let(:seed_country_code) { 'US' }
 

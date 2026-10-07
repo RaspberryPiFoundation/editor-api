@@ -7,14 +7,14 @@ RSpec.describe 'Updating a school', type: :request do
     authenticated_in_hydra_as(owner)
   end
 
-  let!(:school) { create(:school, scratch_enabled: false) }
+  let!(:school) { create(:school, name: 'Original name') }
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:owner) { create(:owner, school:) }
 
   let(:params) do
     {
       school: {
-        scratch_enabled: true
+        name: 'New name'
       }
     }
   end
@@ -28,17 +28,27 @@ RSpec.describe 'Updating a school', type: :request do
     put("/api/schools/#{school.id}", headers:, params:)
     data = JSON.parse(response.body, symbolize_names: true)
 
-    expect(data[:scratch_enabled]).to be(true)
+    expect(data[:id]).to eq(school.id)
+  end
+
+  it 'does not update attributes that are not school settings' do
+    put("/api/schools/#{school.id}", headers:, params:)
+    expect(school.reload.name).to eq('Original name')
+  end
+
+  it 'responds 200 OK when params are missing' do
+    put("/api/schools/#{school.id}", headers:)
+    expect(response).to have_http_status(:ok)
+  end
+
+  it 'responds 200 OK when the school param is not a hash' do
+    put("/api/schools/#{school.id}", headers:, params: { school: 'not-a-hash' })
+    expect(response).to have_http_status(:ok)
   end
 
   it 'responds 404 Not Found when no school exists' do
     put('/api/schools/not-a-real-id', headers:)
     expect(response).to have_http_status(:not_found)
-  end
-
-  it 'responds 400 Bad Request when params are missing' do
-    put("/api/schools/#{school.id}", headers:)
-    expect(response).to have_http_status(:bad_request)
   end
 
   it 'responds 401 Unauthorized when no token is given' do

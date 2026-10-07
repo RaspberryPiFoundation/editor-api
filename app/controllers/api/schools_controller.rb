@@ -114,10 +114,14 @@ module Api
       )
     end
 
+    # School settings that owners can change (e.g. Feature controls in Classroom).
+    # To add one, add a column to `schools`, permit it here, expose it in `api/schools/_school.json.jbuilder`
+    # and add an entry to `featureControls.ts` in editor-standalone.
     def update_params
-      params.expect(
-        school: %i[scratch_enabled]
-      )
+      school_params = params[:school]
+      return {} unless school_params.is_a?(ActionController::Parameters)
+
+      school_params.permit
     end
   end
 end

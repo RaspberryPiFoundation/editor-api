@@ -91,7 +91,6 @@ namespace :for_education do
 
       school = create_school(owner_id, TEST_SCHOOL)
       verify_school(school)
-      school.update!(scratch_enabled: true)
       assign_a_teacher(teacher_id, school)
 
       school_class = create_school_class(owner_id, school)
