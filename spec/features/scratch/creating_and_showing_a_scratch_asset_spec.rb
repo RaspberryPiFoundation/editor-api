@@ -548,6 +548,66 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
     end
   end
 
+  describe 'enforcing the asset size limit' do
+    let(:limit_mb) { 1 }
+    let(:oversized_upload) { 'a' * (limit_mb.megabytes + 1) }
+    let(:upload) { 'a' * limit_mb.megabytes }
+    let(:request_path) { '/api/scratch/assets/test_image_1.png' }
+    let(:request_headers) do
+      { 'Content-Type' => 'application/octet-stream', 'X-Project-ID' => project.identifier }.merge(auth_headers)
+    end
+
+    def make_request(body = upload)
+      post request_path, headers: request_headers, params: body
+    end
+
+    around do |example|
+      ClimateControl.modify(SCRATCH_ASSET_MAX_SIZE_MB: limit_mb.to_s) { example.run }
+    end
+
+    before do
+      authenticated_in_hydra_as(teacher)
+    end
+
+    it 'responds with a 413 status code when the upload is over the limit' do
+      make_request(oversized_upload)
+
+      expect(response).to have_http_status(:content_too_large)
+    end
+
+    it 'does not create an asset or file for an oversized upload' do
+      expect { make_request(oversized_upload) }.not_to change(ScratchAsset, :count)
+      expect { make_request(oversized_upload) }.not_to change(ActiveStorage::Blob, :count)
+    end
+
+    it 'skips the check when the asset already has a file attached' do
+      existing_asset = create_uploaded_scratch_asset(filename:, project:, uploaded_user_id: teacher.id, body: 'existing bytes')
+
+      expect { make_request(oversized_upload) }.not_to change(ScratchAsset, :count)
+
+      expect(response).to have_http_status(:created)
+      expect(existing_asset.reload.file.download).to eq('existing bytes')
+    end
+
+    it 'rejects an oversized upload for an existing asset whose file was never attached' do
+      existing_asset = create(:scratch_asset, filename:, project:, uploaded_user_id: teacher.id)
+
+      expect { make_request(oversized_upload) }.not_to change(ActiveStorage::Blob, :count)
+
+      expect(response).to have_http_status(:content_too_large)
+      expect(existing_asset.reload.file).not_to be_attached
+    end
+
+    it 'still attaches a file within the limit to an existing asset that has none' do
+      existing_asset = create(:scratch_asset, filename:, project:, uploaded_user_id: teacher.id)
+
+      expect { make_request }.not_to change(ScratchAsset, :count)
+
+      expect(response).to have_http_status(:created)
+      expect(existing_asset.reload.file.download).to eq(upload)
+    end
+  end
+
   describe 'visibility of a migrated project asset' do
     let(:student) { create(:student, school:) }
     let(:class_teacher) { create(:teacher, school:) }
