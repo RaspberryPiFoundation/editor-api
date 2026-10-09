@@ -4,6 +4,8 @@ module Salesforce
   class LessonSyncJob < SalesforceSyncJob
     MODEL_CLASS = Salesforce::Lesson
 
+    EXPERIENCE_CS_SALESFORCE_PROJECT_TYPE = 'scratch'
+
     FIELD_MAPPINGS = {
       lesson_uuid__c: :id,
       classroom__r__classroomuuid__c: :school_class_id,
@@ -47,7 +49,7 @@ module Salesforce
     end
 
     def project_type_attribute(lesson)
-      return Project::Types::SCRATCH if lesson.project&.origin == Project::Origins::EXPERIENCE_CS
+      return EXPERIENCE_CS_SALESFORCE_PROJECT_TYPE if lesson.project&.origin == Project::Origins::EXPERIENCE_CS
 
       lesson.project&.project_type
     end

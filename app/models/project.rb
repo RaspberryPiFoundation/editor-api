@@ -6,15 +6,12 @@ class Project < ApplicationRecord
   module Types
     PYTHON = 'python'
     HTML = 'html'
-    SCRATCH = 'scratch'
     CODE_EDITOR_SCRATCH = 'code_editor_scratch'
   end
 
   module Origins
     EXPERIENCE_CS = 'experience_cs'
   end
-
-  EXPERIENCE_CS_PROJECT_TYPES = [Types::SCRATCH, Types::CODE_EDITOR_SCRATCH].freeze
 
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
@@ -108,7 +105,7 @@ class Project < ApplicationRecord
   end
 
   def public_experience_cs_project?
-    user_id.nil? && school_id.nil? && EXPERIENCE_CS_PROJECT_TYPES.include?(project_type)
+    user_id.nil? && school_id.nil? && scratch_project?
   end
 
   def self_and_ancestors

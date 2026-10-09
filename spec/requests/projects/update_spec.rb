@@ -141,7 +141,7 @@ RSpec.describe 'Project update requests' do
         :project,
         identifier: 'experience-cs-project',
         locale: 'fr',
-        project_type: Project::Types::SCRATCH,
+        project_type: Project::Types::CODE_EDITOR_SCRATCH,
         user_id: nil
       )
     end
