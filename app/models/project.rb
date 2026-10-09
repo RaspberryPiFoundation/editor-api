@@ -7,6 +7,8 @@ class Project < ApplicationRecord
     PYTHON = 'python'
     HTML = 'html'
     CODE_EDITOR_SCRATCH = 'code_editor_scratch'
+
+    ALL = [PYTHON, HTML, CODE_EDITOR_SCRATCH].freeze
   end
 
   module Origins
@@ -42,6 +44,7 @@ class Project < ApplicationRecord
   validate :project_with_instructions_must_belong_to_school
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
+  validates :project_type, inclusion: { in: Types::ALL }
   validates :origin, inclusion: { in: [Origins::EXPERIENCE_CS], allow_nil: true }
   validate :origin_cannot_change, on: :update
 
