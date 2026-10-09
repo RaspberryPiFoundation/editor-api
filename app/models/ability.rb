@@ -18,7 +18,6 @@ class Ability
 
     define_editor_admin_abilities(user)
     define_experience_cs_admin_abilities(user)
-    define_experience_cs_service_abilities(user)
   end
 
   private
@@ -159,12 +158,6 @@ class Ability
     can %i[read create update destroy], Project, user_id: nil
     can :create_global, ScratchAsset
     define_school_import_abilities(user)
-  end
-
-  def define_experience_cs_service_abilities(user)
-    return unless user&.experience_cs_service_account?
-
-    can %i[migrate_from_experience_cs upload_migration_asset], Project, &:experience_cs_migration_target?
   end
 
   def school_teacher_can_manage_lesson?(user:, school:, lesson:)
