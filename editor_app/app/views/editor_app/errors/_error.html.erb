@@ -1,0 +1,20 @@
+<main class="error-page">
+  <h1 class="error-page__heading"><%= heading %></h1>
+  <p class="error-page__text"><%= text %></p>
+  <div class="error-page__actions">
+    <% if current_user.nil? %>
+      <%= render DesignSystem::ButtonComponent.new(
+            type: :form,
+            href: editor_login_path(return_to: request.fullpath),
+            text: t('editor_app.errors.log_in')
+          ) %>
+    <% elsif !current_user.student? %>
+      <%= render DesignSystem::ButtonComponent.new(href: projects_path, text: t('editor_app.errors.your_projects')) %>
+    <% end %>
+    <%= render DesignSystem::ButtonComponent.new(
+          href: projects_site_url(''),
+          text: t('editor_app.errors.projects_site'),
+          modifiers: ['secondary']
+        ) %>
+  </div>
+</main>
