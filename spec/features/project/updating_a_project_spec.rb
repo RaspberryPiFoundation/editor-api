@@ -59,7 +59,7 @@ RSpec.describe 'Updating a project', type: :request do
   context 'when an Experience CS admin creates a starter Scratch project' do
     let(:experience_cs_admin) { create(:experience_cs_admin_user) }
     let(:user_id) { nil }
-    let(:project_type) { Project::Types::SCRATCH }
+    let(:project_type) { Project::Types::CODE_EDITOR_SCRATCH }
     let(:params) { { project: { name: 'Test Project' } } }
 
     before do

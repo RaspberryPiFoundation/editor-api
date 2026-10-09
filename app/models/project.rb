@@ -6,15 +6,14 @@ class Project < ApplicationRecord
   module Types
     PYTHON = 'python'
     HTML = 'html'
-    SCRATCH = 'scratch'
     CODE_EDITOR_SCRATCH = 'code_editor_scratch'
+
+    ALL = [PYTHON, HTML, CODE_EDITOR_SCRATCH].freeze
   end
 
   module Origins
     EXPERIENCE_CS = 'experience_cs'
   end
-
-  EXPERIENCE_CS_PROJECT_TYPES = [Types::SCRATCH, Types::CODE_EDITOR_SCRATCH].freeze
 
   belongs_to :school, optional: true
   belongs_to :lesson, optional: true
@@ -45,6 +44,7 @@ class Project < ApplicationRecord
   validate :project_with_instructions_must_belong_to_school
   validate :project_with_school_id_has_school_project
   validate :school_project_school_matches_project_school
+  validates :project_type, inclusion: { in: Types::ALL }
   validates :origin, inclusion: { in: [Origins::EXPERIENCE_CS], allow_nil: true }
   validate :origin_cannot_change, on: :update
 
@@ -108,11 +108,7 @@ class Project < ApplicationRecord
   end
 
   def public_experience_cs_project?
-    user_id.nil? && school_id.nil? && EXPERIENCE_CS_PROJECT_TYPES.include?(project_type)
-  end
-
-  def experience_cs_migration_target?
-    user_id.present? && school_id.present? && project_type == Types::SCRATCH
+    user_id.nil? && school_id.nil? && scratch_project?
   end
 
   def self_and_ancestors

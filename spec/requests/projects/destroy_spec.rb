@@ -41,7 +41,7 @@ RSpec.describe 'Project delete requests' do
       let(:project) do
         create(
           :project, {
-            project_type: Project::Types::SCRATCH,
+            project_type: Project::Types::CODE_EDITOR_SCRATCH,
             user_id: nil,
             locale: 'en'
           }

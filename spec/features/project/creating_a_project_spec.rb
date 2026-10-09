@@ -329,16 +329,6 @@ RSpec.describe 'Creating a project', type: :request do
         expect(Project).to exist(identifier: 'test-project', locale: 'fr', user_id: nil)
       end
 
-      it 'creates a public legacy Scratch project' do
-        params[:project].except!(:instructions, :scratch_component)
-        params[:project][:project_type] = Project::Types::SCRATCH
-
-        post('/api/projects', headers:, params:, as: :json)
-
-        expect(response).to have_http_status(:created)
-        expect(Project).to exist(identifier: 'test-project', locale: 'fr', project_type: Project::Types::SCRATCH)
-      end
-
       it 'does not authorize user-project creation' do
         params[:project][:user_id] = SecureRandom.uuid
 

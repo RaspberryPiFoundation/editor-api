@@ -7,12 +7,10 @@ module Api
     class AssetsController < ApiController
       include ActiveStorage::SetCurrent
 
-      prepend_before_action :load_experience_cs_service_user, only: %i[create_global create_migration]
+      prepend_before_action :load_experience_cs_service_user, only: %i[create_global]
       before_action :authorize_user, except: %i[show]
       prepend_before_action :load_project_from_header, only: %i[show create]
-      authorize_resource :project_from_header, except: %i[create_global create_migration]
-      before_action :load_migration_project, only: :create_migration
-      before_action :authorize_migration_asset, only: :create_migration
+      authorize_resource :project_from_header, except: %i[create_global]
 
       def show
         filename_with_extension = "#{params[:id]}.#{params[:format]}"
@@ -33,15 +31,6 @@ module Api
           project: @project_from_header,
           uploaded_user_id: current_user.id,
           filename: filename_with_extension
-        )
-      end
-
-      def create_migration
-        create_asset(
-          project: @migration_project,
-          uploaded_user_id: @migration_project.user_id,
-          filename: "#{params[:id]}.#{params[:format]}",
-          reject_conflicting_content: true
         )
       end
 
@@ -130,17 +119,6 @@ module Api
           identifier:,
           project_type: Project::Types::CODE_EDITOR_SCRATCH
         )
-      end
-
-      def load_migration_project
-        @migration_project = Project.find_by!(
-          identifier: params.expect(:project_id),
-          locale: nil
-        )
-      end
-
-      def authorize_migration_asset
-        authorize! :upload_migration_asset, @migration_project
       end
     end
   end
