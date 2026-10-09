@@ -70,6 +70,11 @@ RSpec.describe Project, :versioning do
       expect(invalid_project).not_to be_valid
     end
 
+    it 'is invalid with an unrecognised project type' do
+      invalid_project = build(:project, project_type: 'scratch')
+      expect(invalid_project).not_to be_valid
+    end
+
     it 'is valid without a source project' do
       valid_project = build(:project, source_project: nil)
       expect(valid_project).to be_valid
