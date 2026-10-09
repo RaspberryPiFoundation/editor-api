@@ -166,12 +166,6 @@ assets asynchronously. Configure `EXPERIENCE_CS_API_KEY` to the same secret as
 Experience CS's `EDITOR_API_SYNC_API_KEY`. The corresponding request header is
 accepted for public project create/update and global Scratch asset upload.
 
-`PUT /api/experience-cs/projects/:identifier/migrate` lets the service replace
-an exact locale-less Experience CS user-project stub with its Markdown
-instructions and Scratch content. Project-scoped migration assets use
-`POST /api/experience-cs/projects/:identifier/assets/:filename` and remain
-subject to the project's normal viewing permissions.
-
 ### Code Editor for Education
 
 Editor API provides routes for managing resources such as schools, school classes and lessons, as well as for inviting teachers and managing student accounts via `profile` requests.
