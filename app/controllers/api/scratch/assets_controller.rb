@@ -61,16 +61,9 @@ module Api
       def create_asset(reject_conflicting_content: false, **attributes)
         scratch_asset = ScratchAsset.find_or_initialize_by(attributes)
 
-        if scratch_asset.new_record?
-          begin
-            scratch_asset.save!
-          rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
-            raise unless duplicate_filename_error?(e)
+        return reject_oversized_file if !scratch_asset.file.attached? && file_too_big?
 
-            logger.info("Scratch asset already created during concurrent upload: #{attributes.fetch(:filename)}")
-            scratch_asset = ScratchAsset.find_by!(attributes)
-          end
-        end
+        scratch_asset = save_new_asset(scratch_asset, attributes) if scratch_asset.new_record?
 
         if reject_conflicting_content
           return if attach_file_with_conflict_check(scratch_asset, attributes.fetch(:filename)) == :conflict
@@ -79,6 +72,16 @@ module Api
         end
 
         render json: { status: 'ok', 'content-name': params[:id] }, status: :created
+      end
+
+      def save_new_asset(scratch_asset, attributes)
+        scratch_asset.save!
+        scratch_asset
+      rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid => e
+        raise unless duplicate_filename_error?(e)
+
+        logger.info("Scratch asset already created during concurrent upload: #{attributes.fetch(:filename)}")
+        ScratchAsset.find_by!(attributes)
       end
 
       def duplicate_filename_error?(error)
@@ -108,6 +111,19 @@ module Api
 
       def file_matches?(scratch_asset)
         scratch_asset.file.blob.checksum == request_body_checksum
+      end
+
+      def file_too_big?
+        request.body.size > max_file_size_mb.megabytes
+      end
+
+      def reject_oversized_file
+        render json: { error: "The asset was larger than the limit of #{max_file_size_mb} MB" },
+               status: :content_too_large
+      end
+
+      def max_file_size_mb
+        ENV.fetch('SCRATCH_ASSET_MAX_SIZE_MB', 10).to_i
       end
 
       def reject_conflicting_file(scratch_asset)
