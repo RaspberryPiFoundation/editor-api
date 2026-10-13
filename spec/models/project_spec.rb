@@ -70,6 +70,11 @@ RSpec.describe Project, :versioning do
       expect(invalid_project).not_to be_valid
     end
 
+    it 'is invalid with an unrecognised project type' do
+      invalid_project = build(:project, project_type: 'scratch')
+      expect(invalid_project).not_to be_valid
+    end
+
     it 'is valid without a source project' do
       valid_project = build(:project, source_project: nil)
       expect(valid_project).to be_valid
@@ -92,7 +97,7 @@ RSpec.describe Project, :versioning do
         :project,
         instructions: '<p>Project instructions</p>',
         locale: 'en',
-        project_type: Project::Types::SCRATCH,
+        project_type: Project::Types::PYTHON,
         user_id: nil
       )
 
@@ -250,18 +255,14 @@ RSpec.describe Project, :versioning do
   end
 
   describe '#public_experience_cs_project?' do
-    it 'returns true for public Experience CS project types', :aggregate_failures do
-      project_types = [described_class::Types::SCRATCH, described_class::Types::CODE_EDITOR_SCRATCH]
+    it 'returns true for a public Scratch project' do
+      project = build(:project, project_type: described_class::Types::CODE_EDITOR_SCRATCH, user_id: nil, school_id: nil)
 
-      project_types.each do |project_type|
-        project = build(:project, project_type:, user_id: nil, school_id: nil)
-
-        expect(project).to be_public_experience_cs_project
-      end
+      expect(project).to be_public_experience_cs_project
     end
 
     it 'returns false for a user-owned project' do
-      project = build(:project, project_type: described_class::Types::SCRATCH)
+      project = build(:project, project_type: described_class::Types::CODE_EDITOR_SCRATCH)
 
       expect(project).not_to be_public_experience_cs_project
     end
@@ -269,7 +270,7 @@ RSpec.describe Project, :versioning do
     it 'returns false for a school-owned project' do
       project = build(
         :project,
-        project_type: described_class::Types::SCRATCH,
+        project_type: described_class::Types::CODE_EDITOR_SCRATCH,
         user_id: nil,
         school_id: SecureRandom.uuid
       )
@@ -281,43 +282,6 @@ RSpec.describe Project, :versioning do
       project = build(:project, project_type: described_class::Types::PYTHON, user_id: nil)
 
       expect(project).not_to be_public_experience_cs_project
-    end
-  end
-
-  describe '#experience_cs_migration_target?' do
-    let(:project) do
-      build(
-        :project,
-        school_id: SecureRandom.uuid,
-        user_id: SecureRandom.uuid,
-        locale: nil,
-        project_type: described_class::Types::SCRATCH
-      )
-    end
-
-    it 'allows a user-owned school Scratch stub' do
-      expect(project).to be_experience_cs_migration_target
-    end
-
-    it 'rejects a Code Classroom Scratch project' do
-      project.project_type = described_class::Types::CODE_EDITOR_SCRATCH
-
-      expect(project).not_to be_experience_cs_migration_target
-    end
-
-    it 'rejects a non-Scratch project' do
-      project.project_type = described_class::Types::PYTHON
-
-      expect(project).not_to be_experience_cs_migration_target
-    end
-
-    it 'rejects public and non-school projects', :aggregate_failures do
-      project.user_id = nil
-      expect(project).not_to be_experience_cs_migration_target
-
-      project.user_id = SecureRandom.uuid
-      project.school_id = nil
-      expect(project).not_to be_experience_cs_migration_target
     end
   end
 

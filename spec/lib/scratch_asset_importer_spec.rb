@@ -6,7 +6,7 @@ require 'scratch_asset_importer'
 RSpec.describe ScratchAssetImporter do
   describe '.import_all' do
     it 'imports assets from the config' do
-      image = Rails.root.join('spec/fixtures/files/test_image_1.png').read
+      image = Rails.root.join('spec/fixtures/files/test_image_1.png').binread
       stub_request(:get, 'https://example.net/internalapi/asset/123abc.png/get/').to_return(status: 200, body: image)
 
       described_class.import_all(['123abc.png'], 'https://example.net/internalapi/asset/')
