@@ -36,7 +36,7 @@ gem 'omniauth-rpi',
     tag: 'v1.4.1'
 gem 'open-uri'
 gem 'paper_trail'
-gem 'pg', '~> 1.6'
+gem 'pg', '~> 1.7'
 gem 'postmark-rails'
 gem 'propshaft'
 gem 'public_suffix', '~> 7.0'
