@@ -28,7 +28,7 @@ gem 'i18n'
 gem 'image_processing'
 gem 'importmap-rails'
 gem 'jbuilder'
-gem 'json', '~> 2.21.2'
+gem 'json', '~> 3.0.2'
 gem 'kaminari'
 gem 'omniauth-rails_csrf_protection', '~> 2.0.1'
 gem 'omniauth-rpi',
