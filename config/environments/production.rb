@@ -82,7 +82,8 @@ Rails.application.configure do
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   config.hosts = [
-    URI.parse(ENV.fetch('HOST_URL')).host
+    URI.parse(ENV.fetch('HOST_URL')).host,
+    *EditorApp.hosts
   ]
 
   # Skip DNS rebinding protection for the default health check endpoint.

@@ -1,0 +1,12 @@
+<script type="module" src="<%= script_url %>"></script>
+<rpf-global-nav
+  locale="<%= I18n.locale %>"
+  locales="<%= locales %>"
+  logged-in="<%= signed_in %>"
+  log-in-path="<%= log_in_path %>"
+  log-in-token="<%= authenticity_token %>"
+  sign-up-path="<%= sign_up_path %>"
+  sign-up-token="<%= authenticity_token %>"
+  log-out-path="<%= log_out_path %>"
+  <%= 'hide-account-dropdown=true' if student %>
+></rpf-global-nav>

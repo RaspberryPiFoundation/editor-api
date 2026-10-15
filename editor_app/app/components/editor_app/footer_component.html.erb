@@ -1,0 +1,26 @@
+<footer class="footer">
+  <div class="footer__links-wrapper">
+    <div class="footer__top <%= 'footer__top--reverse' unless school %>">
+      <% if school %>
+        <p class="footer__report">
+          <span class="material-symbols-sharp" aria-hidden="true">flag</span>
+          <span class="footer__text"><%= t('editor_app.footer.safeguarding_concern') %></span>
+          <%= link_to t('editor_app.footer.contact_us'), report_concern_url,
+                      class: 'footer__link', target: '_blank', rel: 'noreferrer' %>
+        </p>
+      <% else %>
+        <p class="footer__text"><%= t('editor_app.footer.charity_name_and_number') %></p>
+      <% end %>
+
+      <ul class="footer__links">
+        <% links.each do |text, url| %>
+          <li><%= link_to text, url, class: 'footer__link', target: '_blank', rel: 'noreferrer' %></li>
+        <% end %>
+      </ul>
+    </div>
+
+    <% if school %>
+      <p class="footer__text"><%= t('editor_app.footer.charity_name_and_number') %></p>
+    <% end %>
+  </div>
+</footer>

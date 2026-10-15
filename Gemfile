@@ -5,6 +5,10 @@ git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 ruby file: '.tool-versions'
 
+source 'https://rubygems.pkg.github.com/raspberrypifoundation' do
+  gem 'design_system_rails', '~> 0.19'
+end
+
 gem 'administrate', '~> 1.0.0'
 gem 'administrate-field-active_storage'
 gem 'aws-sdk-s3', require: false
@@ -13,6 +17,7 @@ gem 'bootsnap', require: false
 gem 'cancancan', '~> 3.3'
 gem 'countries'
 gem 'csv', '~> 3.3'
+gem 'editor_app', path: 'editor_app'
 gem 'email_validator'
 gem 'faker'
 gem 'faraday'
@@ -50,6 +55,7 @@ gem 'ruby-vips'
 gem 'rubyzip'
 gem 'sentry-rails'
 gem 'statesman'
+gem 'view_component'
 
 group :development, :test do
   gem 'awesome_print'

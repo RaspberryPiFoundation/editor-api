@@ -1,0 +1,8 @@
+<% content_for :head do %>
+  <%= stylesheet_link_tag 'editor_app/project' %>
+  <%= javascript_include_tag @script_url, crossorigin: 'anonymous', defer: true %>
+<% end %>
+
+<main class="project">
+  <%= render EditorApp::ProjectComponent.new(project: @project, signed_in: current_user.present?) %>
+</main>
