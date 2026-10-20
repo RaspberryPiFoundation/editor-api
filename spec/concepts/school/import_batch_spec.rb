@@ -14,34 +14,27 @@ RSpec.describe School::ImportBatch do
     end
     let(:csv_file) { StringIO.new(csv_content) }
 
-    before do
-      allow(SchoolImportJob).to receive(:perform_later).and_return(
-        instance_double(SchoolImportJob, job_id: 'test-job-id')
-      )
-    end
-
     context 'with valid CSV' do
       it 'returns success response with job_id' do
         result = described_class.call(csv_file: csv_file, current_user: current_user)
 
         expect(result.success?).to be true
-        expect(result[:job_id]).to eq('test-job-id')
+        expect(result[:job_id]).to be_present
         expect(result[:total_schools]).to eq(2)
       end
 
       it 'enqueues SchoolImportJob' do
-        described_class.call(csv_file: csv_file, current_user: current_user)
-
-        expect(SchoolImportJob).to have_received(:perform_later).with(
-          hash_including(
-            schools_data: array_including(
-              hash_including(name: 'Test School 1'),
-              hash_including(name: 'Test School 2')
-            ),
-            user_id: current_user.id,
-            token: current_user.token
+        expect { described_class.call(csv_file: csv_file, current_user: current_user) }
+          .to have_enqueued_job(SchoolImportJob).with(
+            hash_including(
+              schools_data: array_including(
+                hash_including(name: 'Test School 1'),
+                hash_including(name: 'Test School 2')
+              ),
+              user_id: current_user.id,
+              token: current_user.token
+            )
           )
-        )
       end
     end
 
