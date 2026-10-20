@@ -24,14 +24,11 @@ RSpec.describe GithubWebhooksController do
     }
   end
 
-  before do
-    allow(UploadJob).to receive(:perform_later)
-    post '/github_webhooks', env: { RAW_POST_DATA: params.to_json }, headers:
-  end
+  let(:post_webhook) { post '/github_webhooks', env: { RAW_POST_DATA: params.to_json }, headers: }
 
   shared_examples 'upload job' do
     it 'schedules the job' do
-      expect(UploadJob).to have_received(:perform_later).with(params)
+      expect { post_webhook }.to have_enqueued_job(UploadJob).with(params)
     end
   end
 
@@ -60,7 +57,7 @@ RSpec.describe GithubWebhooksController do
       let(:commits) { [{ added: ['en/step2.md'], modified: ['en/step1.md'], removed: ['en/step0.md'] }] }
 
       it 'does not schedule the upload job' do
-        expect(UploadJob).not_to have_received(:perform_later)
+        expect { post_webhook }.not_to have_enqueued_job(UploadJob)
       end
     end
   end
@@ -70,7 +67,7 @@ RSpec.describe GithubWebhooksController do
     let(:commits) { [{ added: [], modified: ['en/code/project1/main.py'], removed: [] }] }
 
     it 'does not schedule the upload job' do
-      expect(UploadJob).not_to have_received(:perform_later)
+      expect { post_webhook }.not_to have_enqueued_job(UploadJob)
     end
   end
 end
