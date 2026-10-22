@@ -73,3 +73,19 @@ RSpec.shared_examples 'a request that handles an unexpected response status' do 
     expect { subject }.to raise_error(ProfileApiClient::UnexpectedResponse)
   end
 end
+
+RSpec.shared_examples 'a request that allows longer for a response' do
+  let(:faraday_connections) { [] }
+
+  before do
+    connections = faraday_connections
+    allow(HttpClient).to receive(:new).and_wrap_original do |original_method, *args, &block|
+      original_method.call(*args, &block).tap { |connection| connections << connection }
+    end
+  end
+
+  it 'gives the profile api longer to respond than the default timeouts allow' do
+    subject
+    expect(faraday_connections.last.options).to have_attributes(open_timeout: 5, write_timeout: 5, read_timeout: 50, timeout: 50)
+  end
+end
