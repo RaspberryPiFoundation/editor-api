@@ -13,7 +13,7 @@ end
 Rails.application.config.middleware.use OmniAuth::Builder do
   provider(
     OmniAuth::Strategies::Rpi, ENV.fetch('HYDRA_CLIENT_ID', nil), ENV.fetch('HYDRA_CLIENT_SECRET', nil),
-    scope: 'openid email profile roles force-consent',
+    scope: EditorHydraClient::SCOPE,
     callback_path: '/auth/callback',
     client_options: {
       site: ENV.fetch('HYDRA_PUBLIC_URL', nil),
@@ -22,7 +22,8 @@ Rails.application.config.middleware.use OmniAuth::Builder do
       auth_scheme: :basic_auth
     },
     authorize_params: {},
-    origin_param: 'returnTo'
+    origin_param: 'returnTo',
+    setup: ->(env) { EditorHydraClient.configure_strategy(env) }
   )
 
   OmniAuth.config.on_failure = AuthController.action(:failure)

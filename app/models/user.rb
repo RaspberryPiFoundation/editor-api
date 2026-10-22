@@ -114,6 +114,15 @@ class User
     new(args)
   end
 
+  def self.from_id_token(id_token, access_token)
+    claims = JWT.decode(id_token, nil, false).first
+    args = claims.slice(*ATTRIBUTES)
+    args['id'] = claims['sub']
+    args['token'] = access_token
+
+    new(args)
+  end
+
   def self.from_token(token:)
     return nil if token.blank?
 

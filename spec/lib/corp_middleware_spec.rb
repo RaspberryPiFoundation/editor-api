@@ -3,14 +3,16 @@
 require 'rails_helper'
 
 describe CorpMiddleware do
+  around do |example|
+    ClimateControl.modify(ALLOWED_ORIGINS: allowed_origins) { example.run }
+  end
+
+  before { allow(app).to receive(:call).and_return([200, {}, ['OK']]) }
+
   let(:app) { instance_double(App::Application) }
   let(:middleware) { described_class.new(app) }
   let(:env) { { 'HTTP_HOST' => 'test.com', 'PATH_INFO' => '/rails/active_storage' } }
-
-  before do
-    allow(app).to receive(:call).and_return([200, {}, ['OK']])
-    allow(ENV).to receive(:[]).with('ALLOWED_ORIGINS').and_return('test.com')
-  end
+  let(:allowed_origins) { 'test.com' }
 
   it 'sets the Cross-Origin-Resource-Policy header for a literal origin' do
     _status, headers, _response = middleware.call(env)
@@ -24,19 +26,23 @@ describe CorpMiddleware do
     expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
   end
 
-  it 'sets the Cross-Origin-Resource-Policy header for regex origin' do
-    allow(ENV).to receive(:[]).with('ALLOWED_ORIGINS').and_return('/test\.com/')
+  context 'when the origin is allowed by a regex' do
+    let(:allowed_origins) { '/test\.com/' }
 
-    _status, headers, _response = middleware.call(env)
+    it 'sets the Cross-Origin-Resource-Policy header' do
+      _status, headers, _response = middleware.call(env)
 
-    expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
+      expect(headers['Cross-Origin-Resource-Policy']).to eq('cross-origin')
+    end
   end
 
-  it 'does not set the Cross-Origin-Resource-Policy header for disallowed origins' do
-    allow(ENV).to receive(:[]).with('ALLOWED_ORIGINS').and_return('other.com')
+  context 'when the origin is not allowed' do
+    let(:allowed_origins) { 'other.com' }
 
-    _status, headers, _response = middleware.call(env)
+    it 'does not set the Cross-Origin-Resource-Policy header' do
+      _status, headers, _response = middleware.call(env)
 
-    expect(headers).not_to have_key('Cross-Origin-Resource-Policy')
+      expect(headers).not_to have_key('Cross-Origin-Resource-Policy')
+    end
   end
 end

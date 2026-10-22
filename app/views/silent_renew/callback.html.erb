@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Silent renew</title>
+    <% if @renewed %>
+      <%= render EditorApp::AuthTokenComponent.new(user: current_user, expires_at: session[:oauth_expires_at]) %>
+    <% end %>
+  </head>
+  <body>
+    <script>
+      window.parent.postMessage(
+        {
+          type: "editor-app:session-renewal",
+          renewed: <%= @renewed ? 'true' : 'false' %>,
+          expiresAt: <%= raw ERB::Util.json_escape(session[:oauth_expires_at].to_json) %>
+        },
+        window.origin
+      );
+    </script>
+  </body>
+</html>

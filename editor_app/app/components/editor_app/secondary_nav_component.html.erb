@@ -1,0 +1,24 @@
+<nav class="secondary-nav" aria-label="<%= t('editor_app.secondary_nav.code_editor') %>">
+  <span class="secondary-nav__title"><%= t('editor_app.secondary_nav.code_editor') %></span>
+  <div class="secondary-nav__links">
+    <%= link_to home_path, class: link_classes(home_path) do %>
+      <span class="secondary-nav__link-text"><%= t('editor_app.secondary_nav.home') %></span>
+    <% end %>
+    <%= link_to education_path, class: link_classes(education_path) do %>
+      <span class="secondary-nav__link-text"><%= t('editor_app.secondary_nav.education') %></span>
+    <% end %>
+    <% if show_separator? %>
+      <hr class="secondary-nav__separator" aria-hidden="true">
+      <% if show_projects? %>
+        <%= link_to projects_path, class: link_classes(projects_path) do %>
+          <span class="secondary-nav__link-text"><%= t('editor_app.secondary_nav.projects') %></span>
+        <% end %>
+      <% end %>
+      <% if show_school? %>
+        <%= link_to code_classroom_url("/#{I18n.locale}/school"), class: 'secondary-nav__link' do %>
+          <span class="secondary-nav__link-text"><%= t('editor_app.secondary_nav.school') %></span>
+        <% end %>
+      <% end %>
+    <% end %>
+  </div>
+</nav>

@@ -1,0 +1,98 @@
+en:
+  editor_app:
+    meta:
+      title: Code Editor | Raspberry Pi
+      description: Code Editor, created by the Raspberry Pi Foundation
+    home:
+      show:
+        title: Code Editor
+        subtitle: Start coding, no setup required!
+        choose_language: What do you want to code with?
+        python: Python
+        html: HTML/CSS
+        where_to_start: Not sure where to start?
+        project_python: Python path
+        project_html: Web path
+        follow_a_path_html: Explore the %{python_link} or %{html_link} on our Projects site for guided learning.
+        also_discover_html: Teachers can also discover %{experience_cs_link}, a Scratch-based curriculum with step-by-step projects for the classroom.
+        experience_cs: Experience CS
+        ready_to_continue: Ready to continue?
+        continue_your_projects: Continue your projects
+        using_code_classroom: Using Code Classroom?
+        login_to_code_editor: Log in to Code Editor
+        login_as_a_student: Log in as a student
+        login_as_a_teacher: Log in as a teacher
+        go_to_classroom: Go to Code Classroom
+        ide_image_alt: A Code Editor project with instructions alongside the code
+    errors:
+      log_in: Log in to your account
+      your_projects: Your projects
+      projects_site: Explore Projects site
+      not_found:
+        heading: This page does not exist
+        text: You can start coding in a new project, or visit the Projects site for
+          cool project ideas.
+      forbidden:
+        heading: You cannot access this page
+        text: If this is your project, log in to see it. If it is not, visit the
+          Projects site for cool project ideas or start coding in a new project.
+    project_types:
+      python: Python
+      html: Web
+      code_editor_scratch: Blocks
+      scratch: Scratch
+    projects:
+      empty: No projects created yet
+      updated: Edited %{time_ago} ago
+      rename: Rename
+      rename_label: Rename project
+      delete: Delete
+      delete_label: Delete project
+      renamed: Project renamed
+      deleted: Project deleted
+      index:
+        title: Your projects
+        subtitle: Select a project to continue coding, view, or edit it.
+        home: Code Editor home
+        new_project: Create a new project
+        load_more: Load more projects
+      new_dialog:
+        heading: Create a new project
+        name_label: Project name
+        name_hint: You can always rename your project later
+        default_name: Untitled
+        type_label: What kind of project do you want to make?
+        python_description: Wide range of built-in libraries
+        html_description: HTML, CSS, and JavaScript
+        submit: Create project
+        cancel: Cancel
+      rename_dialog:
+        heading: Rename project
+        label: Change the name of your project
+        submit: Save
+        cancel: Do not save
+      delete_dialog:
+        heading: Delete project
+        text: Are you sure you want to delete %{name}?
+        submit: Delete
+        cancel: Cancel
+    session:
+      expired: You have been logged out. Log in again to carry on saving your work.
+      log_in_again: Log in again
+    secondary_nav:
+      code_editor: "Code Editor"
+      home: "Home"
+      education: "For Education"
+      projects: "Your Projects"
+      school: "Your School"
+    footer:
+      charity_name_and_number: "Raspberry Pi Foundation UK registered charity 1129409"
+      safeguarding_concern: "Do you have a safeguarding concern?"
+      contact_us: "Report a concern"
+      help: "Help"
+      feedback: "Feedback"
+      terms_and_conditions: "Terms & Conditions"
+      safeguarding: "Safeguarding"
+      accessibility: "Accessibility"
+      privacy: "Privacy"
+      cookies: "Cookies"

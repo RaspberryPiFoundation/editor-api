@@ -1,0 +1,11 @@
+<div class="project-list">
+  <% if projects.any? %>
+    <ul class="project-list__items">
+      <% projects.each do |project| %>
+        <%= render EditorApp::ProjectListItemComponent.new(project: project) %>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="project-list__empty"><%= t('editor_app.projects.empty') %></p>
+  <% end %>
+</div>

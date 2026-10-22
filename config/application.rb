@@ -55,6 +55,8 @@ module App
 
     config.api_only = false
 
+    config.i18n.fallbacks = [:en]
+
     config.middleware.insert_before 0, CorpMiddleware
 
     require 'rack/content_type_default'
