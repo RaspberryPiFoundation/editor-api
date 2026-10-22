@@ -228,48 +228,6 @@ RSpec.describe ProfileApiClient do
     end
   end
 
-  describe '.validate_school_students' do
-    subject(:validate_school_students_response) { validate_school_students }
-
-    let(:students) { [{ name: 'name', username: 'username', password: 'password' }] }
-    let(:school) { build(:school, id: SecureRandom.uuid) }
-    let(:validate_students_url) { "#{api_url}/api/v1/schools/#{school.id}/students/preflight-student-upload" }
-
-    before do
-      stub_request(:post, validate_students_url).to_return(status: 200, body: '{}', headers: { 'content-type' => 'application/json' })
-    end
-
-    it_behaves_like 'an authenticated JSON API request', :post, url: -> { validate_students_url }
-    it_behaves_like 'a request that handles standard HTTP errors', :post, url: -> { validate_students_url }
-    it_behaves_like 'a request that handles an unexpected response status', :post, url: -> { validate_students_url }, status: 201
-    it_behaves_like 'a request that allows longer for a response'
-
-    it 'sends the student details in the request body' do
-      validate_school_students_response
-      expect(WebMock).to have_requested(:post, validate_students_url).with(body: students.to_json)
-    end
-
-    it 'raises 422 exception with the validation errors if 422 status code is returned' do
-      response = { errors: [{ message: 'The password is well dodgy' }] }
-      stub_request(:post, validate_students_url)
-        .to_return(status: 422, body: response.to_json, headers: { 'content-type' => 'application/json' })
-
-      expect { validate_school_students }.to raise_error(ProfileApiClient::Student422Error) do |error|
-        expect(error.errors.first['message']).to eq('The password is well dodgy')
-      end
-    end
-
-    it 'returns nil if token is blank' do
-      expect(described_class.validate_school_students(token: '', students:, school_id: school.id)).to be_nil
-    end
-
-    private
-
-    def validate_school_students
-      described_class.validate_school_students(token:, students:, school_id: school.id)
-    end
-  end
-
   describe '.create_school_students' do
     subject(:create_school_students_response) { create_school_students }
 
@@ -287,7 +245,6 @@ RSpec.describe ProfileApiClient do
     it_behaves_like 'an authenticated JSON API request', :post, url: -> { create_students_url }
     it_behaves_like 'a request that handles standard HTTP errors', :post, url: -> { create_students_url }
     it_behaves_like 'a request that handles an unexpected response status', :post, url: -> { create_students_url }, status: 202
-    it_behaves_like 'a request that allows longer for a response'
 
     it 'raises 422 exception with the relevant message if 400 status code is returned' do
       response = { errors: [{ message: 'The password is well dodgy' }] }
@@ -360,7 +317,6 @@ RSpec.describe ProfileApiClient do
     it_behaves_like 'an authenticated JSON API request', :post, url: -> { create_students_sso_url }
     it_behaves_like 'a request that handles standard HTTP errors', :post, url: -> { create_students_sso_url }
     it_behaves_like 'a request that handles an unexpected response status', :post, url: -> { create_students_sso_url }, status: 202
-    it_behaves_like 'a request that allows longer for a response'
 
     it 'raises 422 exception with the relevant message if 400 status code is returned' do
       response = { errors: [{ message: 'The password is well dodgy' }] }
