@@ -111,7 +111,7 @@ class ProfileApiClient
 
       students = Array(students)
       endpoint = "/api/v1/schools/#{school_id}/students/preflight-student-upload"
-      response = connection(token).post(endpoint) do |request|
+      response = connection(token, connection_options_for_slow_requests).post(endpoint) do |request|
         request.body = students.to_json
         request.headers['Content-Type'] = 'application/json'
       end
@@ -128,7 +128,7 @@ class ProfileApiClient
       students = Array(students)
       endpoint = "/api/v1/schools/#{school_id}/students"
       endpoint += '/preflight' if preflight
-      response = connection(token).post(endpoint) do |request|
+      response = connection(token, connection_options_for_slow_requests).post(endpoint) do |request|
         request.body = students.to_json
         request.headers['Content-Type'] = 'application/json'
       end
@@ -146,7 +146,7 @@ class ProfileApiClient
 
       students = Array(students)
       endpoint = "/api/v1/schools/#{school_id}/students/sso"
-      response = connection(token).post(endpoint) do |request|
+      response = connection(token, connection_options_for_slow_requests).post(endpoint) do |request|
         request.body = students.to_json
         request.headers['Content-Type'] = 'application/json'
       end
@@ -220,8 +220,8 @@ class ProfileApiClient
 
     private
 
-    def connection(token)
-      HttpClient.new(ENV.fetch('IDENTITY_URL')) do |faraday|
+    def connection(token, options = {})
+      HttpClient.new(ENV.fetch('IDENTITY_URL'), options) do |faraday|
         faraday.request :json
         faraday.response :json
         faraday.response :raise_error, allowed_statuses: [401]
@@ -262,6 +262,17 @@ class ProfileApiClient
     def unauthorized!(response)
       # The API is only available to verified non-student users that are over 13. Others get a 401.
       raise UnauthorizedError, 'Profile API unauthorized' if response.status == 401
+    end
+
+    def connection_options_for_slow_requests
+      {
+        request: {
+          read_timeout: 50,
+          open_timeout: 5,
+          write_timeout: 5,
+          timeout: 50
+        }
+      }
     end
   end
 end
