@@ -129,7 +129,7 @@ GEM
       uniform_notifier (~> 1.11)
     byebug (13.0.0)
       reline (>= 0.6.0)
-    cancancan (3.6.2)
+    cancancan (3.7.0)
     capybara (3.40.0)
       addressable
       matrix
@@ -573,7 +573,7 @@ DEPENDENCIES
   base64 (~> 0.3)
   bootsnap
   bullet
-  cancancan (~> 3.6)
+  cancancan (~> 3.7)
   capybara
   climate_control
   countries
