@@ -3,9 +3,10 @@
 class OwnershipTransfer
   class Create
     class << self
-      def call(school:, nominated_user_id:, requested_by_user_id:)
+      def call(school:, nominated_user_id:, requested_by_user_id:, skip_request_email: false)
         response = OperationResponse.new
         ownership_transfer = build_ownership_transfer(school:, nominated_user_id:, requested_by_user_id:)
+        ownership_transfer.skip_request_email = skip_request_email
 
         if ownership_transfer.save
           response[:ownership_transfer] = ownership_transfer
