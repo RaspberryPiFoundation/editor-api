@@ -3,6 +3,8 @@
 require 'rails_helper'
 
 RSpec.describe OwnershipTransfer::Accept, type: :unit do
+  include ActiveSupport::Testing::TimeHelpers
+
   let(:school) { create(:verified_school) }
   let(:owner) { create(:owner, school:) }
   let(:nominee) { create(:teacher, school:) }
@@ -21,6 +23,14 @@ RSpec.describe OwnershipTransfer::Accept, type: :unit do
     described_class.call(ownership_transfer:)
 
     expect(ownership_transfer.reload.status).to eq('completed')
+  end
+
+  it 'sets the accepted_at timestamp on the acceptance' do
+    freeze_time do
+      described_class.call(ownership_transfer:)
+
+      expect(ownership_transfer.reload.accepted_at).to eq(Time.current)
+    end
   end
 
   it 'gives the nominee the owner role' do
