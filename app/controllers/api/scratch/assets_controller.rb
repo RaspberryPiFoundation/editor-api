@@ -113,16 +113,12 @@ module Api
       end
 
       def file_too_big?
-        request.body.size > max_file_size_mb.megabytes
+        request.body.size > ScratchAsset::MAX_SIZE_MB.megabytes
       end
 
       def reject_oversized_file
-        render json: { error: :asset_too_large, detail: "The asset was larger than the limit of #{max_file_size_mb} MB" },
+        render json: { error: :asset_too_large, detail: "The asset was larger than the limit of #{ScratchAsset::MAX_SIZE_MB} MB" },
                status: :content_too_large
-      end
-
-      def max_file_size_mb
-        ENV.fetch('SCRATCH_ASSET_MAX_SIZE_MB', 10).to_i
       end
 
       def project_limit_exceeded?(project)
@@ -130,7 +126,7 @@ module Api
           project_ids: original_and_remix_ids(project),
           uploaded_user_id: current_user.id
         )
-        current_total + request.body.size > max_project_size_mb.megabytes
+        current_total + request.body.size > ScratchAsset::MAX_PROJECT_SIZE_MB.megabytes
       end
 
       def original_and_remix_ids(project)
@@ -138,12 +134,8 @@ module Api
       end
 
       def reject_project_over_limit
-        render json: { error: :project_too_large, detail: "The project would exceed the limit of #{max_project_size_mb} MB" },
+        render json: { error: :project_too_large, detail: "The project would exceed the limit of #{ScratchAsset::MAX_PROJECT_SIZE_MB} MB" },
                status: :unprocessable_content
-      end
-
-      def max_project_size_mb
-        ENV.fetch('SCRATCH_PROJECT_ASSETS_MAX_SIZE_MB', 100).to_i
       end
 
       def reject_conflicting_file(scratch_asset)

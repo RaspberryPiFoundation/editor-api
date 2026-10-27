@@ -495,11 +495,8 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       post request_path, headers: request_headers, params: body
     end
 
-    around do |example|
-      ClimateControl.modify(SCRATCH_ASSET_MAX_SIZE_MB: limit_mb.to_s) { example.run }
-    end
-
     before do
+      stub_const('ScratchAsset::MAX_SIZE_MB', limit_mb)
       authenticated_in_hydra_as(teacher)
     end
 
@@ -554,11 +551,8 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       post request_path, headers: request_headers, params: body
     end
 
-    around do |example|
-      ClimateControl.modify(SCRATCH_PROJECT_ASSETS_MAX_SIZE_MB: limit_mb.to_s) { example.run }
-    end
-
     before do
+      stub_const('ScratchAsset::MAX_PROJECT_SIZE_MB', limit_mb)
       authenticated_in_hydra_as(teacher)
     end
 

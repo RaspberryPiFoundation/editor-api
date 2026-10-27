@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ScratchAsset < ApplicationRecord
+  MAX_SIZE_MB = 20
+  MAX_PROJECT_SIZE_MB = 100
+
   belongs_to :project, optional: true
   has_one_attached :file
 
