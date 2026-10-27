@@ -9,7 +9,7 @@ class OwnershipTransfer
         OwnershipTransfer.transaction do
           demote_previous_owners(school, ownership_transfer.nominated_user_id)
           promote_nominee(school, ownership_transfer.nominated_user_id)
-          ownership_transfer.update!(status: :completed)
+          ownership_transfer.update!(status: :completed, accepted_at: Time.current)
         end
       end
 
