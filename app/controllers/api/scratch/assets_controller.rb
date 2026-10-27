@@ -130,7 +130,12 @@ module Api
       end
 
       def original_and_remix_ids(project)
-        [project.id, remix_for_user(project, current_user)&.id].compact
+        original = users_remix?(project) ? project.parent : project
+        [original.id, project.id, remix_for_user(original, current_user)&.id].compact.uniq
+      end
+
+      def users_remix?(project)
+        project.parent.present? && project.user_id == current_user.id
       end
 
       def reject_project_over_limit
