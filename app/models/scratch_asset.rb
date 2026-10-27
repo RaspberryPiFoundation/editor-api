@@ -25,6 +25,12 @@ class ScratchAsset < ApplicationRecord
     global_assets.find_by(filename:)
   end
 
+  def self.project_byte_size(project_ids:, uploaded_user_id:)
+    joins(file_attachment: :blob)
+      .where(project_id: project_ids, uploaded_user_id:)
+      .sum('active_storage_blobs.byte_size')
+  end
+
   def global?
     project_id.nil?
   end
