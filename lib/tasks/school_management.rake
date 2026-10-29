@@ -33,7 +33,8 @@ namespace :school_management do
     result = nil
 
     school.transaction do
-      school.roles.find_or_create_by!(user_id: new_owner[:id], role: 'teacher')
+      teacher_role = Role.unscoped.teacher.find_or_initialize_by(school:, user_id: new_owner[:id])
+      teacher_role.update!(archived_at: nil)
 
       result = OwnershipTransfer::Create.call(
         school:,

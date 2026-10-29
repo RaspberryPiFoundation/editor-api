@@ -82,6 +82,15 @@ RSpec.describe 'school_management', type: :task do
       expect(school.roles.teacher.pluck(:user_id)).to include(new_user_id)
     end
 
+    it 'restores an archived teacher role for the new owner' do
+      create(:teacher_role, school:, user_id: new_user_id, archived_at: 1.day.ago)
+
+      task.invoke('old_owner@example.com', 'new_owner@example.com')
+
+      expect(school.roles.owner.pluck(:user_id)).to eq([new_user_id])
+      expect(Role.unscoped.teacher.where(school:, user_id: new_user_id).sole.archived_at).to be_nil
+    end
+
     it 'archives the old owner role' do
       task.invoke('old_owner@example.com', 'new_owner@example.com')
 
