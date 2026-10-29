@@ -172,6 +172,14 @@ RSpec.describe OwnershipTransfer do
         SchoolOwnershipMailer, :request_ownership_transfer, params: { ownership_transfer: }
       )
     end
+
+    it 'is not enqueued when skip_request_email is set' do
+      ownership_transfer.skip_request_email = true
+
+      expect do
+        ownership_transfer.save!
+      end.not_to have_enqueued_mail(SchoolOwnershipMailer, :request_ownership_transfer)
+    end
   end
 
   describe 'the cancellation email' do

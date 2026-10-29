@@ -3,6 +3,8 @@
 namespace :school_management do
   desc 'Transfer ownership of a school'
   task :transfer_ownership, %i[old_owner_email new_owner_email keep_old_owner_as_teacher] => :environment do |_task, args|
+    keep_old_owner_as_teacher = ActiveModel::Type::Boolean.new.cast(args[:keep_old_owner_as_teacher])
+
     old_owner = UserInfoApiClient.find_user_by_email(args[:old_owner_email])
     new_owner = UserInfoApiClient.find_user_by_email(args[:new_owner_email])
 
@@ -21,12 +23,37 @@ namespace :school_management do
       next
     end
 
-    school = Role.find_by(roles: { user_id: old_owner[:id], role: 'owner' }).school
+    school = Role.find_by(user_id: old_owner[:id], role: 'owner')&.school
+
+    unless school
+      Rails.logger.error("User #{old_owner[:id]} is not the owner of a school")
+      next
+    end
+
+    result = nil
 
     school.transaction do
-      remove_old_owner(school, old_owner[:id], args[:keep_old_owner_as_teacher])
-      assign_roles_to_new_owner(school, new_owner[:id])
+      teacher_role = Role.unscoped.teacher.find_or_initialize_by(school:, user_id: new_owner[:id])
+      teacher_role.update!(archived_at: nil)
 
+      result = OwnershipTransfer::Create.call(
+        school:,
+        nominated_user_id: new_owner[:id],
+        requested_by_user_id: old_owner[:id],
+        skip_request_email: true
+      )
+
+      raise ActiveRecord::Rollback unless result.success?
+    end
+
+    unless result.success?
+      Rails.logger.error("Could not create ownership transfer: #{result[:error].inspect}")
+      next
+    end
+
+    school.transaction do
+      OwnershipTransfer::Accept.call(ownership_transfer: result[:ownership_transfer])
+      school.roles.teacher.find_by(user_id: old_owner[:id])&.archive! unless keep_old_owner_as_teacher
       school.update!(creator_agree_to_ux_contact: false)
     end
 
@@ -34,15 +61,5 @@ namespace :school_management do
     Rails.logger.warn '⚠️ You must now manually remove the owner safeguarding flag from the old owner.'
     Rails.logger.warn 'Open a bash console on the rpf-profile app: `heroku run bash -a rpf-profile`'
     Rails.logger.warn "Remove the owner safeguarding flag from the old owner: `node profile-cli remove-safeguarding-flag #{args[:old_owner_email]} school:owner`"
-  end
-
-  def remove_old_owner(school, user_id, keep_old_owner_as_teacher)
-    school.roles.owner.find_by(user_id: user_id).destroy!
-    school.roles.teacher.find_by(user_id: user_id)&.destroy! unless keep_old_owner_as_teacher
-  end
-
-  def assign_roles_to_new_owner(school, user_id)
-    school.roles.create!(user_id: user_id, role: 'owner')
-    school.roles.find_or_create_by!(user_id: user_id, role: 'teacher')
   end
 end
