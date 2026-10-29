@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class ScratchAsset < ApplicationRecord
+  MAX_SIZE_MB = 20
+  MAX_PROJECT_SIZE_MB = 100
+
   belongs_to :project, optional: true
   has_one_attached :file
 
@@ -23,6 +26,12 @@ class ScratchAsset < ApplicationRecord
     end
 
     global_assets.find_by(filename:)
+  end
+
+  def self.project_byte_size(project_ids:, uploaded_user_id:)
+    joins(file_attachment: :blob)
+      .where(project_id: project_ids, uploaded_user_id:)
+      .sum('active_storage_blobs.byte_size')
   end
 
   def global?

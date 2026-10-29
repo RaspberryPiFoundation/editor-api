@@ -6,6 +6,7 @@ module Api
   module Scratch
     class AssetsController < ApiController
       include ActiveStorage::SetCurrent
+      include RemixSelection
 
       prepend_before_action :load_experience_cs_service_user, only: %i[create_global]
       before_action :authorize_user, except: %i[show]
@@ -50,7 +51,8 @@ module Api
       def create_asset(reject_conflicting_content: false, **attributes)
         scratch_asset = ScratchAsset.find_or_initialize_by(attributes)
 
-        return reject_oversized_file if !scratch_asset.file.attached? && file_too_big?
+        reject_upload_over_limits(attributes[:project]) unless scratch_asset.file.attached?
+        return if performed?
 
         scratch_asset = save_new_asset(scratch_asset, attributes) if scratch_asset.new_record?
 
@@ -102,17 +104,43 @@ module Api
         scratch_asset.file.blob.checksum == request_body_checksum
       end
 
+      def reject_upload_over_limits(project)
+        if file_too_big?
+          reject_oversized_file
+        elsif project && project_limit_exceeded?(project)
+          reject_project_over_limit
+        end
+      end
+
       def file_too_big?
-        request.body.size > max_file_size_mb.megabytes
+        request.body.size > ScratchAsset::MAX_SIZE_MB.megabytes
       end
 
       def reject_oversized_file
-        render json: { error: "The asset was larger than the limit of #{max_file_size_mb} MB" },
+        render json: { error: :asset_too_large, detail: "The asset was larger than the limit of #{ScratchAsset::MAX_SIZE_MB} MB" },
                status: :content_too_large
       end
 
-      def max_file_size_mb
-        ENV.fetch('SCRATCH_ASSET_MAX_SIZE_MB', 10).to_i
+      def project_limit_exceeded?(project)
+        current_total = ScratchAsset.project_byte_size(
+          project_ids: original_and_remix_ids(project),
+          uploaded_user_id: current_user.id
+        )
+        current_total + request.body.size > ScratchAsset::MAX_PROJECT_SIZE_MB.megabytes
+      end
+
+      def original_and_remix_ids(project)
+        original = users_remix?(project) ? project.parent : project
+        [original.id, project.id, remix_for_user(original, current_user)&.id].compact.uniq
+      end
+
+      def users_remix?(project)
+        project.parent.present? && project.user_id == current_user.id
+      end
+
+      def reject_project_over_limit
+        render json: { error: :project_too_large, detail: "The project would exceed the limit of #{ScratchAsset::MAX_PROJECT_SIZE_MB} MB" },
+               status: :unprocessable_content
       end
 
       def reject_conflicting_file(scratch_asset)
