@@ -1,0 +1,65 @@
+# frozen_string_literal: true
+
+require 'rails_helper'
+
+RSpec.describe 'FriendlyErrorMessages' do
+  describe 'POST /fem' do
+    let(:headers) { { Authorization: UserProfileMock::TOKEN } }
+    let(:school) { create(:school) }
+    let(:student) { create(:student, school:) }
+
+    before do
+      Flipper.enable(:ai_friendly_errors)
+    end
+
+    it 'does not allow logged-out users' do
+      post '/api/fem'
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'disallows requests over 100KB in size' do
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:, params: { content: 'a' * 100.kilobytes })
+
+      expect(response).to have_http_status(:content_too_large)
+    end
+
+    it 'requires message, trace, runtime and code params' do
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:, params: {
+             message: 'message',
+             trace: 'trace',
+             runtime: 'runtime'
+           })
+
+      expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'is protected by a feature flag' do
+      Flipper.disable(:ai_friendly_errors)
+
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:)
+
+      expect(response).to have_http_status(:unauthorized)
+    end
+
+    it 'returns a result for a well-formed request' do
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:, params: {
+             message: 'message',
+             trace: 'trace',
+             runtime: 'runtime',
+             code: 'code'
+           })
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body[:fem]).not_to be_nil
+    end
+  end
+end
