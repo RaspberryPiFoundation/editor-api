@@ -105,7 +105,8 @@ RSpec.describe 'school_management', type: :task do
         status: 'completed',
         nominated_user_id: new_user_id,
         requested_by_user_id: old_user_id,
-        email_address: 'new_owner@example.com'
+        email_address: 'new_owner@example.com',
+        admin_initiated: true
       )
     end
 

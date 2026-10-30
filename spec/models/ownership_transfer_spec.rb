@@ -173,8 +173,8 @@ RSpec.describe OwnershipTransfer do
       )
     end
 
-    it 'is not enqueued when skip_request_email is set' do
-      ownership_transfer.skip_request_email = true
+    it 'is not enqueued when admin_initiated is set' do
+      ownership_transfer.admin_initiated = true
 
       expect do
         ownership_transfer.save!
