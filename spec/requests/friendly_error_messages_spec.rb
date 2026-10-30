@@ -14,20 +14,24 @@ RSpec.describe 'FriendlyErrorMessages' do
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it 'allows logged-in users' do
-      authenticated_in_hydra_as(student)
-
-      post('/api/fem', headers:)
-
-      expect(response).to have_http_status(:success)
-    end
-
     it 'disallows requests over 100KB in size' do
       authenticated_in_hydra_as(student)
 
       post('/api/fem', headers:, params: { content: 'a' * 100.kilobytes })
 
       expect(response).to have_http_status(:content_too_large)
+    end
+
+    it 'requires message, trace, runtime and code params' do
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:, params: {
+             message: 'message',
+             trace: 'trace',
+             runtime: 'runtime'
+           })
+
+      expect(response).to have_http_status(:bad_request)
     end
   end
 end
