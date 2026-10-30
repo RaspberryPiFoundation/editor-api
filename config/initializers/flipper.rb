@@ -41,7 +41,10 @@ end
 ##   Flipper.enable_group :my_feature, :admins
 ##
 ## See https://www.flippercloud.io/docs/features#enablement-group
-#
-# Flipper.register(:admins) do |actor|
-#  actor.respond_to?(:admin?) && actor.admin?
-# end
+
+Flipper.register(:raspberry_pi_staff) do |actor|
+  actor.respond_to?(:email) &&
+    actor.respond_to?(:email_verified) &&
+    actor.email_verified &&
+    actor.email.to_s.downcase.end_with?('@raspberrypi.org')
+end

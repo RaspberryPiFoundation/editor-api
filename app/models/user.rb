@@ -3,6 +3,7 @@
 class User
   include ActiveModel::Serialization
   include ActiveModel::Model
+  include Flipper::Identifier
 
   EXPERIENCE_CS_SERVICE_ACCOUNT_ID = '00000000-0000-0000-0000-000000000000'
 
