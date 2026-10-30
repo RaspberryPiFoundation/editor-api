@@ -21,5 +21,13 @@ RSpec.describe 'FriendlyErrorMessages' do
 
       expect(response).to have_http_status(:success)
     end
+
+    it 'disallows requests over 100KB in size' do
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:, params: { content: 'a' * 100.kilobytes })
+
+      expect(response).to have_http_status(:content_too_large)
+    end
   end
 end
