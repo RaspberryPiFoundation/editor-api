@@ -13,7 +13,14 @@ module Api
 
       params.require(%i[message trace runtime code])
 
-      render json: { result: 'ok' }
+      fem = FriendlyErrorMessagesInferenceClient.new.get_message(
+        params[:message],
+        params[:trace],
+        params[:runtime],
+        params[:code]
+      )
+
+      render json: { fem: }, status: :ok
     end
   end
 end

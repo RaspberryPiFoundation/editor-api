@@ -47,5 +47,19 @@ RSpec.describe 'FriendlyErrorMessages' do
 
       expect(response).to have_http_status(:unauthorized)
     end
+
+    it 'returns a result for a well-formed request' do
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:, params: {
+             message: 'message',
+             trace: 'trace',
+             runtime: 'runtime',
+             code: 'code'
+           })
+
+      expect(response).to have_http_status(:ok)
+      expect(response.parsed_body[:fem]).not_to be_nil
+    end
   end
 end
