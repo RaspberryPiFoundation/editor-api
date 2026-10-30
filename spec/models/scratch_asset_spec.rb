@@ -57,4 +57,29 @@ RSpec.describe ScratchAsset do
       create(:scratch_asset, filename:, project:, uploaded_user_id:)
     end
   end
+
+  describe '.total_byte_size' do
+    let(:user_id) { SecureRandom.uuid }
+    let(:project) { create(:project, user_id:, project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: nil) }
+    let(:other_project) { create(:project, user_id:, project_type: Project::Types::CODE_EDITOR_SCRATCH, locale: nil) }
+
+    it 'sums the file sizes of assets uploaded by the user to the given projects' do
+      create_attached_asset(filename: 'a.png', project:, uploaded_user_id: user_id, body: 'aaa')
+      create_attached_asset(filename: 'b.png', project: other_project, uploaded_user_id: user_id, body: 'bbbbb')
+
+      expect(described_class.project_byte_size(project_ids: [project.id, other_project.id], uploaded_user_id: user_id)).to eq(8)
+    end
+
+    it 'ignores assets without an attached file' do
+      create(:scratch_asset, filename: 'a.png', project:, uploaded_user_id: user_id)
+
+      expect(described_class.project_byte_size(project_ids: [project.id], uploaded_user_id: user_id)).to eq(0)
+    end
+
+    def create_attached_asset(filename:, project:, uploaded_user_id:, body:)
+      described_class.create!(filename:, project:, uploaded_user_id:).tap do |asset|
+        asset.file.attach(io: StringIO.new(body), filename:)
+      end
+    end
+  end
 end

@@ -495,11 +495,8 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
       post request_path, headers: request_headers, params: body
     end
 
-    around do |example|
-      ClimateControl.modify(SCRATCH_ASSET_MAX_SIZE_MB: limit_mb.to_s) { example.run }
-    end
-
     before do
+      stub_const('ScratchAsset::MAX_SIZE_MB', limit_mb)
       authenticated_in_hydra_as(teacher)
     end
 
@@ -539,6 +536,57 @@ RSpec.describe 'Creating a Scratch asset', type: :request do
 
       expect(response).to have_http_status(:created)
       expect(existing_asset.reload.file.download).to eq(upload)
+    end
+  end
+
+  describe 'enforcing the project asset size limit' do
+    let(:limit_mb) { 1 }
+    let(:half_limit) { 'a' * (limit_mb.megabytes / 2) }
+    let(:request_path) { '/api/scratch/assets/test_image_1.png' }
+    let(:request_headers) do
+      { 'Content-Type' => 'application/octet-stream', 'X-Project-ID' => project.identifier }.merge(auth_headers)
+    end
+
+    def make_request(body)
+      post request_path, headers: request_headers, params: body
+    end
+
+    before do
+      stub_const('ScratchAsset::MAX_PROJECT_SIZE_MB', limit_mb)
+      authenticated_in_hydra_as(teacher)
+    end
+
+    it 'responds with a 422 status code when the upload would take the project over the limit' do
+      create_uploaded_scratch_asset(filename: 'existing.png', project:, body: half_limit)
+
+      make_request("#{half_limit}a")
+
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+
+    it 'does not create an asset or file when the project would go over the limit' do
+      create_uploaded_scratch_asset(filename: 'existing.png', project:, body: half_limit)
+
+      expect { make_request("#{half_limit}a") }.not_to change(ScratchAsset, :count)
+      expect { make_request("#{half_limit}a") }.not_to change(ActiveStorage::Blob, :count)
+    end
+
+    it 'accepts an upload that brings the project exactly up to the limit' do
+      create_uploaded_scratch_asset(filename: 'existing.png', project:, body: half_limit)
+
+      make_request(half_limit)
+
+      expect(response).to have_http_status(:created)
+    end
+
+    it 'skips the check when the asset already has a file attached' do
+      create_uploaded_scratch_asset(filename: 'existing.png', project:, body: half_limit)
+      existing_asset = create_uploaded_scratch_asset(filename:, project:, body: half_limit)
+
+      make_request("#{half_limit}a")
+
+      expect(response).to have_http_status(:created)
+      expect(existing_asset.reload.file.download).to eq(half_limit)
     end
   end
 
