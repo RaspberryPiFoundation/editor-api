@@ -8,6 +8,7 @@ module Api
     skip_authorization_check only: :show
 
     def show
+      return render json: {}, status: :unauthorized unless Flipper.enabled?(:ai_friendly_errors)
       return render json: { error: "The request was over the max size of #{MAX_REQUEST_SIZE_KB} KB" }, status: :content_too_large if request.body.size > MAX_REQUEST_SIZE_KB.kilobytes
 
       params.require(%i[message trace runtime code])

@@ -8,6 +8,10 @@ RSpec.describe 'FriendlyErrorMessages' do
     let(:school) { create(:school) }
     let(:student) { create(:student, school:) }
 
+    before do
+      Flipper.enable(:ai_friendly_errors)
+    end
+
     it 'does not allow logged-out users' do
       post '/api/fem'
 
@@ -32,6 +36,16 @@ RSpec.describe 'FriendlyErrorMessages' do
            })
 
       expect(response).to have_http_status(:bad_request)
+    end
+
+    it 'is protected by a feature flag' do
+      Flipper.disable(:ai_friendly_errors)
+
+      authenticated_in_hydra_as(student)
+
+      post('/api/fem', headers:)
+
+      expect(response).to have_http_status(:unauthorized)
     end
   end
 end
