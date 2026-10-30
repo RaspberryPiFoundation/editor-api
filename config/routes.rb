@@ -118,6 +118,8 @@ Rails.application.routes.draw do
     post '/join/:join_code', to: 'join#create'
 
     resources :events, only: %i[create]
+
+    post '/fem', to: 'friendly_error_messages#show'
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
