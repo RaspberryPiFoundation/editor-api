@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class FriendlyErrorMessagesInferenceClient
+  class Error < StandardError; end
+
   SYSTEM_PROMPT_BASE = <<~PROMPT
     You help young people learn to program in Python.
 
@@ -24,7 +26,9 @@ class FriendlyErrorMessagesInferenceClient
   def initialize
     @client = OpenAI::Client.new(
       base_url: ENV.fetch('FEM_INFERENCE_API_URL'),
-      api_key: ENV.fetch('FEM_INFERENCE_API_KEY')
+      api_key: ENV.fetch('FEM_INFERENCE_API_KEY'),
+      timeout: 15.0,
+      max_retries: 0
     )
   end
 
@@ -37,7 +41,10 @@ class FriendlyErrorMessagesInferenceClient
         { role: 'system', content: SYSTEM_PROMPT_BASE },
         { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
-      ]
+      ],
+      reasoning: { effort: :none }
     ).output_text
+  rescue OpenAI::Errors::APIError => e
+    raise Error, e.message
   end
 end

@@ -7,6 +7,7 @@ RSpec.describe 'FriendlyErrorMessages' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
     let(:school) { create(:school) }
     let(:student) { create(:student, school:) }
+    let(:mock_client) { instance_double(FriendlyErrorMessagesInferenceClient) }
 
     before do
       Flipper.enable(:ai_friendly_errors)
@@ -66,6 +67,22 @@ RSpec.describe 'FriendlyErrorMessages' do
 
       expect(response).to have_http_status(:ok)
       expect(response.parsed_body[:fem]).not_to be_nil
+    end
+
+    it 'returns a 503 when the client raises an error' do
+      authenticated_in_hydra_as(student)
+
+      allow(FriendlyErrorMessagesInferenceClient).to receive(:new).and_return(mock_client)
+      allow(mock_client).to receive(:get_message).and_raise(FriendlyErrorMessagesInferenceClient::Error)
+
+      post('/api/fem', headers:, params: {
+             message: 'message',
+             trace: 'trace',
+             runtime: 'runtime',
+             code: 'code'
+           })
+
+      expect(response).to have_http_status(:bad_gateway)
     end
   end
 end

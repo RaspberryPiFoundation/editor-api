@@ -60,6 +60,11 @@ class ApiController < ActionController::API
     render json: { error: 'Internal server error' }, status: :internal_server_error
   end
 
+  def bad_gateway(exception)
+    Sentry.capture_exception(exception)
+    render_error_as_json exception, :bad_gateway
+  end
+
   def render_error_as_json(exception, status)
     render json: { error: "#{exception.class}: #{exception.message}" }, status:
   end
