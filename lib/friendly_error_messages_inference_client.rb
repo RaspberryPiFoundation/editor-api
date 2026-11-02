@@ -26,7 +26,7 @@ class FriendlyErrorMessagesInferenceClient
   def initialize
     @client = OpenAI::Client.new(
       base_url: ENV.fetch('FEM_INFERENCE_API_URL'),
-      api_key: ENV.fetch('FEM_INFERENCE_API_KEY'),
+      api_key: ENV.fetch('FEM_INFERENCE_API_KEY', ''),
       timeout: 15.0,
       max_retries: 0
     )

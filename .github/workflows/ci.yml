@@ -81,6 +81,7 @@ jobs:
       SALESFORCE_CONNECT_USER: postgres
       SALESFORCE_CONNECT_PASSWORD: password
       SALESFORCE_CONNECT_DB: salesforce_test
+      FEM_INFERENCE_API_URL: ''
     services:
       postgres:
         image: postgres:12
