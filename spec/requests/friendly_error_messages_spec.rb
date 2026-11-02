@@ -12,6 +12,12 @@ RSpec.describe 'FriendlyErrorMessages' do
       Flipper.enable(:ai_friendly_errors)
     end
 
+    around do |example|
+      ClimateControl.modify(BYPASS_FEM_INFERENCE: 'true') do
+        example.run
+      end
+    end
+
     it 'does not allow logged-out users' do
       post '/api/fem'
 

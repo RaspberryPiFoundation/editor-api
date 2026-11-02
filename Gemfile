@@ -87,3 +87,5 @@ group :test do
   gem 'webdrivers'
   gem 'webmock'
 end
+
+gem 'openai', '~> 0.115.0'
