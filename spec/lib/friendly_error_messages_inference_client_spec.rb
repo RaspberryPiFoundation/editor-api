@@ -42,6 +42,16 @@ RSpec.describe FriendlyErrorMessagesInferenceClient do
 
       expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
     end
+
+    it 'throws an error when the inference server returns nothing' do
+      responses = instance_double(OpenAI::Resources::Responses)
+      response = instance_double(OpenAI::Models::Responses::Response, output_text: '')
+      allow(OpenAI::Client).to receive(:new).and_return(mock_client)
+      allow(mock_client).to receive(:responses).and_return(responses)
+      allow(responses).to receive(:create).and_return(response)
+
+      expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
+    end
   end
 
   context 'when BYPASS_FEM_INFERENCE is true' do

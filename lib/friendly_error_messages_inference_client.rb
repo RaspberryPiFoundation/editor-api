@@ -35,7 +35,7 @@ class FriendlyErrorMessagesInferenceClient
   def get_message(message, trace, runtime, code)
     return 'This is a placeholder friendly error message.' if ENV.fetch('BYPASS_FEM_INFERENCE', nil) == 'true'
 
-    @client.responses.create(
+    result = @client.responses.create(
       model: 'qwen3.5:9b',
       input: [
         { role: 'system', content: SYSTEM_PROMPT_BASE },
@@ -44,6 +44,10 @@ class FriendlyErrorMessagesInferenceClient
       ],
       reasoning: { effort: :none }
     ).output_text
+
+    raise Error, 'No message returned by inference service.' if result.empty?
+
+    result
   rescue OpenAI::Errors::APIError => e
     raise Error, e.message
   end
