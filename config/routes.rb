@@ -119,7 +119,7 @@ Rails.application.routes.draw do
 
     resources :events, only: %i[create]
 
-    post '/fem', to: 'friendly_error_messages#show'
+    post '/friendly_error_messages', to: 'friendly_error_messages#show'
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }

@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe 'FriendlyErrorMessages' do
-  describe 'POST /fem' do
+  describe 'POST /friendly_error_messages' do
     let(:headers) { { Authorization: UserProfileMock::TOKEN } }
     let(:school) { create(:school) }
     let(:student) { create(:student, school:) }
@@ -20,7 +20,7 @@ RSpec.describe 'FriendlyErrorMessages' do
     end
 
     it 'does not allow logged-out users' do
-      post '/api/fem'
+      post '/api/friendly_error_messages'
 
       expect(response).to have_http_status(:unauthorized)
     end
@@ -28,7 +28,7 @@ RSpec.describe 'FriendlyErrorMessages' do
     it 'disallows requests over 100KB in size' do
       authenticated_in_hydra_as(student)
 
-      post('/api/fem', headers:, params: { content: 'a' * 100.kilobytes })
+      post('/api/friendly_error_messages', headers:, params: { content: 'a' * 100.kilobytes })
 
       expect(response).to have_http_status(:content_too_large)
     end
@@ -36,7 +36,7 @@ RSpec.describe 'FriendlyErrorMessages' do
     it 'requires message, trace, runtime and code params' do
       authenticated_in_hydra_as(student)
 
-      post('/api/fem', headers:, params: {
+      post('/api/friendly_error_messages', headers:, params: {
              message: 'message',
              trace: 'trace',
              runtime: 'runtime'
@@ -50,7 +50,7 @@ RSpec.describe 'FriendlyErrorMessages' do
 
       authenticated_in_hydra_as(student)
 
-      post('/api/fem', headers:)
+      post('/api/friendly_error_messages', headers:)
 
       expect(response).to have_http_status(:unauthorized)
     end
@@ -58,7 +58,7 @@ RSpec.describe 'FriendlyErrorMessages' do
     it 'returns a result for a well-formed request' do
       authenticated_in_hydra_as(student)
 
-      post('/api/fem', headers:, params: {
+      post('/api/friendly_error_messages', headers:, params: {
              message: 'message',
              trace: 'trace',
              runtime: 'runtime',
@@ -75,7 +75,7 @@ RSpec.describe 'FriendlyErrorMessages' do
       allow(FriendlyErrorMessagesInferenceClient).to receive(:new).and_return(mock_client)
       allow(mock_client).to receive(:get_message).and_raise(FriendlyErrorMessagesInferenceClient::Error)
 
-      post('/api/fem', headers:, params: {
+      post('/api/friendly_error_messages', headers:, params: {
              message: 'message',
              trace: 'trace',
              runtime: 'runtime',
