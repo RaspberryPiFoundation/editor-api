@@ -10,7 +10,7 @@ module Api
     rescue_from FriendlyErrorMessagesInferenceClient::Error, with: :bad_gateway
 
     def show
-      return render json: {}, status: :unauthorized unless Flipper.enabled?(:ai_friendly_errors)
+      return render json: {}, status: :unauthorized unless FeatureFlagHelpers.enabled_for_user? :ai_friendly_errors, current_user, current_user&.schools&.first
       return render json: { error: "The request was over the max size of #{MAX_REQUEST_SIZE_KB} KB" }, status: :content_too_large if request.body.size > MAX_REQUEST_SIZE_KB.kilobytes
 
       params.require(%i[message trace runtime code])
