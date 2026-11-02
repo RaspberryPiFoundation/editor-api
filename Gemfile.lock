@@ -325,6 +325,9 @@ GEM
       stringio
       time
       uri
+    openai (0.115.0)
+      connection_pool (>= 2.2.3)
+      logger
     paper_trail (17.0.0)
       activerecord (>= 7.1)
       request_store (~> 1.4)
@@ -604,6 +607,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection (~> 2.0.1)
   omniauth-rpi!
   open-uri
+  openai (~> 0.115.0)
   paper_trail
   pg (~> 1.7)
   postmark-rails
