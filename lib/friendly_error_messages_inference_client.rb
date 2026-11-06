@@ -37,15 +37,15 @@ class FriendlyErrorMessagesInferenceClient
   def get_message(message, trace, runtime, code)
     return 'This is a placeholder friendly error message.' if ENV.fetch('BYPASS_FEM_INFERENCE', nil) == 'true'
 
-    result = @client.responses.create(
+    result = @client.chat.completions.create(
       model: 'qwen3.5:9b',
-      input: [
+      messages: [
         { role: 'system', content: SYSTEM_PROMPT_BASE },
         { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
       ],
-      reasoning: { effort: :none }
-    ).output_text
+      reasoning_effort: :none
+    ).choices.first.message.content.to_s
 
     raise Error, 'No message returned by inference service.' if result.empty?
     raise Error, "The message by the inference service was too long - max #{MAX_RESULT_LENGTH_CHARS} chars, actual #{result.length} chars." if result.length > MAX_RESULT_LENGTH_CHARS
