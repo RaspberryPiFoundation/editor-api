@@ -27,7 +27,7 @@ class FriendlyErrorMessagesInferenceClient
 
   def initialize
     @client = OpenAI::Client.new(
-      base_url: ENV.fetch('FEM_INFERENCE_API_URL'),
+      base_url: "#{ENV.fetch('FEM_INFERENCE_API_URL', '')}/ai/v1",
       api_key: ENV.fetch('FEM_INFERENCE_API_KEY', ''),
       timeout: 15.0,
       max_retries: 0
@@ -38,13 +38,13 @@ class FriendlyErrorMessagesInferenceClient
     return 'This is a placeholder friendly error message.' if ENV.fetch('BYPASS_FEM_INFERENCE', nil) == 'true'
 
     result = @client.chat.completions.create(
-      model: 'qwen3.5:9b',
+      model: '@cf/qwen/qwen3.8-27b',
       messages: [
         { role: 'system', content: SYSTEM_PROMPT_BASE },
         { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
       ],
-      reasoning_effort: :none
+      request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
     ).choices.first.message.content.to_s
 
     raise Error, 'No message returned by inference service.' if result.empty?
