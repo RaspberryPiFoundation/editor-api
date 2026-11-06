@@ -25,6 +25,8 @@ class FriendlyErrorMessagesInferenceClient
     Do not write any code in this reply. No code blocks and no corrected lines.
   PROMPT
 
+  NO_REASONING_COMMAND = '/no_think'
+
   def initialize
     @client = OpenAI::Client.new(
       base_url: "#{ENV.fetch('FEM_INFERENCE_API_URL', '')}/ai/v1",
@@ -55,6 +57,7 @@ class FriendlyErrorMessagesInferenceClient
       messages: [
         { role: 'system', content: SYSTEM_PROMPT_BASE },
         { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
+        { role: 'system', content: NO_REASONING_COMMAND },
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
       ],
       request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
