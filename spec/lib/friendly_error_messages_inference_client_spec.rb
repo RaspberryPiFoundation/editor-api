@@ -6,6 +6,15 @@ RSpec.describe FriendlyErrorMessagesInferenceClient do
   subject(:client) { described_class.new }
 
   let(:mock_client) { instance_double(OpenAI::Client) }
+  let(:chat) { instance_double(OpenAI::Resources::Chat) }
+  let(:completions) { instance_double(OpenAI::Resources::Chat::Completions) }
+
+  def stub_completion(content)
+    message = instance_double(OpenAI::Models::Chat::ChatCompletionMessage, content:)
+    choice = instance_double(OpenAI::Models::Chat::ChatCompletion::Choice, message:)
+    completion = instance_double(OpenAI::Models::Chat::ChatCompletion, choices: [choice])
+    allow(completions).to receive(:create).and_return(completion)
+  end
 
   context 'when BYPASS_FEM_INFERENCE is false' do
     around do |example|
@@ -14,51 +23,39 @@ RSpec.describe FriendlyErrorMessagesInferenceClient do
       end
     end
 
-    it 'calls the inference server' do
-      responses = instance_double(OpenAI::Resources::Responses)
-      response = instance_double(OpenAI::Models::Responses::Response, output_text: 'A friendly error message')
+    before do
       allow(OpenAI::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:responses).and_return(responses)
-      allow(responses).to receive(:create).and_return(response)
+      allow(mock_client).to receive(:chat).and_return(chat)
+      allow(chat).to receive(:completions).and_return(completions)
+    end
+
+    it 'calls the inference server' do
+      stub_completion('A friendly error message')
 
       result = client.get_message('', '', '', '')
       expect(result).to eq 'A friendly error message'
     end
 
     it 'throws an error when the inference call times out' do
-      responses = instance_double(OpenAI::Resources::Responses)
-      allow(OpenAI::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:responses).and_return(responses)
-      allow(responses).to receive(:create).and_raise(OpenAI::Errors::APITimeoutError.new(url: 'http://some_url'))
+      allow(completions).to receive(:create).and_raise(OpenAI::Errors::APITimeoutError.new(url: 'http://some_url'))
 
       expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
     end
 
     it 'throws an error when the inference server is down' do
-      responses = instance_double(OpenAI::Resources::Responses)
-      allow(OpenAI::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:responses).and_return(responses)
-      allow(responses).to receive(:create).and_raise(OpenAI::Errors::APIConnectionError.new(url: 'http://some_url'))
+      allow(completions).to receive(:create).and_raise(OpenAI::Errors::APIConnectionError.new(url: 'http://some_url'))
 
       expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
     end
 
     it 'throws an error when the inference server returns nothing' do
-      responses = instance_double(OpenAI::Resources::Responses)
-      response = instance_double(OpenAI::Models::Responses::Response, output_text: '')
-      allow(OpenAI::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:responses).and_return(responses)
-      allow(responses).to receive(:create).and_return(response)
+      stub_completion(nil)
 
       expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
     end
 
     it 'throws an error when the inference server returns a response that is too long' do
-      responses = instance_double(OpenAI::Resources::Responses)
-      response = instance_double(OpenAI::Models::Responses::Response, output_text: 'a' * 1000)
-      allow(OpenAI::Client).to receive(:new).and_return(mock_client)
-      allow(mock_client).to receive(:responses).and_return(responses)
-      allow(responses).to receive(:create).and_return(response)
+      stub_completion('a' * 1000)
 
       expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
     end

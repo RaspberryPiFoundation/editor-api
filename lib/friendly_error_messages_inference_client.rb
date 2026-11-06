@@ -4,6 +4,7 @@ class FriendlyErrorMessagesInferenceClient
   class Error < StandardError; end
 
   MAX_RESULT_LENGTH_CHARS = 500
+  MAX_COMPLETION_TOKENS = MAX_RESULT_LENGTH_CHARS * 0.66
 
   SYSTEM_PROMPT_BASE = <<~PROMPT
     You help young people learn to program in Python.
@@ -25,9 +26,11 @@ class FriendlyErrorMessagesInferenceClient
     Do not write any code in this reply. No code blocks and no corrected lines.
   PROMPT
 
+  NO_REASONING_COMMAND = '/no_think'
+
   def initialize
     @client = OpenAI::Client.new(
-      base_url: ENV.fetch('FEM_INFERENCE_API_URL'),
+      base_url: "#{ENV.fetch('FEM_INFERENCE_API_URL', '')}/ai/v1",
       api_key: ENV.fetch('FEM_INFERENCE_API_KEY', ''),
       timeout: 15.0,
       max_retries: 0
@@ -37,15 +40,9 @@ class FriendlyErrorMessagesInferenceClient
   def get_message(message, trace, runtime, code)
     return 'This is a placeholder friendly error message.' if ENV.fetch('BYPASS_FEM_INFERENCE', nil) == 'true'
 
-    result = @client.responses.create(
-      model: 'qwen3.5:9b',
-      input: [
-        { role: 'system', content: SYSTEM_PROMPT_BASE },
-        { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
-        { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
-      ],
-      reasoning: { effort: :none }
-    ).output_text
+    result = @client.chat.completions.create(
+      build_request(message, trace, runtime, code)
+    ).choices.first.message.content.to_s
 
     raise Error, 'No message returned by inference service.' if result.empty?
     raise Error, "The message by the inference service was too long - max #{MAX_RESULT_LENGTH_CHARS} chars, actual #{result.length} chars." if result.length > MAX_RESULT_LENGTH_CHARS
@@ -53,5 +50,20 @@ class FriendlyErrorMessagesInferenceClient
     result
   rescue OpenAI::Errors::APIError => e
     raise Error, e.message
+  end
+
+  def build_request(message, trace, runtime, code)
+    {
+      model: '@cf/qwen/qwen3-30b-a3b-fp8',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT_BASE },
+        { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
+        { role: 'system', content: NO_REASONING_COMMAND },
+        { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
+      ],
+      temperature: 0,
+      max_completion_tokens: MAX_COMPLETION_TOKENS,
+      request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
+    }
   end
 end
