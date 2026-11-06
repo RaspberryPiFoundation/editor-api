@@ -38,13 +38,7 @@ class FriendlyErrorMessagesInferenceClient
     return 'This is a placeholder friendly error message.' if ENV.fetch('BYPASS_FEM_INFERENCE', nil) == 'true'
 
     result = @client.chat.completions.create(
-      model: '@cf/qwen/qwen3-30b-a3b-fp8',
-      messages: [
-        { role: 'system', content: SYSTEM_PROMPT_BASE },
-        { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
-        { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
-      ],
-      request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
+      build_request(message, trace, runtime, code)
     ).choices.first.message.content.to_s
 
     raise Error, 'No message returned by inference service.' if result.empty?
@@ -53,5 +47,17 @@ class FriendlyErrorMessagesInferenceClient
     result
   rescue OpenAI::Errors::APIError => e
     raise Error, e.message
+  end
+
+  def build_request(message, trace, runtime, code)
+    {
+      model: '@cf/qwen/qwen3-30b-a3b-fp8',
+      messages: [
+        { role: 'system', content: SYSTEM_PROMPT_BASE },
+        { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
+        { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
+      ],
+      request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
+    }
   end
 end
