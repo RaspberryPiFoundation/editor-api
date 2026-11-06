@@ -28,12 +28,6 @@ RSpec.describe ClassTeacher do
         .and have_enqueued_job(Salesforce::ClassTeacherSyncJob)
     end
 
-    # SchoolClass + initial ClassTeacher rows commit in the same transaction (via
-    # SchoolClass::Create / accepts_nested_attributes_for). Both records' after_commit
-    # callbacks enqueue a SchoolClassSyncJob (deduped at execution by the base job's
-    # good_job_control_concurrency_with), hence .at_least(:once). The ClassTeacherSyncJob
-    # races SchoolClassSyncJob for the parent classroom mirror; ensure_parent_synced! +
-    # retry_on cover that race in the job layer (see class_teacher_sync_job_spec).
     it 'enqueues classroom and class-teacher sync jobs for the initial teachers of a brand-new class' do
       clear_enqueued_jobs
 

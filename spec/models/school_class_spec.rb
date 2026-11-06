@@ -396,10 +396,6 @@ RSpec.describe SchoolClass, :versioning do
       ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }
     end
 
-    # Create enqueues the job twice — once from SchoolClass#after_commit and once from
-    # the initial ClassTeacher#after_commit, both committing in the same transaction.
-    # Duplicates collapse at execution thanks to good_job_control_concurrency_with on
-    # the SalesforceSyncJob base, so .at_least(:once) is the right assertion.
     it 'enqueues Salesforce::SchoolClassSyncJob on create' do
       expect { create(:school_class, teacher_ids: [teacher.id], school:) }
         .to have_enqueued_job(Salesforce::SchoolClassSyncJob).at_least(:once)
