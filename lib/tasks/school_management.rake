@@ -40,7 +40,7 @@ namespace :school_management do
         school:,
         nominated_user_id: new_owner[:id],
         requested_by_user_id: old_owner[:id],
-        skip_request_email: true
+        admin_initiated: true
       )
 
       raise ActiveRecord::Rollback unless result.success?

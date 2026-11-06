@@ -5,8 +5,6 @@ class OwnershipTransfer < ApplicationRecord
 
   belongs_to :school
 
-  attr_accessor :skip_request_email
-
   enum :status, {
     pending: 'pending', completed: 'completed', rejected: 'rejected', cancelled: 'cancelled'
   }, default: :pending, validate: true
@@ -20,7 +18,7 @@ class OwnershipTransfer < ApplicationRecord
             on: :create
   validate :nominee_has_the_school_teacher_role_for_the_school
 
-  after_create_commit :send_ownership_transfer_request_email, unless: :skip_request_email
+  after_create_commit :send_ownership_transfer_request_email, unless: :admin_initiated?
   after_update_commit :send_ownership_transfer_cancelled_email,
                       if: -> { saved_change_to_status?(from: 'pending', to: 'cancelled') }
   after_update_commit :send_ownership_transfer_completed_email,
