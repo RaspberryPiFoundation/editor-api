@@ -60,6 +60,7 @@ class FriendlyErrorMessagesInferenceClient
         { role: 'system', content: NO_REASONING_COMMAND },
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
       ],
+      temperature: 0,
       request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
     }
   end
