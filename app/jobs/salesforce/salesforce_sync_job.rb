@@ -4,12 +4,14 @@ module Salesforce
   class SalesforceSyncJob < ApplicationJob
     include GoodJob::ActiveJobExtensions::Concurrency
 
+    self.good_job_labels = [-> { "#{self.class.name}/#{concurrency_key_id}" }]
+
     # Serialise concurrent performs for the same record (same class + record ID)
     # to prevent TOCTOU races on find_or_initialize_by + save!, while allowing
     # jobs for different records to run fully in parallel.
-    good_job_control_concurrency_with(
+    good_job_concurrency_rule(
       perform_limit: 1,
-      key: -> { "#{self.class.name}/#{concurrency_key_id}" }
+      label: -> { "#{self.class.name}/#{concurrency_key_id}" }
     )
 
     class SalesforceRecordNotFound < StandardError
