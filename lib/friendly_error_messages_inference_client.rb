@@ -4,6 +4,7 @@ class FriendlyErrorMessagesInferenceClient
   class Error < StandardError; end
 
   MAX_RESULT_LENGTH_CHARS = 500
+  MAX_COMPLETION_TOKENS = MAX_RESULT_LENGTH_CHARS * 0.66
 
   SYSTEM_PROMPT_BASE = <<~PROMPT
     You help young people learn to program in Python.
@@ -61,6 +62,7 @@ class FriendlyErrorMessagesInferenceClient
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
       ],
       temperature: 0,
+      max_completion_tokens: MAX_COMPLETION_TOKENS,
       request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
     }
   end
