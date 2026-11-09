@@ -6,15 +6,12 @@ class FriendlyErrorMessagesInferenceClient
   MAX_RESULT_LENGTH_CHARS = 500
   MAX_COMPLETION_TOKENS = MAX_RESULT_LENGTH_CHARS * 0.66
 
-  SYSTEM_PROMPT_BASE = <<~PROMPT
+  SYSTEM_PROMPT = <<~PROMPT
     You help young people learn to program in Python.
 
     A learner will show you some Python code, and usually an error message. Respond with a
     short piece of feedback, addressed to them, that helps them find and fix the problem
     themselves.
-  PROMPT
-
-  SYSTEM_PROMPT_L1_EXPLAIN = <<~PROMPT
     The learner has only seen the raw Python error. Nothing has explained it to them yet.
 
     Say in plain language what the error means, and suggest which part of their code to
@@ -25,8 +22,6 @@ class FriendlyErrorMessagesInferenceClient
 
     Do not write any code in this reply. No code blocks and no corrected lines.
   PROMPT
-
-  NO_REASONING_COMMAND = '/no_think'
 
   def initialize
     @client = OpenAI::Client.new(
@@ -56,14 +51,16 @@ class FriendlyErrorMessagesInferenceClient
     {
       model: '@cf/qwen/qwen3.8-27b',
       messages: [
-        { role: 'system', content: SYSTEM_PROMPT_BASE },
-        { role: 'system', content: SYSTEM_PROMPT_L1_EXPLAIN },
-        { role: 'system', content: NO_REASONING_COMMAND },
+        { role: 'system', content: SYSTEM_PROMPT },
         { role: 'user', content: JSON.dump({ message:, trace:, runtime:, code: }) }
       ],
       temperature: 0,
       max_completion_tokens: MAX_COMPLETION_TOKENS,
-      request_options: { extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') } }
+
+      request_options: {
+        extra_headers: { 'cf-aig-gateway-id' => ENV.fetch('FEM_GATEWAY_NAME', '') },
+        extra_body: { chat_template_kwargs: { enable_thinking: false } }
+      }
     }
   end
 end
