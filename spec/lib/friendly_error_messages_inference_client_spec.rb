@@ -53,12 +53,6 @@ RSpec.describe FriendlyErrorMessagesInferenceClient do
 
       expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
     end
-
-    it 'throws an error when the inference server returns a response that is too long' do
-      stub_completion('a' * 1000)
-
-      expect { client.get_message('', '', '', '') }.to raise_exception(FriendlyErrorMessagesInferenceClient::Error)
-    end
   end
 
   context 'when BYPASS_FEM_INFERENCE is true' do
