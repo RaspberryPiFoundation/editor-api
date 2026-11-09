@@ -3,8 +3,7 @@
 class FriendlyErrorMessagesInferenceClient
   class Error < StandardError; end
 
-  MAX_RESULT_LENGTH_CHARS = 500
-  MAX_COMPLETION_TOKENS = MAX_RESULT_LENGTH_CHARS * 0.66
+  MAX_COMPLETION_TOKENS = 300
 
   SYSTEM_PROMPT = <<~PROMPT
     You help young people learn to program in Python.
@@ -40,7 +39,6 @@ class FriendlyErrorMessagesInferenceClient
     ).choices.first.message.content.to_s
 
     raise Error, 'No message returned by inference service.' if result.empty?
-    raise Error, "The message by the inference service was too long - max #{MAX_RESULT_LENGTH_CHARS} chars, actual #{result.length} chars." if result.length > MAX_RESULT_LENGTH_CHARS
 
     result
   rescue OpenAI::Errors::APIError => e
