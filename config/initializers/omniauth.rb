@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 OmniAuth.config.logger = Rails.logger
+OmniAuth.config.full_host = ENV.fetch('HOST_URL')
 
 if ENV['BYPASS_OAUTH'].present?
   using RpiAuthBypass
