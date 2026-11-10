@@ -5,22 +5,7 @@ class FriendlyErrorMessagesInferenceClient
 
   MAX_COMPLETION_TOKENS = 300
 
-  SYSTEM_PROMPT = <<~PROMPT
-    You help young people learn to program in Python.
-
-    A learner will show you some Python code, and usually an error message. Respond with a
-    short piece of feedback, addressed to them, that helps them find and fix the problem
-    themselves.
-    The learner has only seen the raw Python error. Nothing has explained it to them yet.
-
-    Say in plain language what the error means, and suggest which part of their code to
-    look at. Pose it as a suggestion, not an instruction — "it might be worth checking…"
-    rather than "change…".
-
-    Three or four short sentences.
-
-    Do not write any code in this reply. No code blocks and no corrected lines.
-  PROMPT
+  SYSTEM_PROMPT = Rails.root.join('config/friendly_error_messages_prompt.md').read
 
   def initialize
     @client = OpenAI::Client.new(
