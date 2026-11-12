@@ -37,7 +37,10 @@ module SchoolStudent
         SafeguardingFlagService.create_for_school_roles(user: current_user, school:)
         responses = ProfileApiClient.create_school_students_sso(token:, students:, school_id: school.id)
 
-        create_student_roles(school, responses)
+        successful_responses, failed_responses = responses.partition { |response| response[:success] }
+
+        report_failures(failed_responses)
+        create_student_roles(school, successful_responses)
         format_student_responses(responses)
       rescue ProfileApiClient::Student422Error => e
         handle_validations(e.errors)
@@ -47,6 +50,12 @@ module SchoolStudent
         # Ensure that nil values are empty strings, else Profile will swallow validations
         students.map do |student|
           student.transform_values { |value| value.nil? ? '' : value }
+        end
+      end
+
+      def report_failures(responses)
+        responses.each do |response|
+          Sentry.capture_message('Student creation failed in Profile', extra: response[:error])
         end
       end
 

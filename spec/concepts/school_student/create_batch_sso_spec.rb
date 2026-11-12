@@ -193,6 +193,45 @@ RSpec.describe SchoolStudent::CreateBatchSSO, type: :unit do
     end
   end
 
+  context 'when an error occurs creating an individual student in profile' do
+    before do
+      responses = [
+        { id: SecureRandom.uuid, name: 'Success 1', success: true },
+        {
+          id: nil,
+          error: {
+            path: 'student',
+            errorCode: 'ERROR_CREATE_STUDENT_FAILED',
+            message: 'here is an error message',
+            location: 'body'
+          },
+          success: false
+        },
+        { id: SecureRandom.uuid, name: 'Success 2', success: true }
+      ]
+      allow(ProfileApiClient).to receive(:create_school_students_sso).and_return(responses)
+      allow(Sentry).to receive(:capture_message)
+    end
+
+    it 'only creates the successful students' do
+      initial_student_role_count = Role.student.count
+
+      described_class.call(school:, school_students_params:, current_user:)
+
+      expect(Role.student.count).to eq(initial_student_role_count + 2)
+    end
+
+    it 'reports unexpected errors to sentry' do
+      described_class.call(school:, school_students_params:, current_user:)
+      expect(Sentry).to have_received(:capture_message).with('Student creation failed in Profile', extra: {
+                                                               path: 'student',
+                                                               errorCode: 'ERROR_CREATE_STUDENT_FAILED',
+                                                               message: 'here is an error message',
+                                                               location: 'body'
+                                                             })
+    end
+  end
+
   context 'when a standard error occurs' do
     before do
       allow(ProfileApiClient).to receive(:create_school_students_sso)
