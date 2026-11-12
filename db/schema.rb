@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_06_162624) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_12_152938) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -303,7 +303,7 @@ t.datetime "updated_at", null: false
     t.integer "role"
     t.uuid "school_id"
     t.datetime "updated_at", null: false
-    t.uuid "user_id"
+    t.uuid "user_id", null: false
     t.index ["school_id"], name: "index_roles_on_school_id"
     t.index ["user_id", "school_id", "role"], name: "index_roles_on_user_id_and_school_id_and_role", unique: true
     t.index ["user_id"], name: "index_roles_on_user_id"
