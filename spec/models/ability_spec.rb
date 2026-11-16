@@ -18,6 +18,21 @@ RSpec.describe Ability do
     it { is_expected.not_to be_able_to(:read, build(:teacher_invitation, email_address: nil)) }
   end
 
+  describe 'UserSetting' do
+    let(:user) { build(:user) }
+
+    it { is_expected.to be_able_to(:read, build(:user_setting, user_id: user.id)) }
+    it { is_expected.to be_able_to(:update, build(:user_setting, user_id: user.id)) }
+    it { is_expected.not_to be_able_to(:read, build(:user_setting)) }
+    it { is_expected.not_to be_able_to(:update, build(:user_setting)) }
+
+    context 'with no user' do
+      let(:user) { nil }
+
+      it { is_expected.not_to be_able_to(:read, build(:user_setting)) }
+    end
+  end
+
   describe 'ScratchAsset' do
     context 'with an Experience CS admin' do
       let(:user) { build(:experience_cs_admin_user) }
