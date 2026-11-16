@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_12_152938) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_16_090552) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pgcrypto"
@@ -155,6 +155,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_12_152938) do
     t.datetime "updated_at", null: false
     t.index ["active_job_id", "created_at"], name: "index_good_job_executions_on_active_job_id_and_created_at"
     t.index ["concurrency_key"], name: "index_good_job_executions_on_concurrency_key"
+t.index ["created_at"], name: "index_good_job_executions_on_created_at"
     t.index ["process_id", "created_at"], name: "index_good_job_executions_on_process_id_and_created_at"
     t.index ["scheduled_at"], name: "index_good_job_executions_on_scheduled_at"
   end
