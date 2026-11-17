@@ -5,7 +5,7 @@ require 'project_loader'
 
 RSpec.describe ProjectLoader do
   let(:identifier) { PhraseIdentifier.generate }
-  let(:preferred_locales) { %w[locale1 locale2] }
+  let(:preferred_locales) { %w[fr-FR de-DE] }
   let(:loaded_project) do
     described_class.new(
       identifier,
@@ -14,10 +14,10 @@ RSpec.describe ProjectLoader do
   end
 
   context 'when projects exist in both preferred locales' do
-    let!(:preferred_project) { create(:project, identifier:, locale: 'locale1', user_id: nil) }
+    let!(:preferred_project) { create(:project, identifier:, locale: 'fr-FR', user_id: nil) }
 
     before do
-      create(:project, identifier:, locale: 'locale2', user_id: nil)
+      create(:project, identifier:, locale: 'de-DE', user_id: nil)
     end
 
     it 'returns the project with the locale highest on list' do
@@ -26,7 +26,7 @@ RSpec.describe ProjectLoader do
   end
 
   context 'when project exists in second locale but not first' do
-    let!(:preferred_project) { create(:project, identifier:, locale: 'locale2', user_id: nil) }
+    let!(:preferred_project) { create(:project, identifier:, locale: 'de-DE', user_id: nil) }
 
     it 'returns the project with the locale highest on list' do
       expect(loaded_project).to eq(preferred_project)
@@ -46,6 +46,15 @@ RSpec.describe ProjectLoader do
 
     it 'loads user project' do
       expect(loaded_project).to eq(user_project)
+    end
+  end
+
+  context 'when a preferred locale contains unexpected characters' do
+    let(:preferred_locales) { ["en-US\u0000/../../../robots.txt"] }
+    let!(:english_project) { create(:project, identifier:, locale: 'en') }
+
+    it 'ignores the locale and falls back to en' do
+      expect(loaded_project).to eq(english_project)
     end
   end
 
