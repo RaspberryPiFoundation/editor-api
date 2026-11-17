@@ -87,6 +87,11 @@ RSpec.describe UserSetting do
       expect(user_setting.settings).to eq('font_size' => 'small')
     end
 
+    it 'makes the record invalid when given an unknown key set to nil' do
+      user_setting.merge_settings(colour: nil)
+      expect(user_setting).not_to be_valid
+    end
+
     it 'makes the record invalid when given an unknown key' do
       user_setting.merge_settings(colour: 'red')
       expect(user_setting).not_to be_valid

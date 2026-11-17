@@ -108,6 +108,11 @@ RSpec.describe 'User settings API' do
         expect(response).to have_http_status(:unprocessable_content)
       end
 
+      it 'returns 422 for an unknown key set to null' do
+        patch '/api/user_settings', params: { settings: { colour: nil } }, headers:, as: :json
+        expect(response).to have_http_status(:unprocessable_content)
+      end
+
       it 'returns 422 for a value that is not allowed' do
         patch '/api/user_settings', params: { settings: { font_size: 'huge' } }, headers:, as: :json
         expect(response).to have_http_status(:unprocessable_content)
@@ -134,21 +139,30 @@ RSpec.describe 'User settings API' do
         end.not_to change(UserSetting, :count)
       end
 
-      it 'retries once if another request created the row first' do
-        create(:user_setting, user_id: user.id, settings: { 'theme' => 'dark' })
-        stale = UserSetting.new(user_id: user.id)
-        allow(stale).to receive(:save).and_raise(ActiveRecord::RecordNotUnique)
+      it 'locks the row while updating so concurrent updates are not lost' do
+        allow(UserSetting).to receive(:lock).and_call_original
 
-        calls = 0
-        allow(UserSetting).to receive(:find_or_initialize_by).and_wrap_original do |original, **args|
-          calls += 1
-          calls == 1 ? stale : original.call(**args)
-        end
+        patch '/api/user_settings', params: { settings: { theme: 'dark' } }, headers:, as: :json
+
+        expect(UserSetting).to have_received(:lock)
+      end
+
+      it 'updates the row when it already exists instead of failing' do
+        create(:user_setting, user_id: user.id, settings: { 'theme' => 'dark' })
 
         patch '/api/user_settings', params: { settings: { font_size: 'large' } }, headers:, as: :json
 
         expect(response).to have_http_status(:ok)
-        expect(response.parsed_body).to eq('settings' => defaults.merge('theme' => 'dark', 'font_size' => 'large'))
+        expect(UserSetting.where(user_id: user.id).count).to eq(1)
+      end
+
+      it 'returns the validation error, not a user_id error, when the row exists' do
+        create(:user_setting, user_id: user.id)
+
+        patch '/api/user_settings', params: { settings: { colour: 'red' } }, headers:, as: :json
+
+        expect(response.parsed_body['error']).to include("'colour' is not a valid setting")
+        expect(response.parsed_body['error']).not_to include('User')
       end
     end
   end

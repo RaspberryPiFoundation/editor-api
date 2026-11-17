@@ -23,19 +23,24 @@ module Api
 
     private
 
-    # The row is created on the first update. If two first updates race, the
-    # unique index on user_id rejects one; retry it so it updates the new row.
-    def save_user_setting(retries: 1)
-      user_setting = UserSetting.find_or_initialize_by(user_id: current_user.id)
-      authorize! :update, user_setting
+    # Creates the row if needed, then locks it while merging, so concurrent
+    # updates (including two first updates) are applied one after the other
+    # and neither is lost. Nothing is saved if the new settings are invalid.
+    def save_user_setting
+      authorize! :update, UserSetting.new(user_id: current_user.id)
+      new_settings = settings_params
+      user_setting = nil
 
-      user_setting.merge_settings(settings_params)
-      user_setting.save
+      UserSetting.transaction do
+        # Creates an empty row only; validation runs on the save below.
+        UserSetting.insert({ user_id: current_user.id }, unique_by: :user_id) # rubocop:disable Rails/SkipsModelValidations
+        user_setting = UserSetting.lock.find_by!(user_id: current_user.id)
+
+        user_setting.merge_settings(new_settings)
+        raise ActiveRecord::Rollback unless user_setting.save
+      end
+
       user_setting
-    rescue ActiveRecord::RecordNotUnique
-      raise if retries.zero?
-
-      save_user_setting(retries: retries - 1)
     end
 
     # Keys and values are validated against UserSetting::REGISTRY by the model,

@@ -31,10 +31,11 @@ class UserSetting < ApplicationRecord
   end
 
   # Partial update. A nil value resets that setting to its default.
-  # Keys no longer in REGISTRY are dropped from stored data.
+  # Keys no longer in REGISTRY are dropped from stored data. Unknown keys are
+  # kept (even if nil) so validation rejects them.
   def merge_settings(new_settings)
     merged = settings.slice(*REGISTRY.keys).merge(new_settings.to_h.stringify_keys)
-    self.settings = merged.compact
+    self.settings = merged.reject { |key, value| value.nil? && REGISTRY.key?(key) }
   end
 
   private
