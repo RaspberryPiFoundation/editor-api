@@ -5,7 +5,7 @@ require 'rails_helper'
 RSpec.describe 'User settings API' do
   let(:headers) { { Authorization: UserProfileMock::TOKEN } }
   let(:user) { create(:user) }
-  let(:defaults) { { 'theme' => nil, 'font_size' => 'small', 'ai_friendly_errors' => true } }
+  let(:defaults) { { 'theme' => nil, 'font_size' => 'small', 'ai_hints_enabled' => true } }
 
   describe 'GET /api/user_settings' do
     context 'when logged out' do
@@ -90,9 +90,9 @@ RSpec.describe 'User settings API' do
       end
 
       it 'stores booleans as booleans' do
-        patch '/api/user_settings', params: { settings: { ai_friendly_errors: false } }, headers:, as: :json
+        patch '/api/user_settings', params: { settings: { ai_hints_enabled: false } }, headers:, as: :json
 
-        expect(UserSetting.find_by(user_id: user.id).settings).to eq('ai_friendly_errors' => false)
+        expect(UserSetting.find_by(user_id: user.id).settings).to eq('ai_hints_enabled' => false)
       end
 
       it 'resets a setting to its default when sent null' do
@@ -119,7 +119,7 @@ RSpec.describe 'User settings API' do
       end
 
       it 'returns 422 for a value of the wrong type' do
-        patch '/api/user_settings', params: { settings: { ai_friendly_errors: 'no' } }, headers:, as: :json
+        patch '/api/user_settings', params: { settings: { ai_hints_enabled: 'no' } }, headers:, as: :json
         expect(response).to have_http_status(:unprocessable_content)
       end
 

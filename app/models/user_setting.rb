@@ -5,7 +5,7 @@ class UserSetting < ApplicationRecord
   REGISTRY = {
     'theme' => { values: %w[light dark], default: nil },
     'font_size' => { values: %w[small medium large], default: 'small' },
-    'ai_friendly_errors' => { values: [true, false], default: true }
+    'ai_hints_enabled' => { values: [true, false], default: true }
   }.freeze
 
   validates :user_id, presence: true, uniqueness: true

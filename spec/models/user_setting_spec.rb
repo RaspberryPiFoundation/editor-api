@@ -3,7 +3,7 @@
 require 'rails_helper'
 
 RSpec.describe UserSetting do
-  let(:defaults) { { 'theme' => nil, 'font_size' => 'small', 'ai_friendly_errors' => true } }
+  let(:defaults) { { 'theme' => nil, 'font_size' => 'small', 'ai_hints_enabled' => true } }
 
   describe 'validations' do
     subject(:user_setting) { build(:user_setting) }
@@ -23,7 +23,7 @@ RSpec.describe UserSetting do
     end
 
     it 'accepts valid settings' do
-      user_setting.settings = { 'theme' => 'dark', 'font_size' => 'large', 'ai_friendly_errors' => false }
+      user_setting.settings = { 'theme' => 'dark', 'font_size' => 'large', 'ai_hints_enabled' => false }
       expect(user_setting).to be_valid
     end
 
@@ -38,7 +38,7 @@ RSpec.describe UserSetting do
     end
 
     it 'rejects values of the wrong type' do
-      user_setting.settings = { 'ai_friendly_errors' => 'no' }
+      user_setting.settings = { 'ai_hints_enabled' => 'no' }
       expect(user_setting).not_to be_valid
     end
   end
