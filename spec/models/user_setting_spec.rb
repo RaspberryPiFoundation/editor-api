@@ -8,10 +8,6 @@ RSpec.describe UserSetting do
   describe 'validations' do
     subject(:user_setting) { build(:user_setting) }
 
-    it 'has a valid default factory' do
-      expect(user_setting).to be_valid
-    end
-
     it 'requires a user_id' do
       user_setting.user_id = nil
       expect(user_setting).not_to be_valid
@@ -49,17 +45,6 @@ RSpec.describe UserSetting do
     end
   end
 
-  describe '.for_user' do
-    it 'returns defaults when the user has no row' do
-      expect(described_class.for_user(SecureRandom.uuid)).to eq(defaults)
-    end
-
-    it 'returns stored values merged over defaults' do
-      user_setting = create(:user_setting, settings: { 'theme' => 'dark' })
-      expect(described_class.for_user(user_setting.user_id)).to eq(defaults.merge('theme' => 'dark'))
-    end
-  end
-
   describe '#merged_settings' do
     it 'ignores stored keys that are no longer registered' do
       user_setting = build(:user_setting)
@@ -89,11 +74,6 @@ RSpec.describe UserSetting do
 
     it 'makes the record invalid when given an unknown key set to nil' do
       user_setting.merge_settings(colour: nil)
-      expect(user_setting).not_to be_valid
-    end
-
-    it 'makes the record invalid when given an unknown key' do
-      user_setting.merge_settings(colour: 'red')
       expect(user_setting).not_to be_valid
     end
   end

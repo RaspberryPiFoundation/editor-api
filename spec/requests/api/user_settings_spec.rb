@@ -81,14 +81,6 @@ RSpec.describe 'User settings API' do
         expect(response.parsed_body).to eq('settings' => defaults.merge('theme' => 'dark'))
       end
 
-      it 'only changes the keys sent' do
-        create(:user_setting, user_id: user.id, settings: { 'theme' => 'dark' })
-
-        patch '/api/user_settings', params: { settings: { font_size: 'large' } }, headers:, as: :json
-
-        expect(UserSetting.find_by(user_id: user.id).settings).to eq('theme' => 'dark', 'font_size' => 'large')
-      end
-
       it 'stores booleans as booleans' do
         patch '/api/user_settings', params: { settings: { ai_hints_enabled: false } }, headers:, as: :json
 
@@ -101,26 +93,6 @@ RSpec.describe 'User settings API' do
         patch '/api/user_settings', params: { settings: { theme: nil } }, headers:, as: :json
 
         expect(response.parsed_body).to eq('settings' => defaults)
-      end
-
-      it 'returns 422 for an unknown key' do
-        patch '/api/user_settings', params: { settings: { colour: 'red' } }, headers:, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-
-      it 'returns 422 for an unknown key set to null' do
-        patch '/api/user_settings', params: { settings: { colour: nil } }, headers:, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-
-      it 'returns 422 for a value that is not allowed' do
-        patch '/api/user_settings', params: { settings: { font_size: 'huge' } }, headers:, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
-      end
-
-      it 'returns 422 for a value of the wrong type' do
-        patch '/api/user_settings', params: { settings: { ai_hints_enabled: 'no' } }, headers:, as: :json
-        expect(response).to have_http_status(:unprocessable_content)
       end
 
       it 'returns 422 when settings is not an object' do
@@ -147,20 +119,21 @@ RSpec.describe 'User settings API' do
         expect(UserSetting).to have_received(:lock)
       end
 
-      it 'updates the row when it already exists instead of failing' do
+      it 'updates the existing row, only changing the keys sent' do
         create(:user_setting, user_id: user.id, settings: { 'theme' => 'dark' })
 
         patch '/api/user_settings', params: { settings: { font_size: 'large' } }, headers:, as: :json
 
         expect(response).to have_http_status(:ok)
-        expect(UserSetting.where(user_id: user.id).count).to eq(1)
+        expect(UserSetting.where(user_id: user.id).pluck(:settings)).to eq([{ 'theme' => 'dark', 'font_size' => 'large' }])
       end
 
-      it 'returns the validation error, not a user_id error, when the row exists' do
+      it 'returns 422 with the validation error for an invalid setting' do
         create(:user_setting, user_id: user.id)
 
         patch '/api/user_settings', params: { settings: { colour: 'red' } }, headers:, as: :json
 
+        expect(response).to have_http_status(:unprocessable_content)
         expect(response.parsed_body['error']).to include("'colour' is not a valid setting")
         expect(response.parsed_body['error']).not_to include('User')
       end

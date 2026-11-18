@@ -15,10 +15,6 @@ class UserSetting < ApplicationRecord
     REGISTRY.transform_values { |config| config[:default] }
   end
 
-  def self.for_user(user_id)
-    find_by(user_id:)&.merged_settings || defaults
-  end
-
   def merged_settings
     self.class.defaults.merge(settings.slice(*REGISTRY.keys))
   end
