@@ -23,16 +23,13 @@ module Api
 
     private
 
-    # Creates the row if needed, then locks it while merging, so concurrent
-    # updates (including two first updates) are applied one after the other
-    # and neither is lost. Nothing is saved if the new settings are invalid.
+    # Lock the row so concurrent updates don't overwrite each other.
     def save_user_setting
       authorize! :update, UserSetting.new(user_id: current_user.id)
       new_settings = settings_params
       user_setting = nil
 
       UserSetting.transaction do
-        # Creates an empty row only; validation runs on the save below.
         UserSetting.insert({ user_id: current_user.id }, unique_by: :user_id) # rubocop:disable Rails/SkipsModelValidations
         user_setting = UserSetting.lock.find_by!(user_id: current_user.id)
 
@@ -43,8 +40,6 @@ module Api
       user_setting
     end
 
-    # Keys and values are validated against UserSetting::REGISTRY by the model,
-    # so unknown keys return 422 rather than being silently dropped.
     def settings_params
       settings = params.require(:settings)
       raise ParameterError, 'settings must be an object' unless settings.is_a?(ActionController::Parameters)

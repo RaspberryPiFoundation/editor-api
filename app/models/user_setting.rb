@@ -1,11 +1,6 @@
 # frozen_string_literal: true
 
-# Per-user editor preferences (theme, font size, etc).
-#
-# Settings live in a single jsonb column. The list of allowed settings is
-# defined in REGISTRY, so adding/removing a setting is a code change only
-# (no migration). Only values the user has changed are stored; defaults are
-# merged in on read.
+# Allowed settings are defined in REGISTRY. Defaults are merged in on read.
 class UserSetting < ApplicationRecord
   REGISTRY = {
     'theme' => { values: %w[light dark], default: nil },
@@ -20,19 +15,15 @@ class UserSetting < ApplicationRecord
     REGISTRY.transform_values { |config| config[:default] }
   end
 
-  # Settings for a user, falling back to defaults if they have no row yet.
   def self.for_user(user_id)
     find_by(user_id:)&.merged_settings || defaults
   end
 
-  # Stored values merged over defaults. Keys removed from REGISTRY are ignored.
   def merged_settings
     self.class.defaults.merge(settings.slice(*REGISTRY.keys))
   end
 
-  # Partial update. A nil value resets that setting to its default.
-  # Keys no longer in REGISTRY are dropped from stored data. Unknown keys are
-  # kept (even if nil) so validation rejects them.
+  # A nil value resets that setting to its default.
   def merge_settings(new_settings)
     merged = settings.slice(*REGISTRY.keys).merge(new_settings.to_h.stringify_keys)
     self.settings = merged.reject { |key, value| value.nil? && REGISTRY.key?(key) }
