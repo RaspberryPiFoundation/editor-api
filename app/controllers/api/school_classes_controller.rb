@@ -44,10 +44,8 @@ module Api
         @school_class_with_teachers = school_class.with_teachers
 
         school_students_result = create_school_students(school_students_params, school_class)
-        @school_students = school_students_result[:school_students]
-        @school_students_errors = school_students_result[:errors]
-
-        @class_members = assign_students_to_class(school_class, @school_students)
+        school_students = school_students_result[:school_students]
+        assign_students_to_class(school_class, school_students)
 
         render :import, formats: [:json], status: :created
       else
