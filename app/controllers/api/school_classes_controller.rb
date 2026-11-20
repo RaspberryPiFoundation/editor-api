@@ -139,8 +139,6 @@ module Api
     end
 
     def create_school_students(school_students_params, school_class)
-      return [] unless school_class.present? && school_students_params.present?
-
       school_students_result = SchoolStudent::CreateBatchSSO.call(
         school: @school,
         school_students_params: school_students_params,
@@ -151,9 +149,6 @@ module Api
     end
 
     def assign_students_to_class(school_class, school_students)
-      return [] unless school_class.present? && school_students.present? && school_students.any?
-
-      # Extract the student objects for class member creation
       students = school_students.pluck(:student)
       class_members_result = ClassMember::Create.call(school_class:, students:, teachers: [])
 
@@ -193,8 +188,7 @@ module Api
     end
 
     def import_school_students_params
-      school_students_data = params[:school_students]
-      return [] if school_students_data.blank?
+      school_students_data = Array(params[:school_students])
 
       school_students_data.filter_map do |student|
         next if student.blank?
