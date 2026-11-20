@@ -106,6 +106,7 @@ Rails.application.routes.draw do
     end
 
     resources :user_jobs, only: %i[index show]
+    resource :user_settings, only: %i[show update]
     resources :school_import_jobs, only: %i[show]
 
     post '/google/auth/exchange-code', to: 'google_auth#exchange_code', defaults: { format: :json }
