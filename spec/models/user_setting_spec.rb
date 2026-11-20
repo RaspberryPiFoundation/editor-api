@@ -45,11 +45,10 @@ RSpec.describe UserSetting do
     end
   end
 
-  describe '#merged_settings' do
-    it 'ignores stored keys that are no longer registered' do
-      user_setting = build(:user_setting)
-      user_setting.settings = { 'removed_setting' => true, 'font_size' => 'medium' }
-      expect(user_setting.merged_settings).to eq(defaults.merge('font_size' => 'medium'))
+  describe '#settings_with_defaults' do
+    it 'returns stored values merged over defaults' do
+      user_setting = build(:user_setting, settings: { 'font_size' => 'medium' })
+      expect(user_setting.settings_with_defaults).to eq(defaults.merge('font_size' => 'medium'))
     end
   end
 

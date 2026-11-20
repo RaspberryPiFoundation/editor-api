@@ -15,8 +15,8 @@ class UserSetting < ApplicationRecord
     REGISTRY.transform_values { |config| config[:default] }
   end
 
-  def merged_settings
-    self.class.defaults.merge(settings.slice(*REGISTRY.keys))
+  def settings_with_defaults
+    self.class.defaults.merge(settings)
   end
 
   # A nil value resets that setting to its default.

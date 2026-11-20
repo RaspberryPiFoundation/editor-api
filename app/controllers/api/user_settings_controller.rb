@@ -8,14 +8,14 @@ module Api
       user_setting = UserSetting.find_or_initialize_by(user_id: current_user.id)
       authorize! :read, user_setting
 
-      render json: { settings: user_setting.merged_settings }, status: :ok
+      render json: { settings: user_setting.settings_with_defaults }, status: :ok
     end
 
     def update
       user_setting = save_user_setting
 
       if user_setting.errors.empty?
-        render json: { settings: user_setting.merged_settings }, status: :ok
+        render json: { settings: user_setting.settings_with_defaults }, status: :ok
       else
         render json: { error: user_setting.errors.full_messages.to_sentence }, status: :unprocessable_content
       end
