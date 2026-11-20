@@ -37,21 +37,14 @@ module Api
     def import
       school_class_params = import_school_class_params
       school_students_params = import_school_students_params
-
-      # Find or create the school class
       school_class_result = find_or_create_school_class(school_class_params)
 
       if school_class_result.success?
         school_class = school_class_result[:school_class]
         @school_class_with_teachers = school_class.with_teachers
 
-        # Create students if class exists
-        school_students_result = create_school_students(school_students_params, school_class)
-        @school_students = school_students_result[:school_students]
-        @school_students_errors = school_students_result[:errors]
-
-        # Assign students to class
-        @class_members = assign_students_to_class(school_class, @school_students)
+        school_students = create_school_students(school_students_params, school_class)
+        assign_students_to_class(school_class, school_students)
 
         render :import, formats: [:json], status: :created
       else
@@ -146,34 +139,20 @@ module Api
     end
 
     def create_school_students(school_students_params, school_class)
-      return { school_students: [], errors: nil } unless school_class.present? && school_students_params.present?
-
       school_students_result = SchoolStudent::CreateBatchSSO.call(
         school: @school,
         school_students_params: school_students_params,
         current_user:
       )
 
-      {
-        school_students: school_students_result[:school_students],
-        errors: school_students_result[:errors]
-      }.tap { track_created_school_students(school_students_result[:school_students], class_id: school_class.id) }
+      school_students_result[:school_students].tap { track_created_school_students(school_students_result[:school_students], class_id: school_class.id) }
     end
 
     def assign_students_to_class(school_class, school_students)
-      return [] unless school_class.present? && school_students.present? && school_students.any?
-
-      # Extract the student objects for class member creation
       students = school_students.pluck(:student)
       class_members_result = ClassMember::Create.call(school_class:, students:, teachers: [])
 
-      # Put the errors in a more useful format for the response
-      class_members_errors = class_members_result[:errors].map do |user_id, error|
-        { success: false, student_id: user_id, school_class_id: school_class.id, error: error }
-      end
-
       track_imported_class_students_added(school_class, class_members_result[:class_members])
-      class_members_result[:class_members] + class_members_errors
     end
 
     def load_and_authorize_school
@@ -209,8 +188,7 @@ module Api
     end
 
     def import_school_students_params
-      school_students_data = params[:school_students]
-      return [] if school_students_data.blank?
+      school_students_data = Array(params[:school_students])
 
       school_students_data.filter_map do |student|
         next if student.blank?

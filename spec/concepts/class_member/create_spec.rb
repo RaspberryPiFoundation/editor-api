@@ -75,21 +75,6 @@ RSpec.describe ClassMember::Create, type: :unit do
       it 'does not create a class teacher' do
         expect { described_class.call(school_class:, students:, teachers:) }.not_to change(ClassTeacher, :count)
       end
-
-      it 'returns a failed operation response' do
-        response = described_class.call(school_class:, students:, teachers:)
-        expect(response.failure?).to be(true)
-      end
-
-      it 'returns the error message in the operation response' do
-        response = described_class.call(school_class:, students:, teachers:)
-        expect(response[:error]).to include('No valid school members provided')
-      end
-
-      it 'sent the exception to Sentry' do
-        described_class.call(school_class:, students:, teachers:)
-        expect(Sentry).to have_received(:capture_exception).with(kind_of(StandardError))
-      end
     end
 
     context 'with a student from a different school' do

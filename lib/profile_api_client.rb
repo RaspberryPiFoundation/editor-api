@@ -142,6 +142,7 @@ class ProfileApiClient
     end
 
     def create_school_students_sso(token:, students:, school_id:)
+      return [] if students.blank?
       return nil if token.blank?
 
       students = Array(students)

@@ -22,15 +22,14 @@ module Api
     end
 
     def create
-      user_ids = [class_member_params[:user_id]]
-      user_type = class_member_params[:type]
+      user_id, user_type = class_member_params.require(%i[user_id type])
       owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
       @school_owner_ids = owners.map(&:id)
       if user_type == 'student'
         teachers = { school_teachers: [] }
-        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: user_ids)
+        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: [user_id])
       else
-        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: user_ids)
+        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: [user_id])
         students = { school_students: [] }
       end
       result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
