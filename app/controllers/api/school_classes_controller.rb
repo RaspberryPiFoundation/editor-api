@@ -37,20 +37,16 @@ module Api
     def import
       school_class_params = import_school_class_params
       school_students_params = import_school_students_params
-
-      # Find or create the school class
       school_class_result = find_or_create_school_class(school_class_params)
 
       if school_class_result.success?
         school_class = school_class_result[:school_class]
         @school_class_with_teachers = school_class.with_teachers
 
-        # Create students if class exists
         school_students_result = create_school_students(school_students_params, school_class)
         @school_students = school_students_result[:school_students]
         @school_students_errors = school_students_result[:errors]
 
-        # Assign students to class
         @class_members = assign_students_to_class(school_class, @school_students)
 
         render :import, formats: [:json], status: :created
