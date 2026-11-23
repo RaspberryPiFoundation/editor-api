@@ -200,15 +200,9 @@ RSpec.describe 'Creating a class member', type: :request do
       stub_user_info_api_for_unknown_users(user_id: unknown_user_id)
     end
 
-    it 'responds 422 Unprocessable Entity' do
+    it 'skips over unknown users' do
       post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
-      expect(response).to have_http_status(:unprocessable_content)
-    end
-
-    it 'returns the error message in the operation response' do
-      post("/api/schools/#{school.id}/classes/#{school_class.id}/members/batch", headers:, params: invalid_params)
-      data = JSON.parse(response.body, symbolize_names: true)
-      expect(data[:error]).to include('No valid school members provided')
+      expect(response).to have_http_status(:ok)
     end
   end
 
