@@ -26,23 +26,24 @@ module Api
       owners = SchoolOwner::List.call(school: @school).fetch(:school_owners, [])
       @school_owner_ids = owners.map(&:id)
       if user_type == 'student'
-        teachers = { school_teachers: [] }
-        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: [user_id])
+        teachers = []
+        students = SchoolStudent::List.call(school: @school, token: current_user.token, student_ids: [user_id])[:school_students]
       else
-        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: [user_id])
-        students = { school_students: [] }
+        teachers = SchoolTeacher::List.call(school: @school, teacher_ids: [user_id])[:school_teachers]
+        students = []
       end
-      result = ClassMember::Create.call(school_class: @school_class, students: students[:school_students], teachers: teachers[:school_teachers])
 
-      if result.success?
+      result = ClassMember::Create.call(school_class: @school_class, students: students, teachers: teachers)
+
+      if students.blank? && teachers.blank?
+        render json: { error: 'No valid school members provided' }, status: :unprocessable_content
+      elsif result.success?
         @class_member = result[:class_members].first
         track_class_students_added([@class_member])
         render :show, formats: [:json], status: :created
       else
         render json: result.slice(:error, :errors), status: :unprocessable_content
       end
-    rescue ArgumentError => e
-      render json: { error: e.message }, status: :unprocessable_content
     end
 
     def create_batch
