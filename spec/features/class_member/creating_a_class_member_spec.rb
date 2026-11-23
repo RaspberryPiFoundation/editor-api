@@ -235,6 +235,20 @@ RSpec.describe 'Creating a class member', type: :request do
     end
   end
 
+  context 'when the user has no role in the school' do
+    let(:user_without_role) { create(:user) }
+    let(:params_for_user_without_role) { { class_member: { user_id: user_without_role.id, type: 'student' } } }
+
+    before do
+      stub_profile_api_list_school_students(school:, student_attributes: [])
+    end
+
+    it 'responds 422 Unprocessable Content' do
+      post("/api/schools/#{school.id}/classes/#{school_class.id}/members", headers:, params: params_for_user_without_role)
+      expect(response).to have_http_status(:unprocessable_content)
+    end
+  end
+
   context 'when the user is not authorized' do
     let(:student_params) do
       {
