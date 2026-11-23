@@ -88,4 +88,4 @@ group :test do
   gem 'webmock'
 end
 
-gem 'openai', '~> 0.122.0'
+gem 'openai', '~> 0.123.0'
