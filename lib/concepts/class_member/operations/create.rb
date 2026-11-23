@@ -9,12 +9,8 @@ module ClassMember
         response[:errors] = {}
         raise ArgumentError, 'No valid school members provided' if students.blank? && teachers.blank?
 
-        create_class_teachers(school_class:, teachers:, response:)
-        create_class_students(school_class:, students:, response:)
-        response
-      rescue StandardError => e
-        Sentry.capture_exception(e)
-        response[:error] = "Error creating class members: #{e.message}"
+        create_class_teachers(school_class:, teachers: teachers, response:)
+        create_class_students(school_class:, students: students, response:)
         response
       end
 
