@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 class CreateAndAssignStudentsJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Batches
   include GoodJob::ActiveJobExtensions::Concurrency
 
   BATCH_SIZE = 20
@@ -15,7 +16,11 @@ class CreateAndAssignStudentsJob < ApplicationJob
     school = school_class.school
     SafeguardingFlagService.create_for_school_roles(user: current_user, school:)
     students = StudentHelpers.normalise_nil_values_to_empty_strings(students)
-    batch = GoodJob::Batch.new(description: "Creating and assigning students for #{school_class.school.name}")
+    batch = GoodJob::Batch.new(
+      description: "Creating and assigning students for #{school_class.school.name}",
+      total: students.size,
+      processed: 0
+    )
     batch.add do
       students.each_slice(BATCH_SIZE) do |student_batch|
         CreateAndAssignStudentsJob.perform_later(
@@ -42,6 +47,14 @@ class CreateAndAssignStudentsJob < ApplicationJob
     create_class_students(school_class:, students: successful_responses, creator_id: creator_id)
 
     report_failures(failed_responses)
+    record_progress(students.size)
+  end
+
+  def record_progress(students_processed)
+    return if batch.nil?
+
+    batch.properties[:processed] = batch.properties[:processed].to_i + students_processed
+    batch.save
   end
 
   def create_student_roles(school:, students:, creator_id:)

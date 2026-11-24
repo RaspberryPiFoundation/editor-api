@@ -51,6 +51,19 @@ RSpec.describe CreateAndAssignStudentsJob do
     end
   end
 
+  describe 'batch progress', :inline_jobs do
+    it 'records the number of students to process on the batch' do
+      batch = described_class.enqueue_batches(school_class:, students:, current_user:)
+
+      expect(batch.properties).to include(total: 2)
+    end
+
+    it 'counts the students off as each job performs' do
+      batch = described_class.enqueue_batches(school_class:, students:, current_user:)
+      expect(batch.reload.properties).to include(processed: 2)
+    end
+  end
+
   describe 'concurrency' do
     it 'allows only one job to perform at a time per school class' do
       job = described_class.new(school_class_id: school_class.id, students:, creator_id: current_user.id, token: current_user.token)

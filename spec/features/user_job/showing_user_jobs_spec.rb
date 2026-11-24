@@ -41,6 +41,16 @@ RSpec.describe 'Showing user jobs', type: :request do
     expect(data[:job][:id]).to eq(job_id)
   end
 
+  it 'responds with the progress of a job that tracks it' do
+    progress_batch = GoodJob::BatchRecord.create!(description: school.id, properties: { total: 10, processed: 4 })
+    create(:user_job, good_job_batch_id: progress_batch.id, user_id: owner.id)
+
+    get("/api/user_jobs/#{progress_batch.id}", headers:)
+    data = JSON.parse(response.body, symbolize_names: true)
+
+    expect(data[:job][:progress]).to eq(total: 10, processed: 4)
+  end
+
   it 'responds 404 Not Found when the job belongs to another user' do
     other_batch = GoodJob::BatchRecord.create!(description: 'other-user-job')
     other_user_job = create(:user_job, good_job_batch_id: other_batch.id, user_id: other_user.id)
