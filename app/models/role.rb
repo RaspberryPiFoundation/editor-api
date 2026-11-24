@@ -20,6 +20,16 @@ class Role < ApplicationRecord
 
   after_commit :do_salesforce_sync, on: %i[create update], if: -> { FeatureFlags.salesforce_sync? && !student? }
 
+  def self.create_student_with_tracking!(school:, creator_id:, student_id:)
+    create!(school_id: school.id, user_id: student_id, role: :student)
+
+    EventTracker.track!(user_id: creator_id, name: 'Student - Created', properties: { school_id: school.id, student_id: })
+  rescue ActiveRecord::RecordNotUnique
+    nil
+  rescue ActiveRecord::RecordInvalid => e
+    raise unless e.record.errors.of_kind?(:role, :taken)
+  end
+
   def archive!
     update!(archived_at: Time.zone.now)
   end

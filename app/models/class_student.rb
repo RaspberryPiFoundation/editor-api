@@ -20,6 +20,20 @@ class ClassStudent < ApplicationRecord
 
   after_commit :do_salesforce_sync, on: %i[create destroy], if: -> { FeatureFlags.salesforce_sync? }
 
+  def self.create_with_tracking!(school_class:, student_id:, creator_id:)
+    create!(school_class:, student_id:)
+
+    EventTracker.track!(
+      user_id: creator_id,
+      name: 'Class - Student added',
+      properties: { school_id: school_class.school_id, student_id:, class_id: school_class.id }
+    )
+  rescue ActiveRecord::RecordNotUnique
+    nil
+  rescue ActiveRecord::RecordInvalid => e
+    raise unless e.record.errors.of_kind?(:student_id, :taken)
+  end
+
   def user_id
     student_id
   end
