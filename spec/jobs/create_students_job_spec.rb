@@ -2,7 +2,7 @@
 
 require 'rails_helper'
 
-RSpec.describe CreateStudentsJob do
+RSpec.describe CreateStudentsJob, :inline_jobs do
   include ActiveJob::TestHelper
 
   let(:token) { UserProfileMock::TOKEN }
@@ -16,14 +16,6 @@ RSpec.describe CreateStudentsJob do
       password: 'SaoXlDBAyiAFoMH3VsddhdA7JWnM8P8by1wOjBUWH2g=',
       name: 'School Student'
     }]
-  end
-
-  around do |example|
-    original = ActiveJob::Base.queue_adapter
-    ActiveJob::Base.queue_adapter = :good_job
-    example.run
-  ensure
-    ActiveJob::Base.queue_adapter = original
   end
 
   before do
