@@ -143,7 +143,7 @@ GEM
     climate_control (1.2.0)
     coderay (1.1.3)
     concurrent-ruby (1.3.8)
-    connection_pool (2.5.5)
+    connection_pool (3.0.3)
     countries (8.1.0)
       unaccent (~> 0.3)
     crack (1.0.1)
@@ -330,7 +330,7 @@ GEM
       stringio
       time
       uri
-    openai (0.123.0)
+    openai (0.124.0)
       connection_pool (>= 2.2.3, != 3.0.2, != 3.0.1, != 3.0.0)
       logger
     paper_trail (17.0.0)
@@ -613,7 +613,7 @@ DEPENDENCIES
   omniauth-rails_csrf_protection (~> 2.0.1)
   omniauth-rpi!
   open-uri
-  openai (~> 0.123.0)
+  openai (~> 0.124.0)
   paper_trail
   pg (~> 1.7)
   postmark-rails
