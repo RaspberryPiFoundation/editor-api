@@ -1,5 +1,15 @@
+# frozen_string_literal: true
+
 class CreateAndAssignStudentsJob < ApplicationJob
+  include GoodJob::ActiveJobExtensions::Concurrency
+
   BATCH_SIZE = 20
+
+  good_job_concurrency_rule(
+    label: -> { "create-and-assign-students-school-#{arguments.first[:school_class_id]}" },
+    apply_label: true,
+    perform_limit: 1
+  )
 
   def self.enqueue_batches(school_class:, students:, current_user:)
     school = school_class.school

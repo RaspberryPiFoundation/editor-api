@@ -51,6 +51,15 @@ RSpec.describe CreateAndAssignStudentsJob do
     end
   end
 
+  describe 'concurrency' do
+    it 'allows only one job to perform at a time per school class' do
+      job = described_class.new(school_class_id: school_class.id, students:, creator_id: current_user.id, token: current_user.token)
+
+      expect(job.good_job_labels).to eq(["create-and-assign-students-school-#{school_class.id}"])
+      expect(described_class.good_job_concurrency_rules.first.perform_limit).to eq(1)
+    end
+  end
+
   describe '.enqueue_batches' do
     it 'creates a safeguarding flag for the user' do
       described_class.enqueue_batches(school_class:, students:, current_user:)
