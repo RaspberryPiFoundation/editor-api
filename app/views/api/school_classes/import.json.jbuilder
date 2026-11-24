@@ -20,3 +20,5 @@ json.school_class do
     json.partial! '/api/school_teachers/school_teacher', teacher:, include_email: false
   end
 end
+
+json.job_id @batch.id if defined?(@batch)
