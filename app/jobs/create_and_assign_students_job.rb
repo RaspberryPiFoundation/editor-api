@@ -16,12 +16,12 @@ class CreateAndAssignStudentsJob < ApplicationJob
     school = school_class.school
     SafeguardingFlagService.create_for_school_roles(user: current_user, school:)
     students = StudentHelpers.normalise_nil_values_to_empty_strings(students)
-    @batch = GoodJob::Batch.new(
+    batch = GoodJob::Batch.new(
       description: "Creating and assigning students for #{school_class.school.name}",
       total: students.size,
       processed: 0
     )
-    @batch.add do
+    batch.add do
       students.each_slice(BATCH_SIZE) do |student_batch|
         CreateAndAssignStudentsJob.perform_later(
           school_class_id: school_class.id,
@@ -32,9 +32,9 @@ class CreateAndAssignStudentsJob < ApplicationJob
       end
     end
 
-    @batch.enqueue
-    UserJob.create!(user_id: current_user.id, good_job_batch_id: @batch.id)
-    @batch
+    batch.enqueue
+    UserJob.create!(user_id: current_user.id, good_job_batch_id: batch.id)
+    batch
   end
 
   def perform(school_class_id:, students:, creator_id:, token:)
