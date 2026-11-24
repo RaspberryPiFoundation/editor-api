@@ -5,7 +5,7 @@ default: &default
   port: <%= ENV.fetch('POSTGRES_PORT', '5432') %>
   username: <%= ENV.fetch('POSTGRES_USER', 'no_pg_user_set') %>
   password: <%= ENV.fetch('POSTGRES_PASSWORD', '') %>
-  pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
+  pool: <%= ENV.fetch('DB_POOL') { ENV.fetch('RAILS_MAX_THREADS', 5) } %>
 
 salesforce_connect: &salesforce_connect
   adapter: postgresql
@@ -14,7 +14,7 @@ salesforce_connect: &salesforce_connect
   port: <%= ENV.fetch('SALESFORCE_CONNECT_PORT', ENV.fetch('POSTGRES_PORT', '5432')) %>
   username: <%= ENV.fetch('SALESFORCE_CONNECT_USER', ENV.fetch('POSTGRES_USER', 'no_pg_user_set')) %>
   password: <%= ENV.fetch('SALESFORCE_CONNECT_PASSWORD', ENV.fetch('POSTGRES_PASSWORD', '')) %>
-  pool: <%= ENV.fetch('RAILS_MAX_THREADS', 5) %>
+  pool: <%= ENV.fetch('DB_POOL') { ENV.fetch('RAILS_MAX_THREADS', 5) } %>
   database_tasks: false
 
 development:
