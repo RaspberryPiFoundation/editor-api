@@ -64,4 +64,13 @@ RSpec.describe GenerateAiHintJob do
       expect(Sentry).to have_received(:capture_exception).with(error)
     end
   end
+
+  context 'when an unexpected error is raised' do
+    before { allow(client).to receive(:get_message).and_raise(StandardError, 'boom') }
+
+    it 'marks it failed and re-raises the error' do
+      expect { described_class.perform_now(ai_hint_id: ai_hint.id) }.to raise_error(StandardError, 'boom')
+      expect(ai_hint.reload).to have_attributes(status: 'failed', hint: nil, input: nil)
+    end
+  end
 end

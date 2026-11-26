@@ -24,5 +24,10 @@ class GenerateAiHintJob < ApplicationJob
   rescue FriendlyErrorMessagesInferenceClient::Error => e
     Sentry.capture_exception(e)
     ai_hint.fail!
+  rescue StandardError
+    # Don't leave the hint stuck in pending holding the input; re-raise so
+    # GoodJob records the failure and sentry-rails reports it.
+    ai_hint&.fail!
+    raise
   end
 end
