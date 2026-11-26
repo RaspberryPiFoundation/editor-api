@@ -62,6 +62,36 @@ RSpec.describe ClassStudent, :versioning do
     end
   end
 
+  describe '.create_with_tracking!' do
+    let(:creator_id) { SecureRandom.uuid }
+
+    it 'adds the student to the class' do
+      described_class.create_with_tracking!(school_class:, student_id: student.id, creator_id:)
+
+      expect(described_class.find_by(school_class:, student_id: student.id)).to be_present
+    end
+
+    it 'records a class student added event' do
+      described_class.create_with_tracking!(school_class:, student_id: student.id, creator_id:)
+
+      expect(Event.last).to have_attributes(
+        name: 'Class - Student added',
+        user_id: creator_id,
+        properties: {
+          'school_id' => school.id,
+          'class_id' => school_class.id,
+          'student_id' => student.id
+        }
+      )
+    end
+
+    it 'does not raise when the student is already in the class' do
+      described_class.create_with_tracking!(school_class:, student_id: student.id, creator_id:)
+
+      expect { described_class.create_with_tracking!(school_class:, student_id: student.id, creator_id:) }.not_to raise_error
+    end
+  end
+
   describe 'auditing' do
     subject(:class_student) { create(:class_student, student_id: student.id, school_class:) }
 

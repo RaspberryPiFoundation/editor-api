@@ -103,6 +103,13 @@ RSpec.configure do |config|
     driven_by :rack_test
   end
 
+  config.around(:each, :inline_jobs) do |example|
+    original = ActiveJob::Base.queue_adapter
+    ActiveJob::Base.queue_adapter = :good_job
+    example.run
+    ActiveJob::Base.queue_adapter = original
+  end
+
   config.around(type: :task) do |example|
     DatabaseCleaner.clean_with(:truncation)
     DatabaseCleaner.strategy = :truncation

@@ -166,6 +166,34 @@ RSpec.describe Role do
     end
   end
 
+  describe '.create_student_with_tracking!' do
+    let(:school) { create(:school) }
+    let(:student_id) { SecureRandom.uuid }
+    let(:creator_id) { SecureRandom.uuid }
+
+    it 'creates a student role for the school' do
+      described_class.create_student_with_tracking!(school:, creator_id:, student_id:)
+
+      expect(described_class.student.find_by(school:, user_id: student_id)).to be_present
+    end
+
+    it 'records a student created event' do
+      described_class.create_student_with_tracking!(school:, creator_id:, student_id:)
+
+      expect(Event.last).to have_attributes(
+        name: 'Student - Created',
+        user_id: creator_id,
+        properties: { 'school_id' => school.id, 'student_id' => student_id }
+      )
+    end
+
+    it 'does not raise when the student role already exists' do
+      described_class.create_student_with_tracking!(school:, creator_id:, student_id:)
+
+      expect { described_class.create_student_with_tracking!(school:, creator_id:, student_id:) }.not_to raise_error
+    end
+  end
+
   describe 'salesforce sync' do
     around do |example|
       ClimateControl.modify(SALESFORCE_ENABLED: 'true') { example.run }

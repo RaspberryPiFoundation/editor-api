@@ -43,9 +43,12 @@ module Api
         school_class = school_class_result[:school_class]
         @school_class_with_teachers = school_class.with_teachers
 
-        school_students = create_school_students(school_students_params, school_class)
-        assign_students_to_class(school_class, school_students)
-
+        if params.key?(:async)
+          @batch = CreateAndAssignStudentsJob.enqueue_batches(school_class:, students: school_students_params, current_user:)
+        else
+          school_students = create_school_students(school_students_params, school_class)
+          assign_students_to_class(school_class, school_students)
+        end
         render :import, formats: [:json], status: :created
       else
         render json: { error: school_class_result[:error] }, status: :unprocessable_content

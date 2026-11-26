@@ -59,12 +59,18 @@ module Api
     end
 
     def batch_attributes(batch)
-      {
+      attributes = {
         id: batch.id,
         concurrency_key: batch.description,
         status: batch_status(batch),
         finished_at: batch.finished_at
       }
+      attributes[:progress] = batch_progress(batch) if batch.properties[:total]
+      attributes
+    end
+
+    def batch_progress(batch)
+      { total: batch.properties[:total], processed: batch.properties[:processed].to_i }
     end
 
     # Try to emulate a Job's .status field for a batch.
