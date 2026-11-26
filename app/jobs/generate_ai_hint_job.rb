@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
 class GenerateAiHintJob < ApplicationJob
-  # editor-ui will poll for up to 30s and the inference client can take up to 15s,
-  # so a hint that has waited longer than 15s in the queue can't finish in time.
-  MAX_QUEUE_WAIT = 15.seconds
+  # How long editor-ui polls for a hint before giving up.
+  UI_POLL_TIMEOUT = 30.seconds
+
+  # A hint must leave enough time for inference to finish before editor-ui stops polling.
+  MAX_QUEUE_WAIT = UI_POLL_TIMEOUT - FriendlyErrorMessagesInferenceClient::TIMEOUT
 
   queue_as :ai_hints
 

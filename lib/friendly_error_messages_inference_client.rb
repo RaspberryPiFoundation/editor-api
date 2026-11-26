@@ -4,6 +4,7 @@ class FriendlyErrorMessagesInferenceClient
   class Error < StandardError; end
 
   MAX_COMPLETION_TOKENS = 300
+  TIMEOUT = 15.seconds
 
   SYSTEM_PROMPT = Rails.root.join('config/friendly_error_messages_prompt.md').read
 
@@ -11,7 +12,7 @@ class FriendlyErrorMessagesInferenceClient
     @client = OpenAI::Client.new(
       base_url: "#{ENV.fetch('FEM_INFERENCE_API_URL', '')}/ai/v1",
       api_key: ENV.fetch('FEM_INFERENCE_API_KEY', ''),
-      timeout: 15.0,
+      timeout: TIMEOUT.to_f,
       max_retries: 0
     )
   end
