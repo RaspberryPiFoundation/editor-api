@@ -18,5 +18,22 @@ Rails.application.configure do
   # The create_students_job queue is a serial queue that allows only one job at a time.
   # DO NOT change the value of create_students_job:1 without understanding the implications
   # of processing more than one user creation job at once.
-  config.good_job.queues = 'create_students_job:1;import_schools_job:1;salesforce_sync:10;default:5'
+  #
+  # GOOD_JOB_QUEUES lets smaller environments (e.g. staging, with a 20-connection DB)
+  # run fewer threads. Keep the total thread count within the worker's DB pool
+  # (WORKER_DB_POOL in the Procfile), leaving a couple spare for GoodJob itself.
+  config.good_job.queues = ENV.fetch(
+    'GOOD_JOB_QUEUES',
+    'create_students_job:1;import_schools_job:1;salesforce_sync:10;default:5;ai_hints:5'
+  )
+
+  config.good_job.enable_cron = true
+  config.good_job.cron = {
+    remove_old_ai_hints: {
+      cron: '0 0 * * 6', # every Saturday at midnight
+      class: 'RemoveOldAiHintsJob',
+      description:
+        'At midnight every Saturday, remove ai_hints rows older than a day.'
+    }
+  }
 end

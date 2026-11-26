@@ -121,6 +121,7 @@ Rails.application.routes.draw do
     resources :events, only: %i[create]
 
     post '/friendly_error_messages', to: 'friendly_error_messages#show'
+    resources :ai_hints, only: %i[create show]
   end
 
   resource :github_webhooks, only: :create, defaults: { formats: :json }
