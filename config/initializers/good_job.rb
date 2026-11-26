@@ -26,4 +26,14 @@ Rails.application.configure do
     'GOOD_JOB_QUEUES',
     'create_students_job:1;import_schools_job:1;salesforce_sync:10;default:5;ai_hints:5'
   )
+
+  config.good_job.enable_cron = true
+  config.good_job.cron = {
+    remove_old_ai_hints: {
+      cron: '0 0 * * 6', # every Saturday at midnight
+      class: 'RemoveOldAiHintsJob',
+      description:
+        'At midnight every Saturday, remove ai_hints rows older than a day.'
+    }
+  }
 end
